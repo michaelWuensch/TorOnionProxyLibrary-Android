@@ -13,7 +13,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-
 /*
 Copyright (c) Microsoft Open Technologies, Inc.
 All Rights Reserved
@@ -26,45 +25,43 @@ MERCHANTABLITY OR NON-INFRINGEMENT.
 
 See the Apache 2 License for the specific language governing permissions and limitations under the License.
 */
+package com.msopentech.thali.android.toronionproxy
 
-package com.msopentech.thali.android.toronionproxy;
-
-import com.msopentech.thali.universal.toronionproxy.WriteObserver;
-
-import android.os.FileObserver;
-
-import java.io.File;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import android.os.FileObserver
+import com.msopentech.thali.universal.toronionproxy.WriteObserver
+import java.io.File
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 /**
  * Adapted from the Briar WriteObserver code
  */
-public class AndroidWriteObserver extends FileObserver implements WriteObserver {
-    private final CountDownLatch countDownLatch = new CountDownLatch(1);
+class AndroidWriteObserver(file: File?) :
+    FileObserver(file!!.absolutePath, CLOSE_WRITE), WriteObserver {
+    private val countDownLatch =
+        CountDownLatch(1)
 
-    public AndroidWriteObserver(File file) {
-        super(file.getAbsolutePath(), CLOSE_WRITE);
-
-        if (!file.exists()) {
-            throw new IllegalArgumentException("FileObserver doesn't work properly on files that don't already exist.");
-        }
-
-        this.startWatching();
-    }
-
-    @Override
-    public boolean poll(long timeout, TimeUnit unit) {
-        try {
-            return countDownLatch.await(timeout, unit);
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Internal error has caused AndroidWriteObserver to not be reliable.", e);
+    override fun poll(
+        timeout: Long,
+        unit: TimeUnit?
+    ): Boolean {
+        return try {
+            countDownLatch.await(timeout, unit)
+        } catch (e: InterruptedException) {
+            throw RuntimeException(
+                "Internal error has caused AndroidWriteObserver to not be reliable.",
+                e
+            )
         }
     }
 
-    @Override
-    public void onEvent(int i, String s) {
-        stopWatching();
-        countDownLatch.countDown();
+    override fun onEvent(i: Int, s: String) {
+        stopWatching()
+        countDownLatch.countDown()
+    }
+
+    init {
+        require(file!!.exists()) { "FileObserver doesn't work properly on files that don't already exist." }
+        startWatching()
     }
 }

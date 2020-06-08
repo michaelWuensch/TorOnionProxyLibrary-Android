@@ -10,21 +10,23 @@ MERCHANTABLITY OR NON-INFRINGEMENT.
 
 See the Apache 2 License for the specific language governing permissions and limitations under the License.
 */
-
-package com.msopentech.thali.universal.toronionproxy;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package com.msopentech.thali.universal.toronionproxy
 
 /**
- * Annotates TorConfigBuilder methods. When TorConfigBuilder.updateTorConfig is invoked, it will use this annotation
- * to automatically detect and use the associated method as part of building the config.
- *
- * The annotated method must have a no args.
+ * Service for sending event logs to the system
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
-public @interface SettingsConfig {
+interface EventBroadcaster {
+    fun broadcastBandwidth(
+        upload: Long,
+        download: Long,
+        written: Long,
+        read: Long
+    )
+
+    fun broadcastDebug(msg: String?)
+    fun broadcastException(msg: String, e: Exception)
+    fun broadcastLogMessage(logMessage: String?)
+    fun broadcastNotice(msg: String?)
+    fun broadcastStatus()
+    val status: Status
 }

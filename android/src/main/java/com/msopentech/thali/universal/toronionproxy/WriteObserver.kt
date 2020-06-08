@@ -10,24 +10,19 @@ MERCHANTABLITY OR NON-INFRINGEMENT.
 
 See the Apache 2 License for the specific language governing permissions and limitations under the License.
 */
-package com.msopentech.thali.universal.toronionproxy;
+package com.msopentech.thali.universal.toronionproxy
+
+import java.util.concurrent.TimeUnit
 
 /**
- * Service for sending event logs to the system
+ * Android uses FileObserver and Java uses the WatchService, this class abstracts the two.
  */
-public interface EventBroadcaster {
-    void broadcastBandwidth(long upload, long download, long written, long read);
-
-    void broadcastDebug(String msg);
-
-    void broadcastException(String msg, Exception e);
-
-    void broadcastLogMessage(String logMessage);
-
-    void broadcastNotice(String msg);
-
-    void broadcastStatus();
-
-    Status getStatus();
-
+interface WriteObserver {
+    /**
+     * Waits timeout of unit to see if file is modified
+     * @param timeout How long to wait before returning
+     * @param unit Unit to wait in
+     * @return True if file was modified, false if it was not
+     */
+    fun poll(timeout: Long, unit: TimeUnit?): Boolean
 }

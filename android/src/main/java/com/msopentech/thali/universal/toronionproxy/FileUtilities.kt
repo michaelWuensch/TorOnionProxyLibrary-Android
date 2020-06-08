@@ -10,7 +10,6 @@ MERCHANTABLITY OR NON-INFRINGEMENT.
 
 See the Apache 2 License for the specific language governing permissions and limitations under the License.
 */
-
 /*
 This code took the Socks4a logic from SocksProxyClientConnOperator in NetCipher which we then modified
 to meet our needs. That original code was licensed as:
@@ -64,29 +63,22 @@ http://www.gnu.org/licenses/lgpl.html
 *****
 
  */
+package com.msopentech.thali.universal.toronionproxy
 
-package com.msopentech.thali.universal.toronionproxy;
+import org.slf4j.LoggerFactory
+import java.io.*
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
-public final class FileUtilities {
-    private static final Logger LOG = LoggerFactory.getLogger(FileUtilities.class);
-
-    private FileUtilities() {}
-
-    public static boolean setToReadOnlyPermissions(File file) {
+object FileUtilities {
+    private val LOG = LoggerFactory.getLogger(FileUtilities::class.java)
+    fun setToReadOnlyPermissions(file: File): Boolean {
         return file.setReadable(false, false) &&
                 file.setWritable(false, false) &&
                 file.setExecutable(false, false) &&
-
                 file.setReadable(true, true) &&
                 file.setWritable(true, true) &&
-                file.setExecutable(true, true);
+                file.setExecutable(true, true)
     }
 
     /**
@@ -94,11 +86,11 @@ public final class FileUtilities {
      *
      * @param file the file to set the permissions on
      */
-    public static void setPerms(File file) {
-        file.setReadable(true);
-        file.setExecutable(true);
-        file.setWritable(false);
-        file.setWritable(true, true);
+    fun setPerms(file: File) {
+        file.setReadable(true)
+        file.setExecutable(true)
+        file.setWritable(false)
+        file.setWritable(true, true)
     }
 
     /**
@@ -107,11 +99,12 @@ public final class FileUtilities {
      * @param out Stream to write to
      * @throws java.io.IOException - If close on input or output fails
      */
-    public static void copy(InputStream in, OutputStream out) throws IOException {
+    @Throws(IOException::class)
+    fun copy(`in`: InputStream, out: OutputStream) {
         try {
-            copyDoNotCloseInput(in, out);
+            copyDoNotCloseInput(`in`, out)
         } finally {
-            in.close();
+            `in`.close()
         }
     }
 
@@ -121,42 +114,44 @@ public final class FileUtilities {
      * @param out Will be closed
      * @throws java.io.IOException - If close on output fails
      */
-    public static void copyDoNotCloseInput(InputStream in, OutputStream out) throws IOException {
+    @Throws(IOException::class)
+    fun copyDoNotCloseInput(`in`: InputStream, out: OutputStream) {
         try {
-            byte[] buf = new byte[4096];
-            while(true) {
-                int read = in.read(buf);
-                if(read == -1) break;
-                out.write(buf, 0, read);
+            val buf = ByteArray(4096)
+            while (true) {
+                val read = `in`.read(buf)
+                if (read == -1) break
+                out.write(buf, 0, read)
             }
         } finally {
-            out.close();
+            out.close()
         }
     }
 
-    public static void listFilesToLog(File f) {
-        if(f.isDirectory()) {
-            for(File child : f.listFiles()) {
-                listFilesToLog(child);
+    fun listFilesToLog(f: File?) {
+        if (f!!.isDirectory) {
+            for (child in f.listFiles()) {
+                listFilesToLog(child)
             }
         } else {
-            LOG.info(f.getAbsolutePath());
+            LOG.info(f.absolutePath)
         }
     }
 
-    public static byte[] read(File f) throws IOException {
-        byte[] b = new byte[(int) f.length()];
-        FileInputStream in = new FileInputStream(f);
-        try {
-            int offset = 0;
-            while(offset < b.length) {
-                int read = in.read(b, offset, b.length - offset);
-                if(read == -1) throw new EOFException();
-                offset += read;
+    @Throws(IOException::class)
+    fun read(f: File?): ByteArray {
+        val b = ByteArray(f!!.length().toInt())
+        val `in` = FileInputStream(f)
+        return try {
+            var offset = 0
+            while (offset < b.size) {
+                val read = `in`.read(b, offset, b.size - offset)
+                if (read == -1) throw EOFException()
+                offset += read
             }
-            return b;
+            b
         } finally {
-            in.close();
+            `in`.close()
         }
     }
 
@@ -166,23 +161,26 @@ public final class FileUtilities {
      * @param fileToWriteTo File to write to
      * @throws java.io.IOException - If any of the file operations fail
      */
-    public static void cleanInstallOneFile(InputStream readFrom, File fileToWriteTo) throws IOException {
+    @Throws(IOException::class)
+    fun cleanInstallOneFile(
+        readFrom: InputStream,
+        fileToWriteTo: File
+    ) {
         if (fileToWriteTo.exists() && !fileToWriteTo.delete()) {
-            throw new RuntimeException("Could not remove existing file " + fileToWriteTo.getName());
+            throw RuntimeException("Could not remove existing file " + fileToWriteTo.name)
         }
-        OutputStream out = new FileOutputStream(fileToWriteTo);
-        FileUtilities.copy(readFrom, out);
+        val out: OutputStream = FileOutputStream(fileToWriteTo)
+        copy(readFrom, out)
     }
 
-    public static void recursiveFileDelete(File fileOrDirectory) {
-        if (fileOrDirectory.isDirectory()) {
-            for (File child : fileOrDirectory.listFiles()) {
-                recursiveFileDelete(child);
+    fun recursiveFileDelete(fileOrDirectory: File) {
+        if (fileOrDirectory.isDirectory) {
+            for (child in fileOrDirectory.listFiles()) {
+                recursiveFileDelete(child)
             }
         }
-
         if (fileOrDirectory.exists() && !fileOrDirectory.delete()) {
-            throw new RuntimeException("Could not delete directory " + fileOrDirectory.getAbsolutePath());
+            throw RuntimeException("Could not delete directory " + fileOrDirectory.absolutePath)
         }
     }
 
@@ -192,37 +190,37 @@ public final class FileUtilities {
      * @param zipFileInputStream Stream to unzip
      * @throws java.io.IOException - If there are any file errors
      */
-    public static void extractContentFromZip(File destinationDirectory, InputStream zipFileInputStream)
-            throws IOException {
-        ZipInputStream zipInputStream;
+    @Throws(IOException::class)
+    fun extractContentFromZip(
+        destinationDirectory: File?,
+        zipFileInputStream: InputStream?
+    ) {
+        val zipInputStream: ZipInputStream
         try {
-            zipInputStream = new ZipInputStream(zipFileInputStream);
-            ZipEntry zipEntry;
-            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-                File file = new File(destinationDirectory, zipEntry.getName());
-                if (zipEntry.isDirectory()) {
+            zipInputStream = ZipInputStream(zipFileInputStream)
+            var zipEntry: ZipEntry
+            while (zipInputStream.nextEntry.also { zipEntry = it } != null) {
+                val file = File(destinationDirectory, zipEntry.name)
+                if (zipEntry.isDirectory) {
                     if (file.exists() == false && !file.mkdirs()) {
-                        throw new RuntimeException("Could not create directory " + file);
+                        throw RuntimeException("Could not create directory $file")
                     }
                 } else {
                     if (file.exists() && !file.delete()) {
-                        throw new RuntimeException(
-                                "Could not delete file in preparation for overwriting it. File - " +
-                                        file.getAbsolutePath());
+                        throw RuntimeException(
+                            "Could not delete file in preparation for overwriting it. File - " +
+                                    file.absolutePath
+                        )
                     }
-
                     if (!file.createNewFile()) {
-                        throw new RuntimeException("Could not create file " + file);
+                        throw RuntimeException("Could not create file $file")
                     }
-
-                    OutputStream fileOutputStream = new FileOutputStream(file);
-                    copyDoNotCloseInput(zipInputStream, fileOutputStream);
+                    val fileOutputStream: OutputStream = FileOutputStream(file)
+                    copyDoNotCloseInput(zipInputStream, fileOutputStream)
                 }
             }
         } finally {
-            if (zipFileInputStream != null) {
-                zipFileInputStream.close();
-            }
+            zipFileInputStream?.close()
         }
     }
 }

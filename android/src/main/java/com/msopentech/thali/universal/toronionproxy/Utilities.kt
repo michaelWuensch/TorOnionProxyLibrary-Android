@@ -10,21 +10,18 @@ MERCHANTABLITY OR NON-INFRINGEMENT.
 
 See the Apache 2 License for the specific language governing permissions and limitations under the License.
 */
+package com.msopentech.thali.universal.toronionproxy
 
-package com.msopentech.thali.universal.toronionproxy;
+import java.io.DataInputStream
+import java.io.DataOutputStream
+import java.io.IOException
+import java.net.InetSocketAddress
+import java.net.Socket
+import java.net.SocketAddress
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
-
-public class Utilities {
-    private static final int READ_TIMEOUT_MILLISECONDS = 60000;
-    private static final int CONNECT_TIMEOUT_MILLISECONDS = 60000;
-
-    private Utilities() {}
+object Utilities {
+    private const val READ_TIMEOUT_MILLISECONDS = 60000
+    private const val CONNECT_TIMEOUT_MILLISECONDS = 60000
 
     /**
      * When making a request via the Tor Proxy one needs to establish the socket using SOCKS4a. However Android
@@ -37,8 +34,13 @@ public class Utilities {
      * destination host.
      * @throws IOException Networking issues
      */
-    public static Socket socks4aSocketConnection(String networkHost, int networkPort, String socksHost, int socksPort)
-            throws IOException {
+    @Throws(IOException::class)
+    fun socks4aSocketConnection(
+        networkHost: String,
+        networkPort: Int,
+        socksHost: String,
+        socksPort: Int
+    ): Socket {
         // Perform explicit SOCKS4a connection request. SOCKS4a supports remote host name resolution
         // (i.e., Tor resolves the hostname, which may be an onion address).
         // The Android (Apache Harmony) Socket class appears to support only SOCKS4 and throws an
@@ -57,32 +59,35 @@ public class Utilities {
         // field 4: deliberate invalid IP address, 4 bytes, first three must be 0x00 and the last one must not be 0x00
         // field 5: the user ID string, variable length, terminated with a null (0x00)
         // field 6: the domain name of the host we want to contact, variable length, terminated with a null (0x00)
-
-        Socket socket = new Socket();
-        socket.setSoTimeout(READ_TIMEOUT_MILLISECONDS);
-        SocketAddress socksAddress = new InetSocketAddress(socksHost, socksPort);
-        socket.connect(socksAddress, CONNECT_TIMEOUT_MILLISECONDS);
-
-        DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
-        outputStream.write((byte)0x04);
-        outputStream.write((byte)0x01);
-        outputStream.writeShort((short)networkPort);
-        outputStream.writeInt(0x01);
-        outputStream.write((byte)0x00);
-        outputStream.write(networkHost.getBytes());
-        outputStream.write((byte)0x00);
-
-        DataInputStream inputStream = new DataInputStream(socket.getInputStream());
-        byte firstByte = inputStream.readByte();
-        byte secondByte = inputStream.readByte();
-        if (firstByte != (byte)0x00 || secondByte != (byte)0x5a) {
-            socket.close();
-            throw new IOException("SOCKS4a connect failed, got " + firstByte + " - " + secondByte +
-                    ", but expected 0x00 - 0x5a:, networkHost= " + networkHost + ", networkPort = " + networkPort
-                    + ", socksHost=" + socksHost + ",socksPort=" + socksPort);
+        val socket = Socket()
+        socket.soTimeout = READ_TIMEOUT_MILLISECONDS
+        val socksAddress: SocketAddress = InetSocketAddress(socksHost, socksPort)
+        socket.connect(
+            socksAddress,
+            CONNECT_TIMEOUT_MILLISECONDS
+        )
+        val outputStream =
+            DataOutputStream(socket.getOutputStream())
+        outputStream.write(0x04 as Byte.toInt())
+        outputStream.write(0x01 as Byte.toInt())
+        outputStream.writeShort(networkPort as Short.toInt())
+        outputStream.writeInt(0x01)
+        outputStream.write(0x00 as Byte.toInt())
+        outputStream.write(networkHost.toByteArray())
+        outputStream.write(0x00 as Byte.toInt())
+        val inputStream = DataInputStream(socket.getInputStream())
+        val firstByte = inputStream.readByte()
+        val secondByte = inputStream.readByte()
+        if (firstByte != 0x00.toByte() || secondByte != 0x5a.toByte()) {
+            socket.close()
+            throw IOException(
+                "SOCKS4a connect failed, got " + firstByte + " - " + secondByte +
+                        ", but expected 0x00 - 0x5a:, networkHost= " + networkHost + ", networkPort = " + networkPort
+                        + ", socksHost=" + socksHost + ",socksPort=" + socksPort
+            )
         }
-        inputStream.readShort();
-        inputStream.readInt();
-        return socket;
+        inputStream.readShort()
+        inputStream.readInt()
+        return socket
     }
 }

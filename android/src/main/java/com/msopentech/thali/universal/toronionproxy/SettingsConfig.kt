@@ -10,21 +10,21 @@ MERCHANTABLITY OR NON-INFRINGEMENT.
 
 See the Apache 2 License for the specific language governing permissions and limitations under the License.
 */
+package com.msopentech.thali.universal.toronionproxy
 
-
-package com.msopentech.thali.universal.toronionproxy;
-
-import java.util.concurrent.TimeUnit;
+import java.lang.annotation.Retention
+import java.lang.annotation.RetentionPolicy
 
 /**
- * Android uses FileObserver and Java uses the WatchService, this class abstracts the two.
+ * Annotates TorConfigBuilder methods. When TorConfigBuilder.updateTorConfig is invoked, it will use this annotation
+ * to automatically detect and use the associated method as part of building the config.
+ *
+ * The annotated method must have a no args.
  */
-public interface WriteObserver {
-    /**
-     * Waits timeout of unit to see if file is modified
-     * @param timeout How long to wait before returning
-     * @param unit Unit to wait in
-     * @return True if file was modified, false if it was not
-     */
-    boolean poll(long timeout, TimeUnit unit);
-}
+@Retention(RetentionPolicy.RUNTIME)
+@Target(
+    AnnotationTarget.FUNCTION,
+    AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.PROPERTY_SETTER
+)
+annotation class SettingsConfig

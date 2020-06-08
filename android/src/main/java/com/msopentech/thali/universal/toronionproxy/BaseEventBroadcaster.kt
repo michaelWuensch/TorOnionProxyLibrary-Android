@@ -1,0 +1,66 @@
+/*
+Copyright (c) Microsoft Open Technologies, Inc.
+All Rights Reserved
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
+License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+
+THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+INCLUDING WITHOUT LIMITATION ANY IMPLIED WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+MERCHANTABLITY OR NON-INFRINGEMENT.
+
+See the Apache 2 License for the specific language governing permissions and limitations under the License.
+*/
+package com.msopentech.thali.universal.toronionproxy
+
+import org.slf4j.LoggerFactory
+import java.io.PrintWriter
+import java.io.StringWriter
+
+abstract class BaseEventBroadcaster(settings: TorSettings?) : EventBroadcaster {
+    protected val mSettings: TorSettings
+    override val status: Status
+    override fun broadcastDebug(msg: String?) {
+        if (mSettings.hasDebugLogs()) {
+            LOG.debug(msg)
+            broadcastLogMessage(msg)
+        }
+    }
+
+    override fun broadcastException(
+        msg: String,
+        e: Exception
+    ) {
+        if (mSettings.hasDebugLogs()) {
+            LOG.error(msg, e)
+            val sw = StringWriter()
+            e.printStackTrace(PrintWriter(sw))
+            broadcastLogMessage(
+                """
+    $msg
+    $sw
+    """.trimIndent()
+            )
+        } else {
+            broadcastLogMessage(msg)
+        }
+    }
+
+    override fun broadcastNotice(msg: String?) {
+        if (msg != null && !msg.isEmpty()) {
+            if (mSettings.hasDebugLogs()) {
+                LOG.debug(msg)
+            }
+            broadcastLogMessage(msg)
+        }
+    }
+
+    companion object {
+        protected val LOG =
+            LoggerFactory.getLogger(BaseEventBroadcaster::class.java)
+    }
+
+    init {
+        mSettings = settings ?: DefaultSettings()
+        status = Status(this)
+    }
+}

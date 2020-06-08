@@ -10,39 +10,40 @@ MERCHANTABLITY OR NON-INFRINGEMENT.
 
 See the Apache 2 License for the specific language governing permissions and limitations under the License.
 */
-package com.msopentech.thali.universal.toronionproxy;
+package com.msopentech.thali.universal.toronionproxy
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.concurrent.TimeoutException;
+import java.io.IOException
+import java.io.InputStream
+import java.util.concurrent.TimeoutException
 
-public abstract class TorInstaller {
-
+abstract class TorInstaller {
     /**
      * Sets up and installs the tor environment. If the tor environment is already setup, this does not need to be invoked.
      */
-    public abstract void setup() throws IOException;
+    @Throws(IOException::class)
+    abstract fun setup()
 
-    public abstract void updateTorConfigCustom(String content) throws IOException, TimeoutException;
-
-    public final InputStream getAssetOrResourceByName(String fileName) {
-        return getClass().getResourceAsStream("/" + fileName);
+    @Throws(IOException::class, TimeoutException::class)
+    abstract fun updateTorConfigCustom(content: String?)
+    fun getAssetOrResourceByName(fileName: String): InputStream {
+        return javaClass.getResourceAsStream("/$fileName")
     }
 
     /**
      * If first byte of stream is 0, then the following stream will have the form
      *
-     * <code>
-     *     ($bridge_type $bridge_info \r\n)*
-     * </code>
+     * `
+     * ($bridge_type $bridge_info \r\n)*
+    ` *
      *
      * if first byte is 1, the the stream will have the form
-     * <code>
-     *     ($bridge_info \r\n)*
-     * </code>
+     * `
+     * ($bridge_info \r\n)*
+    ` *
      *
      * The second form is used for custom bridges from the user.
      *
      */
-    public abstract InputStream openBridgesStream() throws IOException;
+    @Throws(IOException::class)
+    abstract fun openBridgesStream(): InputStream?
 }
