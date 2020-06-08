@@ -12,6 +12,7 @@ See the Apache 2 License for the specific language governing permissions and lim
 */
 package com.msopentech.thali.universal.toronionproxy
 
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.BufferedWriter
 import java.io.File
@@ -19,87 +20,68 @@ import java.io.FileWriter
 import java.io.IOException
 
 /**
- * Provides context information about the environment. Implementating classes provide logic for setting up
- * the specific environment
+ * Provides context information about the environment. Implementing classes provide logic
+ * for setting up the specific environment
+ *
+ * Constructs instance of [OnionProxyContext] with the specified [torConfig]. Typically
+ * this constructor will be used when tor is currently installed on the system, with the
+ * tor executable and config files in different locations.
+ *
+ * @param [torConfig] [TorConfig] tor configuration info used for running and installing tor
+ * @param [torInstaller] [TorInstaller]
+ * @param [torSettings] [TorSettings]?
  */
 abstract class OnionProxyContext(
-    torConfig: TorConfig?,
-    torInstaller: TorInstaller?,
-    settings: TorSettings?
+    val torConfig: TorConfig,
+    val torInstaller: TorInstaller,
+    torSettings: TorSettings?
 ) {
-    /**
-     * Gets tor configuration info used for running and installing tor
-     *
-     * @return tor config info
-     */
-    /**
-     * Tor configuration info used for running and installing tor
-     */
-    val config: TorConfig
-    private val dataDirLock = Any()
-    private val dnsLock = Any()
-    private val cookieLock = Any()
-    private val hostnameLock = Any()
-    val settings: TorSettings
-    val installer: TorInstaller
 
-    /**
-     * Constructs instance of `OnionProxyContext` with specified configDir. Use this constructor when
-     * all tor files (including the executable) are under a single directory. Currently, this is used with installers
-     * that assemble all necessary files into one location.
-     *
-     * @param configDir
-     * @throws IllegalArgumentException if specified config in null
-     */
-    constructor(
-        configDir: File?,
-        torInstaller: TorInstaller?
-    ) : this(TorConfig.Companion.createDefault(configDir), torInstaller, null) {
+    val settings: TorSettings = torSettings ?: DefaultSettings()
+
+    companion object {
+        protected val LOG: Logger = LoggerFactory.getLogger(OnionProxyContext::class.java)
     }
+
+    private val dataDirLock = Object()
+    private val dnsLock = Object()
+    private val cookieLock = Object()
+    private val hostnameLock = Object()
 
     /**
      * Creates the configured tor data directory
      *
-     * @return true is directory already exists or has been successfully created, otherwise false
+     * @return true if directory already exists or has been successfully created, otherwise false
      */
-    fun createDataDir(): Boolean {
-        synchronized(
-            dataDirLock
-        ) { return config.dataDir.exists() || config.dataDir.mkdirs() }
-    }
+    fun createDataDir(): Boolean =
+        synchronized(dataDirLock) {
+            return torConfig.dataDir.exists() || torConfig.dataDir.mkdirs()
+        }
 
     /**
      * Deletes the configured tor data directory
      */
-    fun deleteDataDir() {
+    fun deleteDataDir() =
         synchronized(dataDirLock) {
-            for (file in config.dataDir.listFiles()) {
-                if (file.isDirectory) {
-                    if (file.absolutePath != config.hiddenServiceDir
-                            .absolutePath
-                    ) {
+            for (file in torConfig.dataDir.listFiles()) {
+                if (file.isDirectory)
+                    if (file.absolutePath != torConfig.hiddenServiceDir.absolutePath)
                         FileUtilities.recursiveFileDelete(file)
-                    }
-                } else {
-                    if (!file.delete()) {
+                else
+                    if (!file.delete())
                         throw RuntimeException("Could not delete file " + file.absolutePath)
-                    }
-                }
             }
         }
-    }
 
     /**
      * Creates an empty cookie auth file
      *
      * @return true if cookie file is created, otherwise false
      */
-    fun createCookieAuthFile(): Boolean {
+    fun createCookieAuthFile(): Boolean =
         synchronized(cookieLock) {
-            val cookieAuthFile = config.cookieAuthFile
-            if (!cookieAuthFile!!.parentFile.exists() &&
-                !cookieAuthFile.parentFile.mkdirs()
-            ) {
+            val cookieAuthFile = torConfig.cookieAuthFile
+            if (!cookieAuthFile.parentFile.exists() && !cookieAuthFile.parentFile.mkdirs()) {
                 LOG.warn("Could not create cookieFile parent directory")
                 return false
             }
@@ -110,14 +92,11 @@ abstract class OnionProxyContext(
                 false
             }
         }
-    }
 
-    fun createHostnameFile(): Boolean {
+    fun createHostnameFile(): Boolean =
         synchronized(hostnameLock) {
-            val hostnameFile = config.hostnameFile
-            if (!hostnameFile!!.parentFile.exists() &&
-                !hostnameFile.parentFile.mkdirs()
-            ) {
+            val hostnameFile = torConfig.hostnameFile
+            if (!hostnameFile.parentFile.exists() && !hostnameFile.parentFile.mkdirs()) {
                 LOG.warn("Could not create hostnameFile parent directory")
                 return false
             }
@@ -128,22 +107,20 @@ abstract class OnionProxyContext(
                 false
             }
         }
-    }
 
     /**
-     * Creates a default resolve.conf file using the Google nameserver. This is a convenience method.
+     * Creates a default resolv.conf file using the Google name server. This is a convenience method.
      */
     @Throws(IOException::class)
-    fun createGoogleNameserverFile(): File? {
+    fun createGoogleNameserverFile(): File =
         synchronized(dnsLock) {
-            val file = config.resolveConf
+            val file = torConfig.resolveConf
             val writer = BufferedWriter(FileWriter(file))
             writer.write("nameserver 8.8.8.8\n")
             writer.write("nameserver 8.8.4.4\n")
             writer.close()
             return file
         }
-    }
 
     /**
      * Creates an observer for the configured control port file
@@ -151,14 +128,16 @@ abstract class OnionProxyContext(
      * @return write observer for cookie auth file
      */
     @Throws(IOException::class)
-    fun createControlPortFileObserver(): WriteObserver {
-        synchronized(cookieLock) { return generateWriteObserver(config.controlPortFile) }
-    }
+    fun createControlPortFileObserver(): WriteObserver =
+        synchronized(cookieLock) {
+            return generateWriteObserver(torConfig.controlPortFile)
+        }
 
     @Throws(IOException::class)
-    fun createCookieAuthFileObserver(): WriteObserver {
-        synchronized(cookieLock) { return generateWriteObserver(config.cookieAuthFile) }
-    }
+    fun createCookieAuthFileObserver(): WriteObserver =
+        synchronized(cookieLock) {
+            return generateWriteObserver(torConfig.cookieAuthFile)
+        }
 
     /**
      * Creates an observer for the configured hostname file
@@ -166,13 +145,13 @@ abstract class OnionProxyContext(
      * @return write observer for hostname file
      */
     @Throws(IOException::class)
-    fun createHostnameDirObserver(): WriteObserver {
-        synchronized(hostnameLock) { return generateWriteObserver(config.hostnameFile) }
-    }
+    fun createHostnameDirObserver(): WriteObserver =
+        synchronized(hostnameLock) {
+            return generateWriteObserver(torConfig.hostnameFile)
+        }
 
-    fun newConfigBuilder(): TorSettingsBuilder {
-        return TorSettingsBuilder(this)
-    }
+    fun newConfigBuilder(): TorSettingsBuilder =
+        TorSettingsBuilder(this)
 
     /**
      * Returns the system process id of the process running this onion proxy
@@ -182,25 +161,5 @@ abstract class OnionProxyContext(
     abstract val processId: String
 
     @Throws(IOException::class)
-    abstract fun generateWriteObserver(file: File?): WriteObserver
-
-    companion object {
-        protected val LOG = LoggerFactory.getLogger(OnionProxyContext::class.java)
-    }
-
-    /**
-     * Constructs instance of `OnionProxyContext` with the specified torConfig. Typically this constructor
-     * will be used when tor is currently installed on the system, with the tor executable and config files in different
-     * locations.
-     *
-     * @param torConfig tor configuration info used for running and installing tor
-     * @throws IllegalArgumentException if specified config in null
-     */
-    init {
-        requireNotNull(torConfig) { "torConfig is null" }
-        requireNotNull(torInstaller) { "torInstaller is null" }
-        config = torConfig
-        this.settings = settings ?: DefaultSettings()
-        installer = torInstaller
-    }
+    abstract fun generateWriteObserver(file: File): WriteObserver
 }
