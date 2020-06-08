@@ -17,8 +17,8 @@ import java.net.InetSocketAddress
 import java.net.Socket
 import java.util.*
 
-class TorSettingsBuilder(private val context: OnionProxyContext) {
-    private val settings: TorSettings = context.settings
+class TorSettingsBuilder(private val onionProxyContext: OnionProxyContext) {
+    private val settings: TorSettings = onionProxyContext.settings
     private var buffer = StringBuffer()
 
     /**
@@ -89,7 +89,7 @@ class TorSettingsBuilder(private val context: OnionProxyContext) {
     fun cookieAuthentication(): TorSettingsBuilder {
         buffer.append("CookieAuthentication 1 ").append("\n")
         buffer.append("CookieAuthFile ")
-            .append(context.torConfig.cookieAuthFile.absolutePath)
+            .append(onionProxyContext.torConfig.cookieAuthFile.absolutePath)
             .append("\n")
         return this
     }
@@ -117,7 +117,7 @@ class TorSettingsBuilder(private val context: OnionProxyContext) {
 
     @SettingsConfig
     fun controlPortWriteToFileFromConfig(): TorSettingsBuilder =
-        controlPortWriteToFile(context.torConfig.controlPortFile.absolutePath)
+        controlPortWriteToFile(onionProxyContext.torConfig.controlPortFile.absolutePath)
 
     fun debugLogs(): TorSettingsBuilder {
         buffer.append("Log debug syslog").append("\n")
@@ -244,7 +244,7 @@ class TorSettingsBuilder(private val context: OnionProxyContext) {
     fun nonExitRelayFromSettings(): TorSettingsBuilder {
         if (!settings.hasReachableAddress && !settings.hasBridges && settings.isRelay) {
             try {
-                val resolv = context.createGoogleNameserverFile()
+                val resolv = onionProxyContext.createGoogleNameserverFile()
                 makeNonExitRelay(resolv.canonicalPath, settings.relayPort, settings.relayNickname ?: "")
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -378,7 +378,7 @@ class TorSettingsBuilder(private val context: OnionProxyContext) {
 
     @Throws(IOException::class)
     fun setGeoIpFiles(): TorSettingsBuilder {
-        val torConfig = context.torConfig
+        val torConfig = onionProxyContext.torConfig
         if (torConfig.geoIpFile.exists()) {
             geoIpFile(torConfig.geoIpFile.canonicalPath).geoIpV6File(torConfig.geoIpv6File.canonicalPath)
         }
@@ -505,7 +505,7 @@ class TorSettingsBuilder(private val context: OnionProxyContext) {
     @Throws(IOException::class)
     fun addBridgesFromResources(): TorSettingsBuilder {
         if (settings.hasBridges) {
-            val bridgesStream = context.torInstaller.openBridgesStream()
+            val bridgesStream = onionProxyContext.torInstaller.openBridgesStream()
             val formatType = bridgesStream!!.read()
             if (formatType == 0) {
                 addBridges(bridgesStream)
