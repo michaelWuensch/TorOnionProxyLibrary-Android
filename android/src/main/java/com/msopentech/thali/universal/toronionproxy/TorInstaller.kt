@@ -25,9 +25,9 @@ abstract class TorInstaller {
 
     @Throws(IOException::class, TimeoutException::class)
     abstract fun updateTorConfigCustom(content: String?)
-    fun getAssetOrResourceByName(fileName: String): InputStream {
-        return javaClass.getResourceAsStream("/$fileName")
-    }
+
+    fun getAssetOrResourceByName(fileName: String): InputStream? =
+        javaClass.getResourceAsStream("/$fileName")
 
     /**
      * If first byte of stream is 0, then the following stream will have the form

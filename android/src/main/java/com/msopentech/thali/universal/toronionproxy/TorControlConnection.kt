@@ -5,14 +5,15 @@ import java.io.*
 import java.net.Socket
 
 class TorControlConnection : TorControlConnection {
-    constructor(socket: Socket?) : super(socket) {}
-    constructor(inputStream: InputStream?, outputStream: OutputStream?) : super(
-        inputStream,
-        outputStream
-    ) {
-    }
 
-    constructor(reader: Reader?, writer: Writer?) : super(reader, writer) {}
+    constructor(socket: Socket) :
+            super(socket) {}
+
+    constructor(inputStream: InputStream, outputStream: OutputStream) :
+            super(inputStream, outputStream) {}
+
+    constructor(reader: Reader, writer: Writer) :
+            super(reader, writer) {}
 
     @Throws(IOException::class)
     fun takeownership() {
