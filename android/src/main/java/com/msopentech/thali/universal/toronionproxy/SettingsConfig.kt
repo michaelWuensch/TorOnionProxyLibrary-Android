@@ -12,16 +12,14 @@ See the Apache 2 License for the specific language governing permissions and lim
 */
 package com.msopentech.thali.universal.toronionproxy
 
-import java.lang.annotation.Retention
-import java.lang.annotation.RetentionPolicy
-
 /**
- * Annotates TorConfigBuilder methods. When TorConfigBuilder.updateTorConfig is invoked, it will use this annotation
- * to automatically detect and use the associated method as part of building the config.
+ * Annotates [TorSettingsBuilder] methods. When [TorSettingsBuilder.updateTorConfig] is invoked,
+ * it will use this annotation to automatically detect and use the associated method as part of
+ * building the config.
  *
  * The annotated method must have a no args.
  */
-@Retention(RetentionPolicy.RUNTIME)
+@kotlin.annotation.Retention(AnnotationRetention.RUNTIME)
 @Target(
     AnnotationTarget.FUNCTION,
     AnnotationTarget.PROPERTY_GETTER,
