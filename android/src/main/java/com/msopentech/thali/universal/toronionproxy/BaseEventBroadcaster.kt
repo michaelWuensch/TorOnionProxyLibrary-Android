@@ -12,55 +12,46 @@ See the Apache 2 License for the specific language governing permissions and lim
 */
 package com.msopentech.thali.universal.toronionproxy
 
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.PrintWriter
 import java.io.StringWriter
 
 abstract class BaseEventBroadcaster(settings: TorSettings?) : EventBroadcaster {
-    protected val mSettings: TorSettings
+
+    private companion object {
+        val LOG: Logger = LoggerFactory.getLogger(BaseEventBroadcaster::class.java)
+    }
+
+    private val mSettings: TorSettings = settings ?: DefaultSettings()
+
     override val status: Status
-    override fun broadcastDebug(msg: String?) {
+        get() = Status(this)
+
+    override fun broadcastDebug(msg: String) {
         if (mSettings.hasDebugLogs()) {
             LOG.debug(msg)
             broadcastLogMessage(msg)
         }
     }
 
-    override fun broadcastException(
-        msg: String,
-        e: Exception
-    ) {
+    override fun broadcastException(msg: String, e: Exception) {
         if (mSettings.hasDebugLogs()) {
             LOG.error(msg, e)
             val sw = StringWriter()
             e.printStackTrace(PrintWriter(sw))
-            broadcastLogMessage(
-                """
-    $msg
-    $sw
-    """.trimIndent()
-            )
+            broadcastLogMessage("$msg\n$sw".trimIndent())
         } else {
             broadcastLogMessage(msg)
         }
     }
 
-    override fun broadcastNotice(msg: String?) {
-        if (msg != null && !msg.isEmpty()) {
+    override fun broadcastNotice(msg: String) {
+        if (msg.isNotEmpty()) {
             if (mSettings.hasDebugLogs()) {
                 LOG.debug(msg)
             }
             broadcastLogMessage(msg)
         }
-    }
-
-    companion object {
-        protected val LOG =
-            LoggerFactory.getLogger(BaseEventBroadcaster::class.java)
-    }
-
-    init {
-        mSettings = settings ?: DefaultSettings()
-        status = Status(this)
     }
 }

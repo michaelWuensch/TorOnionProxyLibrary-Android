@@ -18,17 +18,13 @@ package com.msopentech.thali.universal.toronionproxy
  * that extends BaseEventBroadcaster.
  */
 class DefaultEventBroadcaster : BaseEventBroadcaster {
+
     constructor() : super(null) {}
     constructor(settings: TorSettings?) : super(settings) {}
 
-    override fun broadcastBandwidth(
-        upload: Long,
-        download: Long,
-        written: Long,
-        read: Long
-    ) {
-    }
+    override fun broadcastBandwidth(upload: Long, download: Long, written: Long, read: Long) {}
 
-    override fun broadcastLogMessage(logMessage: String?) {}
+    override fun broadcastLogMessage(logMessage: String) {}
+
     override fun broadcastStatus() {}
 }

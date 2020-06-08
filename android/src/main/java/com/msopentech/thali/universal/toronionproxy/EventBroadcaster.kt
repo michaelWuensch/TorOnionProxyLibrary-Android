@@ -16,17 +16,19 @@ package com.msopentech.thali.universal.toronionproxy
  * Service for sending event logs to the system
  */
 interface EventBroadcaster {
-    fun broadcastBandwidth(
-        upload: Long,
-        download: Long,
-        written: Long,
-        read: Long
-    )
 
-    fun broadcastDebug(msg: String?)
-    fun broadcastException(msg: String, e: Exception)
-    fun broadcastLogMessage(logMessage: String?)
-    fun broadcastNotice(msg: String?)
-    fun broadcastStatus()
     val status: Status
+
+    fun broadcastBandwidth(upload: Long, download: Long, written: Long, read: Long)
+
+    fun broadcastDebug(msg: String)
+
+    fun broadcastException(msg: String, e: Exception)
+
+    fun broadcastLogMessage(logMessage: String)
+
+    fun broadcastNotice(msg: String)
+
+    fun broadcastStatus()
+
 }
