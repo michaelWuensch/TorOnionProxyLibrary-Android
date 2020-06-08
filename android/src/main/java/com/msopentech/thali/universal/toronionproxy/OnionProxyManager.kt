@@ -67,11 +67,12 @@ open class OnionProxyManager(
 
         val LOG: Logger = LoggerFactory.getLogger(OnionProxyManager::class.java)
 
-        fun execIgnoreException(command: String) =
+        fun execIgnoreException(command: String): Process? =
             try {
                 Runtime.getRuntime().exec(command)
             } catch (e: IOException) {
                 e.printStackTrace()
+                null
             }
     }
 
@@ -514,7 +515,7 @@ open class OnionProxyManager(
         val isCreated = cookieAuthFile.exists() || cookieAuthFile.createNewFile()
         val cookieAuthFileObserver =
             onionProxyContext.createCookieAuthFileObserver()
-        if (!isCreated || cookieAuthFile.length() == 0L && !cookieAuthFileObserver!!.poll(
+        if (!isCreated || cookieAuthFile.length() == 0L && !cookieAuthFileObserver.poll(
                 onionProxyContext.torConfig.fileCreationTimeout.toLong(), TimeUnit.SECONDS
             )
         ) {

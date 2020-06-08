@@ -36,24 +36,16 @@ import java.util.concurrent.TimeUnit
 /**
  * Adapted from the Briar WriteObserver code
  */
-class AndroidWriteObserver(file: File?) :
-    FileObserver(file!!.absolutePath, CLOSE_WRITE), WriteObserver {
-    private val countDownLatch =
-        CountDownLatch(1)
+class AndroidWriteObserver(file: File) : FileObserver(file.absolutePath, CLOSE_WRITE), WriteObserver {
 
-    override fun poll(
-        timeout: Long,
-        unit: TimeUnit?
-    ): Boolean {
-        return try {
+    private val countDownLatch = CountDownLatch(1)
+
+    override fun poll(timeout: Long, unit: TimeUnit): Boolean =
+        try {
             countDownLatch.await(timeout, unit)
         } catch (e: InterruptedException) {
-            throw RuntimeException(
-                "Internal error has caused AndroidWriteObserver to not be reliable.",
-                e
-            )
+            throw RuntimeException("Internal error has caused AndroidWriteObserver to not be reliable.", e)
         }
-    }
 
     override fun onEvent(i: Int, s: String) {
         stopWatching()
@@ -61,7 +53,7 @@ class AndroidWriteObserver(file: File?) :
     }
 
     init {
-        require(file!!.exists()) { "FileObserver doesn't work properly on files that don't already exist." }
+        require(file.exists()) { "FileObserver doesn't work properly on files that don't already exist." }
         startWatching()
     }
 }

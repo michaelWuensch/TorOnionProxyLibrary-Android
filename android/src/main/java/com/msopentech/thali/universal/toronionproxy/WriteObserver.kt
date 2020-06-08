@@ -24,5 +24,5 @@ interface WriteObserver {
      * @param unit Unit to wait in
      * @return True if file was modified, false if it was not
      */
-    fun poll(timeout: Long, unit: TimeUnit?): Boolean
+    fun poll(timeout: Long, unit: TimeUnit): Boolean
 }
