@@ -12,7 +12,6 @@ See the Apache 2 License for the specific language governing permissions and lim
 */
 package com.msopentech.thali.universal.toronionproxy
 
-import com.msopentech.thali.universal.toronionproxy.OsData.OsType
 import java.io.File
 import java.io.IOException
 
@@ -151,14 +150,8 @@ class TorConfig private constructor(
      */
     class Builder(private val installDir: File, private val configDir: File) {
 
-        private companion object {
-            val torExecutableFileName: String
-                get() = when (OsData.osType) {
-                    OsType.ANDROID -> "tor.so"
-                    OsType.LINUX_32, OsType.LINUX_64, OsType.MAC -> "tor"
-                    OsType.WINDOWS -> "tor.exe"
-                    else -> throw RuntimeException("We don't support Tor on this OS")
-                }
+        companion object {
+            const val torExecutableFileName: String = "libTor.so"
         }
 
         private lateinit var mTorExecutableFile: File

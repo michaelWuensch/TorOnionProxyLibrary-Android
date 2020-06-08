@@ -27,7 +27,6 @@ See the Apache 2 License for the specific language governing permissions and lim
 */
 package com.msopentech.thali.universal.toronionproxy
 
-import com.msopentech.thali.universal.toronionproxy.OsData.OsType
 import net.freehaven.tor.control.EventHandler
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -594,30 +593,12 @@ open class OnionProxyManager(
         processBuilder.directory(onionProxyContext.torConfig.configDir)
         val environment = processBuilder.environment()
         environment["HOME"] = onionProxyContext.torConfig.homeDir.absolutePath
-        when (OsData.osType) {
-            OsType.LINUX_32, OsType.LINUX_64 -> {
-                // We have to provide the LD_LIBRARY_PATH because when looking for dynamic libraries
-                // Linux apparently will not look in the current directory by default. By setting this
-                // environment variable we fix that.
-                environment["LD_LIBRARY_PATH"] = onionProxyContext.torConfig.libraryPath.absolutePath
-            }
-            else -> {}
-        }
     }
 
     private val environmentArgsForExec: Array<String>
         get() {
             val envArgs: MutableList<String> = ArrayList()
             envArgs.add("HOME=" + onionProxyContext.torConfig.homeDir.absolutePath)
-            when (OsData.osType) {
-                OsType.LINUX_32, OsType.LINUX_64 -> {
-                    // We have to provide the LD_LIBRARY_PATH because when looking for dynamic libraries
-                    // Linux apparently will not look in the current directory by default. By setting this
-                    // environment variable we fix that.
-                    envArgs.add("LD_LIBRARY_PATH=" + onionProxyContext.torConfig.libraryPath.absolutePath)
-                }
-                else -> {}
-            }
             return envArgs.toTypedArray()
         }
 
