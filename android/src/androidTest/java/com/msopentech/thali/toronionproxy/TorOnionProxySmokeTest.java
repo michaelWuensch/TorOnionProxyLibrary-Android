@@ -70,6 +70,11 @@ package com.msopentech.thali.toronionproxy;
 import com.msopentech.thali.android.toronionproxy.AndroidOnionProxyManager;
 
 import com.msopentech.thali.android.toronionproxy.AndroidTorConfig;
+import com.msopentech.thali.universal.toronionproxy.FileUtilities;
+import com.msopentech.thali.universal.toronionproxy.OnionProxyManager;
+import com.msopentech.thali.universal.toronionproxy.TorConfig;
+import com.msopentech.thali.universal.toronionproxy.Utilities;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;

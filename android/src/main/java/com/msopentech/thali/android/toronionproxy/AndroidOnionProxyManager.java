@@ -29,7 +29,11 @@ See the Apache 2 License for the specific language governing permissions and lim
 
 package com.msopentech.thali.android.toronionproxy;
 
-import com.msopentech.thali.toronionproxy.*;
+import com.msopentech.thali.universal.toronionproxy.EventBroadcaster;
+import com.msopentech.thali.universal.toronionproxy.OnionProxyManager;
+import com.msopentech.thali.universal.toronionproxy.TorConfig;
+import com.msopentech.thali.universal.toronionproxy.TorInstaller;
+import com.msopentech.thali.universal.toronionproxy.TorSettings;
 
 import net.freehaven.tor.control.EventHandler;
 
@@ -43,7 +47,6 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import java.io.File;
 import java.io.IOException;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;

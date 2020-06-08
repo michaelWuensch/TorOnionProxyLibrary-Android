@@ -15,7 +15,9 @@ package com.msopentech.thali.android.installer;
 
 import android.content.Context;
 import android.util.Log;
-import com.msopentech.thali.toronionproxy.TorInstaller;
+
+import com.msopentech.thali.universal.toronionproxy.TorInstaller;
+
 import org.torproject.android.binary.TorResourceInstaller;
 
 import java.io.File;

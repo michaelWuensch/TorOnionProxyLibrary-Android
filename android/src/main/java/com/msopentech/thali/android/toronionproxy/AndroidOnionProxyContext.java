@@ -13,7 +13,11 @@ See the Apache 2 License for the specific language governing permissions and lim
 
 package com.msopentech.thali.android.toronionproxy;
 
-import com.msopentech.thali.toronionproxy.*;
+import com.msopentech.thali.universal.toronionproxy.OnionProxyContext;
+import com.msopentech.thali.universal.toronionproxy.TorConfig;
+import com.msopentech.thali.universal.toronionproxy.TorInstaller;
+import com.msopentech.thali.universal.toronionproxy.TorSettings;
+import com.msopentech.thali.universal.toronionproxy.WriteObserver;
 
 import java.io.File;
 

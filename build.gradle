@@ -11,8 +11,3 @@ subprojects {
     maven { url "https://repo.spring.io/plugins-release" }
   }
 }
-
-evaluationDependsOn ":universal"
-evaluationDependsOn ":java"
-
-

@@ -14,11 +14,9 @@ package com.msopentech.thali.android.toronionproxy;
 
 import android.content.Context;
 import android.util.Log;
-import com.msopentech.thali.toronionproxy.TorConfig;
+import com.msopentech.thali.universal.toronionproxy.TorConfig;
 
 import java.io.File;
-
-import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Creates config file that is compatible with Android.

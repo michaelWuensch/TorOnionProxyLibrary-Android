@@ -13,8 +13,6 @@ See the Apache 2 License for the specific language governing permissions and lim
 
 package com.msopentech.thali.java.toronionproxy;
 
-import com.msopentech.thali.toronionproxy.*;
-
 import java.io.*;
 
 public final class JavaOnionProxyContext extends OnionProxyContext {

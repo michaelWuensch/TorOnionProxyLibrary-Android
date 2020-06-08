@@ -68,7 +68,7 @@ task sourceJar(type: Jar) {
 }
 
 dependencies {
-    implementation project(':universal')
+    implementation project(':android')
     implementation 'org.torproject:tor-android-binary:0.4.2.7a'
 }
 

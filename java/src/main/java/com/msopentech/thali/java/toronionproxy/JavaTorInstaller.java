@@ -12,7 +12,6 @@ See the Apache 2 License for the specific language governing permissions and lim
 */
 package com.msopentech.thali.java.toronionproxy;
 
-import com.msopentech.thali.toronionproxy.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

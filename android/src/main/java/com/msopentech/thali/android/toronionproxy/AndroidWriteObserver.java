@@ -29,7 +29,7 @@ See the Apache 2 License for the specific language governing permissions and lim
 
 package com.msopentech.thali.android.toronionproxy;
 
-import com.msopentech.thali.toronionproxy.WriteObserver;
+import com.msopentech.thali.universal.toronionproxy.WriteObserver;
 
 import android.os.FileObserver;
 
