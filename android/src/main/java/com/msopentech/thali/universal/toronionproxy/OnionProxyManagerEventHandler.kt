@@ -28,64 +28,53 @@ See the Apache 2 License for the specific language governing permissions and lim
 package com.msopentech.thali.universal.toronionproxy
 
 import net.freehaven.tor.control.EventHandler
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
  * Logs the data we get from notifications from the Tor OP. This is really just meant for debugging.
  */
 class OnionProxyManagerEventHandler : EventHandler {
-    override fun circuitStatus(
-        status: String,
-        id: String,
-        path: String
-    ) {
+
+    companion object {
+        private val LOG: Logger = LoggerFactory.getLogger(OnionProxyManagerEventHandler::class.java)
+    }
+
+    override fun circuitStatus(status: String, id: String, path: String) =
         LOG.info("circuitStatus: status:$status, id: $id, path: $path")
-    }
 
-    override fun streamStatus(
-        status: String,
-        id: String,
-        target: String
-    ) {
+    override fun streamStatus(status: String, id: String, target: String) =
         LOG.info("streamStatus: status: $status, id: $id, target: $target")
-    }
 
-    override fun orConnStatus(status: String, orName: String) {
+    override fun orConnStatus(status: String, orName: String) =
         LOG.info("OR connection: status: $status, orName: $orName")
-    }
 
-    override fun bandwidthUsed(read: Long, written: Long) {
+    override fun bandwidthUsed(read: Long, written: Long) =
         LOG.info("bandwidthUsed: read: $read, written: $written")
-    }
 
     override fun newDescriptors(orList: List<String>) {
         val iterator = orList.iterator()
         val stringBuilder = StringBuilder()
-        while (iterator.hasNext()) {
+
+        while (iterator.hasNext())
             stringBuilder.append(iterator.next())
-        }
+
         LOG.info("newDescriptors: $stringBuilder")
     }
 
-    override fun message(severity: String, msg: String) {
+    override fun message(severity: String, msg: String) =
         LOG.info("message: severity: $severity, msg: $msg")
-    }
 
-    override fun unrecognized(type: String, msg: String) {
+    override fun unrecognized(type: String, msg: String) =
         LOG.info("unrecognized: type: $type, msg: $msg")
-    }
 
     private fun shortenPath(path: List<String>): String {
         val s = StringBuilder()
         for (id in path) {
-            if (s.length > 0) s.append(',')
+            if (s.isNotEmpty())
+                s.append(',')
             s.append(id.substring(1, 7))
         }
         return s.toString()
-    }
-
-    companion object {
-        private val LOG =
-            LoggerFactory.getLogger(OnionProxyManagerEventHandler::class.java)
     }
 }
