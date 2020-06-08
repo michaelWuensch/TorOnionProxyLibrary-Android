@@ -16,8 +16,15 @@ package com.msopentech.thali.universal.toronionproxy
  * Current Status of Tor
  */
 class Status(private val broadcaster: EventBroadcaster) {
-    var status: String
-        private set
+
+    private companion object {
+        const val STATUS_OFF = "OFF"
+        const val STATUS_ON = "ON"
+        const val STATUS_STARTING = "STARTING"
+        const val STATUS_STOPPING = "STOPPING"
+    }
+
+    private var status: String = STATUS_OFF
 
     val isOff: Boolean
         get() = STATUS_OFF == status
@@ -49,16 +56,5 @@ class Status(private val broadcaster: EventBroadcaster) {
     fun stopping() {
         status = STATUS_STOPPING
         broadcaster.broadcastStatus()
-    }
-
-    companion object {
-        var STATUS_OFF = "OFF"
-        var STATUS_ON = "ON"
-        var STATUS_STARTING = "STARTING"
-        var STATUS_STOPPING = "STOPPING"
-    }
-
-    init {
-        status = STATUS_OFF
     }
 }
