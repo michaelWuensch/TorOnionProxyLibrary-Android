@@ -12,7 +12,6 @@ See the Apache 2 License for the specific language governing permissions and lim
 */
 package com.msopentech.thali.universal.toronionproxy
 
-import com.msopentech.thali.universal.toronionproxy.OnionProxyContext
 import org.slf4j.LoggerFactory
 import java.io.BufferedWriter
 import java.io.File
@@ -171,8 +170,8 @@ abstract class OnionProxyContext(
         synchronized(hostnameLock) { return generateWriteObserver(config.hostnameFile) }
     }
 
-    fun newConfigBuilder(): TorConfigBuilder {
-        return TorConfigBuilder(this)
+    fun newConfigBuilder(): TorSettingsBuilder {
+        return TorSettingsBuilder(this)
     }
 
     /**

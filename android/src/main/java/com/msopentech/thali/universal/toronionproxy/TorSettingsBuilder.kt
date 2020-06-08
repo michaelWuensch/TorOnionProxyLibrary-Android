@@ -17,7 +17,7 @@ import java.net.InetSocketAddress
 import java.net.Socket
 import java.util.*
 
-class TorConfigBuilder(context: OnionProxyContext) {
+class TorSettingsBuilder(context: OnionProxyContext) {
     private val settings: TorSettings?
     private val context: OnionProxyContext
     private var buffer = StringBuffer()
@@ -26,7 +26,7 @@ class TorConfigBuilder(context: OnionProxyContext) {
      * Updates the tor config for all methods annotated with SettingsConfig
      */
     @Throws(Exception::class)
-    fun updateTorConfig(): TorConfigBuilder {
+    fun updateTorConfig(): TorSettingsBuilder {
         for (method in javaClass.methods) {
             for (annotation in method.annotations) {
                 if (annotation is SettingsConfig) {
@@ -42,17 +42,17 @@ class TorConfigBuilder(context: OnionProxyContext) {
         return buffer.toString()
     }
 
-    fun automapHostsOnResolve(): TorConfigBuilder {
+    fun automapHostsOnResolve(): TorSettingsBuilder {
         buffer.append("AutomapHostsOnResolve 1").append('\n')
         return this
     }
 
     @SettingsConfig
-    fun automapHostsOnResolveFromSettings(): TorConfigBuilder {
+    fun automapHostsOnResolveFromSettings(): TorSettingsBuilder {
         return if (settings!!.isAutomapHostsOnResolve) automapHostsOnResolve() else this
     }
 
-    fun bridge(type: String?, config: String?): TorConfigBuilder {
+    fun bridge(type: String?, config: String?): TorSettingsBuilder {
         if (!isNullOrEmpty(type) && !isNullOrEmpty(
                 config
             )
@@ -62,7 +62,7 @@ class TorConfigBuilder(context: OnionProxyContext) {
         return this
     }
 
-    fun bridgeCustom(config: String?): TorConfigBuilder {
+    fun bridgeCustom(config: String?): TorSettingsBuilder {
         if (!isNullOrEmpty(config)) {
             buffer.append("Bridge ").append(config).append('\n')
         }
@@ -70,7 +70,7 @@ class TorConfigBuilder(context: OnionProxyContext) {
     }
 
     @SettingsConfig
-    fun bridgesFromSettings(): TorConfigBuilder {
+    fun bridgesFromSettings(): TorSettingsBuilder {
         try {
             addBridgesFromResources()
         } catch (e: IOException) {
@@ -80,7 +80,7 @@ class TorConfigBuilder(context: OnionProxyContext) {
     }
 
     @Throws(IOException::class)
-    fun configurePluggableTransportsFromSettings(pluggableTransportClient: File?): TorConfigBuilder {
+    fun configurePluggableTransportsFromSettings(pluggableTransportClient: File?): TorSettingsBuilder {
         if (pluggableTransportClient == null) {
             return this
         }
@@ -100,7 +100,7 @@ class TorConfigBuilder(context: OnionProxyContext) {
         return this
     }
 
-    fun cookieAuthentication(): TorConfigBuilder {
+    fun cookieAuthentication(): TorSettingsBuilder {
         buffer.append("CookieAuthentication 1 ").append('\n')
         buffer.append("CookieAuthFile ")
             .append(context.getConfig().cookieAuthFile.absolutePath).append("\n")
@@ -108,32 +108,32 @@ class TorConfigBuilder(context: OnionProxyContext) {
     }
 
     @SettingsConfig
-    fun cookieAuthenticationFromSettings(): TorConfigBuilder {
+    fun cookieAuthenticationFromSettings(): TorSettingsBuilder {
         return if (settings!!.hasCookieAuthentication()) cookieAuthentication() else this
     }
 
-    fun connectionPadding(): TorConfigBuilder {
+    fun connectionPadding(): TorSettingsBuilder {
         buffer.append("ConnectionPadding 1").append('\n')
         return this
     }
 
     @SettingsConfig
-    fun connectionPaddingFromSettings(): TorConfigBuilder {
+    fun connectionPaddingFromSettings(): TorSettingsBuilder {
         return if (settings!!.hasConnectionPadding()) connectionPadding() else this
     }
 
-    fun controlPortWriteToFile(controlPortFile: String?): TorConfigBuilder {
+    fun controlPortWriteToFile(controlPortFile: String?): TorSettingsBuilder {
         buffer.append("ControlPortWriteToFile ").append(controlPortFile).append('\n')
         buffer.append("ControlPort auto\n")
         return this
     }
 
     @SettingsConfig
-    fun controlPortWriteToFileFromConfig(): TorConfigBuilder {
+    fun controlPortWriteToFileFromConfig(): TorSettingsBuilder {
         return controlPortWriteToFile(context.config.controlPortFile.absolutePath)
     }
 
-    fun debugLogs(): TorConfigBuilder {
+    fun debugLogs(): TorSettingsBuilder {
         buffer.append("Log debug syslog").append('\n')
         buffer.append("Log info syslog").append('\n')
         buffer.append("SafeLogging 0").append('\n')
@@ -141,80 +141,80 @@ class TorConfigBuilder(context: OnionProxyContext) {
     }
 
     @SettingsConfig
-    fun debugLogsFromSettings(): TorConfigBuilder {
+    fun debugLogsFromSettings(): TorSettingsBuilder {
         return if (settings!!.hasDebugLogs()) debugLogs() else this
     }
 
-    fun disableNetwork(): TorConfigBuilder {
+    fun disableNetwork(): TorSettingsBuilder {
         buffer.append("DisableNetwork 1").append('\n')
         return this
     }
 
     @SettingsConfig
-    fun disableNetworkFromSettings(): TorConfigBuilder {
+    fun disableNetworkFromSettings(): TorSettingsBuilder {
         return if (settings!!.disableNetwork()) disableNetwork() else this
     }
 
-    fun dnsPort(dnsPort: String?): TorConfigBuilder {
+    fun dnsPort(dnsPort: String?): TorSettingsBuilder {
         if (!isNullOrEmpty(dnsPort)) buffer.append("DNSPort ")
             .append(dnsPort).append('\n')
         return this
     }
 
     @SettingsConfig
-    fun dnsPortFromSettings(): TorConfigBuilder {
+    fun dnsPortFromSettings(): TorSettingsBuilder {
         return dnsPort(settings!!.dnsPort())
     }
 
-    fun dontUseBridges(): TorConfigBuilder {
+    fun dontUseBridges(): TorSettingsBuilder {
         buffer.append("UseBridges 0").append('\n')
         return this
     }
 
-    fun dormantCanceledByStartup(): TorConfigBuilder {
+    fun dormantCanceledByStartup(): TorSettingsBuilder {
         buffer.append("DormantCanceledByStartup 1\n")
         return this
     }
 
     @SettingsConfig
-    fun dormantCanceledByStartupFromSettings(): TorConfigBuilder {
+    fun dormantCanceledByStartupFromSettings(): TorSettingsBuilder {
         if (settings!!.hasDormantCanceledByStartup()) {
             dormantCanceledByStartup()
         }
         return this
     }
 
-    fun entryNodes(entryNodes: String?): TorConfigBuilder {
+    fun entryNodes(entryNodes: String?): TorSettingsBuilder {
         if (!isNullOrEmpty(entryNodes)) buffer.append("EntryNodes ")
             .append(entryNodes).append('\n')
         return this
     }
 
-    fun excludeNodes(excludeNodes: String?): TorConfigBuilder {
+    fun excludeNodes(excludeNodes: String?): TorSettingsBuilder {
         if (!isNullOrEmpty(excludeNodes)) buffer.append("ExcludeNodes ")
             .append(excludeNodes).append('\n')
         return this
     }
 
-    fun exitNodes(exitNodes: String?): TorConfigBuilder {
+    fun exitNodes(exitNodes: String?): TorSettingsBuilder {
         if (!isNullOrEmpty(exitNodes)) buffer.append("ExitNodes ")
             .append(exitNodes).append('\n')
         return this
     }
 
-    fun geoIpFile(path: String?): TorConfigBuilder {
+    fun geoIpFile(path: String?): TorSettingsBuilder {
         if (!isNullOrEmpty(path)) buffer.append("GeoIPFile ")
             .append(path).append('\n')
         return this
     }
 
-    fun geoIpV6File(path: String?): TorConfigBuilder {
+    fun geoIpV6File(path: String?): TorSettingsBuilder {
         if (!isNullOrEmpty(path)) buffer.append("GeoIPv6File ")
             .append(path).append('\n')
         return this
     }
 
-    fun httpTunnelPort(port: Int, isolationFlags: String?): TorConfigBuilder {
+    fun httpTunnelPort(port: Int, isolationFlags: String?): TorSettingsBuilder {
         buffer.append("HTTPTunnelPort ").append(port)
         if (!isNullOrEmpty(isolationFlags)) {
             buffer.append(" ").append(isolationFlags)
@@ -224,14 +224,14 @@ class TorConfigBuilder(context: OnionProxyContext) {
     }
 
     @SettingsConfig
-    fun httpTunnelPortFromSettings(): TorConfigBuilder {
+    fun httpTunnelPortFromSettings(): TorSettingsBuilder {
         return httpTunnelPort(
             settings.getHttpTunnelPort(),
             if (settings!!.hasIsolationAddressFlagForTunnel()) "IsolateDestAddr" else null
         )
     }
 
-    fun line(value: String?): TorConfigBuilder {
+    fun line(value: String?): TorSettingsBuilder {
         if (!isNullOrEmpty(value)) buffer.append(value).append("\n")
         return this
     }
@@ -240,7 +240,7 @@ class TorConfigBuilder(context: OnionProxyContext) {
         dnsFile: String?,
         orPort: Int,
         nickname: String?
-    ): TorConfigBuilder {
+    ): TorSettingsBuilder {
         buffer.append("ServerDNSResolvConfFile ").append(dnsFile).append('\n')
         buffer.append("ORPort ").append(orPort).append('\n')
         buffer.append("Nickname ").append(nickname).append('\n')
@@ -252,7 +252,7 @@ class TorConfigBuilder(context: OnionProxyContext) {
      * Sets the entry/exit/exclude nodes
      */
     @SettingsConfig
-    fun nodesFromSettings(): TorConfigBuilder {
+    fun nodesFromSettings(): TorSettingsBuilder {
         entryNodes(settings.getEntryNodes()).exitNodes(settings.getExitNodes())
             .excludeNodes(settings.getExcludeNodes())
         return this
@@ -262,7 +262,7 @@ class TorConfigBuilder(context: OnionProxyContext) {
      * Adds non exit relay to builder. This method uses a default google nameserver.
      */
     @SettingsConfig
-    fun nonExitRelayFromSettings(): TorConfigBuilder {
+    fun nonExitRelayFromSettings(): TorSettingsBuilder {
         if (!settings!!.hasReachableAddress() && !settings.hasBridges() && settings.isRelay) {
             try {
                 val resolv = context.createGoogleNameserverFile()
@@ -277,26 +277,26 @@ class TorConfigBuilder(context: OnionProxyContext) {
         return this
     }
 
-    fun proxyOnAllInterfaces(): TorConfigBuilder {
+    fun proxyOnAllInterfaces(): TorSettingsBuilder {
         buffer.append("SocksListenAddress 0.0.0.0").append('\n')
         return this
     }
 
     @SettingsConfig
-    fun proxyOnAllInterfacesFromSettings(): TorConfigBuilder {
+    fun proxyOnAllInterfacesFromSettings(): TorSettingsBuilder {
         return if (settings!!.hasOpenProxyOnAllInterfaces()) proxyOnAllInterfaces() else this
     }
 
     /**
      * Set socks5 proxy with no authentication. This can be set if yo uare using a VPN.
      */
-    fun proxySocks5(host: String?, port: String?): TorConfigBuilder {
+    fun proxySocks5(host: String?, port: String?): TorSettingsBuilder {
         buffer.append("socks5Proxy ").append(host).append(':').append(port).append('\n')
         return this
     }
 
     @SettingsConfig
-    fun proxySocks5FromSettings(): TorConfigBuilder {
+    fun proxySocks5FromSettings(): TorSettingsBuilder {
         return if (settings!!.useSocks5() && !settings.hasBridges()) proxySocks5(
             settings
                 .proxySocks5Host,
@@ -314,7 +314,7 @@ class TorConfigBuilder(context: OnionProxyContext) {
         proxyPort: String?,
         proxyUser: String?,
         proxyPass: String?
-    ): TorConfigBuilder {
+    ): TorSettingsBuilder {
         if (!isNullOrEmpty(proxyType) && !isNullOrEmpty(
                 proxyHost
             ) && !isNullOrEmpty(proxyPort)
@@ -338,7 +338,7 @@ class TorConfigBuilder(context: OnionProxyContext) {
     }
 
     @SettingsConfig
-    fun proxyWithAuthenticationFromSettings(): TorConfigBuilder {
+    fun proxyWithAuthenticationFromSettings(): TorSettingsBuilder {
         return if (!settings!!.useSocks5() && !settings.hasBridges()) proxyWithAuthentication(
             settings.proxyType, settings.proxyHost,
             settings.proxyPort, settings.proxyUser, settings
@@ -346,27 +346,27 @@ class TorConfigBuilder(context: OnionProxyContext) {
         ) else this
     }
 
-    fun reachableAddressPorts(reachableAddressesPorts: String?): TorConfigBuilder {
+    fun reachableAddressPorts(reachableAddressesPorts: String?): TorSettingsBuilder {
         if (!isNullOrEmpty(reachableAddressesPorts)) buffer.append("ReachableAddresses ")
             .append(reachableAddressesPorts).append('\n')
         return this
     }
 
     @SettingsConfig
-    fun reachableAddressesFromSettings(): TorConfigBuilder {
+    fun reachableAddressesFromSettings(): TorSettingsBuilder {
         return if (settings!!.hasReachableAddress()) reachableAddressPorts(
             settings
                 .reachableAddressPorts
         ) else this
     }
 
-    fun reducedConnectionPadding(): TorConfigBuilder {
+    fun reducedConnectionPadding(): TorSettingsBuilder {
         buffer.append("ReducedConnectionPadding 1").append('\n')
         return this
     }
 
     @SettingsConfig
-    fun reducedConnectionPaddingFromSettings(): TorConfigBuilder {
+    fun reducedConnectionPaddingFromSettings(): TorSettingsBuilder {
         return if (settings!!.hasReducedConnectionPadding()) reducedConnectionPadding() else this
     }
 
@@ -375,32 +375,32 @@ class TorConfigBuilder(context: OnionProxyContext) {
     }
 
     @SettingsConfig
-    fun runAsDaemonFromSettings(): TorConfigBuilder {
+    fun runAsDaemonFromSettings(): TorSettingsBuilder {
         return if (settings!!.runAsDaemon()) runAsDaemon() else this
     }
 
-    fun runAsDaemon(): TorConfigBuilder {
+    fun runAsDaemon(): TorSettingsBuilder {
         buffer.append("RunAsDaemon 1").append('\n')
         return this
     }
 
-    fun safeSocksDisable(): TorConfigBuilder {
+    fun safeSocksDisable(): TorSettingsBuilder {
         buffer.append("SafeSocks 0").append('\n')
         return this
     }
 
-    fun safeSocksEnable(): TorConfigBuilder {
+    fun safeSocksEnable(): TorSettingsBuilder {
         buffer.append("SafeSocks 1").append('\n')
         return this
     }
 
     @SettingsConfig
-    fun safeSocksFromSettings(): TorConfigBuilder {
+    fun safeSocksFromSettings(): TorSettingsBuilder {
         return if (!settings!!.hasSafeSocks()) safeSocksDisable() else safeSocksEnable()
     }
 
     @Throws(IOException::class)
-    fun setGeoIpFiles(): TorConfigBuilder {
+    fun setGeoIpFiles(): TorSettingsBuilder {
         val torConfig = context.getConfig()
         if (torConfig.geoIpFile.exists()) {
             geoIpFile(torConfig.geoIpFile.canonicalPath)
@@ -409,7 +409,7 @@ class TorConfigBuilder(context: OnionProxyContext) {
         return this
     }
 
-    fun socksPort(socksPort: String?, isolationFlag: String?): TorConfigBuilder {
+    fun socksPort(socksPort: String?, isolationFlag: String?): TorSettingsBuilder {
         if (isNullOrEmpty(socksPort)) {
             return this
         }
@@ -425,7 +425,7 @@ class TorConfigBuilder(context: OnionProxyContext) {
     }
 
     @SettingsConfig
-    fun socksPortFromSettings(): TorConfigBuilder {
+    fun socksPortFromSettings(): TorSettingsBuilder {
         var socksPort = settings.getSocksPort()
         if (socksPort!!.indexOf(':') != -1) {
             socksPort = socksPort!!.split(":".toRegex()).toTypedArray()[1]
@@ -443,39 +443,39 @@ class TorConfigBuilder(context: OnionProxyContext) {
         )
     }
 
-    fun strictNodesDisable(): TorConfigBuilder {
+    fun strictNodesDisable(): TorSettingsBuilder {
         buffer.append("StrictNodes 0\n")
         return this
     }
 
-    fun strictNodesEnable(): TorConfigBuilder {
+    fun strictNodesEnable(): TorSettingsBuilder {
         buffer.append("StrictNodes 1\n")
         return this
     }
 
     @SettingsConfig
-    fun strictNodesFromSettings(): TorConfigBuilder {
+    fun strictNodesFromSettings(): TorSettingsBuilder {
         return if (settings!!.hasStrictNodes()) strictNodesEnable() else strictNodesDisable()
     }
 
-    fun testSocksDisable(): TorConfigBuilder {
+    fun testSocksDisable(): TorSettingsBuilder {
         buffer.append("TestSocks 0").append('\n')
         return this
     }
 
-    fun testSocksEnable(): TorConfigBuilder {
+    fun testSocksEnable(): TorSettingsBuilder {
         buffer.append("TestSocks 0").append('\n')
         return this
     }
 
     @SettingsConfig
-    fun testSocksFromSettings(): TorConfigBuilder {
+    fun testSocksFromSettings(): TorSettingsBuilder {
         return if (!settings!!.hasTestSocks()) testSocksDisable() else this
     }
 
     @SettingsConfig
     @Throws(UnsupportedEncodingException::class)
-    fun torrcCustomFromSettings(): TorConfigBuilder {
+    fun torrcCustomFromSettings(): TorSettingsBuilder {
         return if (settings.getCustomTorrc() != null) line(
             String(
                 settings.getCustomTorrc().toByteArray(charset("US-ASCII"))
@@ -483,41 +483,41 @@ class TorConfigBuilder(context: OnionProxyContext) {
         ) else this
     }
 
-    fun transPort(transPort: String?): TorConfigBuilder {
+    fun transPort(transPort: String?): TorSettingsBuilder {
         if (!isNullOrEmpty(transPort)) buffer.append("TransPort ")
             .append(transPort).append('\n')
         return this
     }
 
     @SettingsConfig
-    fun transPortFromSettings(): TorConfigBuilder {
+    fun transPortFromSettings(): TorSettingsBuilder {
         return transPort(settings!!.transPort())
     }
 
-    fun transportPlugin(clientPath: String?): TorConfigBuilder {
+    fun transportPlugin(clientPath: String?): TorSettingsBuilder {
         buffer.append("ClientTransportPlugin meek_lite,obfs3,obfs4 exec ").append(clientPath)
             .append('\n')
         return this
     }
 
-    fun useBridges(): TorConfigBuilder {
+    fun useBridges(): TorSettingsBuilder {
         buffer.append("UseBridges 1").append('\n')
         return this
     }
 
     @SettingsConfig
-    fun useBridgesFromSettings(): TorConfigBuilder {
+    fun useBridgesFromSettings(): TorSettingsBuilder {
         return if (settings!!.hasBridges()) useBridges() else this
     }
 
-    fun virtualAddressNetwork(address: String?): TorConfigBuilder {
+    fun virtualAddressNetwork(address: String?): TorSettingsBuilder {
         if (!isNullOrEmpty(address)) buffer.append("VirtualAddrNetwork ")
             .append(address).append('\n')
         return this
     }
 
     @SettingsConfig
-    fun virtualAddressNetworkFromSettings(): TorConfigBuilder {
+    fun virtualAddressNetworkFromSettings(): TorSettingsBuilder {
         return virtualAddressNetwork(settings.getVirtualAddressNetwork())
     }
 
@@ -537,7 +537,7 @@ class TorConfigBuilder(context: OnionProxyContext) {
      *
      */
     @Throws(IOException::class)
-    fun addBridgesFromResources(): TorConfigBuilder {
+    fun addBridgesFromResources(): TorSettingsBuilder {
         if (settings!!.hasBridges()) {
             val bridgesStream = context.installer.openBridgesStream()
             val formatType = bridgesStream!!.read()
