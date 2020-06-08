@@ -28,7 +28,9 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:1.7.30'
     implementation 'org.slf4j:slf4j-android:1.7.30'
 //    implementation 'com.android.support:appcompat-v7:28.0.0'
+
     testImplementation 'junit:junit:4.12'
+
 //    androidTestImplementation project(':android_tor_installer')
 //    androidTestImplementation 'org.torproject:tor-android-binary:0.4.2.7a'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
@@ -44,6 +46,7 @@ task copyPluggableTransports(type: Copy) {
     rename { filename ->
         filename.replace 'obfs4proxy', 'libObfs4proxy.so'
     }
+    delete 'src/main/jniLibs/armeabi'
 }
 
 gradle.projectsEvaluated {
