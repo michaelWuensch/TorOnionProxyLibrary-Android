@@ -19,24 +19,15 @@ import java.io.IOException
 /**
  * Holds Tor configuration information.
  */
-class TorConfig {
-    private val configLock = Any()
-    var geoIpFile: File? = null
-        private set
-    var geoIpv6File: File? = null
-        private set
-    var torrcFile: File? = null
-        private set
-    var torExecutableFile: File? = null
-        private set
-    var hiddenServiceDir: File? = null
-        private set
-    var dataDir: File? = null
-        private set
-    var configDir: File? = null
-        private set
-    var homeDir: File? = null
-        private set
+class TorConfig private constructor(
+    val geoIpFile: File,
+    val geoIpv6File: File,
+    torrcFile: File,
+    val torExecutableFile: File,
+    val hiddenServiceDir: File,
+    val dataDir: File,
+    val configDir: File,
+    val homeDir: File,
 
     /**
      * The <base32-encoded-fingerprint>.onion domain name for this hidden service. If the hidden service is
@@ -44,8 +35,7 @@ class TorConfig {
      *
      * @return hostname file
     </base32-encoded-fingerprint> */
-    var hostnameFile: File? = null
-        private set
+    val hostnameFile: File,
 
     /**
      * Used for cookie authentication with the controller. Location can be overridden by the CookieAuthFile config option.
@@ -53,16 +43,11 @@ class TorConfig {
      *
      * @return
      */
-    var cookieAuthFile: File? = null
-        private set
-    var libraryPath: File? = null
-        private set
-    var resolveConf: File? = null
-        private set
-    var controlPortFile: File? = null
-        private set
-    var installDir: File? = null
-        private set
+    val cookieAuthFile: File,
+    val libraryPath: File,
+    val resolveConf: File,
+    val controlPortFile: File,
+    val installDir: File,
 
     /**
      * When tor starts it waits for the control port and cookie auth files to be created before it proceeds to the
@@ -71,8 +56,43 @@ class TorConfig {
      *
      * This method returns how much time to wait in seconds until failing the startup.
      */
-    var fileCreationTimeout = 0
-        private set
+    val fileCreationTimeout: Int
+) {
+
+    companion object {
+        const val GEO_IP_NAME = "geoip"
+        const val GEO_IPV_6_NAME = "geoip6"
+        const val TORRC_NAME = "torrc"
+        private const val HIDDEN_SERVICE_NAME = "hiddenservice"
+
+        /**
+         * Creates simplest default config. All tor files will be relative to the configDir root.
+         *
+         * @param configDir
+         * @return
+         */
+        fun createDefault(configDir: File): TorConfig =
+            Builder(configDir, configDir).build()
+
+        /**
+         * All files will be in single directory: collapses the data and config directories
+         *
+         * @param configDir
+         * @return
+         */
+        fun createFlatConfig(configDir: File): TorConfig =
+            createConfig(configDir, configDir, configDir)
+
+        fun createConfig(installDir: File, configDir: File, dataDir: File): TorConfig {
+            val builder = Builder(installDir, configDir)
+            builder.dataDir(dataDir)
+            return builder.build()
+        }
+    }
+
+    private val configLock = Object()
+    private var mTorrcFile = torrcFile
+    fun getTorrcFile(): File = mTorrcFile
 
     /**
      * Resolves the tor configuration file. If the torrc file hasn't been set, then this method will attempt to
@@ -82,26 +102,30 @@ class TorConfig {
      * @throws IOException if torrc file is not resolved
      */
     @Throws(IOException::class)
-    fun resolveTorrcFile(): File? {
+    fun resolveTorrcFile(): File {
+
         synchronized(configLock) {
-            if (torrcFile == null || !torrcFile!!.exists()) {
-                var tmpTorrcFile =
-                    File(configDir, TORRC_NAME)
+            if (!mTorrcFile.exists()) {
+                var tmpTorrcFile = File(configDir, TORRC_NAME)
+
                 if (!tmpTorrcFile.exists()) {
                     tmpTorrcFile = File(homeDir, ".$TORRC_NAME")
+
                     if (!tmpTorrcFile.exists()) {
-                        torrcFile = File(configDir, TORRC_NAME)
-                        if (!torrcFile!!.createNewFile()) {
+                        mTorrcFile = File(configDir, TORRC_NAME)
+
+                        if (!mTorrcFile.createNewFile()) {
                             throw IOException("Failed to create torrc file")
                         }
+
                     } else {
-                        torrcFile = tmpTorrcFile
+                        mTorrcFile = tmpTorrcFile
                     }
                 } else {
-                    torrcFile = tmpTorrcFile
+                    mTorrcFile = tmpTorrcFile
                 }
             }
-            return torrcFile
+            return mTorrcFile
         }
     }
 
@@ -109,7 +133,7 @@ class TorConfig {
         return "TorConfig{" +
                 "geoIpFile=" + geoIpFile +
                 ", geoIpv6File=" + geoIpv6File +
-                ", torrcFile=" + torrcFile +
+                ", torrcFile=" + mTorrcFile +
                 ", torExecutableFile=" + torExecutableFile +
                 ", hiddenServiceDir=" + hiddenServiceDir +
                 ", dataDir=" + dataDir +
@@ -125,22 +149,31 @@ class TorConfig {
     /**
      * Builder for TorConfig.
      */
-    class Builder(installDir: File?, configDir: File?) {
-        private var torExecutableFile: File? = null
-        private val configDir: File
-        private var geoIpFile: File? = null
-        private var geoIpv6File: File? = null
-        private var torrcFile: File? = null
-        private var hiddenServiceDir: File? = null
-        private var dataDir: File? = null
-        private var homeDir: File? = null
-        private var libraryPath: File? = null
-        private var cookieAuthFile: File? = null
-        private var hostnameFile: File? = null
-        private var resolveConf: File? = null
-        private var controlPortFile: File? = null
-        private var installDir: File
-        private var fileCreationTimeout = 0
+    class Builder(private val installDir: File, private val configDir: File) {
+
+        private companion object {
+            val torExecutableFileName: String
+                get() = when (OsData.osType) {
+                    OsType.ANDROID -> "tor.so"
+                    OsType.LINUX_32, OsType.LINUX_64, OsType.MAC -> "tor"
+                    OsType.WINDOWS -> "tor.exe"
+                    else -> throw RuntimeException("We don't support Tor on this OS")
+                }
+        }
+
+        private lateinit var mTorExecutableFile: File
+        private lateinit var mGeoIpFile: File
+        private lateinit var mGeoIpv6File: File
+        private lateinit var mTorrcFile: File
+        private lateinit var mHiddenServiceDir: File
+        private lateinit var mDataDir: File
+        private lateinit var mHomeDir: File
+        private lateinit var mLibraryPath: File
+        private lateinit var mCookieAuthFile: File
+        private lateinit var mHostnameFile: File
+        private lateinit var mResolveConf: File
+        private lateinit var mControlPortFile: File
+        private var mFileCreationTimeout = 0
 
         /**
          * Home directory of user.
@@ -152,13 +185,13 @@ class TorConfig {
          * @param homeDir the home directory of the user
          * @return builder
          */
-        fun homeDir(homeDir: File?): Builder {
-            this.homeDir = homeDir
+        fun homeDir(homeDir: File): Builder {
+            this.mHomeDir = homeDir
             return this
         }
 
-        fun torExecutable(file: File?): Builder {
-            torExecutableFile = file
+        fun torExecutable(file: File): Builder {
+            mTorExecutableFile = file
             return this
         }
 
@@ -169,95 +202,85 @@ class TorConfig {
          * current working directory of Tor instance, not to its DataDirectory. Do not rely on this behavior; it is not
          * guaranteed to remain the same in future versions.)
          *
-         *
          * Default value: $configDir/hiddenservices
          *
          * @param directory hidden services directory
          * @return builder
          */
-        fun hiddenServiceDir(directory: File?): Builder {
-            hiddenServiceDir = directory
+        fun hiddenServiceDir(directory: File): Builder {
+            mHiddenServiceDir = directory
             return this
         }
 
         /**
          * A filename containing IPv6 GeoIP data, for use with by-country statistics.
          *
-         *
          * Default value: $configDir/geoip6
          *
          * @param file geoip6 file
          * @return builder
          */
-        fun geoipv6(file: File?): Builder {
-            geoIpv6File = file
+        fun geoipv6(file: File): Builder {
+            mGeoIpv6File = file
             return this
         }
 
         /**
          * A filename containing IPv4 GeoIP data, for use with by-country statistics.
          *
-         *
          * Default value: $configDir/geoip
          *
          * @param file geoip file
          * @return builder
          */
-        fun geoip(file: File?): Builder {
-            geoIpFile = file
+        fun geoip(file: File): Builder {
+            mGeoIpFile = file
             return this
         }
 
         /**
          * Store working data in DIR. Can not be changed while tor is running.
          *
-         *
          * Default value: $configDir/lib/tor
          *
          * @param directory directory where tor runtime data is stored
          * @return builder
          */
-        fun dataDir(directory: File?): Builder {
-            dataDir = directory
+        fun dataDir(directory: File): Builder {
+            mDataDir = directory
             return this
         }
 
         /**
          * The configuration file, which contains "option value" pairs.
          *
-         *
          * Default value: $configDir/torrc
          *
          * @param file
          * @return
          */
-        fun torrc(file: File?): Builder {
-            torrcFile = file
+        fun torrc(file: File): Builder {
+            mTorrcFile = file
             return this
         }
 
-        fun installDir(file: File): Builder {
-            installDir = file
+        fun libraryPath(directory: File): Builder {
+            mLibraryPath = directory
             return this
         }
 
-        fun libraryPath(directory: File?): Builder {
-            libraryPath = directory
+        fun cookieAuthFile(file: File): Builder {
+            mCookieAuthFile = file
             return this
         }
 
-        fun cookieAuthFile(file: File?): Builder {
-            cookieAuthFile = file
+        fun hostnameFile(file: File): Builder {
+            mHostnameFile = file
             return this
         }
 
-        fun hostnameFile(file: File?): Builder {
-            hostnameFile = file
-            return this
-        }
-
-        fun resolveConf(resolveConf: File?): Builder {
-            this.resolveConf = resolveConf
+        fun resolveConf(resolveConf: File): Builder {
+            this.mResolveConf = resolveConf
             return this
         }
 
@@ -271,7 +294,7 @@ class TorConfig {
          * @param timeout in seconds
          */
         fun fileCreationTimeout(timeout: Int): Builder {
-            fileCreationTimeout = timeout
+            mFileCreationTimeout = timeout
             return this
         }
 
@@ -281,144 +304,68 @@ class TorConfig {
          * @return torConfig
          */
         fun build(): TorConfig {
-            if (homeDir == null) {
+            if (!::mHomeDir.isInitialized) {
                 val userHome = System.getProperty("user.home")
-                homeDir =
-                    if (userHome != null && "" != userHome && "/" != userHome) File(
-                        userHome
-                    ) else configDir
+                mHomeDir =
+                    if (userHome != null && "" != userHome && "/" != userHome)
+                        File(userHome)
+                    else
+                        configDir
             }
-            if (torExecutableFile == null) {
-                torExecutableFile = File(
-                    installDir,
-                    torExecutableFileName
-                )
-            }
-            if (geoIpFile == null) {
-                geoIpFile = File(configDir, GEO_IP_NAME)
-            }
-            if (geoIpv6File == null) {
-                geoIpv6File = File(configDir, GEO_IPV_6_NAME)
-            }
-            if (torrcFile == null) {
-                torrcFile = File(configDir, TORRC_NAME)
-            }
-            if (hiddenServiceDir == null) {
-                hiddenServiceDir = File(configDir, HIDDEN_SERVICE_NAME)
-            }
-            if (dataDir == null) {
-                dataDir = File(configDir, "lib/tor")
-            }
-            if (libraryPath == null) {
-                libraryPath = torExecutableFile!!.parentFile
-            }
-            if (hostnameFile == null) {
-                hostnameFile = File(dataDir, "hostname")
-            }
-            if (cookieAuthFile == null) {
-                cookieAuthFile = File(dataDir, "control_auth_cookie")
-            }
-            if (resolveConf == null) {
-                resolveConf = File(configDir, "resolv.conf")
-            }
-            if (controlPortFile == null) {
-                controlPortFile = File(dataDir, "control.txt")
-            }
-            if (fileCreationTimeout <= 0) {
-                fileCreationTimeout = 15
-            }
-            val config = TorConfig()
-            config.hiddenServiceDir = hiddenServiceDir
-            config.torExecutableFile = torExecutableFile
-            config.dataDir = dataDir
-            config.torrcFile = torrcFile
-            config.geoIpv6File = geoIpv6File
-            config.geoIpFile = geoIpFile
-            config.homeDir = homeDir
-            config.configDir = configDir
-            config.hostnameFile = hostnameFile
-            config.cookieAuthFile = cookieAuthFile
-            config.libraryPath = libraryPath
-            config.resolveConf = resolveConf
-            config.controlPortFile = controlPortFile
-            config.installDir = installDir
-            config.fileCreationTimeout = fileCreationTimeout
-            return config
-        }
 
-        companion object {
-            private val torExecutableFileName: String
-                private get() = when (OsData.getOsType()) {
-                    OsType.ANDROID -> "tor.so"
-                    OsType.LINUX_32, OsType.LINUX_64, OsType.MAC -> "tor"
-                    OsType.WINDOWS -> "tor.exe"
-                    else -> throw RuntimeException("We don't support Tor on this OS")
-                }
-        }
+            if (!::mTorExecutableFile.isInitialized)
+                mTorExecutableFile = File(installDir, torExecutableFileName)
 
-        /**
-         * Constructs a builder with the specified configDir and installDir. The install directory contains executable
-         * and libraries, while the configDir is for writeable files.
-         *
-         *
-         * For Linux, the LD_LIBRARY_PATH will be set to the home directory, Any libraries must be in the installDir.
-         *
-         *
-         * For all platforms the configDir will be the default parent location of all files unless they are explicitly set
-         * to a different location in this builder.
-         *
-         * @param configDir
-         * @throws IllegalArgumentException if configDir is null
-         */
-        init {
-            requireNotNull(installDir) { "installDir is null" }
-            requireNotNull(configDir) { "configDir is null" }
-            this.configDir = configDir
-            this.installDir = installDir
-        }
-    }
+            if (!::mGeoIpFile.isInitialized)
+                mGeoIpFile = File(configDir, GEO_IP_NAME)
 
-    companion object {
-        const val GEO_IP_NAME = "geoip"
-        const val GEO_IPV_6_NAME = "geoip6"
-        const val TORRC_NAME = "torrc"
-        private const val HIDDEN_SERVICE_NAME = "hiddenservice"
+            if (!::mGeoIpv6File.isInitialized)
+                mGeoIpv6File = File(configDir, GEO_IPV_6_NAME)
 
-        /**
-         * Creates simplest default config. All tor files will be relative to the configDir root.
-         *
-         * @param configDir
-         * @return
-         */
-        fun createDefault(configDir: File?): TorConfig {
-            return Builder(
+            if (!::mTorrcFile.isInitialized)
+                mTorrcFile = File(configDir, TORRC_NAME)
+
+            if (!::mHiddenServiceDir.isInitialized)
+                mHiddenServiceDir = File(configDir, HIDDEN_SERVICE_NAME)
+
+            if (!::mDataDir.isInitialized)
+                mDataDir = File(configDir, "lib/tor")
+
+            if (!::mLibraryPath.isInitialized)
+                mLibraryPath = File(installDir, torExecutableFileName).parentFile
+
+            if (!::mHostnameFile.isInitialized)
+                mHostnameFile = File(mDataDir, "hostname")
+
+            if (!::mCookieAuthFile.isInitialized)
+                mCookieAuthFile = File(mDataDir, "control_auth_cookie")
+
+            if (!::mResolveConf.isInitialized)
+                mResolveConf = File(configDir, "resolv.conf")
+
+            if (!::mControlPortFile.isInitialized)
+                mControlPortFile = File(mDataDir, "control.txt")
+
+            if (mFileCreationTimeout <= 0)
+                mFileCreationTimeout = 15
+
+            return TorConfig(
+                mGeoIpFile,
+                mGeoIpv6File,
+                mTorrcFile,
+                mTorExecutableFile,
+                mHiddenServiceDir,
+                mDataDir,
                 configDir,
-                configDir
-            ).build()
-        }
-
-        /**
-         * All files will be in single directory: collapses the data and config directories
-         *
-         * @param configDir
-         * @return
-         */
-        fun createFlatConfig(configDir: File?): TorConfig {
-            return createConfig(configDir, configDir, configDir)
-        }
-
-        fun createConfig(
-            installDir: File?,
-            configDir: File?,
-            dataDir: File?
-        ): TorConfig {
-            val builder =
-                Builder(
-                    installDir,
-                    configDir
-                )
-            builder.dataDir(dataDir)
-            return builder.build()
+                mHomeDir,
+                mHostnameFile,
+                mCookieAuthFile,
+                mLibraryPath,
+                mResolveConf,
+                mControlPortFile,
+                installDir,
+                mFileCreationTimeout
+            )
         }
     }
 }
