@@ -71,7 +71,9 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
 object FileUtilities {
+
     private val LOG = LoggerFactory.getLogger(FileUtilities::class.java)
+
     fun setToReadOnlyPermissions(file: File): Boolean {
         return file.setReadable(false, false) &&
                 file.setWritable(false, false) &&
@@ -100,58 +102,49 @@ object FileUtilities {
      * @throws java.io.IOException - If close on input or output fails
      */
     @Throws(IOException::class)
-    fun copy(`in`: InputStream, out: OutputStream) {
-        try {
-            copyDoNotCloseInput(`in`, out)
-        } finally {
-            `in`.close()
+    fun copy(`in`: InputStream, out: OutputStream) =
+        `in`.use { inputStream ->
+            copyDoNotCloseInput(inputStream, out)
         }
-    }
 
     /**
      * Won't close the input stream when it's done, needed to handle ZipInputStreams
      * @param in Won't be closed
      * @param out Will be closed
-     * @throws java.io.IOException - If close on output fails
+     * @throws java.io.IOException If close on output fails
      */
     @Throws(IOException::class)
-    fun copyDoNotCloseInput(`in`: InputStream, out: OutputStream) {
-        try {
+    fun copyDoNotCloseInput(`in`: InputStream, out: OutputStream) =
+        out.use { outputStream ->
             val buf = ByteArray(4096)
             while (true) {
                 val read = `in`.read(buf)
                 if (read == -1) break
-                out.write(buf, 0, read)
+                outputStream.write(buf, 0, read)
             }
-        } finally {
-            out.close()
         }
-    }
 
-    fun listFilesToLog(f: File?) {
-        if (f!!.isDirectory) {
+    fun listFilesToLog(f: File) {
+        if (f.isDirectory)
             for (child in f.listFiles()) {
                 listFilesToLog(child)
             }
-        } else {
+        else
             LOG.info(f.absolutePath)
-        }
     }
 
     @Throws(IOException::class)
-    fun read(f: File?): ByteArray {
-        val b = ByteArray(f!!.length().toInt())
+    fun read(f: File): ByteArray {
+        val b = ByteArray(f.length().toInt())
         val `in` = FileInputStream(f)
-        return try {
+        return `in`.use { inputStream ->
             var offset = 0
             while (offset < b.size) {
-                val read = `in`.read(b, offset, b.size - offset)
+                val read = inputStream.read(b, offset, b.size - offset)
                 if (read == -1) throw EOFException()
                 offset += read
             }
             b
-        } finally {
-            `in`.close()
         }
     }
 
@@ -159,29 +152,26 @@ object FileUtilities {
      * Reads the input stream, deletes fileToWriteTo if it exists and over writes it with the stream.
      * @param readFrom Stream to read from
      * @param fileToWriteTo File to write to
+     *
      * @throws java.io.IOException - If any of the file operations fail
      */
     @Throws(IOException::class)
-    fun cleanInstallOneFile(
-        readFrom: InputStream,
-        fileToWriteTo: File
-    ) {
-        if (fileToWriteTo.exists() && !fileToWriteTo.delete()) {
+    fun cleanInstallOneFile(readFrom: InputStream, fileToWriteTo: File) {
+        if (fileToWriteTo.exists() && !fileToWriteTo.delete())
             throw RuntimeException("Could not remove existing file " + fileToWriteTo.name)
-        }
+
         val out: OutputStream = FileOutputStream(fileToWriteTo)
         copy(readFrom, out)
     }
 
     fun recursiveFileDelete(fileOrDirectory: File) {
-        if (fileOrDirectory.isDirectory) {
+        if (fileOrDirectory.isDirectory)
             for (child in fileOrDirectory.listFiles()) {
                 recursiveFileDelete(child)
             }
-        }
-        if (fileOrDirectory.exists() && !fileOrDirectory.delete()) {
+
+        if (fileOrDirectory.exists() && !fileOrDirectory.delete())
             throw RuntimeException("Could not delete directory " + fileOrDirectory.absolutePath)
-        }
     }
 
     /**
@@ -191,10 +181,7 @@ object FileUtilities {
      * @throws java.io.IOException - If there are any file errors
      */
     @Throws(IOException::class)
-    fun extractContentFromZip(
-        destinationDirectory: File?,
-        zipFileInputStream: InputStream?
-    ) {
+    fun extractContentFromZip(destinationDirectory: File, zipFileInputStream: InputStream) {
         val zipInputStream: ZipInputStream
         try {
             zipInputStream = ZipInputStream(zipFileInputStream)
@@ -220,7 +207,7 @@ object FileUtilities {
                 }
             }
         } finally {
-            zipFileInputStream?.close()
+            zipFileInputStream.close()
         }
     }
 }
