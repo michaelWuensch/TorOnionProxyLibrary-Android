@@ -29,14 +29,14 @@ abstract class BaseEventBroadcaster(settings: TorSettings?) : EventBroadcaster {
         get() = Status(this)
 
     override fun broadcastDebug(msg: String) {
-        if (mSettings.hasDebugLogs()) {
+        if (mSettings.hasDebugLogs) {
             LOG.debug(msg)
             broadcastLogMessage(msg)
         }
     }
 
     override fun broadcastException(msg: String, e: Exception) {
-        if (mSettings.hasDebugLogs()) {
+        if (mSettings.hasDebugLogs) {
             LOG.error(msg, e)
             val sw = StringWriter()
             e.printStackTrace(PrintWriter(sw))
@@ -48,7 +48,7 @@ abstract class BaseEventBroadcaster(settings: TorSettings?) : EventBroadcaster {
 
     override fun broadcastNotice(msg: String) {
         if (msg.isNotEmpty()) {
-            if (mSettings.hasDebugLogs()) {
+            if (mSettings.hasDebugLogs) {
                 LOG.debug(msg)
             }
             broadcastLogMessage(msg)

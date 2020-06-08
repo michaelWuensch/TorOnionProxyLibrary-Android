@@ -7,13 +7,12 @@ import java.util.*
  * make changes.
  */
 open class DefaultSettings : TorSettings {
-    override fun disableNetwork(): Boolean {
-        return true
-    }
 
-    override fun dnsPort(): String {
-        return "5400"
-    }
+    override val disableNetwork: Boolean
+        get() = true
+
+    override val dnsPort: String
+        get() = "5400"
 
     override val customTorrc: String?
         get() = null
@@ -69,69 +68,54 @@ open class DefaultSettings : TorSettings {
     override val virtualAddressNetwork: String?
         get() = null
 
-    override fun hasBridges(): Boolean {
-        return false
-    }
+    override val hasBridges: Boolean
+        get() = false
 
-    override fun hasConnectionPadding(): Boolean {
-        return false
-    }
+    override val hasConnectionPadding: Boolean
+        get() = false
 
-    override fun hasCookieAuthentication(): Boolean {
-        return true
-    }
+    override val hasCookieAuthentication: Boolean
+        get() = true
 
-    override fun hasDebugLogs(): Boolean {
-        return false
-    }
+    override val hasDebugLogs: Boolean
+        get() = false
 
-    override fun hasDormantCanceledByStartup(): Boolean {
-        return false
-    }
+    override val hasDormantCanceledByStartup: Boolean
+        get() = false
 
-    override fun hasIsolationAddressFlagForTunnel(): Boolean {
-        return false
-    }
+    override val hasIsolationAddressFlagForTunnel: Boolean
+        get() = false
 
-    override fun hasOpenProxyOnAllInterfaces(): Boolean {
-        return false
-    }
+    override val hasOpenProxyOnAllInterfaces: Boolean
+        get() = false
 
-    override fun hasReachableAddress(): Boolean {
-        return false
-    }
+    override val hasReachableAddress: Boolean
+        get() = false
 
-    override fun hasReducedConnectionPadding(): Boolean {
-        return true
-    }
+    override val hasReducedConnectionPadding: Boolean
+        get() = true
 
-    override fun hasSafeSocks(): Boolean {
-        return false
-    }
+    override val hasSafeSocks: Boolean
+        get() = false
 
-    override fun hasStrictNodes(): Boolean {
-        return false
-    }
+    override val hasStrictNodes: Boolean
+        get() = false
 
-    override fun hasTestSocks(): Boolean {
-        return false
-    }
+    override val hasTestSocks: Boolean
+        get() = false
 
-    override val isAutomapHostsOnResolve: Boolean
+    override val isAutoMapHostsOnResolve: Boolean
         get() = true
 
     override val isRelay: Boolean
         get() = false
 
-    override fun runAsDaemon(): Boolean {
-        return true
-    }
+    override val runAsDaemon: Boolean
+        get() = true
 
-    override fun transPort(): String {
-        return "9040"
-    }
+    override val transPort: String
+        get() = "9040"
 
-    override fun useSocks5(): Boolean {
-        return false
-    }
+    override val useSocks5: Boolean
+        get() = false
 }

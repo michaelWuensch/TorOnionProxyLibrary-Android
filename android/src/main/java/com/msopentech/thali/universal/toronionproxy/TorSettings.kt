@@ -1,45 +1,81 @@
 package com.msopentech.thali.universal.toronionproxy
 
 interface TorSettings {
-    fun disableNetwork(): Boolean
-    fun dnsPort(): String
+
+    val disableNetwork: Boolean
+
+    val dnsPort: String
+
     val customTorrc: String?
+
     val entryNodes: String?
+
     val excludeNodes: String?
+
     val exitNodes: String?
+
     val httpTunnelPort: Int
 
     /**
      * Returns a list of supported bridges. The string value will include the name: meek_lite, obfs4
      */
     val listOfSupportedBridges: List<String>
+
     val proxyHost: String?
+
     val proxyPassword: String?
+
     val proxyPort: String?
+
     val proxySocks5Host: String?
+
     val proxySocks5ServerPort: String?
+
     val proxyType: String?
+
     val proxyUser: String?
+
     val reachableAddressPorts: String
+
     val relayNickname: String?
+
     val relayPort: Int
+
     val socksPort: String
+
     val virtualAddressNetwork: String?
-    fun hasBridges(): Boolean
-    fun hasConnectionPadding(): Boolean
-    fun hasCookieAuthentication(): Boolean
-    fun hasDebugLogs(): Boolean
-    fun hasDormantCanceledByStartup(): Boolean
-    fun hasIsolationAddressFlagForTunnel(): Boolean
-    fun hasOpenProxyOnAllInterfaces(): Boolean
-    fun hasReachableAddress(): Boolean
-    fun hasReducedConnectionPadding(): Boolean
-    fun hasSafeSocks(): Boolean
-    fun hasStrictNodes(): Boolean
-    fun hasTestSocks(): Boolean
-    val isAutomapHostsOnResolve: Boolean
+
+    val hasBridges: Boolean
+
+    val hasConnectionPadding: Boolean
+
+    val hasCookieAuthentication: Boolean
+
+    val hasDebugLogs: Boolean
+
+    val hasDormantCanceledByStartup: Boolean
+
+    val hasIsolationAddressFlagForTunnel: Boolean
+
+    val hasOpenProxyOnAllInterfaces: Boolean
+
+    val hasReachableAddress: Boolean
+
+    val hasReducedConnectionPadding: Boolean
+
+    val hasSafeSocks: Boolean
+
+    val hasStrictNodes: Boolean
+
+    val hasTestSocks: Boolean
+
+    val isAutoMapHostsOnResolve: Boolean
+
     val isRelay: Boolean
-    fun runAsDaemon(): Boolean
-    fun transPort(): String
-    fun useSocks5(): Boolean
+
+    val runAsDaemon: Boolean
+
+    val transPort: String
+
+    val useSocks5: Boolean
 }
