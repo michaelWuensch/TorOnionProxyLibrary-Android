@@ -61,29 +61,28 @@ object Utilities {
         // field 6: the domain name of the host we want to contact, variable length, terminated with a null (0x00)
         val socket = Socket()
         socket.soTimeout = READ_TIMEOUT_MILLISECONDS
+
         val socksAddress: SocketAddress = InetSocketAddress(socksHost, socksPort)
-        socket.connect(
-            socksAddress,
-            CONNECT_TIMEOUT_MILLISECONDS
-        )
-        val outputStream =
-            DataOutputStream(socket.getOutputStream())
-        outputStream.write(0x04 as Byte.toInt())
-        outputStream.write(0x01 as Byte.toInt())
-        outputStream.writeShort(networkPort as Short.toInt())
+        socket.connect(socksAddress, CONNECT_TIMEOUT_MILLISECONDS)
+
+        val outputStream = DataOutputStream(socket.getOutputStream())
+        outputStream.write(byteArrayOf(0x04.toByte()))
+        outputStream.write(byteArrayOf(0x01.toByte()))
+        outputStream.writeShort(networkPort)
         outputStream.writeInt(0x01)
-        outputStream.write(0x00 as Byte.toInt())
+        outputStream.write(byteArrayOf(0x00.toByte()))
         outputStream.write(networkHost.toByteArray())
-        outputStream.write(0x00 as Byte.toInt())
+        outputStream.write(byteArrayOf(0x00.toByte()))
+
         val inputStream = DataInputStream(socket.getInputStream())
         val firstByte = inputStream.readByte()
         val secondByte = inputStream.readByte()
         if (firstByte != 0x00.toByte() || secondByte != 0x5a.toByte()) {
             socket.close()
             throw IOException(
-                "SOCKS4a connect failed, got " + firstByte + " - " + secondByte +
-                        ", but expected 0x00 - 0x5a:, networkHost= " + networkHost + ", networkPort = " + networkPort
-                        + ", socksHost=" + socksHost + ",socksPort=" + socksPort
+                "SOCKS4a connect failed, got $firstByte - $secondByte, but expected 0x00 - 0x5a: "
+                        + "networkHost = $networkHost, networkPort = $networkPort, "
+                        + "socksHost = $socksHost, socksPort = $socksPort"
             )
         }
         inputStream.readShort()
