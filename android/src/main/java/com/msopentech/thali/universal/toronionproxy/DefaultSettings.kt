@@ -69,7 +69,7 @@ open class DefaultSettings : TorSettings {
         get() = null
 
     override val hasBridges: Boolean
-        get() = false
+        get() = true
 
     override val hasConnectionPadding: Boolean
         get() = false
