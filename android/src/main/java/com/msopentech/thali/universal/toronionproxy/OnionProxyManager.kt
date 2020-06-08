@@ -430,7 +430,7 @@ open class OnionProxyManager(
                 controlPortTokens[0].split("=".toRegex()).toTypedArray()[1],
                 control_port
             )
-            controlConnection = TorControlConnection(controlSocket)
+            controlConnection = TorControlConnection(controlSocket!!)
             eventBroadcaster.broadcastNotice("SUCCESS connected to Tor control port.")
         } catch (e: IOException) {
             throw IOException(e.message)
