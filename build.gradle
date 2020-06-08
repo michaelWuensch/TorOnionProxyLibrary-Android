@@ -1,13 +1,21 @@
-allprojects  {
-  apply plugin: 'maven'
-  group = 'com.msopentech.thali'
-  version = '0.0.3'
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:4.0.0"
+    }
 }
 
-subprojects {
-  repositories {
-    mavenLocal()
-    mavenCentral()
-    maven { url "https://repo.spring.io/plugins-release" }
-  }
+allprojects  {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+task clean(type: Delete) {
+  delete rootProject.buildDir
 }

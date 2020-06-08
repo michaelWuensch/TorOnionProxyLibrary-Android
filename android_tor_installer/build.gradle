@@ -1,21 +1,8 @@
 apply plugin: 'com.android.library'
-apply plugin: 'maven'
-apply plugin: 'maven-publish'
-
-buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        jcenter()
-        google()
-    }
-    dependencies {
-        classpath "com.android.tools.build:gradle:4.0.0"
-    }
-}
 
 android {
     compileSdkVersion 28
+    buildToolsVersion "29.0.3"
 
     defaultConfig {
         minSdkVersion 16
@@ -24,7 +11,6 @@ android {
         versionName "0.0.3"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
@@ -35,48 +21,8 @@ android {
     }
 }
 
-publishing {
-    publications {
-        android(MavenPublication) {
-            groupId 'com.msopentech.thali.toronionproxy.android'
-            artifactId 'android_tor_installer'
-            version '0.0.3'
-            afterEvaluate {
-                artifact(sourceJar)
-            }
-            artifact("$buildDir/outputs/aar/android_tor_installer-release.aar")
-            pom.withXml {
-                def dependenciesNode = asNode().appendNode('dependencies')
-                //Iterate over the compile dependencies (we don't want the test ones), adding a <dependency> node for each
-                configurations.compile.allDependencies.each {
-                    if(it.group != null && (it.name != null || "unspecified".equals(it.name)) && it.version != null)
-                    {
-                        def dependencyNode = dependenciesNode.appendNode('dependency')
-                        dependencyNode.appendNode('groupId', it.group)
-                        dependencyNode.appendNode('artifactId', it.name)
-                        dependencyNode.appendNode('version', it.version)
-                    }
-                }
-            }
-        }
-    }
-}
-
-task sourceJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier "source"
-}
-
 dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation project(':android')
     implementation 'org.torproject:tor-android-binary:0.4.2.7a'
-}
-
-repositories {
-    mavenLocal()
-    mavenCentral()
-    google()
-    maven { url "https://repo.spring.io/plugins-release" }
-    maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
-
 }
