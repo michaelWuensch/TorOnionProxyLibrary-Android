@@ -34,18 +34,31 @@ import android.content.IntentFilter
 import android.net.ConnectivityManager
 import com.msopentech.thali.universal.toronionproxy.*
 import net.freehaven.tor.control.EventHandler
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.IOException
 
 class AndroidOnionProxyManager(
-    private override val context: Context, torConfig: TorConfig?,
-    torInstaller: TorInstaller?, settings: TorSettings?,
-    eventBroadcaster: EventBroadcaster?, eventHandler: EventHandler?
+    private val context: Context,
+    torConfig: TorConfig,
+    torInstaller: TorInstaller,
+    settings: TorSettings?,
+    eventBroadcaster: EventBroadcaster?,
+    eventHandler: EventHandler?
 ) : OnionProxyManager(
-    AndroidOnionProxyContext(torConfig, torInstaller, settings),
+    AndroidOnionProxyContext(
+        torConfig,
+        torInstaller,
+        settings
+    ),
     eventBroadcaster,
     eventHandler
 ) {
+
+    private companion object {
+        val LOG: Logger = LoggerFactory.getLogger(AndroidOnionProxyManager::class.java)
+    }
+
     @Volatile
     private var networkStateReceiver: BroadcastReceiver? = null
 
@@ -65,53 +78,43 @@ class AndroidOnionProxyManager(
         try {
             super.stop()
         } finally {
-            if (networkStateReceiver != null) {
-                try {
-                    context.unregisterReceiver(networkStateReceiver)
-                } catch (e: IllegalArgumentException) {
-                    // There is a race condition where if someone calls stop before installAndStartTorOp is done
-                    // then we could get an exception because the network state receiver might not be properly
-                    // registered.
-                    LOG.info(
-                        "Someone tried to call stop before we had finished registering the receiver",
-                        e
-                    )
-                }
+            if (networkStateReceiver == null) return
+
+            try {
+                context.unregisterReceiver(networkStateReceiver)
+            } catch (e: IllegalArgumentException) {
+                // There is a race condition where if someone calls stop before
+                // installAndStartTorOp is done then we could get an exception because
+                // the network state receiver might not be properly registered.
+                LOG.info("Someone tried to call stop before registering the receiver finished", e)
             }
         }
     }
 
     private inner class NetworkStateReceiver : BroadcastReceiver() {
+
         override fun onReceive(ctx: Context, i: Intent) {
+
             Thread(Runnable {
-                if (!isRunning) {
-                    return@Runnable
-                }
-                var online =
-                    !i.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false)
+                if (!isRunning) return@Runnable
+
+                var online = !i.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false)
                 if (online) {
                     // Some devices fail to set EXTRA_NO_CONNECTIVITY, double check
-                    val o =
-                        ctx.getSystemService(Context.CONNECTIVITY_SERVICE)
-                    val cm = o as ConnectivityManager
+                    val cm = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
                     val net = cm.activeNetworkInfo
-                    if (net == null || !net.isConnected) {
+                    if (net == null || !net.isConnected)
                         online = false
-                    }
                 }
                 LOG.info("Online: $online")
+
                 try {
                     enableNetwork(online)
                 } catch (e: IOException) {
                     LOG.warn(e.toString(), e)
                 }
+
             }).start()
         }
     }
-
-    companion object {
-        private val LOG =
-            LoggerFactory.getLogger(AndroidOnionProxyManager::class.java)
-    }
-
 }
