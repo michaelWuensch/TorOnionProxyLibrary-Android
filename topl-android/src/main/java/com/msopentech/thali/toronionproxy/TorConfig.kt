@@ -325,7 +325,7 @@ class TorConfig private constructor(
                 mDataDir = File(configDir, "lib/tor")
 
             if (!::mLibraryPath.isInitialized)
-                mLibraryPath = File(installDir, torExecutableFileName).parentFile
+                mLibraryPath = mTorExecutableFile.parentFile
 
             if (!::mHostnameFile.isInitialized)
                 mHostnameFile = File(mDataDir, "hostname")
