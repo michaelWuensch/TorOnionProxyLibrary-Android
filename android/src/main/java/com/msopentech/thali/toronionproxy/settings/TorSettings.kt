@@ -1,4 +1,4 @@
-package com.msopentech.thali.universal.toronionproxy
+package com.msopentech.thali.toronionproxy.settings
 
 interface TorSettings {
 

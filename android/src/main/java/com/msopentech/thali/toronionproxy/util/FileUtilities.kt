@@ -63,7 +63,7 @@ http://www.gnu.org/licenses/lgpl.html
 *****
 
  */
-package com.msopentech.thali.universal.toronionproxy
+package com.msopentech.thali.toronionproxy.util
 
 import org.slf4j.LoggerFactory
 import java.io.*

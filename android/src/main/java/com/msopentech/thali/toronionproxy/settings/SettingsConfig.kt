@@ -10,25 +10,19 @@ MERCHANTABLITY OR NON-INFRINGEMENT.
 
 See the Apache 2 License for the specific language governing permissions and limitations under the License.
 */
-package com.msopentech.thali.universal.toronionproxy
+package com.msopentech.thali.toronionproxy.settings
 
 /**
- * Service for sending event logs to the system
+ * Annotates [TorSettingsBuilder] methods. When [TorSettingsBuilder.updateTorConfig] is invoked,
+ * it will use this annotation to automatically detect and use the associated method as part of
+ * building the config.
+ *
+ * The annotated method must have a no args.
  */
-interface EventBroadcaster {
-
-    val status: Status
-
-    fun broadcastBandwidth(upload: Long, download: Long, written: Long, read: Long)
-
-    fun broadcastDebug(msg: String)
-
-    fun broadcastException(msg: String, e: Exception)
-
-    fun broadcastLogMessage(logMessage: String)
-
-    fun broadcastNotice(msg: String)
-
-    fun broadcastStatus()
-
-}
+@kotlin.annotation.Retention(AnnotationRetention.RUNTIME)
+@Target(
+    AnnotationTarget.FUNCTION,
+    AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.PROPERTY_SETTER
+)
+annotation class SettingsConfig
