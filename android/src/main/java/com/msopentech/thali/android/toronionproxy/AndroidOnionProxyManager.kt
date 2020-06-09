@@ -46,11 +46,7 @@ class AndroidOnionProxyManager(
     eventBroadcaster: EventBroadcaster?,
     eventHandler: EventHandler?
 ) : OnionProxyManager(
-    AndroidOnionProxyContext(
-        torConfig,
-        torInstaller,
-        settings
-    ),
+    OnionProxyContext(torConfig, torInstaller, settings),
     eventBroadcaster,
     eventHandler
 ) {

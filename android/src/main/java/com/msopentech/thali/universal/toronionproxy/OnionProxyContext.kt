@@ -12,6 +12,8 @@ See the Apache 2 License for the specific language governing permissions and lim
 */
 package com.msopentech.thali.universal.toronionproxy
 
+import android.os.Process
+import com.msopentech.thali.android.toronionproxy.AndroidWriteObserver
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.BufferedWriter
@@ -31,7 +33,7 @@ import java.io.IOException
  * @param [torInstaller] [TorInstaller]
  * @param [torSettings] [TorSettings]?
  */
-abstract class OnionProxyContext(
+class OnionProxyContext(
     val torConfig: TorConfig,
     val torInstaller: TorInstaller,
     torSettings: TorSettings?
@@ -158,8 +160,10 @@ abstract class OnionProxyContext(
      *
      * @return process id
      */
-    abstract val processId: String
+    val processId: String
+        get() = Process.myPid().toString()
 
     @Throws(IOException::class)
-    abstract fun generateWriteObserver(file: File): WriteObserver
+    fun generateWriteObserver(file: File): WriteObserver =
+        AndroidWriteObserver(file)
 }
