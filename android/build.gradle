@@ -38,12 +38,9 @@ dependencies {
     implementation 'net.freehaven.tor.control:jtorctl:0.2'
     implementation 'org.slf4j:slf4j-api:1.7.30'
     implementation 'org.slf4j:slf4j-android:1.7.30'
-//    implementation 'com.android.support:appcompat-v7:28.0.0'
 
     testImplementation 'junit:junit:4.12'
 
-//    androidTestImplementation project(':android_tor_installer')
-//    androidTestImplementation 'org.torproject:tor-android-binary:0.4.2.7a'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }
@@ -52,12 +49,13 @@ dependencies {
  * Rename the native libraries to have 'so' extension so that the build will automatically package it in aar
  */
 task copyPluggableTransports(type: Copy) {
-    from "../external/pluto/bin"
+    from('../external/pluto/bin') {
+        exclude 'armeabi'
+    }
     into "src/main/jniLibs"
     rename { filename ->
         filename.replace 'obfs4proxy', 'libObfs4proxy.so'
     }
-    delete 'src/main/jniLibs/armeabi'
 }
 
 gradle.projectsEvaluated {
