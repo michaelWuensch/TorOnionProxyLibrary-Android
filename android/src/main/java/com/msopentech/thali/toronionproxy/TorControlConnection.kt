@@ -15,6 +15,7 @@ class TorControlConnection : TorControlConnection {
     constructor(reader: Reader, writer: Writer) :
             super(reader, writer) {}
 
+    @Suppress("INACCESSIBLE_TYPE")
     @Throws(IOException::class)
     fun takeownership() {
         sendAndWaitForResponse("TAKEOWNERSHIP\r\n", null)

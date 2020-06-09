@@ -422,7 +422,10 @@ class OnionProxyManager(
         }
 
         networkStateReceiver = NetworkStateReceiver()
+
+        @Suppress("DEPRECATION")
         val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+
         context.registerReceiver(networkStateReceiver, filter)
 
         LOG.info("Completed starting of tor")
