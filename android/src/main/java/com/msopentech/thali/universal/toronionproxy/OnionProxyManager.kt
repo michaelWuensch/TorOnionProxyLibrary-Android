@@ -27,6 +27,11 @@ See the Apache 2 License for the specific language governing permissions and lim
 */
 package com.msopentech.thali.universal.toronionproxy
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import net.freehaven.tor.control.EventHandler
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -52,8 +57,9 @@ import java.util.concurrent.TimeUnit
  * @param [eventBroadcaster] [EventBroadcaster]? will fallback to defaults if null
  * @param [eventHandler] [EventHandler]? will fallback to defaults if null
  */
-open class OnionProxyManager(
-    val onionProxyContext: OnionProxyContext,
+class OnionProxyManager(
+    private val context: Context,
+    private val onionProxyContext: OnionProxyContext,
     eventBroadcaster: EventBroadcaster?,
     eventHandler: EventHandler?
 ) {
@@ -77,6 +83,9 @@ open class OnionProxyManager(
 
     private val eventBroadcaster: EventBroadcaster = eventBroadcaster ?: DefaultEventBroadcaster()
     private val eventHandler: EventHandler = eventHandler ?: OnionProxyManagerEventHandler()
+
+    @Volatile
+    private var networkStateReceiver: BroadcastReceiver? = null
 
     @Volatile
     private var controlSocket: Socket? = null
@@ -233,7 +242,7 @@ open class OnionProxyManager(
      */
     @Synchronized
     @Throws(IOException::class)
-    open fun stop() {
+    fun stop() {
         try {
             if (controlConnection == null) return
 
@@ -250,6 +259,17 @@ open class OnionProxyManager(
                 } finally {
                     controlSocket = null
                 }
+            }
+
+            if (networkStateReceiver == null) return
+
+            try {
+                context.unregisterReceiver(networkStateReceiver)
+            } catch (e: IllegalArgumentException) {
+                // There is a race condition where if someone calls stop before
+                // installAndStartTorOp is done then we could get an exception because
+                // the network state receiver might not be properly registered.
+                LOG.info("Someone tried to call stop before registering the receiver finished", e)
             }
         }
     }
@@ -341,7 +361,7 @@ open class OnionProxyManager(
      */
     @Synchronized
     @Throws(IOException::class)
-    open fun start() {
+    fun start() {
         if (controlConnection != null) {
             LOG.info("Control connection not null. aborting")
             return
@@ -397,6 +417,11 @@ open class OnionProxyManager(
             this.controlConnection = null
             throw IOException(e.message)
         }
+
+        networkStateReceiver = NetworkStateReceiver()
+        val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        context.registerReceiver(networkStateReceiver, filter)
+
         LOG.info("Completed starting of tor")
     }
 
@@ -749,4 +774,32 @@ open class OnionProxyManager(
                 throw Exception("Cannot kill: ${onionProxyContext.torConfig.torExecutableFile.absolutePath}")
         }
     }
+
+    private inner class NetworkStateReceiver : BroadcastReceiver() {
+
+        override fun onReceive(ctx: Context, i: Intent) {
+
+            Thread(Runnable {
+                if (!isRunning) return@Runnable
+
+                var online = !i.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false)
+                if (online) {
+                    // Some devices fail to set EXTRA_NO_CONNECTIVITY, double check
+                    val cm = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                    val net = cm.activeNetworkInfo
+                    if (net == null || !net.isConnected)
+                        online = false
+                }
+                LOG.info("Online: $online")
+
+                try {
+                    enableNetwork(online)
+                } catch (e: IOException) {
+                    LOG.warn(e.toString(), e)
+                }
+
+            }).start()
+        }
+    }
+
 }
