@@ -1,18 +1,20 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion versions.compileSdk
     buildToolsVersion "29.0.3"
 
     defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 28
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.compileSdk
         versionCode 1
-        versionName "0.0.3"
+        versionName VERSION_NAME
 
-        consumerProguardFiles 'proguard-rules.pro'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        testInstrumentationRunnerArguments disableAnalytics: 'true'
+        consumerProguardFiles 'proguard-rules.pro'
     }
 
     buildTypes {
@@ -34,16 +36,16 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'net.freehaven.tor.control:jtorctl:0.2'
-    implementation 'org.slf4j:slf4j-api:1.7.30'
-    implementation 'org.slf4j:slf4j-android:1.7.30'
+    implementation deps.kotlin.stdlib
+    implementation deps.jtorctl
+    implementation deps.slf4j.api
+    implementation deps.slf4j.android
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation deps.junit
 
-    androidTestImplementation 'androidx.test:core:1.2.0'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation deps.androidx.test.core
+    androidTestImplementation deps.androidx.test.junit
+    androidTestImplementation deps.androidx.test.espresso
 }
 
 task updatePluggableTransportsSubmodule(type: Exec) {

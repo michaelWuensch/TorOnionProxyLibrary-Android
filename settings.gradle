@@ -1,2 +1,2 @@
-rootProject.name = 'project'
-include 'topl-android'
+rootProject.name = 'topl-kotlin-android'
+include ':topl-android'
