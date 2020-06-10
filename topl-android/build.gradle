@@ -74,7 +74,7 @@ task copyTorBinaries(type: Copy, dependsOn: buildTorBinaries) {
 
 task updateTorBinaries(type: Exec, dependsOn: copyTorBinaries) {
     workingDir "$rootDir"
-    commandLine 'scripts/update_tor_binaries.sh', 'update_version_number'
+    commandLine 'scripts/update_tor_binaries.sh', 'update_versions_file'
 }
 
 task checkForTorBinaryUpdate(type: Exec) {

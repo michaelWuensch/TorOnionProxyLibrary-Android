@@ -3,5 +3,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 cd "$DIR"/../external/AndroidPluggableTransports || exit 1
-git pull
+
+git pull || exit 1
+
 exit 0

@@ -4,7 +4,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 cd "$DIR"/../external/tor-android || exit 1
-git fetch
+git fetch || exit 1
 
 CURRENT_BRANCH=$( git status | grep "On branch " | cut -d ' ' -f 3 )
 LATEST_BRANCH=
@@ -29,7 +29,7 @@ is_newer_binary_available() {
   local BRANCH=
   mapfile -t BRANCHES < <( git branch -a | grep "remotes/origin/tor-android-binary-tor-" | cut -d '/' -f 3)
 
-  if echo "$CURRENT_BRANCH" | grep "tor-android-binary-tor-"; then
+  if echo "$CURRENT_BRANCH" | grep "tor-android-binary-tor-" > /dev/null 2>&1; then
     update_latest_branch "$CURRENT_BRANCH"
   else
     update_latest_branch ${BRANCHES[0]}
@@ -51,10 +51,6 @@ is_newer_binary_available() {
 }
 
 build() {
-  if ! is_newer_binary_available; then
-    exit 0
-  fi
-
   git checkout "$LATEST_BRANCH" && git pull
 
   if ! ./tor-droid-make.sh fetch; then
@@ -70,61 +66,105 @@ build() {
   return 0
 }
 
-EXIT_ARG=0
-if [ "$1" == "build" ]; then
-
+check_for_needed_environment_variables() {
   if [ -z "$ANDROID_HOME" ]; then
     echo "ANDROID_HOME environment variable not set"
-    exit 1
+    return 1
+  elif [ ! -d "$ANDROID_HOME/build-tools" ]; then
+    echo "$ANDROID_HOME/build-tools/ doesn't exist, check your ANDROID_HOME path"
+    return 1
   fi
 
   if [ -z "$ANDROID_NDK_HOME" ]; then
     echo "ANDROID_NDK_HOME environment variable not set"
-    exit 1
+    return 1
+  elif [ ! -f "$ANDROID_NDK_HOME/ndk-build" ]; then
+    echo "$ANDROID_NDK_HOME/ndk-build doesn't exist, check your ANDROID_NDK_HOME path"
+    return 1
   fi
 
-  if build; then
-    if [ "$CURRENT_BRANCH" != "master" ]; then
-      git branch -D "$CURRENT_BRANCH"
-    fi
-  else
-    git add --all
-    git stash
-    git stash drop
-    git checkout "$CURRENT_BRANCH"
-    ./tor-droid-make.sh fetch
-    git branch -D "$LATEST_BRANCH"
-    EXIT_ARG=1
-  fi
+  return 0
+}
 
-elif [ "$1" == "update_version_number" ]; then
-
-  TOR_VERSION=$( git -C external/tor describe --tags --always | cut -d '-' -f 2 )
-  sed -i "s/TOR_BINARY_VERSION.*/TOR_BINARY_VERSION=$TOR_VERSION/" "$DIR/../.versions"
-  unset TOR_VERSION
-
-elif [ "$1" == "check_for_update" ]; then
-
-  if is_newer_binary_available; then
-    echo ""
-    echo "---------------------------------------------------"
-    echo "|     A newer tor binary version is available     |"
-    echo "---------------------------------------------------"
-    echo ""
-  fi
-
-else
-
-  echo "Invalid Arguments"
+newer_binaries_available_msg() {
   echo ""
-  echo "Arguments:"
-  echo "            build                   checks for newer version and builds tor binaries"
-  echo "            update_version_number   increases TOR_BINARY_VERSION in .versions file"
-  echo "            check_for_update        checks if a newer tor binary version is available"
-  EXIT_ARG=1
+  echo "    ==========================================================="
+  echo "    | ======================================================= |"
+  echo "    | |                                                     | |"
+  echo "    | |     A **NEWER** tor binary version is available     | |"
+  echo "    | |                                                     | |"
+  echo "    | ======================================================= |"
+  echo "    ==========================================================="
+  echo ""
+}
 
-fi
+binaries_are_up_to_date_msg() {
+  echo ""
+  echo "    ==================================================="
+  echo "    ||           Tor binaries are up to date         ||"
+  echo "    ==================================================="
+  echo ""
+}
 
-unset CURRENT_BRANCH LATEST_BRANCH LATEST_BRANCH_VERSION_NUM TOR_VERSION
+display_help_message() {
+  echo ""
+  echo "    Invalid Arguments"
+  echo ""
+  echo "    Arguments:"
+  echo "                build                   checks for newer version and builds tor binaries"
+  echo "                update_versions_file    increases TOR_BINARY_VERSION in .versions file"
+  echo "                check_for_update        checks if a newer tor binary version is available"
+  echo ""
+}
+
+EXIT_ARG=0
+case "$1" in
+  "build")
+
+    check_for_needed_environment_variables || exit 1
+
+    if is_newer_binary_available; then
+      newer_binaries_available_msg
+    else
+      binaries_are_up_to_date_msg
+      exit 0
+    fi
+
+    if ! build; then
+      git add --all
+      git stash
+      git stash drop
+      git checkout "$CURRENT_BRANCH"
+      ./tor-droid-make.sh fetch
+      git branch -D "$LATEST_BRANCH"
+      EXIT_ARG=1
+    fi
+    ;;
+
+  "update_versions_file")
+
+    VERSION=$( git -C external/tor describe --tags --always | cut -d '-' -f 2 )
+    sed -i "s/TOR_BINARY_VERSION.*/TOR_BINARY_VERSION=$VERSION/" "$DIR/../.versions"
+    unset TOR_VERSION
+    ;;
+
+  "check_for_update")
+
+    if is_newer_binary_available; then
+      newer_binaries_available_msg
+    else
+      binaries_are_up_to_date_msg
+    fi
+    ;;
+
+  *)
+
+    display_help_message
+    EXIT_ARG=1
+    ;;
+
+esac
+
+unset CURRENT_BRANCH LATEST_BRANCH LATEST_BRANCH_VERSION_NUM
 
 exit $EXIT_ARG
