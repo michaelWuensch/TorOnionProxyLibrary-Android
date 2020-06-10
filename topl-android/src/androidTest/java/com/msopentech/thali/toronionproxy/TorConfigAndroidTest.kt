@@ -1,25 +1,34 @@
-package com.msopentech.toronionproxy
+package com.msopentech.thali.toronionproxy
 
-import com.msopentech.thali.toronionproxy.TorConfig
-import org.junit.Assert
+import android.content.Context
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.filters.LargeTest
+import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import java.io.File
 
-class TorConfigUnitTest {
+@RunWith(AndroidJUnit4ClassRunner::class)
+@LargeTest
+class TorConfigAndroidTest {
 
-    private val sampleFile = File("sample")
+    private val appContext: Context by lazy {
+        ApplicationProvider.getApplicationContext() as Context
+    }
     private lateinit var torConfigBuilder: TorConfig.Builder
+    private val sampleFile = File("sample")
 
     @Before
     fun setup() {
-        torConfigBuilder = TorConfig.Builder(sampleFile, sampleFile)
+        torConfigBuilder = TorConfig.Builder(appContext, sampleFile)
     }
 
     @Test
     fun defaultDataDir() {
         val config = torConfigBuilder.build()
-        Assert.assertEquals(
+        assertEquals(
             File(sampleFile, "lib/tor").path, config.dataDir.path
         )
     }
@@ -27,7 +36,7 @@ class TorConfigUnitTest {
     @Test
     fun defaultCookie() {
         val config = torConfigBuilder.build()
-        Assert.assertEquals(
+        assertEquals(
             File(sampleFile, "lib/tor/control_auth_cookie").path, config.cookieAuthFile.path
         )
     }
@@ -35,7 +44,7 @@ class TorConfigUnitTest {
     @Test
     fun defaultHostname() {
         val config = torConfigBuilder.build()
-        Assert.assertEquals(
+        assertEquals(
             File(sampleFile, "lib/tor/hostname").path, config.hostnameFile.path
         )
     }
@@ -43,8 +52,17 @@ class TorConfigUnitTest {
     @Test
     fun libraryPathRelativeToExecutable() {
         val config = torConfigBuilder.torExecutable(File(sampleFile, "exedir/tor.real")).build()
-        Assert.assertEquals(
+        assertEquals(
             File(sampleFile, "exedir").path,
+            config.libraryPath.path
+        )
+    }
+
+    @Test
+    fun libraryPathDefaultExecutableInstall() {
+        val config = torConfigBuilder.build()
+        assertEquals(
+            appContext.applicationInfo.nativeLibraryDir,
             config.libraryPath.path
         )
     }
@@ -53,7 +71,7 @@ class TorConfigUnitTest {
     fun defaultCookieWithDataDir() {
         val dataDir = File("sample/datadir")
         val config = torConfigBuilder.dataDir(dataDir).build()
-        Assert.assertEquals(
+        assertEquals(
             File(dataDir, "control_auth_cookie").path,
             config.cookieAuthFile.path
         )
@@ -62,7 +80,7 @@ class TorConfigUnitTest {
     @Test
     fun geoip() {
         val config = torConfigBuilder.build()
-        Assert.assertEquals(
+        assertEquals(
             File(sampleFile, TorConfig.GEO_IP_NAME).path,
             config.geoIpFile.path
         )
