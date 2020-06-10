@@ -41,23 +41,48 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
 
+    androidTestImplementation 'androidx.test:core:1.2.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }
 
-/**
- * Rename the native libraries to have 'so' extension so that the build will automatically package it in aar
- */
-task copyPluggableTransports(type: Copy) {
-    from('../external/pluto/bin') {
-        exclude 'armeabi'
-    }
-    into "src/main/jniLibs"
+task updatePluggableTransportsSubmodule(type: Exec) {
+    workingDir "$rootDir"
+    commandLine "scripts/pull_latest_transports.sh"
+}
+
+task copyPluggableTransports(type: Copy, dependsOn: updatePluggableTransportsSubmodule) {
+    from("$rootDir/external/AndroidPluggableTransports/APTDispatchLibrary-MeekObfs4-Legacy/src/main/libs")
+    into("src/main/jniLibs")
     rename { filename ->
-        filename.replace 'obfs4proxy', 'libObfs4proxy.so'
+        filename.replace "$filename", 'libObfs4proxy.so'
     }
 }
 
+task buildTorBinaries(type: Exec) {
+    workingDir "$rootDir"
+    commandLine 'scripts/update_tor_binaries.sh', 'build'
+}
+
+task copyTorBinaries(type: Copy, dependsOn: buildTorBinaries) {
+    from("$rootDir/external/tor-android/tor-android-binary/src/main/libs")
+    into("src/main/jniLibs")
+    rename { filename ->
+        filename.replace "$filename", 'libTor.so'
+    }
+}
+
+task updateTorBinaries(type: Exec, dependsOn: copyTorBinaries) {
+    workingDir "$rootDir"
+    commandLine 'scripts/update_tor_binaries.sh', 'update_version_number'
+}
+
+task checkForTorBinaryUpdate(type: Exec) {
+    workingDir "$rootDir"
+    commandLine 'scripts/update_tor_binaries.sh', 'check_for_update'
+}
+
 gradle.projectsEvaluated {
+    preBuild.dependsOn(checkForTorBinaryUpdate)
     preBuild.dependsOn(copyPluggableTransports)
 }
