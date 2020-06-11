@@ -1,12 +1,13 @@
 package com.msopentech.thali.toronionproxy.settings
 
+import io.matthewnelson.topl_settings.TorSettings
 import java.util.*
 
 /**
  * Provides some reasonable default settings. Override this class or create a new implementation to
  * make changes.
  */
-open class DefaultSettings : TorSettings {
+open class DefaultSettings : TorSettings() {
 
     override val disableNetwork: Boolean
         get() = true

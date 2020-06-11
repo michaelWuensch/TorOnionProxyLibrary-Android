@@ -13,6 +13,7 @@ See the Apache 2 License for the specific language governing permissions and lim
 package com.msopentech.thali.toronionproxy.settings
 
 import com.msopentech.thali.toronionproxy.OnionProxyContext
+import io.matthewnelson.topl_settings.TorSettings
 import java.io.*
 import java.net.InetSocketAddress
 import java.net.Socket

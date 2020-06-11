@@ -14,7 +14,7 @@ package com.msopentech.thali.toronionproxy
 
 import android.os.Process
 import com.msopentech.thali.toronionproxy.settings.DefaultSettings
-import com.msopentech.thali.toronionproxy.settings.TorSettings
+import io.matthewnelson.topl_settings.TorSettings
 import com.msopentech.thali.toronionproxy.settings.TorSettingsBuilder
 import com.msopentech.thali.toronionproxy.util.FileUtilities
 import com.msopentech.thali.toronionproxy.util.TorInstaller
@@ -46,8 +46,8 @@ class OnionProxyContext(
 
     val settings: TorSettings = torSettings ?: DefaultSettings()
 
-    companion object {
-        protected val LOG: Logger = LoggerFactory.getLogger(OnionProxyContext::class.java)
+    private companion object {
+        val LOG: Logger = LoggerFactory.getLogger(OnionProxyContext::class.java)
     }
 
     private val dataDirLock = Object()

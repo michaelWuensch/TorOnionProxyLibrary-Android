@@ -13,7 +13,6 @@ See the Apache 2 License for the specific language governing permissions and lim
 package com.msopentech.thali.toronionproxy.broadcaster
 
 import com.msopentech.thali.toronionproxy.settings.DefaultSettings
-import com.msopentech.thali.toronionproxy.settings.TorSettings
 import io.matthewnelson.topl_settings.TorSettings
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
