@@ -1,4 +1,4 @@
-package com.msopentech.thali.toronionproxy.util;
+package io.matthewnelson.topl_android.util;
 
 import android.content.Context;
 

@@ -65,15 +65,15 @@ http://www.gnu.org/licenses/lgpl.html
 
  */
 
-package com.msopentech.thali.toronionproxy;
+package io.matthewnelson.topl_android;
 
 //import com.msopentech.thali.android.toronionproxy.AndroidOnionProxyManager;
 //
 //import com.msopentech.thali.android.toronionproxy.AndroidTorConfig;
-//import com.msopentech.thali.toronionproxy.util.FileUtilities;
-//import com.msopentech.thali.toronionproxy.OnionProxyManager;
-//import com.msopentech.thali.toronionproxy.TorConfig;
-//import com.msopentech.thali.toronionproxy.util.Utilities;
+//import io.matthewnelson.topl_android.util.FileUtilities;
+//import io.matthewnelson.topl_android.OnionProxyManager;
+//import io.matthewnelson.topl_android.TorConfig;
+//import io.matthewnelson.topl_android.util.Utilities;
 //
 //import org.junit.Test;
 //import org.junit.runner.RunWith;

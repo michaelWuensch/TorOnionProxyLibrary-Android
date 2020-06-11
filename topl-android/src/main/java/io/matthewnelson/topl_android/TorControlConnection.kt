@@ -1,4 +1,4 @@
-package com.msopentech.thali.toronionproxy
+package io.matthewnelson.topl_android
 
 import net.freehaven.tor.control.TorControlConnection
 import java.io.*

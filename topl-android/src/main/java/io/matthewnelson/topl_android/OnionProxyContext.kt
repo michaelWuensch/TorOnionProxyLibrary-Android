@@ -10,15 +10,14 @@ MERCHANTABLITY OR NON-INFRINGEMENT.
 
 See the Apache 2 License for the specific language governing permissions and limitations under the License.
 */
-package com.msopentech.thali.toronionproxy
+package io.matthewnelson.topl_android
 
 import android.os.Process
-import com.msopentech.thali.toronionproxy.settings.DefaultSettings
 import io.matthewnelson.topl_settings.TorSettings
-import com.msopentech.thali.toronionproxy.settings.TorSettingsBuilder
-import com.msopentech.thali.toronionproxy.util.FileUtilities
-import com.msopentech.thali.toronionproxy.util.TorInstaller
-import com.msopentech.thali.toronionproxy.util.WriteObserver
+import io.matthewnelson.topl_android.settings.TorSettingsBuilder
+import io.matthewnelson.topl_android.util.FileUtilities
+import io.matthewnelson.topl_android.util.TorInstaller
+import io.matthewnelson.topl_android.util.WriteObserver
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.BufferedWriter

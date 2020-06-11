@@ -63,7 +63,7 @@ http://www.gnu.org/licenses/lgpl.html
 *****
 
  */
-package com.msopentech.thali.toronionproxy.util
+package io.matthewnelson.topl_android.util
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

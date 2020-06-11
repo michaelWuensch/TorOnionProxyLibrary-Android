@@ -1,4 +1,4 @@
-package com.msopentech.thali.toronionproxy
+package io.matthewnelson.topl_android
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider

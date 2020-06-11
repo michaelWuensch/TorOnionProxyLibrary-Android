@@ -25,16 +25,16 @@ MERCHANTABLITY OR NON-INFRINGEMENT.
 
 See the Apache 2 License for the specific language governing permissions and limitations under the License.
 */
-package com.msopentech.thali.toronionproxy
+package io.matthewnelson.topl_android
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
-import com.msopentech.thali.toronionproxy.broadcaster.DefaultEventBroadcaster
-import com.msopentech.thali.toronionproxy.broadcaster.EventBroadcaster
-import com.msopentech.thali.toronionproxy.util.FileUtilities
+import io.matthewnelson.topl_android.broadcaster.DefaultEventBroadcaster
+import io.matthewnelson.topl_android.broadcaster.EventBroadcaster
+import io.matthewnelson.topl_android.util.FileUtilities
 import net.freehaven.tor.control.EventHandler
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -85,7 +85,9 @@ class OnionProxyManager(
     }
 
     private val eventBroadcaster: EventBroadcaster =
-        eventBroadcaster ?: DefaultEventBroadcaster(onionProxyContext.torSettings)
+        eventBroadcaster ?: DefaultEventBroadcaster(
+            onionProxyContext.torSettings
+        )
     private val eventHandler: EventHandler =
         eventHandler ?: OnionProxyManagerEventHandler()
 

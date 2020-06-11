@@ -1,4 +1,4 @@
-package com.msopentech.thali.toronionproxy.settings
+package io.matthewnelson.topl_android.settings
 
 import io.matthewnelson.topl_settings.TorSettings
 import java.util.*
