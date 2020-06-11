@@ -15,20 +15,20 @@ package com.msopentech.thali.toronionproxy.broadcaster
 /**
  * Service for sending event logs to the system
  */
-interface EventBroadcaster {
+abstract class EventBroadcaster {
 
-    val status: Status
+    abstract val status: Status
 
-    fun broadcastBandwidth(upload: Long, download: Long, written: Long, read: Long)
+    abstract fun broadcastBandwidth(upload: Long, download: Long, written: Long, read: Long)
 
-    fun broadcastDebug(msg: String)
+    abstract fun broadcastDebug(msg: String)
 
-    fun broadcastException(msg: String, e: Exception)
+    abstract fun broadcastException(msg: String, e: Exception)
 
-    fun broadcastLogMessage(logMessage: String)
+    abstract fun broadcastLogMessage(logMessage: String)
 
-    fun broadcastNotice(msg: String)
+    abstract fun broadcastNotice(msg: String)
 
-    fun broadcastStatus()
+    abstract fun broadcastStatus()
 
 }

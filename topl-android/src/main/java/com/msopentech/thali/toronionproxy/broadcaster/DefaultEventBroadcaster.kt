@@ -12,21 +12,59 @@ See the Apache 2 License for the specific language governing permissions and lim
 */
 package com.msopentech.thali.toronionproxy.broadcaster
 
+import com.msopentech.thali.toronionproxy.settings.DefaultSettings
 import com.msopentech.thali.toronionproxy.settings.TorSettings
+import io.matthewnelson.topl_settings.TorSettings
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.io.PrintWriter
+import java.io.StringWriter
 
 /**
- * Default EventBroadcaster. broadcastBandwidth, broadcastLogMessage, broadcastStatus are all
- * no operations. If you need to implement these broadcast methods, then create a new class
- * that extends BaseEventBroadcaster.
- */
-class DefaultEventBroadcaster : BaseEventBroadcaster {
+ * Override this class to implement [broadcastBandwidth], [broadcastLogMessage],
+ * and [broadcastStatus].
+ * */
+open class DefaultEventBroadcaster(settings: TorSettings?) : EventBroadcaster() {
 
-    constructor() : super(null) {}
-    constructor(settings: TorSettings?) : super(settings) {}
+    private companion object {
+        val LOG: Logger = LoggerFactory.getLogger(DefaultEventBroadcaster::class.java)
+    }
+
+    private val mSettings: TorSettings = settings ?: DefaultSettings()
+
+    override val status: Status
+        get() = Status(this)
 
     override fun broadcastBandwidth(upload: Long, download: Long, written: Long, read: Long) {}
 
+    override fun broadcastDebug(msg: String) {
+        if (mSettings.hasDebugLogs) {
+            LOG.debug(msg)
+            broadcastLogMessage(msg)
+        }
+    }
+
+    override fun broadcastException(msg: String, e: Exception) {
+        if (mSettings.hasDebugLogs) {
+            LOG.error(msg, e)
+            val sw = StringWriter()
+            e.printStackTrace(PrintWriter(sw))
+            broadcastLogMessage("$msg\n$sw".trimIndent())
+        } else {
+            broadcastLogMessage(msg)
+        }
+    }
+
     override fun broadcastLogMessage(logMessage: String) {}
+
+    override fun broadcastNotice(msg: String) {
+        if (msg.isNotEmpty()) {
+            if (mSettings.hasDebugLogs) {
+                LOG.debug(msg)
+            }
+            broadcastLogMessage(msg)
+        }
+    }
 
     override fun broadcastStatus() {}
 }
