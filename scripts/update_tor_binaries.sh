@@ -108,12 +108,20 @@ binaries_are_up_to_date_msg() {
 
 display_help_message() {
   echo ""
-  echo "    Invalid Arguments"
+  echo "Invalid Arguments"
   echo ""
   echo "    Arguments:"
-  echo "                build                   checks for newer version and builds tor binaries"
-  echo "                update_versions_file    increases TOR_BINARY_VERSION in .versions file"
-  echo "                check_for_update        checks if a newer tor binary version is available"
+  echo ""
+  echo "        build                                           Checks for newer version and builds tor binaries"
+  echo ""
+  echo "        update_versions_file                            Increases TOR_BINARY_VERSION in .versions file"
+  echo ""
+  echo "        check_for_update                                Checks if a newer tor binary version is available"
+  echo ""
+  echo "        check_for_update_cron_job <email address>       Checks if a newer tor binary version is available"
+  echo "                                                        and will send an email to the one defined as the"
+  echo "                                                        2nd argument. Requires that you have setup on your"
+  echo "                                                        server something like msmpt."
   echo ""
 }
 
@@ -154,6 +162,19 @@ case "$1" in
       newer_binaries_available_msg
     else
       binaries_are_up_to_date_msg
+    fi
+    ;;
+
+  "check_for_update_cron_job")
+
+    # send email address in 2nd argument...
+    if [ "$2" == "" ]; then
+      EXIT_ARG=1
+    else
+      if is_newer_binary_available; then
+        echo "A newer Tor Android Binary is available for building and publishing." | mail -s \
+        "Tor Android Binary Update: AVAILABLE" "$2"
+      fi
     fi
     ;;
 
