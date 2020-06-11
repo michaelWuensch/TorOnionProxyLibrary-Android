@@ -84,8 +84,10 @@ class OnionProxyManager(
             }
     }
 
-    private val eventBroadcaster: EventBroadcaster = eventBroadcaster ?: DefaultEventBroadcaster()
-    private val eventHandler: EventHandler = eventHandler ?: OnionProxyManagerEventHandler()
+    private val eventBroadcaster: EventBroadcaster =
+        eventBroadcaster ?: DefaultEventBroadcaster(onionProxyContext.torSettings)
+    private val eventHandler: EventHandler =
+        eventHandler ?: OnionProxyManagerEventHandler()
 
     @Volatile
     private var networkStateReceiver: BroadcastReceiver? = null
@@ -99,7 +101,7 @@ class OnionProxyManager(
     private var controlConnection: TorControlConnection? = null
 
     @Volatile
-    private var control_port = 0
+    private var controlPort = 0
 
     /**
      * This is a blocking call that will try to start the Tor OP, connect it to the network
@@ -455,11 +457,11 @@ class OnionProxyManager(
         try {
             val controlPortTokens = String(FileUtilities.read(controlPortFile))
                 .trim { it <= ' ' }.split(":".toRegex()).toTypedArray()
-            control_port = controlPortTokens[1].toInt()
-            eventBroadcaster.broadcastNotice("Connecting to control port: $control_port")
+            controlPort = controlPortTokens[1].toInt()
+            eventBroadcaster.broadcastNotice("Connecting to control port: $controlPort")
             controlSocket = Socket(
                 controlPortTokens[0].split("=".toRegex()).toTypedArray()[1],
-                control_port
+                controlPort
             )
             controlConnection = TorControlConnection(controlSocket!!)
             eventBroadcaster.broadcastNotice("SUCCESS connected to Tor control port.")
@@ -470,7 +472,7 @@ class OnionProxyManager(
                 "Failed to read control port: " + String(FileUtilities.read(controlPortFile))
             )
         }
-        if (onionProxyContext.settings.hasDebugLogs) {
+        if (onionProxyContext.torSettings.hasDebugLogs) {
             controlConnection.setDebugging(System.out)
         }
         return controlConnection
@@ -500,7 +502,7 @@ class OnionProxyManager(
         }
 
         eatStream(torProcess.errorStream, true)
-        if (onionProxyContext.settings.hasDebugLogs)
+        if (onionProxyContext.torSettings.hasDebugLogs)
             eatStream(torProcess.inputStream, false)
         return torProcess
     }
@@ -543,8 +545,7 @@ class OnionProxyManager(
         val cookieAuthStartTime = System.currentTimeMillis()
         LOG.info("Waiting for cookie auth file")
         val isCreated = cookieAuthFile.exists() || cookieAuthFile.createNewFile()
-        val cookieAuthFileObserver =
-            onionProxyContext.createCookieAuthFileObserver()
+        val cookieAuthFileObserver = onionProxyContext.createCookieAuthFileObserver()
         if (!isCreated || cookieAuthFile.length() == 0L && !cookieAuthFileObserver.poll(
                 onionProxyContext.torConfig.fileCreationTimeout.toLong(), TimeUnit.SECONDS
             )
@@ -691,24 +692,28 @@ class OnionProxyManager(
     fun disableNetwork(isEnabled: Boolean): Boolean {
         return if (!hasControlConnection()) {
             false
-        } else try {
-            controlConnection!!.setConf("DisableNetwork", if (isEnabled) "0" else "1")
-            true
-        } catch (e: Exception) {
-            eventBroadcaster.broadcastDebug("error disabling network ${e.localizedMessage}")
-            false
+        } else {
+            try {
+                controlConnection!!.setConf("DisableNetwork", if (isEnabled) "0" else "1")
+                true
+            } catch (e: Exception) {
+                eventBroadcaster.broadcastDebug("error disabling network ${e.localizedMessage}")
+                false
+            }
         }
     }
 
     fun setNewIdentity(): Boolean {
         return if (!hasControlConnection()) {
             false
-        } else try {
-            controlConnection!!.signal("NEWNYM")
-            true
-        } catch (e: IOException) {
-            eventBroadcaster.broadcastDebug("error requesting newnym: ${e.localizedMessage}")
-            false
+        } else {
+            try {
+                controlConnection!!.signal("NEWNYM")
+                true
+            } catch (e: IOException) {
+                eventBroadcaster.broadcastDebug("error requesting newnym: ${e.localizedMessage}")
+                false
+            }
         }
     }
 

@@ -36,15 +36,13 @@ import java.io.IOException
  *
  * @param [torConfig] [TorConfig] tor configuration info used for running and installing tor
  * @param [torInstaller] [TorInstaller]
- * @param [torSettings] [TorSettings]?
+ * @param [torSettings] [TorSettings]
  */
 class OnionProxyContext(
     val torConfig: TorConfig,
     val torInstaller: TorInstaller,
-    torSettings: TorSettings?
+    val torSettings: TorSettings
 ) {
-
-    val settings: TorSettings = torSettings ?: DefaultSettings()
 
     private companion object {
         val LOG: Logger = LoggerFactory.getLogger(OnionProxyContext::class.java)
@@ -70,14 +68,13 @@ class OnionProxyContext(
      */
     fun deleteDataDir() =
         synchronized(dataDirLock) {
-            for (file in torConfig.dataDir.listFiles()) {
+            for (file in torConfig.dataDir.listFiles())
                 if (file.isDirectory)
                     if (file.absolutePath != torConfig.hiddenServiceDir.absolutePath)
                         FileUtilities.recursiveFileDelete(file)
                 else
                     if (!file.delete())
-                        throw RuntimeException("Could not delete file " + file.absolutePath)
-            }
+                        throw RuntimeException("Could not delete file ${file.absolutePath}")
         }
 
     /**
@@ -92,6 +89,7 @@ class OnionProxyContext(
                 LOG.warn("Could not create cookieFile parent directory")
                 return false
             }
+
             return try {
                 cookieAuthFile.exists() || cookieAuthFile.createNewFile()
             } catch (e: IOException) {
@@ -107,6 +105,7 @@ class OnionProxyContext(
                 LOG.warn("Could not create hostnameFile parent directory")
                 return false
             }
+
             return try {
                 hostnameFile.exists() || hostnameFile.createNewFile()
             } catch (e: IOException) {

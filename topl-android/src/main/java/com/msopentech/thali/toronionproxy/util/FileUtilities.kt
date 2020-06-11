@@ -65,6 +65,7 @@ http://www.gnu.org/licenses/lgpl.html
  */
 package com.msopentech.thali.toronionproxy.util
 
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.*
 import java.util.zip.ZipEntry
@@ -72,7 +73,7 @@ import java.util.zip.ZipInputStream
 
 object FileUtilities {
 
-    private val LOG = LoggerFactory.getLogger(FileUtilities::class.java)
+    private val LOG: Logger = LoggerFactory.getLogger(FileUtilities::class.java)
 
     fun setToReadOnlyPermissions(file: File): Boolean {
         return file.setReadable(false, false) &&
@@ -126,9 +127,8 @@ object FileUtilities {
 
     fun listFilesToLog(f: File) {
         if (f.isDirectory)
-            for (child in f.listFiles()) {
+            for (child in f.listFiles())
                 listFilesToLog(child)
-            }
         else
             LOG.info(f.absolutePath)
     }
@@ -137,13 +137,16 @@ object FileUtilities {
     fun read(f: File): ByteArray {
         val b = ByteArray(f.length().toInt())
         val `in` = FileInputStream(f)
+
         return `in`.use { inputStream ->
             var offset = 0
+
             while (offset < b.size) {
                 val read = inputStream.read(b, offset, b.size - offset)
                 if (read == -1) throw EOFException()
                 offset += read
             }
+
             b
         }
     }
@@ -158,7 +161,7 @@ object FileUtilities {
     @Throws(IOException::class)
     fun cleanInstallOneFile(readFrom: InputStream, fileToWriteTo: File) {
         if (fileToWriteTo.exists() && !fileToWriteTo.delete())
-            throw RuntimeException("Could not remove existing file " + fileToWriteTo.name)
+            throw RuntimeException("Could not remove existing file ${fileToWriteTo.name}")
 
         val out: OutputStream = FileOutputStream(fileToWriteTo)
         copy(readFrom, out)
@@ -166,12 +169,11 @@ object FileUtilities {
 
     fun recursiveFileDelete(fileOrDirectory: File) {
         if (fileOrDirectory.isDirectory)
-            for (child in fileOrDirectory.listFiles()) {
+            for (child in fileOrDirectory.listFiles())
                 recursiveFileDelete(child)
-            }
 
         if (fileOrDirectory.exists() && !fileOrDirectory.delete())
-            throw RuntimeException("Could not delete directory " + fileOrDirectory.absolutePath)
+            throw RuntimeException("Could not delete directory ${fileOrDirectory.absolutePath}")
     }
 
     /**
@@ -184,28 +186,29 @@ object FileUtilities {
     fun extractContentFromZip(destinationDirectory: File, zipFileInputStream: InputStream) {
         val zipInputStream: ZipInputStream
         try {
+
             zipInputStream = ZipInputStream(zipFileInputStream)
             var zipEntry: ZipEntry
+
             while (zipInputStream.nextEntry.also { zipEntry = it } != null) {
                 val file = File(destinationDirectory, zipEntry.name)
-                if (zipEntry.isDirectory) {
-                    if (file.exists() == false && !file.mkdirs()) {
+                if (zipEntry.isDirectory)
+                    if (!file.exists() && !file.mkdirs())
                         throw RuntimeException("Could not create directory $file")
-                    }
-                } else {
-                    if (file.exists() && !file.delete()) {
-                        throw RuntimeException(
-                            "Could not delete file in preparation for overwriting it. File - " +
-                                    file.absolutePath
+
+                else
+                    if (file.exists() && !file.delete())
+                        throw RuntimeException("Could not delete file in preparation " +
+                                "for overwriting it. File - ${file.absolutePath}"
                         )
-                    }
-                    if (!file.createNewFile()) {
+
+                    if (!file.createNewFile())
                         throw RuntimeException("Could not create file $file")
-                    }
+
                     val fileOutputStream: OutputStream = FileOutputStream(file)
                     copyDoNotCloseInput(zipInputStream, fileOutputStream)
-                }
             }
+
         } finally {
             zipFileInputStream.close()
         }

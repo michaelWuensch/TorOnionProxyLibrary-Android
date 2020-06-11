@@ -6,14 +6,9 @@ import java.net.Socket
 
 class TorControlConnection : TorControlConnection {
 
-    constructor(socket: Socket) :
-            super(socket) {}
-
-    constructor(inputStream: InputStream, outputStream: OutputStream) :
-            super(inputStream, outputStream) {}
-
-    constructor(reader: Reader, writer: Writer) :
-            super(reader, writer) {}
+    constructor(socket: Socket) : super(socket)
+    constructor(inputStream: InputStream, outputStream: OutputStream) : super(inputStream, outputStream)
+    constructor(reader: Reader, writer: Writer) : super(reader, writer)
 
     @Suppress("INACCESSIBLE_TYPE")
     @Throws(IOException::class)

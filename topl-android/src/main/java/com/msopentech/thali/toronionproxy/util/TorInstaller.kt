@@ -17,6 +17,7 @@ import java.io.InputStream
 import java.util.concurrent.TimeoutException
 
 abstract class TorInstaller {
+
     /**
      * Sets up and installs the tor environment. If the tor environment is already setup, this does not need to be invoked.
      */
@@ -32,17 +33,14 @@ abstract class TorInstaller {
     /**
      * If first byte of stream is 0, then the following stream will have the form
      *
-     * `
-     * ($bridge_type $bridge_info \r\n)*
-    ` *
+     * `($bridge_type $bridge_info \r\n)*`
+     *
      *
      * if first byte is 1, the the stream will have the form
-     * `
-     * ($bridge_info \r\n)*
-    ` *
+     *
+     * `($bridge_info \r\n)*`
      *
      * The second form is used for custom bridges from the user.
-     *
      */
     @Throws(IOException::class)
     abstract fun openBridgesStream(): InputStream?

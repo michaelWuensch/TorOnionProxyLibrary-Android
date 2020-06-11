@@ -36,8 +36,8 @@ import org.slf4j.LoggerFactory
  */
 class OnionProxyManagerEventHandler : EventHandler {
 
-    companion object {
-        private val LOG: Logger = LoggerFactory.getLogger(OnionProxyManagerEventHandler::class.java)
+    private companion object {
+        val LOG: Logger = LoggerFactory.getLogger(OnionProxyManagerEventHandler::class.java)
     }
 
     override fun circuitStatus(status: String, id: String, path: String) =

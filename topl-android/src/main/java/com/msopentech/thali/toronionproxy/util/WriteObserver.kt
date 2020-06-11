@@ -43,7 +43,7 @@ class WriteObserver(file: File) : FileObserver(file.absolutePath, CLOSE_WRITE) {
         try {
             countDownLatch.await(timeout, unit)
         } catch (e: InterruptedException) {
-            throw RuntimeException("Internal error has caused AndroidWriteObserver to not be reliable.", e)
+            throw RuntimeException("Internal error has caused WriteObserver to not be reliable.", e)
         }
 
     override fun onEvent(i: Int, s: String) {

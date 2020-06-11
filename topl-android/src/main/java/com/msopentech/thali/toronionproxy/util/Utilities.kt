@@ -20,6 +20,7 @@ import java.net.Socket
 import java.net.SocketAddress
 
 object Utilities {
+
     private const val READ_TIMEOUT_MILLISECONDS = 60000
     private const val CONNECT_TIMEOUT_MILLISECONDS = 60000
 

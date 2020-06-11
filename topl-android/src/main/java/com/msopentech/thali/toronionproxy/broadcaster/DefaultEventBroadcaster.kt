@@ -12,7 +12,6 @@ See the Apache 2 License for the specific language governing permissions and lim
 */
 package com.msopentech.thali.toronionproxy.broadcaster
 
-import com.msopentech.thali.toronionproxy.settings.DefaultSettings
 import io.matthewnelson.topl_settings.TorSettings
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -23,13 +22,11 @@ import java.io.StringWriter
  * Override this class to implement [broadcastBandwidth], [broadcastLogMessage],
  * and [broadcastStatus].
  * */
-open class DefaultEventBroadcaster(settings: TorSettings?) : EventBroadcaster() {
+open class DefaultEventBroadcaster(private val torSettings: TorSettings) : EventBroadcaster() {
 
     private companion object {
         val LOG: Logger = LoggerFactory.getLogger(DefaultEventBroadcaster::class.java)
     }
-
-    private val mSettings: TorSettings = settings ?: DefaultSettings()
 
     override val status: Status
         get() = Status(this)
@@ -37,14 +34,13 @@ open class DefaultEventBroadcaster(settings: TorSettings?) : EventBroadcaster() 
     override fun broadcastBandwidth(upload: Long, download: Long, written: Long, read: Long) {}
 
     override fun broadcastDebug(msg: String) {
-        if (mSettings.hasDebugLogs) {
+        if (torSettings.hasDebugLogs)
             LOG.debug(msg)
             broadcastLogMessage(msg)
-        }
     }
 
     override fun broadcastException(msg: String, e: Exception) {
-        if (mSettings.hasDebugLogs) {
+        if (torSettings.hasDebugLogs) {
             LOG.error(msg, e)
             val sw = StringWriter()
             e.printStackTrace(PrintWriter(sw))
@@ -57,12 +53,11 @@ open class DefaultEventBroadcaster(settings: TorSettings?) : EventBroadcaster() 
     override fun broadcastLogMessage(logMessage: String) {}
 
     override fun broadcastNotice(msg: String) {
-        if (msg.isNotEmpty()) {
-            if (mSettings.hasDebugLogs) {
+        if (msg.isNotEmpty())
+            if (torSettings.hasDebugLogs)
                 LOG.debug(msg)
-            }
+
             broadcastLogMessage(msg)
-        }
     }
 
     override fun broadcastStatus() {}
