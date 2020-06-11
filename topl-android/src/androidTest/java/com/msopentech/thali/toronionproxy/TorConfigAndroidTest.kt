@@ -22,14 +22,19 @@ class TorConfigAndroidTest {
 
     @Before
     fun setup() {
-        torConfigBuilder = TorConfig.Builder(appContext, sampleFile)
+        torConfigBuilder =
+            TorConfig.Builder(
+                File(appContext.applicationInfo.nativeLibraryDir),
+                sampleFile
+            )
     }
 
     @Test
     fun defaultDataDir() {
         val config = torConfigBuilder.build()
         assertEquals(
-            File(sampleFile, "lib/tor").path, config.dataDir.path
+            File(sampleFile, "lib/tor").path,
+            config.dataDir.path
         )
     }
 
@@ -37,7 +42,8 @@ class TorConfigAndroidTest {
     fun defaultCookie() {
         val config = torConfigBuilder.build()
         assertEquals(
-            File(sampleFile, "lib/tor/control_auth_cookie").path, config.cookieAuthFile.path
+            File(sampleFile, "lib/tor/control_auth_cookie").path,
+            config.cookieAuthFile.path
         )
     }
 
@@ -45,7 +51,8 @@ class TorConfigAndroidTest {
     fun defaultHostname() {
         val config = torConfigBuilder.build()
         assertEquals(
-            File(sampleFile, "lib/tor/hostname").path, config.hostnameFile.path
+            File(sampleFile, "lib/tor/hostname").path,
+            config.hostnameFile.path
         )
     }
 
