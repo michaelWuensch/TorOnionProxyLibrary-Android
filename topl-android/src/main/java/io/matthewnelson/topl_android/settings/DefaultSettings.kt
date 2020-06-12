@@ -1,6 +1,6 @@
 package io.matthewnelson.topl_android.settings
 
-import io.matthewnelson.topl_settings.TorSettings
+import io.matthewnelson.topl_android_settings.TorSettings
 import java.util.*
 
 /**

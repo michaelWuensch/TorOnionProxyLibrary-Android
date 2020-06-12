@@ -1,4 +1,4 @@
-package io.matthewnelson.topl_settings
+package io.matthewnelson.topl_android_settings
 
 abstract class TorSettings {
 

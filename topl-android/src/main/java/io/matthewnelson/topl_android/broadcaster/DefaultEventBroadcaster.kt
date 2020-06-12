@@ -12,7 +12,7 @@ See the Apache 2 License for the specific language governing permissions and lim
 */
 package io.matthewnelson.topl_android.broadcaster
 
-import io.matthewnelson.topl_settings.TorSettings
+import io.matthewnelson.topl_android_settings.TorSettings
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.PrintWriter
