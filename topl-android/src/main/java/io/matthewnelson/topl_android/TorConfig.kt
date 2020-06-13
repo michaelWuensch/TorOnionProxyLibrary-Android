@@ -65,6 +65,10 @@ class TorConfig private constructor(
         const val TORRC_NAME = "torrc"
         const val HIDDEN_SERVICE_NAME = "hiddenservice"
 
+        /**
+         * If your .so file name is different, call [Builder.torExecutable] to set it
+         * manually rather than using the [createConfig] convenience method.
+         * */
         private const val torExecutableFileName: String = "libTor.so"
 
         /**
@@ -73,10 +77,7 @@ class TorConfig private constructor(
          * */
         fun createConfig(context: Context, configDir: File, dataDir: File? = null): TorConfig {
             val nativeDir = File(context.applicationInfo.nativeLibraryDir)
-            val builder = Builder(
-                nativeDir,
-                configDir
-            )
+            val builder = Builder(nativeDir, configDir)
             if (dataDir != null)
                 builder.dataDir(dataDir)
             return builder.build()
@@ -301,29 +302,19 @@ class TorConfig private constructor(
             }
 
             if (!::mTorExecutableFile.isInitialized)
-                mTorExecutableFile = File(installDir,
-                    torExecutableFileName
-                )
+                mTorExecutableFile = File(installDir, torExecutableFileName)
 
             if (!::mGeoIpFile.isInitialized)
-                mGeoIpFile = File(configDir,
-                    GEO_IP_NAME
-                )
+                mGeoIpFile = File(configDir, GEO_IP_NAME)
 
             if (!::mGeoIpv6File.isInitialized)
-                mGeoIpv6File = File(configDir,
-                    GEO_IPV_6_NAME
-                )
+                mGeoIpv6File = File(configDir, GEO_IPV_6_NAME)
 
             if (!::mTorrcFile.isInitialized)
-                mTorrcFile = File(configDir,
-                    TORRC_NAME
-                )
+                mTorrcFile = File(configDir, TORRC_NAME)
 
             if (!::mHiddenServiceDir.isInitialized)
-                mHiddenServiceDir = File(configDir,
-                    HIDDEN_SERVICE_NAME
-                )
+                mHiddenServiceDir = File(configDir, HIDDEN_SERVICE_NAME)
 
             if (!::mDataDir.isInitialized)
                 mDataDir = File(configDir, "lib/tor")
