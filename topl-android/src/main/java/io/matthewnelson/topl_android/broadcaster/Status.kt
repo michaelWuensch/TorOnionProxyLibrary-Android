@@ -17,14 +17,15 @@ package io.matthewnelson.topl_android.broadcaster
  */
 class Status(private val broadcaster: EventBroadcaster) {
 
-    private companion object {
+    companion object {
         const val STATUS_OFF = "OFF"
         const val STATUS_ON = "ON"
         const val STATUS_STARTING = "STARTING"
         const val STATUS_STOPPING = "STOPPING"
     }
 
-    private var status: String = STATUS_OFF
+    var status: String = STATUS_OFF
+        private set
 
     val isOff: Boolean
         get() = STATUS_OFF == status
