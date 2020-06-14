@@ -8,6 +8,7 @@ ext.versions = [
 ext.deps = [
     androidGradlePlugin: "com.android.tools.build:gradle:4.0.0",
     androidx: [
+        localBroadcastManager: "androidx.localbroadcastmanager:localbroadcastmanager:1.0.0",
         test: [
             core: "androidx.test:core:1.2.0",
             espresso: "androidx.test.espresso:espresso-core:3.2.0",
