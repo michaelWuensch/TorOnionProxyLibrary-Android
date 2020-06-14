@@ -39,6 +39,7 @@ class WriteObserver(file: File) : FileObserver(file.absolutePath, CLOSE_WRITE) {
 
     private val countDownLatch = CountDownLatch(1)
 
+    @Throws(RuntimeException::class)
     fun poll(timeout: Long, unit: TimeUnit): Boolean =
         try {
             countDownLatch.await(timeout, unit)
@@ -51,8 +52,12 @@ class WriteObserver(file: File) : FileObserver(file.absolutePath, CLOSE_WRITE) {
         countDownLatch.countDown()
     }
 
-    init {
+    @Throws(IllegalArgumentException::class, SecurityException::class)
+    private fun checkExists(file: File) =
         require(file.exists()) { "FileObserver doesn't work properly on files that don't already exist." }
+
+    init {
+        checkExists(file)
         startWatching()
     }
 }
