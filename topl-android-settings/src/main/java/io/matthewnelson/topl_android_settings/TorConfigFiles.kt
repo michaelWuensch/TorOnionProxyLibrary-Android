@@ -157,7 +157,7 @@ class TorConfigFiles private constructor(
     }
 
     override fun toString(): String {
-        return "TorConfig{ " +
+        return "TorConfigFiles{ " +
                 "geoIpFile=$geoIpFile, " +
                 "geoIpv6File=$geoIpv6File, " +
                 "torrcFile=$torrcFile, " +
