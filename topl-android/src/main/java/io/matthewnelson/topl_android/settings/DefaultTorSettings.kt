@@ -4,8 +4,8 @@ import io.matthewnelson.topl_android_settings.TorSettings
 import java.util.*
 
 /**
- * Provides some reasonable default settings. Override this class or create a new
- * implementation to make changes.
+ * Provides some reasonable default settings. Create your own by extending [TorSettings]
+ * or overriding this class.
  */
 open class DefaultTorSettings : TorSettings() {
 
@@ -45,7 +45,7 @@ open class DefaultTorSettings : TorSettings() {
     override val proxySocks5Host: String?
         get() = "127.0.0.1"
 
-    override val proxySocks5ServerPort: String?
+    override val proxySocks5ServerPort: Int?
         get() = null
 
     override val proxyType: String?
@@ -64,10 +64,10 @@ open class DefaultTorSettings : TorSettings() {
         get() = 9001
 
     override val socksPort: String
-        get() = "9050"
+        get() = "9051"
 
     override val virtualAddressNetwork: String?
-        get() = "10.192.0.0/10"
+        get() = "10.192.0.1/10"
 
     override val hasBridges: Boolean
         get() = false
@@ -115,7 +115,7 @@ open class DefaultTorSettings : TorSettings() {
         get() = true
 
     override val transPort: Int?
-        get() = 9140
+        get() = 9141
 
     override val useSocks5: Boolean
         get() = true

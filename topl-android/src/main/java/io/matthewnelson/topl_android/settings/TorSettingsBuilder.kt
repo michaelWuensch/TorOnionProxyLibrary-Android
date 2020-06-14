@@ -271,7 +271,7 @@ class TorSettingsBuilder(private val onionProxyContext: OnionProxyContext) {
     }
 
     /**
-     * Adds non exit relay to builder. This method uses a default google nameserver.
+     * Adds non exit relay to builder. This method uses a default OpenDNS Home nameserver.
      */
     @SettingsConfig
     fun nonExitRelayFromSettings(): TorSettingsBuilder {
@@ -280,11 +280,11 @@ class TorSettingsBuilder(private val onionProxyContext: OnionProxyContext) {
             onionProxyContext.torSettings.isRelay
         ) {
             try {
-                val resolv = onionProxyContext.createGoogleNameserverFile()
+                val resolv = onionProxyContext.createQuad9NameserverFile()
                 makeNonExitRelay(
                     resolv.canonicalPath,
                     onionProxyContext.torSettings.relayPort,
-                    onionProxyContext.torSettings.relayNickname ?: ""
+                    onionProxyContext.torSettings.relayNickname ?: "OpenDNSHome"
                 )
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -308,8 +308,10 @@ class TorSettingsBuilder(private val onionProxyContext: OnionProxyContext) {
     /**
      * Set socks5 proxy with no authentication. This can be set if you are using a VPN.
      */
-    fun proxySocks5(host: String?, port: String?): TorSettingsBuilder {
-        buffer.append("socks5Proxy ").append(host).append(":").append(port).append("\n")
+    fun proxySocks5(host: String?, port: Int?): TorSettingsBuilder {
+        if (!host.isNullOrEmpty() && port != null) {
+            buffer.append("socks5Proxy ").append(host).append(":").append(port.toString()).append("\n")
+        }
         return this
     }
 
@@ -347,7 +349,7 @@ class TorSettingsBuilder(private val onionProxyContext: OnionProxyContext) {
                 }
             } else if (proxyPass != null) {
                 buffer.append(proxyType).append("ProxyAuthenticator ").append(proxyUser)
-                    .append(':').append(proxyPort.toString()).append('\n')
+                    .append(":").append(proxyPort.toString()).append("\n")
             }
         }
         return this
@@ -407,22 +409,15 @@ class TorSettingsBuilder(private val onionProxyContext: OnionProxyContext) {
         return this
     }
 
-    fun safeSocksDisable(): TorSettingsBuilder {
-        buffer.append("SafeSocks 0").append("\n")
-        return this
-    }
-
-    fun safeSocksEnable(): TorSettingsBuilder {
-        buffer.append("SafeSocks 1").append("\n")
+    fun safeSocks(enable: Boolean): TorSettingsBuilder {
+        val safeSocksSetting = if (enable) "1" else "0"
+        buffer.append("SafeSocks $safeSocksSetting").append("\n")
         return this
     }
 
     @SettingsConfig
     fun safeSocksFromSettings(): TorSettingsBuilder =
-        if (!onionProxyContext.torSettings.hasSafeSocks)
-            safeSocksDisable()
-        else
-            safeSocksEnable()
+        safeSocks(onionProxyContext.torSettings.hasSafeSocks)
 
     @Throws(IOException::class, SecurityException::class)
     fun setGeoIpFiles(): TorSettingsBuilder {
