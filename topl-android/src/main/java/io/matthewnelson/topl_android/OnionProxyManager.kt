@@ -554,7 +554,7 @@ class OnionProxyManager(
             LOG.warn("Control port file not created")
             FileUtilities.listFilesToLog(onionProxyContext.torConfigFiles.dataDir)
             eventBroadcaster.broadcastNotice("Tor control port file not created")
-            eventBroadcaster.status.stopping()
+            eventBroadcaster.state.stopping()
             throw IOException(
                 "Control port file not created: ${controlPortFile.absolutePath}, "
                         + "len = ${controlPortFile.length()}"
@@ -581,7 +581,7 @@ class OnionProxyManager(
         ) {
             LOG.warn("Cookie Auth file not created")
             eventBroadcaster.broadcastNotice("Cookie Auth file not created")
-            eventBroadcaster.status.stopping()
+            eventBroadcaster.state.stopping()
             throw IOException(
                 "Cookie Auth file not created: ${cookieAuthFile.absolutePath}, " +
                         "len = ${cookieAuthFile.length()}"
@@ -626,7 +626,7 @@ class OnionProxyManager(
 
         if (!torExe.exists()) {
             eventBroadcaster.broadcastNotice("Tor executable not found")
-            eventBroadcaster.status.stopping()
+            eventBroadcaster.state.stopping()
             LOG.error("Tor executable not found: ${torExe.absolutePath}")
             throw IOException("Tor executable not found")
         }
@@ -638,7 +638,7 @@ class OnionProxyManager(
         val torrc = onionProxyContext.torConfigFiles.torrcFile
         if (!torrc.exists()) {
             eventBroadcaster.broadcastNotice("Torrc not found")
-            eventBroadcaster.status.stopping()
+            eventBroadcaster.state.stopping()
             LOG.error("Torrc not found: ${torrc.absolutePath}")
             throw IOException("Torrc not found")
         }

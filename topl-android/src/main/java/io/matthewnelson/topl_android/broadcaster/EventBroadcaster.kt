@@ -17,7 +17,7 @@ package io.matthewnelson.topl_android.broadcaster
  */
 abstract class EventBroadcaster {
 
-    abstract val status: Status
+    abstract val state: State
 
     abstract fun broadcastBandwidth(upload: Long, download: Long, written: Long, read: Long)
 

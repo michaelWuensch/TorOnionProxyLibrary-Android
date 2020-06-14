@@ -12,50 +12,47 @@ See the Apache 2 License for the specific language governing permissions and lim
 */
 package io.matthewnelson.topl_android.broadcaster
 
+import io.matthewnelson.topl_android_settings.TorState
+
 /**
  * Current Status of Tor
  */
-class Status(private val broadcaster: EventBroadcaster) {
+class State(private val broadcaster: EventBroadcaster) {
 
-    companion object {
-        const val STATUS_OFF = "OFF"
-        const val STATUS_ON = "ON"
-        const val STATUS_STARTING = "STARTING"
-        const val STATUS_STOPPING = "STOPPING"
-    }
+    // TODO: Kotlin Coroutin StateFlow to emmit State
 
-    var status: String = STATUS_OFF
+    var torState: @TorState.State String = TorState.OFF
         private set
 
     val isOff: Boolean
-        get() = STATUS_OFF == status
+        get() = TorState.OFF == torState
 
     val isOn: Boolean
-        get() = STATUS_ON == status
+        get() = TorState.ON == torState
 
     val isStarting: Boolean
-        get() = STATUS_STARTING == status
+        get() = TorState.STARTING == torState
 
     val isStopping: Boolean
-        get() = STATUS_STOPPING == status
+        get() = TorState.STOPPING == torState
 
     fun off() {
-        status = STATUS_OFF
+        torState = TorState.OFF
         broadcaster.broadcastStatus()
     }
 
     fun on() {
-        status = STATUS_ON
+        torState = TorState.ON
         broadcaster.broadcastStatus()
     }
 
     fun starting() {
-        status = STATUS_STARTING
+        torState = TorState.STARTING
         broadcaster.broadcastStatus()
     }
 
     fun stopping() {
-        status = STATUS_STOPPING
+        torState = TorState.STOPPING
         broadcaster.broadcastStatus()
     }
 }

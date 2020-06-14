@@ -28,8 +28,8 @@ open class DefaultEventBroadcaster(private val torSettings: TorSettings) : Event
         val LOG: Logger = LoggerFactory.getLogger(DefaultEventBroadcaster::class.java)
     }
 
-    override val status: Status
-        get() = Status(this)
+    override val state: State
+        get() = State(this)
 
     override fun broadcastBandwidth(upload: Long, download: Long, written: Long, read: Long) {}
 
