@@ -72,7 +72,7 @@ package io.matthewnelson.topl_android;
 //import com.msopentech.thali.android.toronionproxy.AndroidTorConfig;
 //import io.matthewnelson.topl_android.util.FileUtilities;
 //import io.matthewnelson.topl_android.OnionProxyManager;
-//import io.matthewnelson.topl_android.TorConfig;
+//import io.matthewnelson.topl_android_settings.TorConfig;
 //import io.matthewnelson.topl_android.util.Utilities;
 //
 //import org.junit.Test;

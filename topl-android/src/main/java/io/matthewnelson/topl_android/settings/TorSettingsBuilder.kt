@@ -13,7 +13,7 @@ See the Apache 2 License for the specific language governing permissions and lim
 package io.matthewnelson.topl_android.settings
 
 import io.matthewnelson.topl_android.OnionProxyContext
-import io.matthewnelson.topl_android.TorConfig
+import io.matthewnelson.topl_android_settings.TorConfigFiles
 import java.io.*
 import java.lang.reflect.InvocationTargetException
 import java.net.InetSocketAddress
@@ -110,7 +110,7 @@ class TorSettingsBuilder(private val onionProxyContext: OnionProxyContext) {
     fun cookieAuthentication(): TorSettingsBuilder {
         buffer.append("CookieAuthentication 1 ").append("\n")
         buffer.append("CookieAuthFile ")
-            .append(onionProxyContext.torConfig.cookieAuthFile.absolutePath)
+            .append(onionProxyContext.torConfigFiles.cookieAuthFile.absolutePath)
             .append("\n")
         return this
     }
@@ -134,16 +134,16 @@ class TorSettingsBuilder(private val onionProxyContext: OnionProxyContext) {
         else
             this
 
-    fun controlPortWriteToFile(torConfig: TorConfig): TorSettingsBuilder {
+    fun controlPortWriteToFile(torConfigFiles: TorConfigFiles): TorSettingsBuilder {
         buffer.append("ControlPortWriteToFile ")
-            .append(torConfig.controlPortFile.absolutePath).append("\n")
+            .append(torConfigFiles.controlPortFile.absolutePath).append("\n")
         buffer.append("ControlPort auto").append("\n")
         return this
     }
 
     @SettingsConfig
     fun controlPortWriteToFileFromConfig(): TorSettingsBuilder =
-        controlPortWriteToFile(onionProxyContext.torConfig)
+        controlPortWriteToFile(onionProxyContext.torConfigFiles)
 
     fun debugLogs(): TorSettingsBuilder {
         buffer.append("Log debug syslog").append("\n")
@@ -421,9 +421,9 @@ class TorSettingsBuilder(private val onionProxyContext: OnionProxyContext) {
 
     @Throws(IOException::class, SecurityException::class)
     fun setGeoIpFiles(): TorSettingsBuilder {
-        val torConfig = onionProxyContext.torConfig
-        if (torConfig.geoIpFile.exists())
-            geoIpFile(torConfig.geoIpFile.canonicalPath).geoIpV6File(torConfig.geoIpv6File.canonicalPath)
+        val torConfigFiles = onionProxyContext.torConfigFiles
+        if (torConfigFiles.geoIpFile.exists())
+            geoIpFile(torConfigFiles.geoIpFile.canonicalPath).geoIpV6File(torConfigFiles.geoIpv6File.canonicalPath)
         return this
     }
 

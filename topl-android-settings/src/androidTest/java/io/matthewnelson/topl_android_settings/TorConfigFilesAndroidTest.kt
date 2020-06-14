@@ -1,4 +1,4 @@
-package io.matthewnelson.topl_android
+package io.matthewnelson.topl_android_settings
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
@@ -12,18 +12,18 @@ import java.io.File
 
 @RunWith(AndroidJUnit4ClassRunner::class)
 @LargeTest
-class TorConfigAndroidTest {
+class TorConfigFilesAndroidTest {
 
     private val appContext: Context by lazy {
         ApplicationProvider.getApplicationContext() as Context
     }
-    private lateinit var torConfigBuilder: TorConfig.Builder
+    private lateinit var torConfigFilesBuilder: TorConfigFiles.Builder
     private val sampleFile = File("sample")
 
     @Before
     fun setup() {
-        torConfigBuilder =
-            TorConfig.Builder(
+        torConfigFilesBuilder =
+            TorConfigFiles.Builder(
                 File(appContext.applicationInfo.nativeLibraryDir),
                 sampleFile
             )
@@ -31,7 +31,7 @@ class TorConfigAndroidTest {
 
     @Test
     fun defaultDataDir() {
-        val config = torConfigBuilder.build()
+        val config = torConfigFilesBuilder.build()
         assertEquals(
             File(sampleFile, "lib/tor").path,
             config.dataDir.path
@@ -40,7 +40,7 @@ class TorConfigAndroidTest {
 
     @Test
     fun defaultCookie() {
-        val config = torConfigBuilder.build()
+        val config = torConfigFilesBuilder.build()
         assertEquals(
             File(sampleFile, "lib/tor/control_auth_cookie").path,
             config.cookieAuthFile.path
@@ -49,7 +49,7 @@ class TorConfigAndroidTest {
 
     @Test
     fun defaultHostname() {
-        val config = torConfigBuilder.build()
+        val config = torConfigFilesBuilder.build()
         assertEquals(
             File(sampleFile, "lib/tor/hostname").path,
             config.hostnameFile.path
@@ -58,7 +58,7 @@ class TorConfigAndroidTest {
 
     @Test
     fun libraryPathRelativeToExecutable() {
-        val config = torConfigBuilder.torExecutable(File(sampleFile, "exedir/tor.real")).build()
+        val config = torConfigFilesBuilder.torExecutable(File(sampleFile, "exedir/tor.real")).build()
         assertEquals(
             File(sampleFile, "exedir").path,
             config.libraryPath.path
@@ -67,7 +67,7 @@ class TorConfigAndroidTest {
 
     @Test
     fun libraryPathDefaultExecutableInstall() {
-        val config = torConfigBuilder.build()
+        val config = torConfigFilesBuilder.build()
         assertEquals(
             appContext.applicationInfo.nativeLibraryDir,
             config.libraryPath.path
@@ -77,7 +77,7 @@ class TorConfigAndroidTest {
     @Test
     fun defaultCookieWithDataDir() {
         val dataDir = File("sample/datadir")
-        val config = torConfigBuilder.dataDir(dataDir).build()
+        val config = torConfigFilesBuilder.dataDir(dataDir).build()
         assertEquals(
             File(dataDir, "control_auth_cookie").path,
             config.cookieAuthFile.path
@@ -86,9 +86,9 @@ class TorConfigAndroidTest {
 
     @Test
     fun geoip() {
-        val config = torConfigBuilder.build()
+        val config = torConfigFilesBuilder.build()
         assertEquals(
-            File(sampleFile, TorConfig.GEO_IP_NAME).path,
+            File(sampleFile, TorConfigFiles.GEO_IP_NAME).path,
             config.geoIpFile.path
         )
     }

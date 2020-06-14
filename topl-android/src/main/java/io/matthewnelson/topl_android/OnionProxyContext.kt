@@ -19,6 +19,7 @@ import io.matthewnelson.topl_android.settings.TorSettingsBuilder
 import io.matthewnelson.topl_android.util.FileUtilities
 import io.matthewnelson.topl_android.util.TorInstaller
 import io.matthewnelson.topl_android.util.WriteObserver
+import io.matthewnelson.topl_android_settings.TorConfigFiles
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.BufferedWriter
@@ -30,16 +31,16 @@ import java.io.IOException
  * Provides context information about the environment. Implementing classes provide logic
  * for setting up the specific environment
  *
- * Constructs instance of [OnionProxyContext] with the specified [torConfig]. Typically
+ * Constructs instance of [OnionProxyContext] with the specified [torConfigFiles]. Typically
  * this constructor will be used when tor is currently installed on the system, with the
  * tor executable and config files in different locations.
  *
- * @param [torConfig] [TorConfig] tor configuration info used for running and installing tor
+ * @param [torConfigFiles] [TorConfigFiles] tor configuration info used for running and installing tor
  * @param [torInstaller] [TorInstaller]
  * @param [torSettings] [TorSettings]
  */
 class OnionProxyContext(
-    val torConfig: TorConfig,
+    val torConfigFiles: TorConfigFiles,
     val torInstaller: TorInstaller,
     torSettings: TorSettings?
 ) {
@@ -61,7 +62,7 @@ class OnionProxyContext(
             createDataDir()
         } catch (e: SecurityException) {
             e.printStackTrace()
-            LOG.warn("Could not create directory dataDir: ${torConfig.dataDir}")
+            LOG.warn("Could not create directory dataDir: ${torConfigFiles.dataDir}")
         }
     }
 
@@ -75,7 +76,7 @@ class OnionProxyContext(
     @Throws(SecurityException::class)
     fun createDataDir(): Boolean =
         synchronized(dataDirLock) {
-            return torConfig.dataDir.exists() || torConfig.dataDir.mkdirs()
+            return torConfigFiles.dataDir.exists() || torConfigFiles.dataDir.mkdirs()
         }
 
     /**
@@ -84,9 +85,9 @@ class OnionProxyContext(
     @Throws(RuntimeException::class, SecurityException::class)
     fun deleteDataDir() =
         synchronized(dataDirLock) {
-            for (file in torConfig.dataDir.listFiles())
+            for (file in torConfigFiles.dataDir.listFiles())
                 if (file.isDirectory)
-                    if (file.absolutePath != torConfig.hiddenServiceDir.absolutePath)
+                    if (file.absolutePath != torConfigFiles.hiddenServiceDir.absolutePath)
                         FileUtilities.recursiveFileDelete(file)
                 else
                     if (!file.delete())
@@ -103,7 +104,7 @@ class OnionProxyContext(
     @Throws(SecurityException::class)
     fun createCookieAuthFile(): Boolean =
         synchronized(cookieLock) {
-            val cookieAuthFile = torConfig.cookieAuthFile
+            val cookieAuthFile = torConfigFiles.cookieAuthFile
             if (!cookieAuthFile.parentFile.exists() && !cookieAuthFile.parentFile.mkdirs()) {
                 LOG.warn("Could not create cookieFile parent directory")
                 return false
@@ -120,7 +121,7 @@ class OnionProxyContext(
     @Throws(SecurityException::class)
     fun createHostnameFile(): Boolean =
         synchronized(hostnameLock) {
-            val hostnameFile = torConfig.hostnameFile
+            val hostnameFile = torConfigFiles.hostnameFile
             if (!hostnameFile.parentFile.exists() && !hostnameFile.parentFile.mkdirs()) {
                 LOG.warn("Could not create hostnameFile parent directory")
                 return false
@@ -140,7 +141,7 @@ class OnionProxyContext(
     @Throws(IOException::class)
     fun createQuad9NameserverFile(): File =
         synchronized(dnsLock) {
-            val file = torConfig.resolveConf
+            val file = torConfigFiles.resolveConf
             val writer = BufferedWriter(FileWriter(file))
             writer.write("nameserver 9.9.9.9\n")
             writer.write("nameserver 149.112.112.112\n")
@@ -160,7 +161,7 @@ class OnionProxyContext(
     @Throws(IOException::class, IllegalArgumentException::class, SecurityException::class)
     fun createControlPortFileObserver(): WriteObserver =
         synchronized(cookieLock) {
-            return generateWriteObserver(torConfig.controlPortFile)
+            return generateWriteObserver(torConfigFiles.controlPortFile)
         }
 
     /**
@@ -175,7 +176,7 @@ class OnionProxyContext(
     @Throws(IOException::class, IllegalArgumentException::class, SecurityException::class)
     fun createCookieAuthFileObserver(): WriteObserver =
         synchronized(cookieLock) {
-            return generateWriteObserver(torConfig.cookieAuthFile)
+            return generateWriteObserver(torConfigFiles.cookieAuthFile)
         }
 
     /**
@@ -190,7 +191,7 @@ class OnionProxyContext(
     @Throws(IOException::class, IllegalArgumentException::class, SecurityException::class)
     fun createHostnameDirObserver(): WriteObserver =
         synchronized(hostnameLock) {
-            return generateWriteObserver(torConfig.hostnameFile)
+            return generateWriteObserver(torConfigFiles.hostnameFile)
         }
 
     fun newSettingsBuilder(): TorSettingsBuilder =

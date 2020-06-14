@@ -10,7 +10,7 @@ MERCHANTABLITY OR NON-INFRINGEMENT.
 
 See the Apache 2 License for the specific language governing permissions and limitations under the License.
 */
-package io.matthewnelson.topl_android
+package io.matthewnelson.topl_android_settings
 
 import android.content.Context
 import java.io.File
@@ -21,7 +21,7 @@ import java.io.IOException
  *
  * See [Companion.createConfig] or [Builder] to instantiate.
  */
-class TorConfig private constructor(
+class TorConfigFiles private constructor(
     val geoIpFile: File,
     val geoIpv6File: File,
     mTorrcFile: File,
@@ -85,9 +85,13 @@ class TorConfig private constructor(
          * @param [configDir] context.getDir("dir_name_here", Context.MODE_PRIVATE)
          * @param [dataDir] if you wish it in a different location than lib/tor
          * */
-        fun createConfig(context: Context, configDir: File, dataDir: File? = null): TorConfig {
+        fun createConfig(context: Context, configDir: File, dataDir: File? = null): TorConfigFiles {
             val installDir = File(context.applicationInfo.nativeLibraryDir)
-            val builder = Builder(installDir, configDir)
+            val builder =
+                Builder(
+                    installDir,
+                    configDir
+                )
             if (dataDir != null)
                 builder.dataDir(dataDir)
             return builder.build()
@@ -99,8 +103,11 @@ class TorConfig private constructor(
          *
          * @param context Context
          * */
-        fun createConfig(context: Context): TorConfig =
-            createConfig(context, context.getDir("torservice", Context.MODE_PRIVATE))
+        fun createConfig(context: Context): TorConfigFiles =
+            createConfig(
+                context,
+                context.getDir("torservice", Context.MODE_PRIVATE)
+            )
     }
 
     private val configLock = Object()
@@ -122,13 +129,17 @@ class TorConfig private constructor(
 
         synchronized(configLock) {
             if (!torrcFile.exists()) {
-                var tmpTorrcFile = File(configDir, TORRC_NAME)
+                var tmpTorrcFile = File(configDir,
+                    TORRC_NAME
+                )
 
                 if (!tmpTorrcFile.exists()) {
                     tmpTorrcFile = File(homeDir, ".$TORRC_NAME")
 
                     if (!tmpTorrcFile.exists()) {
-                        torrcFile = File(configDir, TORRC_NAME)
+                        torrcFile = File(configDir,
+                            TORRC_NAME
+                        )
 
                         if (!torrcFile.createNewFile()) {
                             throw IOException("Failed to create torrc file")
@@ -322,9 +333,9 @@ class TorConfig private constructor(
         /**
          * Builds torConfig and sets default values if not explicitly configured through builder.
          *
-         * @return [TorConfig]
+         * @return [TorConfigFiles]
          */
-        fun build(): TorConfig {
+        fun build(): TorConfigFiles {
             if (!::mHomeDir.isInitialized) {
                 val userHome = System.getProperty("user.home")
                 mHomeDir =
@@ -335,19 +346,29 @@ class TorConfig private constructor(
             }
 
             if (!::mTorExecutableFile.isInitialized)
-                mTorExecutableFile = File(installDir, torExecutableFileName)
+                mTorExecutableFile = File(installDir,
+                    torExecutableFileName
+                )
 
             if (!::mGeoIpFile.isInitialized)
-                mGeoIpFile = File(configDir, GEO_IP_NAME)
+                mGeoIpFile = File(configDir,
+                    GEO_IP_NAME
+                )
 
             if (!::mGeoIpv6File.isInitialized)
-                mGeoIpv6File = File(configDir, GEO_IPV_6_NAME)
+                mGeoIpv6File = File(configDir,
+                    GEO_IPV_6_NAME
+                )
 
             if (!::mTorrcFile.isInitialized)
-                mTorrcFile = File(configDir, TORRC_NAME)
+                mTorrcFile = File(configDir,
+                    TORRC_NAME
+                )
 
             if (!::mHiddenServiceDir.isInitialized)
-                mHiddenServiceDir = File(configDir, HIDDEN_SERVICE_NAME)
+                mHiddenServiceDir = File(configDir,
+                    HIDDEN_SERVICE_NAME
+                )
 
             if (!::mDataDir.isInitialized)
                 mDataDir = File(configDir, "lib/tor")
@@ -370,7 +391,7 @@ class TorConfig private constructor(
             if (mFileCreationTimeout <= 0)
                 mFileCreationTimeout = 15
 
-            return TorConfig(
+            return TorConfigFiles(
                 mGeoIpFile,
                 mGeoIpv6File,
                 mTorrcFile,

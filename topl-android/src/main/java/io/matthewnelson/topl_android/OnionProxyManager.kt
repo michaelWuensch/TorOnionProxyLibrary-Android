@@ -220,7 +220,7 @@ class OnionProxyManager(
 
         // Watch for the hostname file being created/updated
         val hostNameFileObserver = onionProxyContext.createHostnameDirObserver()
-        val hostnameFile = onionProxyContext.torConfig.hostnameFile
+        val hostnameFile = onionProxyContext.torConfigFiles.hostnameFile
         val hostnameDir = hostnameFile.parentFile
         if (!FileUtilities.setToReadOnlyPermissions(hostnameDir))
             throw RuntimeException("Unable to set permissions on hostName dir")
@@ -397,11 +397,11 @@ class OnionProxyManager(
         val hasExistingTorConnection = controlConnection != null
 
         if (!hasExistingTorConnection) {
-            val controlPortFile = onionProxyContext.torConfig.controlPortFile
+            val controlPortFile = onionProxyContext.torConfigFiles.controlPortFile
             controlPortFile.delete()
             if (!controlPortFile.parentFile.exists()) controlPortFile.parentFile.mkdirs()
 
-            val cookieAuthFile = onionProxyContext.torConfig.cookieAuthFile
+            val cookieAuthFile = onionProxyContext.torConfigFiles.cookieAuthFile
             cookieAuthFile.delete()
             if (!cookieAuthFile.parentFile.exists()) cookieAuthFile.parentFile.mkdirs()
 
@@ -419,7 +419,7 @@ class OnionProxyManager(
         try {
             this.controlConnection = controlConnection
 
-            val cookieAuthFile = onionProxyContext.torConfig.cookieAuthFile
+            val cookieAuthFile = onionProxyContext.torConfigFiles.cookieAuthFile
             waitForCookieAuthFileCreation(cookieAuthFile)
             controlConnection!!.authenticate(FileUtilities.read(cookieAuthFile))
             eventBroadcaster.broadcastNotice("SUCCESS - authenticated tor control port.")
@@ -430,10 +430,10 @@ class OnionProxyManager(
             controlConnection.takeOwnership()
             controlConnection.resetConf(setOf(OWNER))
             eventBroadcaster.broadcastNotice("Took ownership of tor control port.")
-            eventBroadcaster.broadcastNotice("adding control port event handler")
+            eventBroadcaster.broadcastNotice("adding control port event listener")
             controlConnection.addRawEventListener(eventListener)
             controlConnection.setEvents(listOf(*eventListener.CONTROL_COMMAND_EVENTS))
-            eventBroadcaster.broadcastNotice("SUCCESS added control port event handler")
+            eventBroadcaster.broadcastNotice("SUCCESS added control port event listener")
             enableNetwork(true)
         } catch (e: IOException) {
             torProcess?.destroy()
@@ -458,7 +458,7 @@ class OnionProxyManager(
      */
     @Throws(SecurityException::class)
     private fun findExistingTorConnection(): TorControlConnection? {
-        val controlPortFile = onionProxyContext.torConfig.controlPortFile
+        val controlPortFile = onionProxyContext.torConfigFiles.controlPortFile
         return if (controlPortFile.exists())
             try {
                 connectToTorControlSocket(controlPortFile)
@@ -544,11 +544,11 @@ class OnionProxyManager(
         val isCreated = controlPortFile.exists() || controlPortFile.createNewFile()
         val controlPortFileObserver = onionProxyContext.createControlPortFileObserver()
         if (!isCreated || controlPortFile.length() == 0L && !controlPortFileObserver.poll(
-                onionProxyContext.torConfig.fileCreationTimeout.toLong(), TimeUnit.SECONDS
+                onionProxyContext.torConfigFiles.fileCreationTimeout.toLong(), TimeUnit.SECONDS
             )
         ) {
             LOG.warn("Control port file not created")
-            FileUtilities.listFilesToLog(onionProxyContext.torConfig.dataDir)
+            FileUtilities.listFilesToLog(onionProxyContext.torConfigFiles.dataDir)
             eventBroadcaster.broadcastNotice("Tor control port file not created")
             eventBroadcaster.status.stopping()
             throw IOException(
@@ -572,7 +572,7 @@ class OnionProxyManager(
         val isCreated = cookieAuthFile.exists() || cookieAuthFile.createNewFile()
         val cookieAuthFileObserver = onionProxyContext.createCookieAuthFileObserver()
         if (!isCreated || cookieAuthFile.length() == 0L && !cookieAuthFileObserver.poll(
-                onionProxyContext.torConfig.fileCreationTimeout.toLong(), TimeUnit.SECONDS
+                onionProxyContext.torConfigFiles.fileCreationTimeout.toLong(), TimeUnit.SECONDS
             )
         ) {
             LOG.warn("Cookie Auth file not created")
@@ -615,7 +615,7 @@ class OnionProxyManager(
 
     @Throws(IOException::class)
     private fun torExecutable(): File {
-        var torExe = onionProxyContext.torConfig.torExecutableFile
+        var torExe = onionProxyContext.torConfigFiles.torExecutableFile
         //Try removing platform specific extension
         if (!torExe.exists())
             torExe = File(torExe.parent, "tor")
@@ -631,7 +631,7 @@ class OnionProxyManager(
 
     @Throws(IOException::class, SecurityException::class)
     private fun torrc(): File {
-        val torrc = onionProxyContext.torConfig.torrcFile
+        val torrc = onionProxyContext.torConfigFiles.torrcFile
         if (!torrc.exists()) {
             eventBroadcaster.broadcastNotice("Torrc not found")
             eventBroadcaster.status.stopping()
@@ -647,15 +647,15 @@ class OnionProxyManager(
      * @param [processBuilder] we will call start on this to run Tor
      */
     private fun setEnvironmentArgsAndWorkingDirectoryForStart(processBuilder: ProcessBuilder) {
-        processBuilder.directory(onionProxyContext.torConfig.configDir)
+        processBuilder.directory(onionProxyContext.torConfigFiles.configDir)
         val environment = processBuilder.environment()
-        environment["HOME"] = onionProxyContext.torConfig.homeDir.absolutePath
+        environment["HOME"] = onionProxyContext.torConfigFiles.homeDir.absolutePath
     }
 
     private val environmentArgsForExec: Array<String>
         get() {
             val envArgs: MutableList<String> = ArrayList()
-            envArgs.add("HOME=" + onionProxyContext.torConfig.homeDir.absolutePath)
+            envArgs.add("HOME=" + onionProxyContext.torConfigFiles.homeDir.absolutePath)
             return envArgs.toTypedArray()
         }
 
@@ -700,8 +700,8 @@ class OnionProxyManager(
             }
         } else {
             try {
-                controlConnection!!.setConf("GeoIPFile", onionProxyContext.torConfig.geoIpFile.canonicalPath)
-                controlConnection!!.setConf("GeoIPv6File", onionProxyContext.torConfig.geoIpv6File.canonicalPath)
+                controlConnection!!.setConf("GeoIPFile", onionProxyContext.torConfigFiles.geoIpFile.canonicalPath)
+                controlConnection!!.setConf("GeoIPv6File", onionProxyContext.torConfigFiles.geoIpv6File.canonicalPath)
                 controlConnection!!.setConf("ExitNodes", exitNodes)
                 controlConnection!!.setConf("StrictNodes", "1")
                 controlConnection!!.setConf("DisableNetwork", "1")
@@ -790,7 +790,7 @@ class OnionProxyManager(
     @Throws(Exception::class)
     private fun killTorProcess(signal: Int) {
         //Based on logic from Orbot project
-        val torFileName = onionProxyContext.torConfig.torExecutableFile.name
+        val torFileName = onionProxyContext.torConfigFiles.torExecutableFile.name
         var procId: Int
         var killAttempts = 0
         while (torPid.also { procId = it } != -1) {
@@ -808,7 +808,7 @@ class OnionProxyManager(
             killAttempts++
 
             if (killAttempts > 4)
-                throw Exception("Cannot kill: ${onionProxyContext.torConfig.torExecutableFile.absolutePath}")
+                throw Exception("Cannot kill: ${onionProxyContext.torConfigFiles.torExecutableFile.absolutePath}")
         }
     }
 
