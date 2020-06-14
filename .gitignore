@@ -24,3 +24,6 @@ proguard/
 
 # intellij
 .idea/
+
+sampleapp/
+topl-android-service/
