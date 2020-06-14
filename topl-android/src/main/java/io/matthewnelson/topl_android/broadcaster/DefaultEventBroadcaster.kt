@@ -20,7 +20,7 @@ import java.io.StringWriter
 
 /**
  * Override this class to implement [broadcastBandwidth], [broadcastLogMessage],
- * and [broadcastStatus].
+ * and [broadcastStatus] or extend [EventBroadcaster] and create your own.
  * */
 open class DefaultEventBroadcaster(private val torSettings: TorSettings) : EventBroadcaster() {
 

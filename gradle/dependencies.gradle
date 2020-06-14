@@ -10,12 +10,12 @@ ext.deps = [
     androidx: [
         test: [
             core: "androidx.test:core:1.2.0",
-            junit: "androidx.test.ext:junit:1.1.1",
             espresso: "androidx.test.espresso:espresso-core:3.2.0",
+            junit: "androidx.test.ext:junit:1.1.1",
         ],
     ],
     gradleVersions: "com.github.ben-manes:gradle-versions-plugin:0.20.0",
-    jtorctl: "net.freehaven.tor.control:jtorctl:0.2",
+    jtorctl: "info.guardianproject:jtorctl:0.4",
     junit: "junit:junit:4.12",
     kotlin: [
         gradlePlugin: "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
