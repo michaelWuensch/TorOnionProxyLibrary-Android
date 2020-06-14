@@ -18,11 +18,13 @@ import java.io.IOException
 
 /**
  * Holds Tor configuration information.
+ *
+ * See [Companion.createConfig] or [Builder] to instantiate.
  */
 class TorConfig private constructor(
     val geoIpFile: File,
     val geoIpv6File: File,
-    torrcFile: File,
+    mTorrcFile: File,
     val torExecutableFile: File,
     val hiddenServiceDir: File,
     val dataDir: File,
@@ -30,18 +32,22 @@ class TorConfig private constructor(
     val homeDir: File,
 
     /**
-     * The <base32-encoded-fingerprint>.onion domain name for this hidden service. If the hidden service is
-     * restricted to authorized clients only, this file also contains authorization data for all clients.
+     * The <base32-encoded-fingerprint>.onion domain name for this hidden service.
+     * If the hidden service is restricted to authorized clients only, this file
+     * also contains authorization data for all clients.
      *
-     * @return hostname file
-    </base32-encoded-fingerprint> */
+     * @return [hostnameFile] </base32-encoded-fingerprint>
+     * */
     val hostnameFile: File,
 
     /**
-     * Used for cookie authentication with the controller. Location can be overridden by the CookieAuthFile config option.
-     * Regenerated on startup. See control-spec.txt in torspec for details. Only used when cookie authentication is enabled.
+     * Used for cookie authentication with the controller. Location can be
+     * overridden by the CookieAuthFile config option. Regenerated on startup.
+     * See control-spec.txt in torspec for details.
      *
-     * @return
+     * Only used when cookie authentication is enabled.
+     *
+     * @return [cookieAuthFile]
      */
     val cookieAuthFile: File,
     val libraryPath: File,
@@ -50,9 +56,9 @@ class TorConfig private constructor(
     val installDir: File,
 
     /**
-     * When tor starts it waits for the control port and cookie auth files to be created before it proceeds to the
-     * next step in startup. If these files are not created after a certain amount of time, then the startup has
-     * failed.
+     * When tor starts it waits for the control port and cookie auth files to be created
+     * before it proceeds to the next step in startup. If these files are not created
+     * after a certain amount of time, then the startup has failed.
      *
      * This method returns how much time to wait in seconds until failing the startup.
      */
@@ -74,78 +80,94 @@ class TorConfig private constructor(
         /**
          * Convenience method for if you're including in your App's jniLibs directory
          * the `libTor.so` binary, or utilizing those maintained by this project.
+         *
+         * @param [context] Context
+         * @param [configDir] context.getDir("dir_name_here", Context.MODE_PRIVATE)
+         * @param [dataDir] if you wish it in a different location than lib/tor
          * */
         fun createConfig(context: Context, configDir: File, dataDir: File? = null): TorConfig {
-            val nativeDir = File(context.applicationInfo.nativeLibraryDir)
-            val builder = Builder(nativeDir, configDir)
+            val installDir = File(context.applicationInfo.nativeLibraryDir)
+            val builder = Builder(installDir, configDir)
             if (dataDir != null)
                 builder.dataDir(dataDir)
             return builder.build()
         }
+
+        /**
+         * Convenience method for setting up all of your files and directories in their
+         * default locations.
+         *
+         * @param context Context
+         * */
+        fun createConfig(context: Context): TorConfig =
+            createConfig(context, context.getDir("torservice", Context.MODE_PRIVATE))
     }
 
     private val configLock = Object()
-    private var mTorrcFile = torrcFile
-    fun getTorrcFile(): File = mTorrcFile
+    var torrcFile = mTorrcFile
+        private set
 
     /**
-     * Resolves the tor configuration file. If the torrc file hasn't been set, then this method will attempt to
-     * resolve the config file by looking in the root of the $configDir and then in $user.home directory
+     * Resolves the tor configuration file. If the torrc file hasn't been set, then
+     * this method will attempt to resolve the config file by looking in the root of
+     * the $configDir and then in $user.home directory
      *
-     * @return torrc file
-     * @throws IOException if torrc file is not resolved
+     * @throws [IOException] If torrc file is not resolved.
+     * @throws [SecurityException] if unable to access the file.
+     *
+     * @return [torrcFile]
      */
-    @Throws(IOException::class)
+    @Throws(IOException::class, SecurityException::class)
     fun resolveTorrcFile(): File {
 
         synchronized(configLock) {
-            if (!mTorrcFile.exists()) {
-                var tmpTorrcFile = File(configDir,
-                    TORRC_NAME
-                )
+            if (!torrcFile.exists()) {
+                var tmpTorrcFile = File(configDir, TORRC_NAME)
 
                 if (!tmpTorrcFile.exists()) {
                     tmpTorrcFile = File(homeDir, ".$TORRC_NAME")
 
                     if (!tmpTorrcFile.exists()) {
-                        mTorrcFile = File(configDir,
-                            TORRC_NAME
-                        )
+                        torrcFile = File(configDir, TORRC_NAME)
 
-                        if (!mTorrcFile.createNewFile()) {
+                        if (!torrcFile.createNewFile()) {
                             throw IOException("Failed to create torrc file")
                         }
 
                     } else {
-                        mTorrcFile = tmpTorrcFile
+                        torrcFile = tmpTorrcFile
                     }
                 } else {
-                    mTorrcFile = tmpTorrcFile
+                    torrcFile = tmpTorrcFile
                 }
             }
-            return mTorrcFile
+            return torrcFile
         }
     }
 
     override fun toString(): String {
-        return "TorConfig{" +
-                "geoIpFile=" + geoIpFile +
-                ", geoIpv6File=" + geoIpv6File +
-                ", torrcFile=" + mTorrcFile +
-                ", torExecutableFile=" + torExecutableFile +
-                ", hiddenServiceDir=" + hiddenServiceDir +
-                ", dataDir=" + dataDir +
-                ", configDir=" + configDir +
-                ", installDir=" + installDir +
-                ", homeDir=" + homeDir +
-                ", hostnameFile=" + hostnameFile +
-                ", cookieAuthFile=" + cookieAuthFile +
-                ", libraryPath=" + libraryPath +
-                '}'
+        return "TorConfig{ " +
+                "geoIpFile=$geoIpFile, " +
+                "geoIpv6File=$geoIpv6File, " +
+                "torrcFile=$torrcFile, " +
+                "torExecutableFile=$torExecutableFile, " +
+                "hiddenServiceDir=$hiddenServiceDir, " +
+                "dataDir=$dataDir, " +
+                "configDir=$configDir, " +
+                "installDir=$installDir, " +
+                "homeDir=$homeDir, " +
+                "hostnameFile=$hostnameFile, " +
+                "cookieAuthFile=$cookieAuthFile, " +
+                "libraryPath=$libraryPath }"
     }
 
     /**
      * Builder for TorConfig.
+     *
+     * See also [Companion.createConfig] for convenience methods.
+     *
+     * @param [installDir] directory where the tor binaries are installed.
+     * @param [configDir] directory where the filesystem will be setup for tor.
      */
     class Builder(private val installDir: File, private val configDir: File) {
 
@@ -166,12 +188,12 @@ class TorConfig private constructor(
         /**
          * Home directory of user.
          *
+         * Default value: $home.user if $home.user environment property exists, otherwise
+         * $configDir. On Android, this will always default to $configDir.
          *
-         * Default value: $home.user if $home.user environment property exists, otherwise $configDir. On Android, this
-         * will always default to $configDir.
+         * @param [homeDir] the home directory of the user
          *
-         * @param homeDir the home directory of the user
-         * @return builder
+         * @return [Builder]
          */
         fun homeDir(homeDir: File): Builder {
             this.mHomeDir = homeDir
@@ -184,16 +206,19 @@ class TorConfig private constructor(
         }
 
         /**
-         * Store data files for a hidden service in DIRECTORY. Every hidden service must have a separate directory.
-         * You may use this option multiple times to specify multiple services. If DIRECTORY does not exist, Tor will
-         * create it. (Note: in current versions of Tor, if DIRECTORY is a relative path, it will be relative to the
-         * current working directory of Tor instance, not to its DataDirectory. Do not rely on this behavior; it is not
-         * guaranteed to remain the same in future versions.)
+         * Store data files for a hidden service in DIRECTORY. Every hidden service must
+         * have a separate directory. You may use this option multiple times to specify
+         * multiple services. If DIRECTORY does not exist, Tor will create it. (Note: in
+         * current versions of Tor, if DIRECTORY is a relative path, it will be relative
+         * to the current working directory of Tor instance, not to its DataDirectory. Do
+         * not rely on this behavior; it is not guaranteed to remain the same in future
+         * versions.)
          *
          * Default value: $configDir/hiddenservices
          *
-         * @param directory hidden services directory
-         * @return builder
+         * @param [directory] hidden services directory
+         *
+         * @return [Builder]
          */
         fun hiddenServiceDir(directory: File): Builder {
             mHiddenServiceDir = directory
@@ -205,8 +230,9 @@ class TorConfig private constructor(
          *
          * Default value: $configDir/geoip6
          *
-         * @param file geoip6 file
-         * @return builder
+         * @param [file] geoip6 file
+         *
+         * @return [Builder]
          */
         fun geoipv6(file: File): Builder {
             mGeoIpv6File = file
@@ -218,8 +244,9 @@ class TorConfig private constructor(
          *
          * Default value: $configDir/geoip
          *
-         * @param file geoip file
-         * @return builder
+         * @param [file] geoip file
+         *
+         * @return [Builder]
          */
         fun geoip(file: File): Builder {
             mGeoIpFile = file
@@ -231,8 +258,9 @@ class TorConfig private constructor(
          *
          * Default value: $configDir/lib/tor
          *
-         * @param directory directory where tor runtime data is stored
-         * @return builder
+         * @param [directory] directory where tor runtime data is stored
+         *
+         * @return [Builder]
          */
         fun dataDir(directory: File): Builder {
             mDataDir = directory
@@ -244,8 +272,9 @@ class TorConfig private constructor(
          *
          * Default value: $configDir/torrc
          *
-         * @param file
-         * @return
+         * @param [file] your torrc file
+         *
+         * @return [Builder]
          */
         fun torrc(file: File): Builder {
             mTorrcFile = file
@@ -273,23 +302,27 @@ class TorConfig private constructor(
         }
 
         /**
-         * When tor starts it waits for the control port and cookie auth files to be created before it proceeds to the
-         * next step in startup. If these files are not created after a certain amount of time, then the startup has
-         * failed.
+         * When tor starts it waits for the control port and cookie auth files to be
+         * created before it proceeds to the next step in startup. If these files are
+         * not created after a certain amount of time, then the startup has failed.
          *
          * This method specifies how much time to wait until failing the startup.
          *
-         * @param timeout in seconds
+         * Default value is 15 seconds
+         *
+         * @param [timeoutSeconds] Int
+         *
+         * @return [Builder]
          */
-        fun fileCreationTimeout(timeout: Int): Builder {
-            mFileCreationTimeout = timeout
+        fun fileCreationTimeout(timeoutSeconds: Int): Builder {
+                mFileCreationTimeout = timeoutSeconds
             return this
         }
 
         /**
          * Builds torConfig and sets default values if not explicitly configured through builder.
          *
-         * @return torConfig
+         * @return [TorConfig]
          */
         fun build(): TorConfig {
             if (!::mHomeDir.isInitialized) {
