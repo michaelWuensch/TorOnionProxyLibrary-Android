@@ -9,7 +9,7 @@ import net.freehaven.tor.control.TorControlCommands
 abstract class BaseEventListener: EventListener() {
 
     /**
-     * See [TorControlCommands.EVENT_NAMES] values. These are Required
+     * See [TorControlCommands.EVENT_NAMES] values. These are *REQUIRED*
      * for registering them in [io.matthewnelson.topl_android.OnionProxyManager.start]
      * which allows you full control over what you wish to listen for.
      * */

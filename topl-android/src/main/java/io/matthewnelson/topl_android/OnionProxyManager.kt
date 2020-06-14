@@ -430,10 +430,14 @@ class OnionProxyManager(
             controlConnection.takeOwnership()
             controlConnection.resetConf(setOf(OWNER))
             eventBroadcaster.broadcastNotice("Took ownership of tor control port.")
-            eventBroadcaster.broadcastNotice("adding control port event listener")
-            controlConnection.addRawEventListener(eventListener)
-            controlConnection.setEvents(listOf(*eventListener.CONTROL_COMMAND_EVENTS))
-            eventBroadcaster.broadcastNotice("SUCCESS added control port event listener")
+
+            if (eventListener.CONTROL_COMMAND_EVENTS.isNotEmpty()) {
+                eventBroadcaster.broadcastNotice("adding control port event listener")
+                controlConnection.addRawEventListener(eventListener)
+                controlConnection.setEvents(listOf(*eventListener.CONTROL_COMMAND_EVENTS))
+                eventBroadcaster.broadcastNotice("SUCCESS added control port event listener")
+            }
+
             enableNetwork(true)
         } catch (e: IOException) {
             torProcess?.destroy()
