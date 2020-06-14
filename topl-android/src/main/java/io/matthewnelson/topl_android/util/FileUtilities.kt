@@ -125,6 +125,7 @@ object FileUtilities {
             }
         }
 
+    @Throws(SecurityException::class)
     fun listFilesToLog(f: File) {
         if (f.isDirectory)
             for (child in f.listFiles())
@@ -133,7 +134,7 @@ object FileUtilities {
             LOG.info(f.absolutePath)
     }
 
-    @Throws(IOException::class)
+    @Throws(IOException::class, SecurityException::class)
     fun read(f: File): ByteArray {
         val b = ByteArray(f.length().toInt())
         val `in` = FileInputStream(f)
@@ -158,7 +159,7 @@ object FileUtilities {
      *
      * @throws java.io.IOException - If any of the file operations fail
      */
-    @Throws(IOException::class)
+    @Throws(IOException::class, SecurityException::class)
     fun cleanInstallOneFile(readFrom: InputStream, fileToWriteTo: File) {
         if (fileToWriteTo.exists() && !fileToWriteTo.delete())
             throw RuntimeException("Could not remove existing file ${fileToWriteTo.name}")
@@ -167,6 +168,7 @@ object FileUtilities {
         copy(readFrom, out)
     }
 
+    @Throws(SecurityException::class)
     fun recursiveFileDelete(fileOrDirectory: File) {
         if (fileOrDirectory.isDirectory)
             for (child in fileOrDirectory.listFiles())
@@ -182,7 +184,7 @@ object FileUtilities {
      * @param zipFileInputStream Stream to unzip
      * @throws java.io.IOException - If there are any file errors
      */
-    @Throws(IOException::class)
+    @Throws(IOException::class, RuntimeException::class)
     fun extractContentFromZip(destinationDirectory: File, zipFileInputStream: InputStream) {
         val zipInputStream: ZipInputStream
         try {

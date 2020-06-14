@@ -13,6 +13,7 @@ See the Apache 2 License for the specific language governing permissions and lim
 package io.matthewnelson.topl_android
 
 import android.os.Process
+import io.matthewnelson.topl_android.settings.DefaultTorSettings
 import io.matthewnelson.topl_android_settings.TorSettings
 import io.matthewnelson.topl_android.settings.TorSettingsBuilder
 import io.matthewnelson.topl_android.util.FileUtilities
@@ -40,8 +41,10 @@ import java.io.IOException
 class OnionProxyContext(
     val torConfig: TorConfig,
     val torInstaller: TorInstaller,
-    val torSettings: TorSettings
+    torSettings: TorSettings?
 ) {
+
+    val torSettings = torSettings ?: DefaultTorSettings()
 
     private companion object {
         val LOG: Logger = LoggerFactory.getLogger(OnionProxyContext::class.java)
@@ -52,11 +55,24 @@ class OnionProxyContext(
     private val cookieLock = Object()
     private val hostnameLock = Object()
 
+    // Try creating the data dir upon instantiation. Everything hinges on it.
+    init {
+        try {
+            createDataDir()
+        } catch (e: SecurityException) {
+            e.printStackTrace()
+            LOG.warn("Could not create directory dataDir: ${torConfig.dataDir}")
+        }
+    }
+
     /**
      * Creates the configured tor data directory
      *
+     * @throws [SecurityException]
+     *
      * @return true if directory already exists or has been successfully created, otherwise false
      */
+    @Throws(SecurityException::class)
     fun createDataDir(): Boolean =
         synchronized(dataDirLock) {
             return torConfig.dataDir.exists() || torConfig.dataDir.mkdirs()
@@ -65,6 +81,7 @@ class OnionProxyContext(
     /**
      * Deletes the configured tor data directory
      */
+    @Throws(RuntimeException::class, SecurityException::class)
     fun deleteDataDir() =
         synchronized(dataDirLock) {
             for (file in torConfig.dataDir.listFiles())
@@ -79,8 +96,11 @@ class OnionProxyContext(
     /**
      * Creates an empty cookie auth file
      *
-     * @return true if cookie file is created, otherwise false
+     * @throws [SecurityException]
+     *
+     * @return True if cookie file is created, otherwise false.
      */
+    @Throws(SecurityException::class)
     fun createCookieAuthFile(): Boolean =
         synchronized(cookieLock) {
             val cookieAuthFile = torConfig.cookieAuthFile
@@ -97,6 +117,7 @@ class OnionProxyContext(
             }
         }
 
+    @Throws(SecurityException::class)
     fun createHostnameFile(): Boolean =
         synchronized(hostnameLock) {
             val hostnameFile = torConfig.hostnameFile
@@ -114,48 +135,65 @@ class OnionProxyContext(
         }
 
     /**
-     * Creates a default resolv.conf file using the Google name server. This is a convenience method.
+     * Creates a default resolv.conf file using the Quad9 name server. This is a convenience method.
      */
     @Throws(IOException::class)
-    fun createGoogleNameserverFile(): File =
+    fun createQuad9NameserverFile(): File =
         synchronized(dnsLock) {
             val file = torConfig.resolveConf
             val writer = BufferedWriter(FileWriter(file))
-            writer.write("nameserver 8.8.8.8\n")
-            writer.write("nameserver 8.8.4.4\n")
+            writer.write("nameserver 9.9.9.9\n")
+            writer.write("nameserver 149.112.112.112\n")
             writer.close()
             return file
         }
 
     /**
-     * Creates an observer for the configured control port file
+     * Creates an observer for the configured control port file.
      *
-     * @return write observer for cookie auth file
+     * @throws [IOException] File errors
+     * @throws [IllegalArgumentException] see [WriteObserver]
+     * @throws [SecurityException] see [WriteObserver]
+     *
+     * @return write observer for the control port file
      */
-    @Throws(IOException::class)
+    @Throws(IOException::class, IllegalArgumentException::class, SecurityException::class)
     fun createControlPortFileObserver(): WriteObserver =
         synchronized(cookieLock) {
             return generateWriteObserver(torConfig.controlPortFile)
         }
 
-    @Throws(IOException::class)
+    /**
+     * Creates an observer for the configured cookie auth file.
+     *
+     * @throws [IOException] File errors
+     * @throws [IllegalArgumentException] see [WriteObserver]
+     * @throws [SecurityException] see [WriteObserver]
+     *
+     * @return write observer for the cookie auth file
+     */
+    @Throws(IOException::class, IllegalArgumentException::class, SecurityException::class)
     fun createCookieAuthFileObserver(): WriteObserver =
         synchronized(cookieLock) {
             return generateWriteObserver(torConfig.cookieAuthFile)
         }
 
     /**
-     * Creates an observer for the configured hostname file
+     * Creates an observer for the configured hostname file.
      *
-     * @return write observer for hostname file
+     * @throws [IOException] File errors
+     * @throws [IllegalArgumentException] see [WriteObserver]
+     * @throws [SecurityException] see [WriteObserver]
+     *
+     * @return write observer for the hostname file
      */
-    @Throws(IOException::class)
+    @Throws(IOException::class, IllegalArgumentException::class, SecurityException::class)
     fun createHostnameDirObserver(): WriteObserver =
         synchronized(hostnameLock) {
             return generateWriteObserver(torConfig.hostnameFile)
         }
 
-    fun newConfigBuilder(): TorSettingsBuilder =
+    fun newSettingsBuilder(): TorSettingsBuilder =
         TorSettingsBuilder(this)
 
     /**
@@ -166,7 +204,13 @@ class OnionProxyContext(
     val processId: String
         get() = Process.myPid().toString()
 
-    @Throws(IOException::class)
+    /**
+     * Generates a write observer for the given file
+     *
+     * @throws [IllegalArgumentException] if the file does not exist.
+     * @throws [SecurityException] File errors
+     * */
+    @Throws(IllegalArgumentException::class, SecurityException::class)
     fun generateWriteObserver(file: File): WriteObserver =
         WriteObserver(file)
 }
