@@ -3,6 +3,7 @@ package io.matthewnelson.topl_android_service
 import android.content.Context
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import io.matthewnelson.topl_android_service.model.NotificationSettings
 import io.matthewnelson.topl_android_settings.TorConfigFiles
 import io.matthewnelson.topl_android_settings.TorSettings
 
@@ -15,76 +16,99 @@ class TorServiceController private constructor() {
         private val geoip6AssetPath: String
     ) {
 
-        private lateinit var torConfigFiles: TorConfigFiles
-        private var startServiceAsap = false
-        private var stopTorOnTermination = true
+        private lateinit var torConfig: TorConfigFiles
+        private lateinit var startServiceAsap: String
+        private lateinit var stopServiceOnTermination: String
 
         fun useCustomTorConfigFiles(torConfigFiles: TorConfigFiles): Builder {
-            // TODO: Implement
+            torConfig = torConfigFiles
             return this
         }
 
         fun startServiceAsSoonAsPossible(): Builder {
-            // TODO: Implement
+            startServiceAsap = ""
             return this
         }
 
         fun stopServiceWhenAppIsTerminated(): Builder {
-            // TODO: Implement
+            stopServiceOnTermination = ""
             return this
         }
 
-        fun showNotification(channelDescription: String): NotificationBuilder {
-            // TODO: Implement
-            return NotificationBuilder(this)
+        fun showNotification(channelDescription: String, notificationID: Short): NotificationBuilder {
+            return NotificationBuilder(this, channelDescription, notificationID.toInt())
         }
 
-        class NotificationBuilder(private val builder: Builder) {
+        class NotificationBuilder(
+            private val builder: Builder,
+            channelDescription: String,
+            notificationID: Int
+        ) {
+
+            private val notificationSettings = NotificationSettings(channelDescription, notificationID)
 
             fun setNotificationImageTorOn(@DrawableRes drawableRes: Int): NotificationBuilder {
-                // TODO: Implement
+                notificationSettings.imageOn = drawableRes
                 return this
             }
 
             fun setNotificationImageTorOff(@DrawableRes drawableRes: Int): NotificationBuilder {
-                // TODO: Implement
+                notificationSettings.imageOff = drawableRes
                 return this
             }
 
             fun setNotificationImageDataTransfer(@DrawableRes drawableRes: Int): NotificationBuilder {
-                // TODO: Implement
+                notificationSettings.imageData = drawableRes
                 return this
             }
 
             fun setNotificationImageErrors(@DrawableRes drawableRes: Int): NotificationBuilder {
-                // TODO: Implement
+                notificationSettings.imageError = drawableRes
                 return this
             }
 
             fun setNotificationColor(@ColorRes colorRes: Int): NotificationBuilder {
-                // TODO: Implement
+                notificationSettings.colorRes = colorRes
                 return this
             }
 
             fun enableRestartButton(): NotificationBuilder {
-                // TODO: Implement
+                notificationSettings.enableRestartButton = true
                 return this
             }
 
             fun enableStopButton(): NotificationBuilder {
-                // TODO: Implement
+                notificationSettings.enableStopButton = true
                 return this
             }
 
             fun applyNotificationSettings(): Builder {
-                // TODO: Implement
+                notificationSettings.show = true
+                TorServiceManager.setNotificationSettings(notificationSettings)
                 return builder
             }
 
         }
 
         fun build() {
-            // TODO: Implement
+            if (!TorServiceManager.isNotificationSettingsInitialized()) {
+                TorServiceManager.setNotificationSettings(
+                    NotificationSettings(
+                        "BSG is a national treasure. Separate Money and State. #BitcoinFixesThis",
+                        615615
+                    )
+                )
+            }
+
+            TorServiceManager.initialize(
+                context,
+                torSettings,
+                geoipAssetPath,
+                geoip6AssetPath,
+                if (::torConfig.isInitialized) torConfig else null,
+                ::startServiceAsap.isInitialized,
+                ::stopServiceOnTermination.isInitialized
+            )
         }
     }
 
