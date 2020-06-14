@@ -4,7 +4,7 @@ abstract class TorSettings {
 
     abstract val disableNetwork: Boolean
 
-    abstract val dnsPort: String
+    abstract val dnsPort: Int
 
     abstract val customTorrc: String?
 
@@ -25,7 +25,7 @@ abstract class TorSettings {
 
     abstract val proxyPassword: String?
 
-    abstract val proxyPort: String?
+    abstract val proxyPort: Int?
 
     abstract val proxySocks5Host: String?
 
@@ -41,6 +41,9 @@ abstract class TorSettings {
 
     abstract val relayPort: Int
 
+    /**
+     * Could be a port "9050", or "auto"
+     * */
     abstract val socksPort: String
 
     abstract val virtualAddressNetwork: String?
@@ -75,7 +78,7 @@ abstract class TorSettings {
 
     abstract val runAsDaemon: Boolean
 
-    abstract val transPort: String
+    abstract val transPort: Int?
 
     abstract val useSocks5: Boolean
 }

@@ -4,16 +4,16 @@ import io.matthewnelson.topl_android_settings.TorSettings
 import java.util.*
 
 /**
- * Provides some reasonable default settings. Override this class or create a new implementation to
- * make changes.
+ * Provides some reasonable default settings. Override this class or create a new
+ * implementation to make changes.
  */
-open class DefaultSettings : TorSettings() {
+open class DefaultTorSettings : TorSettings() {
 
     override val disableNetwork: Boolean
         get() = true
 
-    override val dnsPort: String
-        get() = "5400"
+    override val dnsPort: Int
+        get() = 5400
 
     override val customTorrc: String?
         get() = null
@@ -39,11 +39,11 @@ open class DefaultSettings : TorSettings() {
     override val proxyPassword: String?
         get() = null
 
-    override val proxyPort: String?
+    override val proxyPort: Int?
         get() = null
 
     override val proxySocks5Host: String?
-        get() = null
+        get() = "127.0.0.1"
 
     override val proxySocks5ServerPort: String?
         get() = null
@@ -67,10 +67,10 @@ open class DefaultSettings : TorSettings() {
         get() = "9050"
 
     override val virtualAddressNetwork: String?
-        get() = null
+        get() = "10.192.0.0/10"
 
     override val hasBridges: Boolean
-        get() = true
+        get() = false
 
     override val hasConnectionPadding: Boolean
         get() = false
@@ -82,7 +82,7 @@ open class DefaultSettings : TorSettings() {
         get() = false
 
     override val hasDormantCanceledByStartup: Boolean
-        get() = false
+        get() = true
 
     override val hasIsolationAddressFlagForTunnel: Boolean
         get() = false
@@ -114,9 +114,9 @@ open class DefaultSettings : TorSettings() {
     override val runAsDaemon: Boolean
         get() = true
 
-    override val transPort: String
-        get() = "9040"
+    override val transPort: Int?
+        get() = 9140
 
     override val useSocks5: Boolean
-        get() = false
+        get() = true
 }
