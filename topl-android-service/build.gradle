@@ -40,6 +40,7 @@ dependencies {
     implementation project(':topl-android-settings')
     implementation deps.kotlin.stdlib
     implementation deps.androidx.localBroadcastManager
+    implementation deps.kotlin.coroutinesCore
     implementation deps.jtorctl
 
     testImplementation deps.junit
