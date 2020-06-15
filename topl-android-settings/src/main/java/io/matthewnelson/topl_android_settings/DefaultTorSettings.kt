@@ -1,4 +1,4 @@
-package io.matthewnelson.topl_android.settings
+package io.matthewnelson.topl_android_settings
 
 import io.matthewnelson.topl_android_settings.TorSettings
 import java.util.*
