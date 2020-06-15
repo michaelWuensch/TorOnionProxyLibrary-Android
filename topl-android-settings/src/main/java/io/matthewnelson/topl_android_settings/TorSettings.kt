@@ -149,44 +149,44 @@ abstract class TorSettings {
 
     abstract val useSocks5: Boolean
 
-    override fun toString(): String {
-        return "TorSettings{ " +
-                "disableNetwork=${if (disableNetwork) TRUE else FALSE}, " +
-                "dnsPort=${dnsPort.toString()}, " +
-                "customTorrc=${customTorrc ?: NULL}, " +
-                "entryNodes=${entryNodes ?: NULL}, " +
-                "excludeNodes=${excludeNodes ?: NULL}, " +
-                "exitNodes=${exitNodes ?: NULL}, " +
-                "httpTunnelPort=${httpTunnelPort.toString()}, " +
-                "listOfSupportedBridges=${listOfSupportedBridges.joinToString(", ", "[", "]")}, " +
-                "proxyHost=${proxyHost ?: NULL}, " +
-                "proxyPassword=${proxyPassword ?: NULL}, " +
-                "proxyPort=${proxyPort?.toString() ?: NULL}, " +
-                "proxySocks5Host=${proxySocks5Host ?: NULL}, " +
-                "proxySocks5ServerPort=${proxySocks5ServerPort?.toString() ?: NULL}, " +
-                "proxyType=${proxyType ?: NULL}, " +
-                "proxyUser=${proxyUser ?: NULL}, " +
-                "reachableAddressPorts=$reachableAddressPorts, " +
-                "relayNickname=${relayNickname ?: NULL}, " +
-                "relayPort=${relayPort.toString()}, " +
-                "socksPort=$socksPort, " +
-                "virtualAddressNetwork=${virtualAddressNetwork ?: NULL}, " +
-                "hasBridges=${if (hasBridges) TRUE else FALSE}, " +
-                "hasConnectionPadding=${if (hasConnectionPadding) TRUE else FALSE}, " +
-                "hasCookieAuthentication=${if (hasCookieAuthentication) TRUE else FALSE}, " +
-                "hasDebugLogs=${if (hasDebugLogs) TRUE else FALSE}, " +
-                "hasDormantCanceledByStartup=${if (hasDormantCanceledByStartup) TRUE else FALSE}, " +
-                "hasIsolationAddressFlagForTunnel=${if (hasIsolationAddressFlagForTunnel) TRUE else FALSE}, " +
-                "hasOpenProxyOnAllInterfaces=${if (hasOpenProxyOnAllInterfaces) TRUE else FALSE}, " +
-                "hasReachableAddress=${if (hasReachableAddress) TRUE else FALSE}, " +
-                "hasReducedConnectionPadding=${if (hasReducedConnectionPadding) TRUE else FALSE}, " +
-                "hasSafeSocks=${if (hasSafeSocks) TRUE else FALSE}, " +
-                "hasStrictNodes=${if (hasStrictNodes) TRUE else FALSE}, " +
-                "hasTestSocks=${if (hasTestSocks) TRUE else FALSE}, " +
-                "isAutoMapHostsOnResolve=${if (isAutoMapHostsOnResolve) TRUE else FALSE}, " +
-                "isRelay=${if (isRelay) TRUE else FALSE}, " +
-                "runAsDaemon=${if (runAsDaemon) TRUE else FALSE}, " +
-                "transPort=${transPort?.toString() ?: NULL}, " +
-                "useSocks5=${if (useSocks5) TRUE else FALSE} }"
-    }
+//    override fun toString(): String {
+//        return "TorSettings{ " +
+//                "disableNetwork=${if (disableNetwork) TRUE else FALSE}, " +
+//                "dnsPort=${dnsPort.toString()}, " +
+//                "customTorrc=${customTorrc ?: NULL}, " +
+//                "entryNodes=${entryNodes ?: NULL}, " +
+//                "excludeNodes=${excludeNodes ?: NULL}, " +
+//                "exitNodes=${exitNodes ?: NULL}, " +
+//                "httpTunnelPort=${httpTunnelPort.toString()}, " +
+//                "listOfSupportedBridges=${listOfSupportedBridges.joinToString(", ", "[", "]")}, " +
+//                "proxyHost=${proxyHost ?: NULL}, " +
+//                "proxyPassword=${proxyPassword ?: NULL}, " +
+//                "proxyPort=${proxyPort?.toString() ?: NULL}, " +
+//                "proxySocks5Host=${proxySocks5Host ?: NULL}, " +
+//                "proxySocks5ServerPort=${proxySocks5ServerPort?.toString() ?: NULL}, " +
+//                "proxyType=${proxyType ?: NULL}, " +
+//                "proxyUser=${proxyUser ?: NULL}, " +
+//                "reachableAddressPorts=$reachableAddressPorts, " +
+//                "relayNickname=${relayNickname ?: NULL}, " +
+//                "relayPort=${relayPort.toString()}, " +
+//                "socksPort=$socksPort, " +
+//                "virtualAddressNetwork=${virtualAddressNetwork ?: NULL}, " +
+//                "hasBridges=${if (hasBridges) TRUE else FALSE}, " +
+//                "hasConnectionPadding=${if (hasConnectionPadding) TRUE else FALSE}, " +
+//                "hasCookieAuthentication=${if (hasCookieAuthentication) TRUE else FALSE}, " +
+//                "hasDebugLogs=${if (hasDebugLogs) TRUE else FALSE}, " +
+//                "hasDormantCanceledByStartup=${if (hasDormantCanceledByStartup) TRUE else FALSE}, " +
+//                "hasIsolationAddressFlagForTunnel=${if (hasIsolationAddressFlagForTunnel) TRUE else FALSE}, " +
+//                "hasOpenProxyOnAllInterfaces=${if (hasOpenProxyOnAllInterfaces) TRUE else FALSE}, " +
+//                "hasReachableAddress=${if (hasReachableAddress) TRUE else FALSE}, " +
+//                "hasReducedConnectionPadding=${if (hasReducedConnectionPadding) TRUE else FALSE}, " +
+//                "hasSafeSocks=${if (hasSafeSocks) TRUE else FALSE}, " +
+//                "hasStrictNodes=${if (hasStrictNodes) TRUE else FALSE}, " +
+//                "hasTestSocks=${if (hasTestSocks) TRUE else FALSE}, " +
+//                "isAutoMapHostsOnResolve=${if (isAutoMapHostsOnResolve) TRUE else FALSE}, " +
+//                "isRelay=${if (isRelay) TRUE else FALSE}, " +
+//                "runAsDaemon=${if (runAsDaemon) TRUE else FALSE}, " +
+//                "transPort=${transPort?.toString() ?: NULL}, " +
+//                "useSocks5=${if (useSocks5) TRUE else FALSE} }"
+//    }
 }

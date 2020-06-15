@@ -68,29 +68,20 @@ internal class TorServiceManager private constructor(private val context: Contex
         //  then starting services if startServiceAsap is true
     }
 
-    private fun updateSettings(settings: TorSettings?): Boolean {
-        return if (settings != null && settings.toString() != torSettings.toString()) {
-            torSettings = settings
-            true
-        } else {
-            false
-        }
-    }
-
-    private fun sendBroadcast(receiverAction: String, updateSettings: Boolean) {
+    private fun sendBroadcast(receiverAction: String) {
 
     }
 
-    fun startTor(torSettings: TorSettings?) =
-        sendBroadcast(TorServiceReceiver.TOR_SERVICE_START, updateSettings(torSettings))
+    fun startTor() =
+        sendBroadcast(TorServiceReceiver.TOR_SERVICE_START)
 
     fun stopTor() =
-        sendBroadcast(TorServiceReceiver.TOR_SERVICE_STOP, false)
+        sendBroadcast(TorServiceReceiver.TOR_SERVICE_STOP)
 
-    fun restartTor(torSettings: TorSettings?) =
-        sendBroadcast(TorServiceReceiver.TOR_SERVICE_RESTART, updateSettings(torSettings))
+    fun restartTor() =
+        sendBroadcast(TorServiceReceiver.TOR_SERVICE_RESTART)
 
     fun newIdentity() =
-        sendBroadcast(TorServiceReceiver.TOR_SERVICE_RENEW, false)
+        sendBroadcast(TorServiceReceiver.TOR_SERVICE_RENEW)
 
 }

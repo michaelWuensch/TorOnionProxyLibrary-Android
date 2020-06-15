@@ -14,9 +14,6 @@ internal class TorServiceReceiver: BroadcastReceiver() {
         val TOR_SERVICE_STOP: String = BigInteger(130, SecureRandom()).toString(32)
         val TOR_SERVICE_RESTART: String = BigInteger(130, SecureRandom()).toString(32)
         val TOR_SERVICE_RENEW: String = BigInteger(130, SecureRandom()).toString(32)
-
-        const val EXTRAS = "EXTRAS"
-        const val UPDATE_SETTINGS = "UPDATE_SETTINGS"
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -24,7 +21,6 @@ internal class TorServiceReceiver: BroadcastReceiver() {
             when (val action = intent.action) {
                 TOR_SERVICE_START, TOR_SERVICE_STOP, TOR_SERVICE_RESTART, TOR_SERVICE_RENEW -> {
                     val torServiceIntent = Intent(context.applicationContext, TorService::class.java)
-                    torServiceIntent.putExtra(EXTRAS, intent.getBooleanExtra(UPDATE_SETTINGS, false))
                     torServiceIntent.action = action
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

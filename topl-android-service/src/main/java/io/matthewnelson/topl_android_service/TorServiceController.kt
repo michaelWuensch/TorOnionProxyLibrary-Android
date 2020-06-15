@@ -115,11 +115,9 @@ class TorServiceController private constructor() {
 
         /**
          * Starts the TorService
-         *
-         * @param [torSettings] Apply new settings before tor starts. Send null if not.
          * */
-        fun startTor(torSettings: TorSettings?) =
-            TorServiceManager.getInstance()?.startTor(torSettings)
+        fun startTor() =
+            TorServiceManager.getInstance()?.startTor()
 
         /**
          * Stops the TorService
@@ -129,12 +127,13 @@ class TorServiceController private constructor() {
 
         /**
          * Restarts the TorService
-         *
-         * @param [torSettings] Apply new settings between stop and start. Send null if not.
          * */
-        fun restartTor(torSettings: TorSettings?) =
-            TorServiceManager.getInstance()?.restartTor(torSettings)
+        fun restartTor() =
+            TorServiceManager.getInstance()?.restartTor()
 
+        /**
+         * Renews the identity
+         * */
         fun newIdentity() =
             TorServiceManager.getInstance()?.newIdentity()
     }

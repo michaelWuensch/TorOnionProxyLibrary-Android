@@ -17,7 +17,7 @@ internal class NotificationSettings(
     var enableStopButton: Boolean = false
 ) {
     companion object {
-        const val DEFAULT_CHAN_DESC = ""
+        const val DEFAULT_CHAN_DESC = "BSG is a national treasure"
         const val DEFAULT_CHAN_ID = 615615
 
         private lateinit var notificationSettings: NotificationSettings
