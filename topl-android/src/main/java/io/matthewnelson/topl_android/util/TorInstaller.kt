@@ -19,7 +19,10 @@ import java.util.concurrent.TimeoutException
 abstract class TorInstaller {
 
     /**
-     * Sets up and installs the tor environment. If the tor environment is already setup, this does not need to be invoked.
+     * Sets up and installs any files needed to run tor. If the tor files are already on
+     * the system this does not need to be invoked.
+     *
+     * @return true if tor installation is successful, otherwise false.
      */
     @Throws(IOException::class)
     abstract fun setup(): Boolean
