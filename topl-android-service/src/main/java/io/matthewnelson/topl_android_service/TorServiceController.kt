@@ -11,6 +11,7 @@ class TorServiceController private constructor() {
 
     class Builder(
         private val context: Context,
+        private val buildConfigVersion: Int,
         private val torSettings: TorSettings,
         private val geoipAssetPath: String,
         private val geoip6AssetPath: String
@@ -84,25 +85,23 @@ class TorServiceController private constructor() {
 
             fun applyNotificationSettings(): Builder {
                 notificationSettings.show = true
-                TorServiceManager.setNotificationSettings(notificationSettings)
+                NotificationSettings.initialize(notificationSettings)
                 return builder
             }
 
         }
 
         fun build() {
-            if (!TorServiceManager.isNotificationSettingsInitialized()) {
-                TorServiceManager.setNotificationSettings(
-                    NotificationSettings(
-                        "BSG is a national treasure. Separate Money and State. #BitcoinFixesThis",
-                        615615
-                    )
+            NotificationSettings.initialize(
+                NotificationSettings(
+                    NotificationSettings.DEFAULT_CHAN_DESC,
+                    NotificationSettings.DEFAULT_CHAN_ID
                 )
-            }
+            )
 
-            TorServiceManager.initialize(
-                context,
+            TorServiceManager.getInstance(context.applicationContext).initialize(
                 torSettings,
+                buildConfigVersion,
                 geoipAssetPath,
                 geoip6AssetPath,
                 if (::torConfig.isInitialized) torConfig else null,
@@ -117,28 +116,26 @@ class TorServiceController private constructor() {
         /**
          * Starts the TorService
          *
-         * @param [torSettings] If you wish to apply new settings before tor starts.
+         * @param [torSettings] Apply new settings before tor starts. Send null if not.
          * */
-        fun startTorService(torSettings: TorSettings?) {
-            // TODO: Implement
-        }
+        fun startTor(torSettings: TorSettings?) =
+            TorServiceManager.getInstance()?.startTor(torSettings)
 
         /**
          * Stops the TorService
-         *
-         * @param [torSettings] If you wish to apply new settings after tor stops.
          * */
-        fun stopTorService(torSettings: TorSettings?) {
-            // TODO: Implement
-        }
+        fun stopTor() =
+            TorServiceManager.getInstance()?.stopTor()
 
         /**
          * Restarts the TorService
          *
-         * @param [torSettings] If you wish to apply new settings between stop and start.
+         * @param [torSettings] Apply new settings between stop and start. Send null if not.
          * */
-        fun restartTorService(torSettings: TorSettings?) {
-            // TODO: Implement
-        }
+        fun restartTor(torSettings: TorSettings?) =
+            TorServiceManager.getInstance()?.restartTor(torSettings)
+
+        fun newIdentity() =
+            TorServiceManager.getInstance()?.newIdentity()
     }
 }

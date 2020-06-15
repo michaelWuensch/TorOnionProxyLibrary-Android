@@ -15,4 +15,23 @@ internal class NotificationSettings(
     @ColorRes var colorRes: Int = R.color.tor_channel_color_white,
     var enableRestartButton: Boolean = false,
     var enableStopButton: Boolean = false
-)
+) {
+    companion object {
+        const val DEFAULT_CHAN_DESC = ""
+        const val DEFAULT_CHAN_ID = 615615
+
+        private lateinit var notificationSettings: NotificationSettings
+
+        fun initialize(settings: NotificationSettings) {
+            if (!::notificationSettings.isInitialized) {
+                notificationSettings = settings
+            }
+        }
+
+        fun getNotificationSettings(): NotificationSettings =
+            if (::notificationSettings.isInitialized)
+                notificationSettings
+            else
+                NotificationSettings(DEFAULT_CHAN_DESC, DEFAULT_CHAN_ID)
+    }
+}
