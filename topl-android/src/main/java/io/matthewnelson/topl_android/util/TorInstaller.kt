@@ -22,7 +22,7 @@ abstract class TorInstaller {
      * Sets up and installs the tor environment. If the tor environment is already setup, this does not need to be invoked.
      */
     @Throws(IOException::class)
-    abstract fun setup()
+    abstract fun setup(): Boolean
 
     @Throws(IOException::class, TimeoutException::class)
     abstract fun updateTorConfigCustom(content: String?)
