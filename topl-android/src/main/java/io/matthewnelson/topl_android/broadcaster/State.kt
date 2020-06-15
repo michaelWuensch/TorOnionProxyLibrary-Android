@@ -36,23 +36,19 @@ class State(private val broadcaster: EventBroadcaster) {
     val isStopping: Boolean
         get() = TorState.STOPPING == torState
 
-    fun off() {
-        torState = TorState.OFF
-        broadcaster.broadcastStatus()
-    }
-
-    fun on() {
-        torState = TorState.ON
-        broadcaster.broadcastStatus()
-    }
-
-    fun starting() {
-        torState = TorState.STARTING
-        broadcaster.broadcastStatus()
-    }
-
-    fun stopping() {
-        torState = TorState.STOPPING
-        broadcaster.broadcastStatus()
+    /**
+     * Will set the state to that which is specified if it isn't already.
+     *
+     * @return Previous state.
+     * */
+    fun setTorState(state: @TorState.State String): @TorState.State String {
+        val currentState = torState
+        if (torState != state) {
+            torState = state
+            broadcaster.broadcastTorState(torState)
+        } else {
+            broadcaster.broadcastDebug("TorState was already set to $currentState")
+        }
+        return currentState
     }
 }
