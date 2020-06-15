@@ -418,18 +418,19 @@ class OnionProxyManager(
     /**
      * Starts tor control service if it isn't already running.
      *
-     * @throws IOException
+     * @throws [IOException] File errors
+     * @throws [SecurityException] File errors
      */
     @Synchronized
-    @Throws(IOException::class)
+    @Throws(IOException::class, SecurityException::class)
     fun start() {
         if (controlConnection != null) {
             eventBroadcaster.broadcastNotice("Start command called but TorControlConnection already exists.")
+            eventBroadcaster.state.setTorState(TorState.ON)
             return
         }
 
-
-        LOG.info("Starting Tor")
+        eventBroadcaster.state.setTorState(TorState.STARTING)
 
         var torProcess: Process? = null
         var controlConnection = findExistingTorConnection()
@@ -450,6 +451,7 @@ class OnionProxyManager(
                 connectToTorControlSocket(controlPortFile)
             } catch (e: IOException) {
                 torProcess.destroy()
+                eventBroadcaster.state.setTorState(TorState.OFF)
                 throw IOException(e.message)
             }
         } else {
@@ -481,8 +483,11 @@ class OnionProxyManager(
         } catch (e: Exception) {
             torProcess?.destroy()
             this.controlConnection = null
+            eventBroadcaster.state.setTorState(TorState.OFF)
             throw IOException(e.message)
         }
+
+        eventBroadcaster.state.setTorState(TorState.ON)
 
         networkStateReceiver = NetworkStateReceiver()
 
