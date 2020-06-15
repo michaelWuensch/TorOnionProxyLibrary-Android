@@ -1,6 +1,7 @@
 package io.matthewnelson.topl_android_service
 
 import android.content.Context
+import android.content.IntentFilter
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import io.matthewnelson.topl_android_service.model.NotificationSettings
@@ -20,7 +21,6 @@ class TorServiceController private constructor() {
         private lateinit var torConfig: TorConfigFiles
         private lateinit var startServiceAsap: String
         private lateinit var stopServiceOnTermination: String
-        private lateinit var notificationsBeingSet: String
 
         fun useCustomTorConfigFiles(torConfigFiles: TorConfigFiles): Builder {
             torConfig = torConfigFiles
@@ -38,7 +38,6 @@ class TorServiceController private constructor() {
         }
 
         fun showNotification(channelDescription: String, notificationID: Short): NotificationBuilder {
-            notificationsBeingSet = ""
             return NotificationBuilder(this, channelDescription, notificationID.toInt())
         }
 

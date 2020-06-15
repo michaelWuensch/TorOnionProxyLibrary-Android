@@ -19,9 +19,7 @@ internal class NotificationSettings(
         private lateinit var notificationSettings: NotificationSettings
 
         fun initialize(settings: NotificationSettings) {
-            if (!::notificationSettings.isInitialized) {
-                notificationSettings = settings
-            }
+            notificationSettings = settings
         }
 
         fun getSettings(): NotificationSettings? =
