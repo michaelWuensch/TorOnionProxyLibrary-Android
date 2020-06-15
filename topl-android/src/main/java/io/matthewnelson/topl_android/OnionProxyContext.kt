@@ -83,7 +83,7 @@ class OnionProxyContext(
      * Deletes the configured tor data directory
      */
     @Throws(RuntimeException::class, SecurityException::class)
-    fun deleteDataDir() =
+    fun deleteDataDirExceptHiddenService() =
         synchronized(dataDirLock) {
             for (file in torConfigFiles.dataDir.listFiles())
                 if (file.isDirectory)

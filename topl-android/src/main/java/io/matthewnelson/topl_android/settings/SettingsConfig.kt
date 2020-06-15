@@ -13,7 +13,7 @@ See the Apache 2 License for the specific language governing permissions and lim
 package io.matthewnelson.topl_android.settings
 
 /**
- * Annotates [TorSettingsBuilder] methods. When [TorSettingsBuilder.updateTorConfig] is invoked,
+ * Annotates [TorSettingsBuilder] methods. When [TorSettingsBuilder.updateTorSettings] is invoked,
  * it will use this annotation to automatically detect and use the associated method as part of
  * building the config.
  *

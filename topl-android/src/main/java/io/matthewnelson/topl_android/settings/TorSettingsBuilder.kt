@@ -42,7 +42,7 @@ class TorSettingsBuilder(private val onionProxyContext: OnionProxyContext) {
         NullPointerException::class,
         ExceptionInInitializerError::class
     )
-    fun updateTorConfig(): TorSettingsBuilder {
+    fun updateTorSettings(): TorSettingsBuilder {
         for (method in this.javaClass.methods)
             for (annotation in method.annotations)
                 if (annotation is SettingsConfig) {

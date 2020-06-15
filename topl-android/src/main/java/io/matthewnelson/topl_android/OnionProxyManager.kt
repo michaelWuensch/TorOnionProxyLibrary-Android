@@ -151,7 +151,7 @@ class OnionProxyManager(
                 // It can take a little bit for the Tor OP to detect the connection is dead and
                 // kill itself.
                 Thread.sleep(1000, 0)
-                onionProxyContext.deleteDataDir()
+                onionProxyContext.deleteDataDirExceptHiddenService()
             }
             false
         } finally {
