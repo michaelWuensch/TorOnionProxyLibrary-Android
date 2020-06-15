@@ -79,14 +79,6 @@ class OnionProxyManager(
         const val HOSTNAME_TIMEOUT = 30
 
         val LOG: Logger = LoggerFactory.getLogger(OnionProxyManager::class.java)
-
-        fun execIgnoreException(command: String): Process? =
-            try {
-                Runtime.getRuntime().exec(command)
-            } catch (e: IOException) {
-                e.printStackTrace()
-                null
-            }
     }
 
     @Volatile
@@ -869,6 +861,13 @@ class OnionProxyManager(
                 throw Exception("Cannot kill: ${onionProxyContext.torConfigFiles.torExecutableFile.absolutePath}")
         }
     }
+
+    private fun execIgnoreException(command: String): Process? =
+        try {
+            Runtime.getRuntime().exec(command)
+        } catch (e: Exception) {
+            null
+        }
 
     private inner class NetworkStateReceiver : BroadcastReceiver() {
 
