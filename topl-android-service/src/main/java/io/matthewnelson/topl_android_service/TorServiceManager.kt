@@ -2,8 +2,7 @@ package io.matthewnelson.topl_android_service
 
 import android.content.Context
 import android.content.Intent
-import io.matthewnelson.topl_android.OnionProxyContext
-import io.matthewnelson.topl_android.OnionProxyManager
+import android.content.IntentFilter
 import io.matthewnelson.topl_android_service.onionproxy.OnionProxyInstaller
 import io.matthewnelson.topl_android_settings.TorConfigFiles
 import io.matthewnelson.topl_android_settings.TorSettings
@@ -64,24 +63,28 @@ internal class TorServiceManager private constructor(private val context: Contex
                 geoipAssetPath,
                 geoip6AssetPath
             )
+
+        context.applicationContext.registerReceiver(TorServiceReceiver(), IntentFilter(TorServiceReceiver.INTENT_FILTER_ACTION))
         // TODO: Coroutine for installing files
         //  then starting services if startServiceAsap is true
     }
 
     private fun sendBroadcast(receiverAction: String) {
-
+        val broadcastIntent = Intent(TorServiceReceiver.INTENT_FILTER_ACTION)
+        broadcastIntent.putExtra(TorServiceReceiver.EXTRAS_KEY, receiverAction)
+        context.sendBroadcast(broadcastIntent)
     }
 
     fun startTor() =
-        sendBroadcast(TorServiceReceiver.TOR_SERVICE_START)
+        sendBroadcast(TorServiceReceiver.ACTION_START)
 
     fun stopTor() =
-        sendBroadcast(TorServiceReceiver.TOR_SERVICE_STOP)
+        sendBroadcast(TorServiceReceiver.ACTION_STOP)
 
     fun restartTor() =
-        sendBroadcast(TorServiceReceiver.TOR_SERVICE_RESTART)
+        sendBroadcast(TorServiceReceiver.ACTION_RESTART)
 
     fun newIdentity() =
-        sendBroadcast(TorServiceReceiver.TOR_SERVICE_RENEW)
+        sendBroadcast(TorServiceReceiver.ACTION_RENEW)
 
 }
