@@ -114,14 +114,15 @@ class OnionProxyManager(
      *
      * @return True if bootstrap succeeded, false if there is a problem or timeout.
      *
-     * @throws [java.lang.InterruptedException] You know, if we are interrupted
-     * @throws [java.io.IOException]
+     * @throws [IllegalArgumentException] if values passed are incorrect
+     * @throws [InterruptedException] You know, if we are interrupted
+     * @throws [IOException]
      */
     @Synchronized
-    @Throws(InterruptedException::class, IOException::class)
+    @Throws(IllegalArgumentException::class, InterruptedException::class, IOException::class)
     fun startWithRepeat(secondsBeforeTimeOut: Int, numberOfRetries: Int): Boolean {
-        require(!(secondsBeforeTimeOut <= 0 || numberOfRetries < 0)) {
-            "secondsBeforeTimeOut >= 0 & numberOfRetries > 0"
+        require(secondsBeforeTimeOut > 0 && numberOfRetries > 0) {
+            "secondsBeforeTimeOut was less than 0 || numberOfRetries was less than 0"
         }
         return try {
             for (retryCount in 0 until numberOfRetries) {
@@ -256,7 +257,7 @@ class OnionProxyManager(
      * Kills the Tor OP Process. Once you have called this method nothing is going
      * to work until you either call startWithRepeat or start
      *
-     * @throws [java.io.IOException] File errors
+     * @throws [NullPointerException] If controlConnection magically changes to null.
      */
     @Synchronized
     @Throws(NullPointerException::class)
@@ -323,7 +324,6 @@ class OnionProxyManager(
      * network connections.
      *
      * @return True if running
-     * @throws [java.io.IOException]
      */
     @get:Synchronized
     val isRunning: Boolean
@@ -331,21 +331,34 @@ class OnionProxyManager(
             isBootstrapped && isNetworkEnabled
         } catch (e: IOException) {
             false
+        } catch (ee: NullPointerException) {
+            false
         }
 
     /**
      * Tells the Tor OP if it should accept network connections
      *
      * @param [enable] If true then the Tor OP will accept SOCKS connections, otherwise not.
-     * @throws [java.io.IOException]
+     * @throws [IOException] if having issues with TorControlConnection#setConf
+     * @throws [NullPointerException] if [controlConnection] is null even after checking.
      */
     @Synchronized
-    @Throws(IOException::class)
+    @Throws(IOException::class, NullPointerException::class)
     fun enableNetwork(enable: Boolean) {
         if (controlConnection == null) return
 
-        LOG.info("Enabling network: $enable")
-        controlConnection!!.setConf("DisableNetwork", if (enable) "0" else "1")
+        eventBroadcaster.broadcastNotice("Enabling network: $enable")
+
+        try {
+            controlConnection!!.setConf("DisableNetwork", if (enable) "0" else "1")
+        } catch (e: KotlinNullPointerException) {
+            LOG.error("controlConnection was null even after checking...")
+            eventBroadcaster.broadcastException(e.message, e)
+            throw NullPointerException(e.message)
+        } catch (ee: IOException) {
+            eventBroadcaster.broadcastException(ee.message, ee)
+            throw IOException(ee.message)
+        }
     }
 
     /**
@@ -364,7 +377,13 @@ class OnionProxyManager(
             val disableNetworkSettingValues = try {
                 controlConnection!!.getConf("DisableNetwork")
             } catch (e: KotlinNullPointerException) {
+                eventBroadcaster.broadcastException(e.message, e)
+                LOG.error("controlConnection was null even after checking...")
                 throw NullPointerException(e.message)
+            } catch (ee: IOException) {
+                LOG.warn("TorControlConnection is not responding properly to getConf.")
+                eventBroadcaster.broadcastException(ee.message, ee)
+                throw IOException(ee.message)
             }
 
             var result = false
@@ -398,6 +417,7 @@ class OnionProxyManager(
                     return true
                 }
             } catch (e: IOException) {
+                eventBroadcaster.broadcastException(e.message, e)
                 LOG.warn("Control connection is not responding properly to getInfo", e)
             }
             return false
@@ -412,9 +432,10 @@ class OnionProxyManager(
     @Throws(IOException::class)
     fun start() {
         if (controlConnection != null) {
-            LOG.info("Control connection not null. aborting")
+            eventBroadcaster.broadcastNotice("Start command called but TorControlConnection already exists.")
             return
         }
+
 
         LOG.info("Starting Tor")
 
@@ -465,7 +486,7 @@ class OnionProxyManager(
             }
 
             enableNetwork(true)
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             torProcess?.destroy()
             this.controlConnection = null
             throw IOException(e.message)
@@ -786,6 +807,12 @@ class OnionProxyManager(
         } else try {
             controlConnection!!.getInfo(info)
         } catch (e: IOException) {
+            LOG.warn("Control connection is not responding properly to getInfo", e)
+            eventBroadcaster.broadcastException(e.message, e)
+            null
+        } catch (ee: KotlinNullPointerException) {
+            LOG.warn("controlConnection was null even after checking")
+            eventBroadcaster.broadcastException(ee.message, ee)
             null
         }
     }
@@ -794,17 +821,19 @@ class OnionProxyManager(
         if (!hasControlConnection()) return false
 
         try {
-            controlConnection!!.signal("HUP")
+            controlConnection!!.signal(TorControlCommands.SIGNAL_RELOAD)
             return true
         } catch (e: IOException) {
-            e.printStackTrace()
+        } catch (ee: KotlinNullPointerException) {
+            LOG.warn("controlConnection was null even after checking...")
+            eventBroadcaster.broadcastException(ee.message, ee)
         }
 
         try {
             restartTorProcess()
             return true
         } catch (e: Exception) {
-            e.printStackTrace()
+            eventBroadcaster.broadcastException(e.message, e)
         }
 
         return false
@@ -860,8 +889,8 @@ class OnionProxyManager(
 
                 try {
                     enableNetwork(online)
-                } catch (e: IOException) {
-                    LOG.warn(e.toString(), e)
+                } catch (e: Exception) {
+                    LOG.warn(e.message, e)
                 }
 
             }).start()
