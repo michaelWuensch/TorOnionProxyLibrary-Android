@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application>
-        <service android:name=".TorService" android:enabled="true" android:exported="false" />
+        <service android:name="io.matthewnelson.topl_android_service.TorService" android:enabled="true" android:exported="false" />
         <!-- TODO: Don't want to stopWithTask b/c we need to allow Tor to close properly beforehand -->
     </application>
 </manifest>
