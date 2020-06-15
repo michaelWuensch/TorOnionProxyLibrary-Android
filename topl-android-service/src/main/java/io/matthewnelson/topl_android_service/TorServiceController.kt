@@ -20,6 +20,7 @@ class TorServiceController private constructor() {
         private lateinit var torConfig: TorConfigFiles
         private lateinit var startServiceAsap: String
         private lateinit var stopServiceOnTermination: String
+        private lateinit var notificationsBeingSet: String
 
         fun useCustomTorConfigFiles(torConfigFiles: TorConfigFiles): Builder {
             torConfig = torConfigFiles
@@ -37,6 +38,7 @@ class TorServiceController private constructor() {
         }
 
         fun showNotification(channelDescription: String, notificationID: Short): NotificationBuilder {
+            notificationsBeingSet = ""
             return NotificationBuilder(this, channelDescription, notificationID.toInt())
         }
 
@@ -84,7 +86,6 @@ class TorServiceController private constructor() {
             }
 
             fun applyNotificationSettings(): Builder {
-                notificationSettings.show = true
                 NotificationSettings.initialize(notificationSettings)
                 return builder
             }
@@ -92,13 +93,6 @@ class TorServiceController private constructor() {
         }
 
         fun build() {
-            NotificationSettings.initialize(
-                NotificationSettings(
-                    NotificationSettings.DEFAULT_CHAN_DESC,
-                    NotificationSettings.DEFAULT_CHAN_ID
-                )
-            )
-
             TorServiceManager.getInstance(context.applicationContext).initialize(
                 torSettings,
                 buildConfigVersion,
@@ -114,25 +108,25 @@ class TorServiceController private constructor() {
     companion object {
 
         /**
-         * Starts the TorService
+         * Starts the TorService. Does nothing if called before the builder has gone off.
          * */
         fun startTor() =
             TorServiceManager.getInstance()?.startTor()
 
         /**
-         * Stops the TorService
+         * Stops the TorService. Does nothing if called before the builder has gone off.
          * */
         fun stopTor() =
             TorServiceManager.getInstance()?.stopTor()
 
         /**
-         * Restarts the TorService
+         * Restarts the TorService. Does nothing if called before the builder has gone off.
          * */
         fun restartTor() =
             TorServiceManager.getInstance()?.restartTor()
 
         /**
-         * Renews the identity
+         * Renews the identity. Does nothing if called before the builder has gone off.
          * */
         fun newIdentity() =
             TorServiceManager.getInstance()?.newIdentity()
