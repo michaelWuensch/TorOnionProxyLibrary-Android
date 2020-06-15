@@ -10,18 +10,23 @@ import java.security.SecureRandom
 internal class TorServiceReceiver: BroadcastReceiver() {
 
     companion object {
-        val TOR_SERVICE_START: String = BigInteger(130, SecureRandom()).toString(32)
-        val TOR_SERVICE_STOP: String = BigInteger(130, SecureRandom()).toString(32)
-        val TOR_SERVICE_RESTART: String = BigInteger(130, SecureRandom()).toString(32)
-        val TOR_SERVICE_RENEW: String = BigInteger(130, SecureRandom()).toString(32)
+        val INTENT_FILTER_ACTION: String= BigInteger(130, SecureRandom()).toString(32)
+        val EXTRAS_KEY: String = BigInteger(130, SecureRandom()).toString(32)
+        const val ACTION_START = "ACTION_START"
+        const val ACTION_STOP = "ACTION_STOP"
+        const val ACTION_RESTART = "ACTION_RESTART"
+        const val ACTION_RENEW = "ACTION_RENEW"
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context != null && intent != null) {
-            when (val action = intent.action) {
-                TOR_SERVICE_START, TOR_SERVICE_STOP, TOR_SERVICE_RESTART, TOR_SERVICE_RENEW -> {
+            if (intent.action != INTENT_FILTER_ACTION) return
+
+            when (val extra = intent.getStringExtra(EXTRAS_KEY)) {
+                ACTION_START, ACTION_STOP, ACTION_RESTART, ACTION_RENEW -> {
                     val torServiceIntent = Intent(context.applicationContext, TorService::class.java)
-                    torServiceIntent.action = action
+                    torServiceIntent.putExtra(EXTRAS_KEY, extra)
+                    torServiceIntent.action = intent.action
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         context.startForegroundService(torServiceIntent)
