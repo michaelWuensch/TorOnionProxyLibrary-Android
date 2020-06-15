@@ -106,12 +106,20 @@ class OnionProxyManager(
      *
      * @return True if bootstrap succeeded, false if there is a problem or timeout.
      *
-     * @throws [IllegalArgumentException] if values passed are incorrect
-     * @throws [InterruptedException] You know, if we are interrupted
-     * @throws [IOException]
+     * @throws [IllegalArgumentException] If values passed are out of specified bounds.
+     * @throws [InterruptedException] You know, if we are interrupted.
+     * @throws [IOException] TorControlConnection or File problems.
+     * @throws [SecurityException] See [OnionProxyContext.deleteDataDirExceptHiddenService]
+     * @throws [RuntimeException] See [OnionProxyContext.deleteDataDirExceptHiddenService]
      */
     @Synchronized
-    @Throws(IllegalArgumentException::class, InterruptedException::class, IOException::class)
+    @Throws(
+        IllegalArgumentException::class,
+        InterruptedException::class,
+        IOException::class,
+        SecurityException::class,
+        RuntimeException::class
+    )
     fun startWithRepeat(secondsBeforeTimeOut: Int, numberOfRetries: Int): Boolean {
         require(secondsBeforeTimeOut > 0 && numberOfRetries > 0) {
             "secondsBeforeTimeOut was less than 0 || numberOfRetries was less than 0"
@@ -161,18 +169,29 @@ class OnionProxyManager(
      * Returns the socks port on the IPv4 localhost address that the Tor OP is listening on
      *
      * @return Discovered socks port
-     * @throws [java.io.IOException] File errors
+     * @throws [IOException] TorControlConnection or File errors.
+     * @throws [RuntimeException] If Tor is not running or there's no localhost binding for Socks.
+     * @throws [NullPointerException] If [controlConnection] is null even after checking.
      */
-    @get:Throws(IOException::class)
+    @get:Throws(IOException::class, RuntimeException::class, NullPointerException::class)
     @get:Synchronized
     val iPv4LocalHostSocksPort: Int
         get() {
             if (!isRunning) throw RuntimeException("Tor is not running!")
 
-            // This returns a set of space delimited quoted strings which could be Ipv4,
-            // Ipv6 or unix sockets.
-            val socksIpPorts = controlConnection!!.getInfo("net/listeners/socks")
-                .split(" ".toRegex()).toTypedArray()
+            val socksIpPorts = try {
+                // This returns a set of space delimited quoted strings which could be Ipv4,
+                // Ipv6 or unix sockets.
+                controlConnection!!.getInfo("net/listeners/socks").split(" ".toRegex())
+                    .toTypedArray()
+            } catch (e: KotlinNullPointerException) {
+                LOG.warn("TorControlConnection was null even after checking...")
+                eventBroadcaster.broadcastException(e.message, e)
+                throw NullPointerException(e.message)
+            } catch (ee: IOException) {
+                LOG.warn("Control connection is not responding properly to getInfo", ee)
+                throw IOException(ee.message)
+            }
 
             for (address in socksIpPorts) {
                 if (address.contains("\"127.0.0.1:")) {
@@ -523,8 +542,9 @@ class OnionProxyManager(
      *
      * @throws [IOException] File errors
      * @throws [SecurityException] File errors
+     * @throws [NullPointerException] If controlSocket was null even after setting it.
      */
-    @Throws(IOException::class, SecurityException::class)
+    @Throws(IOException::class, SecurityException::class, NullPointerException::class)
     private fun connectToTorControlSocket(controlPortFile: File): TorControlConnection {
         val controlConnection: TorControlConnection
         try {
@@ -540,10 +560,14 @@ class OnionProxyManager(
             eventBroadcaster.broadcastNotice("SUCCESS connected to Tor control port.")
         } catch (e: IOException) {
             throw IOException(e.message)
-        } catch (e: ArrayIndexOutOfBoundsException) {
+        } catch (ee: ArrayIndexOutOfBoundsException) {
             throw IOException(
                 "Failed to read control port: ${String(FileUtilities.read(controlPortFile))}"
             )
+        } catch (eee: KotlinNullPointerException) {
+            eventBroadcaster.broadcastException(eee.message, eee)
+            LOG.warn("controlSocket was null even after it was setup")
+            throw NullPointerException(eee.message)
         }
         if (onionProxyContext.torSettings.hasDebugLogs) {
             controlConnection.setDebugging(System.out)
@@ -553,8 +577,11 @@ class OnionProxyManager(
 
     /**
      * Spawns the tor native process from the existing Java process.
+     *
+     * @throws [IOException] File errors.
+     * @throws [SecurityException] File errors.
      */
-    @Throws(IOException::class)
+    @Throws(IOException::class, SecurityException::class)
     private fun spawnTorProcess(): Process {
         val pid = onionProxyContext.processId
         val cmd = arrayOf(
@@ -581,11 +608,12 @@ class OnionProxyManager(
     }
 
     /**
-     * Waits for the control port file to be created by the Tor process. If there is
-     * any problem creating the file OR if the timeout for the control port file to be
-     * created is exceeded, then an IOException is thrown.
+     * Waits for the control port file to be created by the Tor process.
+     *
+     * @throws [IOException] File problems or timeout
+     * @throws [SecurityException] File problems
      */
-    @Throws(IOException::class)
+    @Throws(IOException::class, SecurityException::class)
     private fun waitForControlPortFileCreation(controlPortFile: File) {
         val controlPortStartTime = System.currentTimeMillis()
         LOG.info("Waiting for control port")
@@ -661,7 +689,7 @@ class OnionProxyManager(
         }.start()
     }
 
-    @Throws(IOException::class)
+    @Throws(IOException::class, SecurityException::class)
     private fun torExecutable(): File {
         var torExe = onionProxyContext.torConfigFiles.torExecutableFile
         //Try removing platform specific extension
@@ -807,7 +835,6 @@ class OnionProxyManager(
             controlConnection!!.getInfo(info)
         } catch (e: IOException) {
             LOG.warn("Control connection is not responding properly to getInfo", e)
-            eventBroadcaster.broadcastException(e.message, e)
             null
         } catch (ee: KotlinNullPointerException) {
             LOG.warn("controlConnection was null even after checking")
