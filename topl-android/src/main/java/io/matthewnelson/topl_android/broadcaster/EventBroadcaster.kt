@@ -12,23 +12,26 @@ See the Apache 2 License for the specific language governing permissions and lim
 */
 package io.matthewnelson.topl_android.broadcaster
 
+import io.matthewnelson.topl_android_settings.TorState
+
 /**
  * Service for sending event logs to the system
  */
 abstract class EventBroadcaster {
 
-    abstract val state: State
+    val state: State
+        get() = State(this)
 
     abstract fun broadcastBandwidth(upload: Long, download: Long, written: Long, read: Long)
 
     abstract fun broadcastDebug(msg: String)
 
-    abstract fun broadcastException(msg: String, e: Exception)
+    abstract fun broadcastException(msg: String?, e: Exception)
 
-    abstract fun broadcastLogMessage(logMessage: String)
+    abstract fun broadcastLogMessage(logMessage: String?)
 
     abstract fun broadcastNotice(msg: String)
 
-    abstract fun broadcastStatus()
+    abstract fun broadcastTorState(state: @TorState.State String)
 
 }

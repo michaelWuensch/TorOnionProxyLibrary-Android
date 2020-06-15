@@ -16,15 +16,23 @@ class OnionProxyEventBroadcaster(
         TODO("Not yet implemented")
     }
 
-    override fun broadcastLogMessage(logMessage: String) {
+    override fun broadcastDebug(msg: String) {
+        super.broadcastDebug(msg)
+    }
+
+    override fun broadcastException(msg: String?, e: Exception) {
+        super.broadcastException(msg, e)
+    }
+
+    override fun broadcastLogMessage(logMessage: String?) {
         TODO("Not yet implemented")
     }
 
     override fun broadcastNotice(msg: String) {
-        TODO("Not yet implemented")
+        super.broadcastNotice(msg)
     }
 
-    override fun broadcastStatus() {
+    override fun broadcastTorState(state: String) {
         TODO("Not yet implemented")
     }
 }

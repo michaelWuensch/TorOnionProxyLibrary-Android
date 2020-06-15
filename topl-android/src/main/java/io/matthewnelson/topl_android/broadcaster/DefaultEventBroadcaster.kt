@@ -13,6 +13,7 @@ See the Apache 2 License for the specific language governing permissions and lim
 package io.matthewnelson.topl_android.broadcaster
 
 import io.matthewnelson.topl_android_settings.TorSettings
+import io.matthewnelson.topl_android_settings.TorState
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.PrintWriter
@@ -20,16 +21,13 @@ import java.io.StringWriter
 
 /**
  * Override this class to implement [broadcastBandwidth], [broadcastLogMessage],
- * and [broadcastStatus] or extend [EventBroadcaster] and create your own.
+ * and [broadcastTorState] or extend [EventBroadcaster] and create your own.
  * */
 open class DefaultEventBroadcaster(private val torSettings: TorSettings) : EventBroadcaster() {
 
     private companion object {
         val LOG: Logger = LoggerFactory.getLogger(DefaultEventBroadcaster::class.java)
     }
-
-    override val state: State
-        get() = State(this)
 
     override fun broadcastBandwidth(upload: Long, download: Long, written: Long, read: Long) {}
 
@@ -39,7 +37,7 @@ open class DefaultEventBroadcaster(private val torSettings: TorSettings) : Event
             broadcastLogMessage(msg)
     }
 
-    override fun broadcastException(msg: String, e: Exception) {
+    override fun broadcastException(msg: String?, e: Exception) {
         if (torSettings.hasDebugLogs) {
             LOG.error(msg, e)
             val sw = StringWriter()
@@ -50,7 +48,7 @@ open class DefaultEventBroadcaster(private val torSettings: TorSettings) : Event
         }
     }
 
-    override fun broadcastLogMessage(logMessage: String) {}
+    override fun broadcastLogMessage(logMessage: String?) {}
 
     override fun broadcastNotice(msg: String) {
         if (msg.isNotEmpty())
@@ -60,5 +58,5 @@ open class DefaultEventBroadcaster(private val torSettings: TorSettings) : Event
             broadcastLogMessage(msg)
     }
 
-    override fun broadcastStatus() {}
+    override fun broadcastTorState(state: @TorState.State String) {}
 }
