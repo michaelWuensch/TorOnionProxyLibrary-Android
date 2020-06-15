@@ -150,8 +150,10 @@ class OnionProxyManager(
             false
         } finally {
             // Make sure we return the Tor OP in some kind of consistent state, even if it's 'off'.
-            if (!isRunning)
-                stop()
+            try {
+                if (!isRunning)
+                    stop()
+            } catch (e: NullPointerException) {}
         }
     }
 
