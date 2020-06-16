@@ -1,4 +1,4 @@
-package io.matthewnelson.topl_android_service
+package io.matthewnelson.topl_android_service.receiver
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -6,16 +6,17 @@ import android.content.Intent
 import android.os.Build
 import java.math.BigInteger
 import java.security.SecureRandom
+import io.matthewnelson.topl_android_service.receiver.IntentExtra.Companion.ACTION_RENEW
+import io.matthewnelson.topl_android_service.receiver.IntentExtra.Companion.ACTION_RESTART
+import io.matthewnelson.topl_android_service.receiver.IntentExtra.Companion.ACTION_START
+import io.matthewnelson.topl_android_service.receiver.IntentExtra.Companion.ACTION_STOP
+import io.matthewnelson.topl_android_service.TorService
 
 internal class TorServiceReceiver: BroadcastReceiver() {
 
     companion object {
         val INTENT_FILTER_ACTION: String= BigInteger(130, SecureRandom()).toString(32)
         val EXTRAS_KEY: String = BigInteger(130, SecureRandom()).toString(32)
-        const val ACTION_START = "ACTION_START"
-        const val ACTION_STOP = "ACTION_STOP"
-        const val ACTION_RESTART = "ACTION_RESTART"
-        const val ACTION_RENEW = "ACTION_RENEW"
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
