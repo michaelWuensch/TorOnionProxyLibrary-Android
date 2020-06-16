@@ -48,5 +48,6 @@ internal class TorService: Service() {
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
         // TODO: Implement
+        onDestroy()
     }
 }
