@@ -1,10 +1,14 @@
 package io.matthewnelson.topl_android_service
 
 import android.content.Context
+import android.content.Intent
 import android.content.IntentFilter
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import io.matthewnelson.topl_android_service.receiver.IntentExtra
 import io.matthewnelson.topl_android_service.model.NotificationSettings
+import io.matthewnelson.topl_android_service.receiver.TorServiceReceiver
+import io.matthewnelson.topl_android_service.onionproxy.OnionProxyInstaller
 import io.matthewnelson.topl_android_settings.TorConfigFiles
 import io.matthewnelson.topl_android_settings.TorSettings
 
@@ -92,42 +96,73 @@ class TorServiceController private constructor() {
         }
 
         fun build() {
-            TorServiceManager.getInstance(context.applicationContext).initialize(
-                torSettings,
-                buildConfigVersion,
-                geoipAssetPath,
-                geoip6AssetPath,
-                if (::torConfig.isInitialized) torConfig else null,
-                ::startServiceAsap.isInitialized,
-                ::stopServiceOnTermination.isInitialized
+            val torConfigFiles =
+                if (::torConfig.isInitialized) {
+                    torConfig
+                } else {
+                    TorConfigFiles.createConfig(context.applicationContext)
+                }
+
+            TorService.setOnionProxyContext(
+                torConfigFiles,
+                OnionProxyInstaller(
+                    context.applicationContext,
+                    torConfigFiles,
+                    buildConfigVersion,
+                    geoipAssetPath,
+                    geoip6AssetPath
+                ),
+                torSettings
             )
+
+            context.applicationContext.registerReceiver(
+                TorServiceReceiver(), IntentFilter(TorServiceReceiver.INTENT_FILTER_ACTION)
+            )
+
+            contxt = context.applicationContext
         }
     }
 
     companion object {
 
+        private lateinit var contxt: Context
+
+        private fun sendBroadcast(extras: String) {
+            val broadcastIntent = Intent(TorServiceReceiver.INTENT_FILTER_ACTION)
+            broadcastIntent.putExtra(TorServiceReceiver.EXTRAS_KEY, extras)
+            contxt.sendBroadcast(broadcastIntent)
+        }
+
         /**
          * Starts the TorService. Does nothing if called before the builder has gone off.
          * */
-        fun startTor() =
-            TorServiceManager.getInstance()?.startTor()
+        fun startTor() {
+            if (::contxt.isInitialized)
+                sendBroadcast(IntentExtra.ACTION_START)
+        }
 
         /**
          * Stops the TorService. Does nothing if called before the builder has gone off.
          * */
-        fun stopTor() =
-            TorServiceManager.getInstance()?.stopTor()
+        fun stopTor() {
+            if (::contxt.isInitialized)
+                sendBroadcast(IntentExtra.ACTION_STOP)
+        }
 
         /**
          * Restarts the TorService. Does nothing if called before the builder has gone off.
          * */
-        fun restartTor() =
-            TorServiceManager.getInstance()?.restartTor()
+        fun restartTor() {
+            if (::contxt.isInitialized)
+                sendBroadcast(IntentExtra.ACTION_RESTART)
+        }
 
         /**
          * Renews the identity. Does nothing if called before the builder has gone off.
          * */
-        fun newIdentity() =
-            TorServiceManager.getInstance()?.newIdentity()
+        fun newIdentity() {
+            if (::contxt.isInitialized)
+                sendBroadcast(IntentExtra.ACTION_RENEW)
+        }
     }
 }

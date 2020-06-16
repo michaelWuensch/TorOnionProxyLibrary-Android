@@ -3,11 +3,21 @@ package io.matthewnelson.topl_android_service
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import io.matthewnelson.topl_android.OnionProxyContext
+import io.matthewnelson.topl_android.util.TorInstaller
+import io.matthewnelson.topl_android_settings.TorConfigFiles
+import io.matthewnelson.topl_android_settings.TorSettings
 
 internal class TorService: Service() {
 
     companion object {
-
+        private lateinit var onionProxyContext: OnionProxyContext
+        fun setOnionProxyContext(
+            torConfigFiles: TorConfigFiles, torInstaller: TorInstaller, torSettings: TorSettings
+        ) {
+            if (!::onionProxyContext.isInitialized)
+                onionProxyContext = OnionProxyContext(torConfigFiles, torInstaller, torSettings)
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder? {
