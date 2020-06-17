@@ -738,7 +738,8 @@ class OnionProxyManager(
      *
      * @return true if tor installation is successful, otherwise false
      */
-    fun setup(): Boolean =
+    @Throws(IOException::class)
+    fun setup() =
         onionProxyContext.torInstaller.setup()
 
     val isIPv4LocalHostSocksPortOpen: Boolean

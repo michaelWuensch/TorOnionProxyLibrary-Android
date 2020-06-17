@@ -25,7 +25,7 @@ abstract class TorInstaller {
      * @return true if tor installation is successful, otherwise false.
      */
     @Throws(IOException::class)
-    abstract fun setup(): Boolean
+    abstract fun setup()
 
     @Throws(IOException::class, TimeoutException::class)
     abstract fun updateTorConfigCustom(content: String?)
