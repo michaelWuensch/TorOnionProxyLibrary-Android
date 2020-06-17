@@ -7,9 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.IBinder
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import io.matthewnelson.topl_android.OnionProxyContext
-import io.matthewnelson.topl_android.util.TorInstaller
-import io.matthewnelson.topl_android_service.receiver.ServiceAction
+import io.matthewnelson.topl_android_service.util.ServiceAction
 import io.matthewnelson.topl_android_settings.TorConfigFiles
 import io.matthewnelson.topl_android_settings.TorSettings
 
@@ -98,7 +96,7 @@ internal class TorService: Service() {
                     ServiceAction.ACTION_RESTART -> {
                         // TODO: Implement
                     }
-                    ServiceAction.ACTION_RENEW -> {
+                    ServiceAction.ACTION_NEW_ID -> {
                         // TODO: Implement
                     }
                     else -> {}

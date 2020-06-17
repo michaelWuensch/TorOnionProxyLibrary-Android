@@ -1,4 +1,4 @@
-package io.matthewnelson.topl_android_service.receiver
+package io.matthewnelson.topl_android_service.util
 
 import androidx.annotation.StringDef
 
@@ -7,7 +7,7 @@ abstract class ServiceAction {
     @StringDef(
         ACTION_STOP,
         ACTION_RESTART,
-        ACTION_RENEW
+        ACTION_NEW_ID
     )
     @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
     annotation class Action
@@ -18,6 +18,6 @@ abstract class ServiceAction {
     companion object {
         const val ACTION_STOP = "ACTION_STOP"
         const val ACTION_RESTART = "ACTION_RESTART"
-        const val ACTION_RENEW = "ACTION_RENEW"
+        const val ACTION_NEW_ID = "ACTION_NEW_ID"
     }
 }

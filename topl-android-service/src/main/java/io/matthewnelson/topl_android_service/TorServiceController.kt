@@ -6,7 +6,7 @@ import android.os.Build
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import io.matthewnelson.topl_android_service.receiver.ServiceAction
+import io.matthewnelson.topl_android_service.util.ServiceAction
 import io.matthewnelson.topl_android_service.model.ServiceNotification
 import io.matthewnelson.topl_android_settings.TorConfigFiles
 import io.matthewnelson.topl_android_settings.TorSettings
@@ -154,6 +154,6 @@ class TorServiceController private constructor() {
          * Renews the identity. Does nothing if called before the builder has gone off.
          * */
         fun newIdentity() =
-            broadcastAction(ServiceAction.ACTION_RENEW)
+            broadcastAction(ServiceAction.ACTION_NEW_ID)
     }
 }
