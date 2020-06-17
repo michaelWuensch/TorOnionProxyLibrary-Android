@@ -16,12 +16,24 @@ import io.matthewnelson.topl_android_settings.TorSettings
 internal class TorService: Service() {
 
     companion object {
-        private lateinit var onionProxyContext: OnionProxyContext
-        fun setOnionProxyContext(
-            torConfigFiles: TorConfigFiles, torInstaller: TorInstaller, torSettings: TorSettings
+        private lateinit var torConfigFiles: TorConfigFiles
+        private lateinit var torSettings: TorSettings
+        private var buildConfigVersion: Int = -1
+        private lateinit var geoipAssetPath: String
+        private lateinit var geoip6AssetPath: String
+
+        fun initialize(
+            config: TorConfigFiles,
+            settings: TorSettings,
+            buildVersion: Int,
+            geoipPath: String,
+            geoip6Path: String
         ) {
-            if (!::onionProxyContext.isInitialized)
-                onionProxyContext = OnionProxyContext(torConfigFiles, torInstaller, torSettings)
+            torConfigFiles = config
+            torSettings = settings
+            buildConfigVersion = buildVersion
+            geoipAssetPath = geoipPath
+            geoip6AssetPath = geoip6Path
         }
 
         // Intents/LocalBroadcastManager
@@ -52,7 +64,7 @@ internal class TorService: Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        return super.onStartCommand(intent, flags, startId)
+        return START_STICKY
         // TODO: Implement
     }
 

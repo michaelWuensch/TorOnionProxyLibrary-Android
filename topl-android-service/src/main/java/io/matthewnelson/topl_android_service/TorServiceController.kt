@@ -104,16 +104,12 @@ class TorServiceController private constructor() {
                     TorConfigFiles.createConfig(context.applicationContext)
                 }
 
-            TorService.setOnionProxyContext(
+            TorService.initialize(
                 torConfigFiles,
-                OnionProxyInstaller(
-                    context.applicationContext,
-                    torConfigFiles,
-                    buildConfigVersion,
-                    geoipAssetPath,
-                    geoip6AssetPath
-                ),
-                torSettings
+                torSettings,
+                buildConfigVersion,
+                geoipAssetPath,
+                geoip6AssetPath
             )
 
             contxt = context.applicationContext
