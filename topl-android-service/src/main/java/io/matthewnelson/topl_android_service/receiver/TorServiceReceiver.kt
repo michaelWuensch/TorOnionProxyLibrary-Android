@@ -6,10 +6,10 @@ import android.content.Intent
 import android.os.Build
 import java.math.BigInteger
 import java.security.SecureRandom
-import io.matthewnelson.topl_android_service.receiver.IntentExtra.Companion.ACTION_RENEW
-import io.matthewnelson.topl_android_service.receiver.IntentExtra.Companion.ACTION_RESTART
-import io.matthewnelson.topl_android_service.receiver.IntentExtra.Companion.ACTION_START
-import io.matthewnelson.topl_android_service.receiver.IntentExtra.Companion.ACTION_STOP
+import io.matthewnelson.topl_android_service.receiver.ServiceAction.Companion.ACTION_RENEW
+import io.matthewnelson.topl_android_service.receiver.ServiceAction.Companion.ACTION_RESTART
+import io.matthewnelson.topl_android_service.receiver.ServiceAction.Companion.ACTION_START
+import io.matthewnelson.topl_android_service.receiver.ServiceAction.Companion.ACTION_STOP
 import io.matthewnelson.topl_android_service.TorService
 
 internal class TorServiceReceiver: BroadcastReceiver() {

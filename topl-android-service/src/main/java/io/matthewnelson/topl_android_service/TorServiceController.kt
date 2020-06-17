@@ -5,7 +5,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
-import io.matthewnelson.topl_android_service.receiver.IntentExtra
+import io.matthewnelson.topl_android_service.receiver.ServiceAction
 import io.matthewnelson.topl_android_service.model.NotificationSettings
 import io.matthewnelson.topl_android_service.receiver.TorServiceReceiver
 import io.matthewnelson.topl_android_service.onionproxy.OnionProxyInstaller
@@ -138,7 +138,7 @@ class TorServiceController private constructor() {
          * */
         fun startTor() {
             if (::contxt.isInitialized)
-                sendBroadcast(IntentExtra.ACTION_START)
+                sendBroadcast(ServiceAction.ACTION_START)
         }
 
         /**
@@ -146,7 +146,7 @@ class TorServiceController private constructor() {
          * */
         fun stopTor() {
             if (::contxt.isInitialized)
-                sendBroadcast(IntentExtra.ACTION_STOP)
+                sendBroadcast(ServiceAction.ACTION_STOP)
         }
 
         /**
@@ -154,7 +154,7 @@ class TorServiceController private constructor() {
          * */
         fun restartTor() {
             if (::contxt.isInitialized)
-                sendBroadcast(IntentExtra.ACTION_RESTART)
+                sendBroadcast(ServiceAction.ACTION_RESTART)
         }
 
         /**
@@ -162,7 +162,7 @@ class TorServiceController private constructor() {
          * */
         fun newIdentity() {
             if (::contxt.isInitialized)
-                sendBroadcast(IntentExtra.ACTION_RENEW)
+                sendBroadcast(ServiceAction.ACTION_RENEW)
         }
     }
 }
