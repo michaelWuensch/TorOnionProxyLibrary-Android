@@ -2,14 +2,12 @@ package io.matthewnelson.topl_android_service
 
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Build
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.matthewnelson.topl_android_service.receiver.ServiceAction
-import io.matthewnelson.topl_android_service.model.NotificationSettings
-import io.matthewnelson.topl_android_service.onionproxy.OnionProxyInstaller
+import io.matthewnelson.topl_android_service.model.ServiceNotification
 import io.matthewnelson.topl_android_settings.TorConfigFiles
 import io.matthewnelson.topl_android_settings.TorSettings
 
@@ -24,73 +22,72 @@ class TorServiceController private constructor() {
     ) {
 
         private lateinit var torConfig: TorConfigFiles
-        private lateinit var startServiceAsap: String
-        private lateinit var stopServiceOnTermination: String
 
         fun useCustomTorConfigFiles(torConfigFiles: TorConfigFiles): Builder {
             torConfig = torConfigFiles
             return this
         }
 
-        fun startServiceAsSoonAsPossible(): Builder {
-            startServiceAsap = ""
-            return this
-        }
-
-        fun stopServiceWhenAppIsTerminated(): Builder {
-            stopServiceOnTermination = ""
-            return this
-        }
-
-        fun showNotification(channelDescription: String, notificationID: Short): NotificationBuilder {
-            return NotificationBuilder(this, channelDescription, notificationID.toInt())
+        fun customizeNotification(
+            channelDescription: String,
+            notificationID: Short,
+            activityToOpenWhenClicked: Class<*>?
+        ): NotificationBuilder {
+            return NotificationBuilder(
+                this,
+                channelDescription,
+                notificationID.toInt(),
+                activityToOpenWhenClicked
+            )
         }
 
         class NotificationBuilder(
             private val builder: Builder,
             channelDescription: String,
-            notificationID: Int
+            notificationID: Int,
+            activityToOpenWhenClicked: Class<*>?
         ) {
 
-            private val notificationSettings = NotificationSettings(channelDescription, notificationID)
+            private val serviceNotification =
+                ServiceNotification(channelDescription, notificationID, activityToOpenWhenClicked)
 
             fun setNotificationImageTorOn(@DrawableRes drawableRes: Int): NotificationBuilder {
-                notificationSettings.imageOn = drawableRes
+                serviceNotification.imageOn = drawableRes
                 return this
             }
 
             fun setNotificationImageTorOff(@DrawableRes drawableRes: Int): NotificationBuilder {
-                notificationSettings.imageOff = drawableRes
+                serviceNotification.imageOff = drawableRes
                 return this
             }
 
             fun setNotificationImageDataTransfer(@DrawableRes drawableRes: Int): NotificationBuilder {
-                notificationSettings.imageData = drawableRes
+                serviceNotification.imageData = drawableRes
                 return this
             }
 
             fun setNotificationImageErrors(@DrawableRes drawableRes: Int): NotificationBuilder {
-                notificationSettings.imageError = drawableRes
+                serviceNotification.imageError = drawableRes
                 return this
             }
 
             fun setNotificationColor(@ColorRes colorRes: Int): NotificationBuilder {
-                notificationSettings.colorRes = colorRes
+                serviceNotification.colorRes = colorRes
                 return this
             }
 
             fun enableRestartButton(): NotificationBuilder {
-                notificationSettings.enableRestartButton = true
+                serviceNotification.enableRestartButton = true
                 return this
             }
 
             fun enableStopButton(): NotificationBuilder {
-                notificationSettings.enableStopButton = true
+                serviceNotification.enableStopButton = true
                 return this
             }
 
             fun applyNotificationSettings(): Builder {
-                NotificationSettings.initialize(notificationSettings)
+                ServiceNotification.initialize(serviceNotification)
                 return builder
             }
 

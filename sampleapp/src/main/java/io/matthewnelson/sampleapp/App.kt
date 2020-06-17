@@ -15,8 +15,10 @@ class App: Application() {
             DefaultTorSettings(),
             "common/geoip",
             "common/geoip6"
-        ).showNotification("My Sample Application for demoing TorServices", 6156)
-            .applyNotificationSettings().build()
+        )
+            .customizeNotification("My Sample Application", 6156, MainActivity::class.java)
+            .applyNotificationSettings()
+            .build()
 
         TorServiceController.startTor()
     }
