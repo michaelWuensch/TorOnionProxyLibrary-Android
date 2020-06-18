@@ -37,6 +37,8 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation project(':topl-android-settings')
+    implementation project(':topl-service-prefs')
+    implementation project(':topl-service-settings')
     implementation deps.kotlin.stdlib
     implementation deps.jtorctl
     implementation deps.slf4j.api

@@ -30,4 +30,5 @@ ext.deps = [
         api: "org.slf4j:slf4j-api:${versions.slf4j}",
         android: "org.slf4j:slf4j-android:${versions.slf4j}",
     ],
+    robolectric: "org.robolectric:robolectric:4.3.1",
 ]

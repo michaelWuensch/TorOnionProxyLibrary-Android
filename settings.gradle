@@ -1,3 +1,4 @@
+include ':topl-service-prefs'
 rootProject.name = 'topl-kotlin-android'
 include ':sampleapp'
 include ':topl-android'
