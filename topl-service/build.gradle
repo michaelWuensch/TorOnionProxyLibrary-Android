@@ -42,6 +42,7 @@ dependencies {
     implementation project(':topl-service-settings')
     implementation deps.kotlin.stdlib
     implementation deps.androidx.localBroadcastManager
+    implementation deps.androidx.core
     implementation deps.kotlin.coroutinesCore
     implementation deps.jtorctl
 

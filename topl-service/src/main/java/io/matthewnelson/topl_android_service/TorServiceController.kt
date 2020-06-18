@@ -29,28 +29,52 @@ class TorServiceController private constructor(): ServiceActions() {
             return this
         }
 
+        @Throws(IllegalArgumentException::class)
         fun customizeNotification(
+            channelName: String,
+            channelID: String,
             channelDescription: String,
-            notificationID: Short,
-            activityToOpenWhenClicked: Class<*>?
+            notificationID: Short
         ): NotificationBuilder {
+            require(channelName.isNotEmpty() && channelID.isNotEmpty()) {
+                "channelName & channelID must not be empty."
+            }
+
             return NotificationBuilder(
                 this,
+                channelName,
+                channelID,
                 channelDescription,
-                notificationID.toInt(),
-                activityToOpenWhenClicked
+                notificationID.toInt()
             )
         }
 
         class NotificationBuilder(
             private val builder: Builder,
+            channelName: String,
+            channelID: String,
             channelDescription: String,
-            notificationID: Int,
-            activityToOpenWhenClicked: Class<*>?
+            notificationID: Int
         ) {
 
             private val serviceNotification =
-                ServiceNotification(channelDescription, notificationID, activityToOpenWhenClicked)
+                ServiceNotification(
+                    channelName,
+                    channelID,
+                    channelDescription,
+                    notificationID
+                )
+
+            fun setActivityToBeOpenedOnTap(
+                clazz: Class<*>,
+                intentExtrasKey: String?,
+                intentExtras: String?
+            ): NotificationBuilder {
+                serviceNotification.activityWhenTapped = clazz
+                serviceNotification.activityIntentKey = intentExtrasKey
+                serviceNotification.activityIntentExtras = intentExtras
+                return this
+            }
 
             fun setNotificationImageTorOn(@DrawableRes drawableRes: Int): NotificationBuilder {
                 serviceNotification.imageOn = drawableRes
@@ -110,32 +134,34 @@ class TorServiceController private constructor(): ServiceActions() {
                 geoip6AssetPath
             )
 
-            contxt = context.applicationContext
+            ServiceNotification.get().setupNotificationChannel(context.applicationContext)
+
+            appContext = context.applicationContext
         }
     }
 
     companion object {
 
-        private lateinit var contxt: Context
+        private lateinit var appContext: Context
 
         private fun broadcastAction(@ServiceAction actions: String) {
-            if (!::contxt.isInitialized) return
+            if (!::appContext.isInitialized) return
             val broadcastIntent = Intent(TorService.FILTER)
             broadcastIntent.putExtra(TorService.ACTION_EXTRAS_KEY, actions)
-            LocalBroadcastManager.getInstance(contxt).sendBroadcast(broadcastIntent)
+            LocalBroadcastManager.getInstance(appContext).sendBroadcast(broadcastIntent)
         }
 
         /**
          * Starts the TorService. Does nothing if called before the builder has gone off.
          * */
         fun startTor() {
-            if (!::contxt.isInitialized) return
+            if (!::appContext.isInitialized) return
 
-            val torServiceIntent = Intent(contxt.applicationContext, TorService::class.java)
+            val torServiceIntent = Intent(appContext.applicationContext, TorService::class.java)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                contxt.startForegroundService(torServiceIntent)
+                appContext.startForegroundService(torServiceIntent)
             else
-                contxt.startService(torServiceIntent)
+                appContext.startService(torServiceIntent)
         }
 
         /**

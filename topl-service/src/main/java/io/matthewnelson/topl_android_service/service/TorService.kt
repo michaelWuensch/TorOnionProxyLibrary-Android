@@ -7,8 +7,10 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.IBinder
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import io.matthewnelson.topl_android_service.model.ServiceNotification
 import io.matthewnelson.topl_android_settings.TorConfigFiles
 import io.matthewnelson.topl_android_settings.TorSettings
+import io.matthewnelson.topl_android_service.service.ServiceActions.ServiceAction
 
 internal class TorService: Service() {
 
@@ -46,6 +48,7 @@ internal class TorService: Service() {
     override fun onCreate() {
         super.onCreate()
         registerBroadcastReceiver(this)
+        ServiceNotification.get().startForegroundNotification(this)
         // TODO: Implement
     }
 
@@ -61,8 +64,8 @@ internal class TorService: Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        return START_STICKY
         // TODO: Implement
+        return START_STICKY
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
@@ -89,13 +92,13 @@ internal class TorService: Service() {
             if (intent != null) {
 
                 when (intent.getStringExtra(ACTION_EXTRAS_KEY)) {
-                    ServiceActions.ACTION_STOP -> {
+                    ServiceAction.ACTION_STOP -> {
                         // TODO: Implement
                     }
-                    ServiceActions.ACTION_RESTART -> {
+                    ServiceAction.ACTION_RESTART -> {
                         // TODO: Implement
                     }
-                    ServiceActions.ACTION_NEW_ID -> {
+                    ServiceAction.ACTION_NEW_ID -> {
                         // TODO: Implement
                     }
                     else -> {}
