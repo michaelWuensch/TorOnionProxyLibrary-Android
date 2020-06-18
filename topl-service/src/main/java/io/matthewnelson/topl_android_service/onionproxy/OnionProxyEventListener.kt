@@ -1,7 +1,7 @@
 package io.matthewnelson.topl_android_service.onionproxy
 
 import io.matthewnelson.topl_android.listener.BaseEventListener
-import io.matthewnelson.topl_android_service.TorService
+import io.matthewnelson.topl_android_service.service.TorService
 import net.freehaven.tor.control.TorControlCommands
 
 internal class OnionProxyEventListener(

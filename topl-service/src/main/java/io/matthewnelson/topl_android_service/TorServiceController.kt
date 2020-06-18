@@ -6,12 +6,13 @@ import android.os.Build
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import io.matthewnelson.topl_android_service.util.ServiceAction
 import io.matthewnelson.topl_android_service.model.ServiceNotification
+import io.matthewnelson.topl_android_service.service.ServiceActions
+import io.matthewnelson.topl_android_service.service.TorService
 import io.matthewnelson.topl_android_settings.TorConfigFiles
 import io.matthewnelson.topl_android_settings.TorSettings
 
-class TorServiceController private constructor() {
+class TorServiceController private constructor(): ServiceActions() {
 
     class Builder(
         private val context: Context,
@@ -117,10 +118,10 @@ class TorServiceController private constructor() {
 
         private lateinit var contxt: Context
 
-        private fun broadcastAction(action: @ServiceAction.Action String) {
+        private fun broadcastAction(@ServiceAction actions: String) {
             if (!::contxt.isInitialized) return
             val broadcastIntent = Intent(TorService.FILTER)
-            broadcastIntent.putExtra(TorService.ACTION_EXTRAS_KEY, action)
+            broadcastIntent.putExtra(TorService.ACTION_EXTRAS_KEY, actions)
             LocalBroadcastManager.getInstance(contxt).sendBroadcast(broadcastIntent)
         }
 
@@ -131,11 +132,10 @@ class TorServiceController private constructor() {
             if (!::contxt.isInitialized) return
 
             val torServiceIntent = Intent(contxt.applicationContext, TorService::class.java)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 contxt.startForegroundService(torServiceIntent)
-            } else {
+            else
                 contxt.startService(torServiceIntent)
-            }
         }
 
         /**

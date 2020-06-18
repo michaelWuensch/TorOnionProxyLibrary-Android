@@ -7,7 +7,7 @@
     <application>
         <!-- Don't want to use stopWithTask b/c we need to interrupt the shutdown and -->
         <!-- restart Tor if the user opens the application again before the service stops. -->
-        <service android:name="io.matthewnelson.topl_android_service.TorService"
+        <service android:name="io.matthewnelson.topl_android_service.service.TorService"
             android:enabled="true" android:exported="false" />
     </application>
 </manifest>
