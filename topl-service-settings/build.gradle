@@ -6,6 +6,7 @@ android {
     compileSdkVersion versions.compileSdk
     buildToolsVersion "29.0.3"
 
+    testOptions.unitTests.includeAndroidResources = true
     defaultConfig {
         minSdkVersion versions.minSdk
         targetSdkVersion versions.compileSdk
@@ -37,12 +38,14 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation project(':topl-android-settings')
+    implementation project(':topl-service-prefs')
     implementation deps.kotlin.stdlib
     implementation deps.androidx.core
 
     testImplementation deps.junit
+    testImplementation deps.androidx.test.core
+    testImplementation deps.robolectric
 
-    androidTestImplementation deps.androidx.test.core
     androidTestImplementation deps.androidx.test.junit
     androidTestImplementation deps.androidx.test.espresso
 }
