@@ -13,7 +13,6 @@ See the Apache 2 License for the specific language governing permissions and lim
 package io.matthewnelson.topl_android
 
 import android.os.Process
-import io.matthewnelson.topl_android_settings.DefaultTorSettings
 import io.matthewnelson.topl_android_settings.TorSettings
 import io.matthewnelson.topl_android.settings.TorSettingsBuilder
 import io.matthewnelson.topl_android.util.FileUtilities
@@ -42,10 +41,8 @@ import java.io.IOException
 class OnionProxyContext(
     val torConfigFiles: TorConfigFiles,
     val torInstaller: TorInstaller,
-    torSettings: TorSettings?
+    val torSettings: TorSettings
 ) {
-
-    val torSettings = torSettings ?: DefaultTorSettings()
 
     private companion object {
         val LOG: Logger = LoggerFactory.getLogger(OnionProxyContext::class.java)

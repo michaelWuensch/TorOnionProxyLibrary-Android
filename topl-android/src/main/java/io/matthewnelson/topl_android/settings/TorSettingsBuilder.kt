@@ -529,7 +529,8 @@ class TorSettingsBuilder(private val onionProxyContext: OnionProxyContext) {
         virtualAddressNetwork(onionProxyContext.torSettings.virtualAddressNetwork)
 
     /**
-     * Adds bridges from a resource stream. This relies on the TorInstaller to know how to obtain this stream.
+     * Adds bridges from a resource stream. This relies on the
+     * [io.matthewnelson.topl_android.util.TorInstaller] to know how to obtain this stream.
      * These entries may be type-specified like:
      *
      *
@@ -541,7 +542,8 @@ class TorSettingsBuilder(private val onionProxyContext: OnionProxyContext) {
      *
      * `69.163.45.129:443 9F090DE98CA6F67DEEB1F87EFE7C1BFD884E6E2F`
      *
-     *
+     * See [io.matthewnelson.topl_android.util.TorInstaller] comment for further details
+     * on how to implement that.
      */
     @Throws(IOException::class)
     fun addBridgesFromResources(): TorSettingsBuilder {

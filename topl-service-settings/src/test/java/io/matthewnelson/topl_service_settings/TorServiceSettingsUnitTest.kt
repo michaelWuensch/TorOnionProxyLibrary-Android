@@ -2,7 +2,6 @@ package io.matthewnelson.topl_service_settings
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
-import io.matthewnelson.topl_android_settings.DefaultTorSettings
 import io.matthewnelson.topl_service_prefs.PrefsKeys
 import io.matthewnelson.topl_service_prefs.TorServicePrefs
 import org.junit.Assert.assertEquals
@@ -19,7 +18,7 @@ class TorServiceSettingsUnitTest: PrefsKeys() {
     private val appContext: Context by lazy {
         ApplicationProvider.getApplicationContext() as Context
     }
-    private val defaults = DefaultTorSettings()
+    private val defaults = TestTorSettings()
     private lateinit var settings: TorServiceSettings
     private lateinit var prefs: TorServicePrefs
 

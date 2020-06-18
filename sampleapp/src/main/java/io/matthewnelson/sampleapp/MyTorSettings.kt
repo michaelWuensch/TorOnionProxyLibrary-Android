@@ -1,122 +1,117 @@
-package io.matthewnelson.topl_android_settings
+package io.matthewnelson.sampleapp
 
 import io.matthewnelson.topl_android_settings.TorSettings
-import java.util.*
 
-/**
- * Provides some reasonable default settings. Create your own by extending [TorSettings]
- * or overriding this class.
- */
-open class DefaultTorSettings : TorSettings() {
+class MyTorSettings: TorSettings() {
 
     override val disableNetwork: Boolean
-        get() = true
+        get() = DEFAULT__DISABLE_NETWORK
 
     override val dnsPort: Int
-        get() = 5400
+        get() = 5401
 
     override val customTorrc: String?
-        get() = null
+        get() = DEFAULT__CUSTOM_TORRC
 
     override val entryNodes: String?
-        get() = null
+        get() = DEFAULT__ENTRY_NODES
 
     override val excludeNodes: String?
-        get() = null
+        get() = DEFAULT__EXCLUDED_NODES
 
     override val exitNodes: String?
-        get() = null
+        get() = DEFAULT__EXIT_NODES
 
     override val httpTunnelPort: Int
         get() = 8118
 
     override val listOfSupportedBridges: List<String>
-        get() = ArrayList()
+        get() = arrayListOf(SupportedBridges.MEEK, SupportedBridges.OBFS4)
 
     override val proxyHost: String?
-        get() = null
+        get() = DEFAULT__PROXY_HOST
 
     override val proxyPassword: String?
-        get() = null
+        get() = DEFAULT__PROXY_PASSWORD
 
     override val proxyPort: Int?
         get() = null
 
     override val proxySocks5Host: String?
-        get() = "127.0.0.1"
+        get() = DEFAULT__PROXY_SOCKS5_HOST
 
     override val proxySocks5ServerPort: Int?
         get() = null
 
     override val proxyType: String?
-        get() = null
+        get() = DEFAULT__PROXY_TYPE
 
     override val proxyUser: String?
-        get() = null
+        get() = DEFAULT__PROXY_USER
 
     override val reachableAddressPorts: String
-        get() = "*:80,*:443"
+        get() = DEFAULT__REACHABLE_ADDRESS_PORTS
 
     override val relayNickname: String?
-        get() = null
+        get() = DEFAULT__RELAY_NICKNAME
 
     override val relayPort: Int
-        get() = 9001
+        get() = 9005
 
     override val socksPort: String
         get() = "9051"
 
     override val virtualAddressNetwork: String?
-        get() = "10.192.0.1/10"
+        get() = "10.192.0.2/10"
 
     override val hasBridges: Boolean
-        get() = false
+        get() = DEFAULT__HAS_BRIDGES
 
     override val hasConnectionPadding: Boolean
-        get() = false
+        get() = DEFAULT__HAS_CONNECTION_PADDING
 
     override val hasCookieAuthentication: Boolean
-        get() = true
+        get() = DEFAULT__HAS_COOKIE_AUTHENTICATION
 
     override val hasDebugLogs: Boolean
-        get() = false
+        get() = DEFAULT__HAS_DEBUG_LOGS
 
     override val hasDormantCanceledByStartup: Boolean
-        get() = true
+        get() = DEFAULT__HAS_DORMANT_CANCELED_BY_STARTUP
 
     override val hasIsolationAddressFlagForTunnel: Boolean
-        get() = false
+        get() = DEFAULT__HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL
 
     override val hasOpenProxyOnAllInterfaces: Boolean
-        get() = false
+        get() = DEFAULT__HAS_OPEN_PROXY_ON_ALL_INTERFACES
 
     override val hasReachableAddress: Boolean
-        get() = false
+        get() = DEFAULT__HAS_REACHABLE_ADDRESS
 
     override val hasReducedConnectionPadding: Boolean
-        get() = true
+        get() = DEFAULT__HAS_REDUCED_CONNECTION_PADDING
 
     override val hasSafeSocks: Boolean
-        get() = false
+        get() = DEFAULT__HAS_SAFE_SOCKS
 
     override val hasStrictNodes: Boolean
-        get() = false
+        get() = DEFAULT__HAS_STRICT_NODES
 
     override val hasTestSocks: Boolean
-        get() = false
+        get() = DEFAULT__HAS_TEST_SOCKS
 
     override val isAutoMapHostsOnResolve: Boolean
-        get() = true
+        get() = DEFAULT__IS_AUTO_MAP_HOSTS_ON_RESOLVE
 
     override val isRelay: Boolean
-        get() = false
+        get() = DEFAULT__IS_RELAY
 
     override val runAsDaemon: Boolean
-        get() = true
+        get() = DEFAULT__RUN_AS_DAEMON
 
     override val transPort: Int?
         get() = 9141
 
     override val useSocks5: Boolean
-        get() = true
+        get() = DEFAULT__USE_SOCKS5
 }

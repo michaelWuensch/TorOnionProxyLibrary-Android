@@ -2,7 +2,6 @@ package io.matthewnelson.sampleapp
 
 import android.app.Application
 import io.matthewnelson.topl_android_service.TorServiceController
-import io.matthewnelson.topl_android_settings.DefaultTorSettings
 
 class App: Application() {
 
@@ -12,7 +11,7 @@ class App: Application() {
         TorServiceController.Builder(
             this,
             BuildConfig.VERSION_CODE,
-            DefaultTorSettings(),
+            MyTorSettings(),
             "common/geoip",
             "common/geoip6"
         )
