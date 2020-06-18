@@ -1,4 +1,4 @@
-package io.matthewnelson.topl_android_service
+package io.matthewnelson.topl_service
 
 import android.content.Context
 import android.content.Intent
@@ -6,9 +6,9 @@ import android.os.Build
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import io.matthewnelson.topl_android_service.model.ServiceNotification
-import io.matthewnelson.topl_android_service.service.ServiceActions
-import io.matthewnelson.topl_android_service.service.TorService
+import io.matthewnelson.topl_service.model.ServiceNotification
+import io.matthewnelson.topl_service.service.ServiceActions
+import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_android_settings.TorConfigFiles
 import io.matthewnelson.topl_android_settings.TorSettings
 

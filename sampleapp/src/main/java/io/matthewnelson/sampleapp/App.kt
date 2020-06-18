@@ -2,7 +2,7 @@ package io.matthewnelson.sampleapp
 
 import android.app.Application
 import android.content.Context
-import io.matthewnelson.topl_android_service.TorServiceController
+import io.matthewnelson.topl_service.TorServiceController
 
 class App: Application() {
 

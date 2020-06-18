@@ -1,4 +1,4 @@
-package io.matthewnelson.topl_android_service.service
+package io.matthewnelson.topl_service.service
 
 import androidx.annotation.StringDef
 

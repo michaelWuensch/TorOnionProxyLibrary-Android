@@ -1,4 +1,4 @@
-package io.matthewnelson.topl_android_service.onionproxy
+package io.matthewnelson.topl_service.onionproxy
 
 import android.content.Context
 import io.matthewnelson.topl_android.util.TorInstaller

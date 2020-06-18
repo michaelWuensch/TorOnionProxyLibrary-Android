@@ -3,7 +3,7 @@ package io.matthewnelson.sampleapp
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
-import io.matthewnelson.topl_android_service.TorServiceController
+import io.matthewnelson.topl_service.TorServiceController
 
 class MainActivity : AppCompatActivity() {
 

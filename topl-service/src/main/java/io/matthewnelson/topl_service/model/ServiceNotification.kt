@@ -1,4 +1,4 @@
-package io.matthewnelson.topl_android_service.model
+package io.matthewnelson.topl_service.model
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -9,8 +9,8 @@ import android.os.Build
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
-import io.matthewnelson.topl_android_service.R
-import io.matthewnelson.topl_android_service.service.TorService
+import io.matthewnelson.topl_service.R
+import io.matthewnelson.topl_service.service.TorService
 
 internal class ServiceNotification(
     private val channelName: String,

@@ -1,4 +1,4 @@
-package io.matthewnelson.topl_android_service.service
+package io.matthewnelson.topl_service.service
 
 import android.app.Service
 import android.content.BroadcastReceiver
@@ -7,10 +7,10 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.IBinder
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import io.matthewnelson.topl_android_service.model.ServiceNotification
+import io.matthewnelson.topl_service.model.ServiceNotification
 import io.matthewnelson.topl_android_settings.TorConfigFiles
 import io.matthewnelson.topl_android_settings.TorSettings
-import io.matthewnelson.topl_android_service.service.ServiceActions.ServiceAction
+import io.matthewnelson.topl_service.service.ServiceActions.ServiceAction
 
 internal class TorService: Service() {
 
@@ -36,7 +36,7 @@ internal class TorService: Service() {
         }
 
         // Intents/LocalBroadcastManager
-        const val FILTER = "io.matthewnelson.topl_android_service.service.TorService"
+        const val FILTER = "io.matthewnelson.topl_service.service.TorService"
         const val ACTION_EXTRAS_KEY = "SERVICE_ACTION_EXTRA"
     }
 
