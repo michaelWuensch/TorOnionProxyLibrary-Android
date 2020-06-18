@@ -13,7 +13,6 @@ See the Apache 2 License for the specific language governing permissions and lim
 package io.matthewnelson.topl_android.broadcaster
 
 import io.matthewnelson.topl_android_settings.TorSettings
-import io.matthewnelson.topl_android_settings.TorState
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.PrintWriter
@@ -58,5 +57,5 @@ open class DefaultEventBroadcaster(private val torSettings: TorSettings) : Event
             broadcastLogMessage(msg)
     }
 
-    override fun broadcastTorState(state: @TorState.State String) {}
+    override fun broadcastTorState(@TorState state: String) {}
 }

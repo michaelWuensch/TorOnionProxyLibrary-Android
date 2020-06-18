@@ -37,7 +37,7 @@ import io.matthewnelson.topl_android.broadcaster.EventBroadcaster
 import io.matthewnelson.topl_android.listener.BaseEventListener
 import io.matthewnelson.topl_android.listener.DefaultEventListener
 import io.matthewnelson.topl_android.util.FileUtilities
-import io.matthewnelson.topl_android_settings.TorState
+import io.matthewnelson.topl_android_settings.TorStates
 import net.freehaven.tor.control.TorControlCommands
 import net.freehaven.tor.control.TorControlConnection
 import org.slf4j.Logger
@@ -68,7 +68,7 @@ class OnionProxyManager(
     val onionProxyContext: OnionProxyContext,
     eventBroadcaster: EventBroadcaster?,
     baseEventListener: BaseEventListener?
-) {
+): TorStates() {
 
     val eventBroadcaster: EventBroadcaster =
         eventBroadcaster ?: DefaultEventBroadcaster(onionProxyContext.torSettings)
@@ -446,6 +446,8 @@ class OnionProxyManager(
     fun start() {
         if (controlConnection != null) {
             eventBroadcaster.broadcastNotice("Start command called but TorControlConnection already exists.")
+
+            // Re-sync state if it's out of whack
             eventBroadcaster.state.setTorState(TorState.ON)
             return
         }

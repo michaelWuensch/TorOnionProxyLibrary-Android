@@ -32,7 +32,7 @@ class OnionProxyEventBroadcaster(
         super.broadcastNotice(msg)
     }
 
-    override fun broadcastTorState(state: String) {
+    override fun broadcastTorState(@TorState state: String) {
         TODO("Not yet implemented")
     }
 }

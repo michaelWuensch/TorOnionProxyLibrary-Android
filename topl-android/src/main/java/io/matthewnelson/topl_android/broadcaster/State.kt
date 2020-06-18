@@ -12,16 +12,14 @@ See the Apache 2 License for the specific language governing permissions and lim
 */
 package io.matthewnelson.topl_android.broadcaster
 
-import io.matthewnelson.topl_android_settings.TorState
+import io.matthewnelson.topl_android_settings.TorStates
 
 /**
  * Current Status of Tor
  */
-class State(private val broadcaster: EventBroadcaster) {
+class State(private val broadcaster: EventBroadcaster): TorStates() {
 
-    // TODO: Kotlin Coroutin StateFlow to emmit State
-
-    var torState: @TorState.State String = TorState.OFF
+    var torState: @TorState String = TorState.OFF
         private set
 
     val isOff: Boolean
@@ -39,9 +37,9 @@ class State(private val broadcaster: EventBroadcaster) {
     /**
      * Will set the state to that which is specified if it isn't already.
      *
-     * @return Previous state.
+     * @return Previous [TorStates.TorState]
      * */
-    fun setTorState(state: @TorState.State String): @TorState.State String {
+    fun setTorState(@TorState state: String): @TorState String {
         val currentState = torState
         if (torState != state) {
             torState = state

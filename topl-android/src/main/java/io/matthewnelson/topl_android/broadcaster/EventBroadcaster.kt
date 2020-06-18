@@ -12,12 +12,12 @@ See the Apache 2 License for the specific language governing permissions and lim
 */
 package io.matthewnelson.topl_android.broadcaster
 
-import io.matthewnelson.topl_android_settings.TorState
+import io.matthewnelson.topl_android_settings.TorStates
 
 /**
  * Service for sending event logs to the system
  */
-abstract class EventBroadcaster {
+abstract class EventBroadcaster: TorStates() {
 
     val state: State
         get() = State(this)
@@ -32,6 +32,6 @@ abstract class EventBroadcaster {
 
     abstract fun broadcastNotice(msg: String)
 
-    abstract fun broadcastTorState(state: @TorState.State String)
+    abstract fun broadcastTorState(@TorState state: String)
 
 }
