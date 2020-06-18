@@ -5,7 +5,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application>
-        <!-- Don't want to use stopWithTask b/c we need to allow Tor to close properly beforehand -->
+        <!-- Don't want to use stopWithTask b/c we need to interrupt the shutdown and -->
+        <!-- restart Tor if the user opens the application again before the service stops. -->
         <service android:name="io.matthewnelson.topl_android_service.TorService"
             android:enabled="true" android:exported="false" />
     </application>
