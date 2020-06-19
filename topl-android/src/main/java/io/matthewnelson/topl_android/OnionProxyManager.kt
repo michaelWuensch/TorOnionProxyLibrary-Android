@@ -70,8 +70,7 @@ class OnionProxyManager(
     baseEventListener: BaseEventListener?
 ): TorStates() {
 
-    val eventBroadcaster: EventBroadcaster =
-        eventBroadcaster ?: DefaultEventBroadcaster(onionProxyContext.torSettings)
+    val eventBroadcaster = eventBroadcaster ?: DefaultEventBroadcaster(onionProxyContext.torSettings)
     private val eventListener = baseEventListener ?: DefaultEventListener()
 
     private companion object {
@@ -279,11 +278,11 @@ class OnionProxyManager(
             eventBroadcaster.broadcastNotice("Stop command called but no TorControlConnection exists.")
 
             // Re-sync state if it's out of whack
-            eventBroadcaster.state.setTorState(TorState.OFF)
+            eventBroadcaster.torStateMachine.setTorState(TorState.OFF)
             return
         }
 
-        eventBroadcaster.state.setTorState(TorState.STOPPING)
+        eventBroadcaster.torStateMachine.setTorState(TorState.STOPPING)
         eventBroadcaster.broadcastNotice("Using control port to shutdown Tor")
         try {
             controlConnection!!.setConf("DisableNetwork", "1")
@@ -293,7 +292,7 @@ class OnionProxyManager(
         } catch (e: KotlinNullPointerException) {
             // TODO: May need to resync TorSettings...
             eventBroadcaster.broadcastException(e.message, e)
-            eventBroadcaster.state.setTorState(TorState.OFF)
+            eventBroadcaster.torStateMachine.setTorState(TorState.OFF)
             throw NullPointerException(e.message)
         } catch (ee: IOException) {
             eventBroadcaster.broadcastException(ee.message, ee)
@@ -303,7 +302,7 @@ class OnionProxyManager(
                 controlConnection!!.shutdownTor(TorControlCommands.SIGNAL_HALT)
             } catch (eee: KotlinNullPointerException) {
                 eventBroadcaster.broadcastException(eee.message, eee)
-                eventBroadcaster.state.setTorState(TorState.OFF)
+                eventBroadcaster.torStateMachine.setTorState(TorState.OFF)
                 throw NullPointerException(eee.message)
             } catch (eeee: IOException) {}
 
@@ -317,7 +316,7 @@ class OnionProxyManager(
                 }
             }
 
-            eventBroadcaster.state.setTorState(TorState.OFF)
+            eventBroadcaster.torStateMachine.setTorState(TorState.OFF)
 
             if (networkStateReceiver == null) return
 
@@ -448,11 +447,11 @@ class OnionProxyManager(
             eventBroadcaster.broadcastNotice("Start command called but TorControlConnection already exists.")
 
             // Re-sync state if it's out of whack
-            eventBroadcaster.state.setTorState(TorState.ON)
+            eventBroadcaster.torStateMachine.setTorState(TorState.ON)
             return
         }
 
-        eventBroadcaster.state.setTorState(TorState.STARTING)
+        eventBroadcaster.torStateMachine.setTorState(TorState.STARTING)
 
         var torProcess: Process? = null
         var controlConnection = findExistingTorConnection()
@@ -461,11 +460,13 @@ class OnionProxyManager(
         if (!hasExistingTorConnection) {
             val controlPortFile = onionProxyContext.torConfigFiles.controlPortFile
             controlPortFile.delete()
-            if (!controlPortFile.parentFile.exists()) controlPortFile.parentFile.mkdirs()
+            if (!controlPortFile.parentFile.exists())
+                controlPortFile.parentFile.mkdirs()
 
             val cookieAuthFile = onionProxyContext.torConfigFiles.cookieAuthFile
             cookieAuthFile.delete()
-            if (!cookieAuthFile.parentFile.exists()) cookieAuthFile.parentFile.mkdirs()
+            if (!cookieAuthFile.parentFile.exists())
+                cookieAuthFile.parentFile.mkdirs()
 
             torProcess = spawnTorProcess()
             controlConnection = try {
@@ -473,7 +474,7 @@ class OnionProxyManager(
                 connectToTorControlSocket(controlPortFile)
             } catch (e: IOException) {
                 torProcess.destroy()
-                eventBroadcaster.state.setTorState(TorState.OFF)
+                eventBroadcaster.torStateMachine.setTorState(TorState.OFF)
                 throw IOException(e.message)
             }
         } else {
@@ -505,11 +506,11 @@ class OnionProxyManager(
         } catch (e: Exception) {
             torProcess?.destroy()
             this.controlConnection = null
-            eventBroadcaster.state.setTorState(TorState.OFF)
+            eventBroadcaster.torStateMachine.setTorState(TorState.OFF)
             throw IOException(e.message)
         }
 
-        eventBroadcaster.state.setTorState(TorState.ON)
+        eventBroadcaster.torStateMachine.setTorState(TorState.ON)
 
         networkStateReceiver = NetworkStateReceiver()
 
@@ -617,6 +618,9 @@ class OnionProxyManager(
         val controlPortStartTime = System.currentTimeMillis()
         LOG.info("Waiting for control port")
         val isCreated = controlPortFile.exists() || controlPortFile.createNewFile()
+
+        // TODO: need a moment here to create a new file before creating a FileObserver...
+
         val controlPortFileObserver = onionProxyContext.createControlPortFileObserver()
         if (!isCreated || controlPortFile.length() == 0L && !controlPortFileObserver.poll(
                 onionProxyContext.torConfigFiles.fileCreationTimeout.toLong(), TimeUnit.SECONDS
@@ -625,7 +629,7 @@ class OnionProxyManager(
             LOG.warn("Control port file not created")
             FileUtilities.listFilesToLog(onionProxyContext.torConfigFiles.dataDir)
             eventBroadcaster.broadcastNotice("Tor control port file not created")
-            eventBroadcaster.state.setTorState(TorState.STOPPING)
+            eventBroadcaster.torStateMachine.setTorState(TorState.STOPPING)
             throw IOException(
                 "Control port file not created: ${controlPortFile.absolutePath}, "
                         + "len = ${controlPortFile.length()}"
@@ -652,7 +656,7 @@ class OnionProxyManager(
         ) {
             LOG.warn("Cookie Auth file not created")
             eventBroadcaster.broadcastNotice("Cookie Auth file not created")
-            eventBroadcaster.state.setTorState(TorState.STOPPING)
+            eventBroadcaster.torStateMachine.setTorState(TorState.STOPPING)
             throw IOException(
                 "Cookie Auth file not created: ${cookieAuthFile.absolutePath}, " +
                         "len = ${cookieAuthFile.length()}"
@@ -697,7 +701,7 @@ class OnionProxyManager(
 
         if (!torExe.exists()) {
             eventBroadcaster.broadcastNotice("Tor executable not found")
-            eventBroadcaster.state.setTorState(TorState.STOPPING)
+            eventBroadcaster.torStateMachine.setTorState(TorState.STOPPING)
             LOG.error("Tor executable not found: ${torExe.absolutePath}")
             throw IOException("Tor executable not found")
         }
@@ -709,7 +713,7 @@ class OnionProxyManager(
         val torrc = onionProxyContext.torConfigFiles.torrcFile
         if (!torrc.exists()) {
             eventBroadcaster.broadcastNotice("Torrc not found")
-            eventBroadcaster.state.setTorState(TorState.STOPPING)
+            eventBroadcaster.torStateMachine.setTorState(TorState.STOPPING)
             LOG.error("Torrc not found: ${torrc.absolutePath}")
             throw IOException("Torrc not found")
         }

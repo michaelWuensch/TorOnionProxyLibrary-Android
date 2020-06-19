@@ -17,33 +17,33 @@ import io.matthewnelson.topl_android_settings.TorStates
 /**
  * Current Status of Tor
  */
-class State(private val broadcaster: EventBroadcaster): TorStates() {
+class TorStateMachine(private val broadcaster: EventBroadcaster): TorStates() {
 
-    var torState: @TorState String = TorState.OFF
+    var currentTorState: @TorState String = TorState.OFF
         private set
 
     val isOff: Boolean
-        get() = TorState.OFF == torState
+        get() = TorState.OFF == currentTorState
 
     val isOn: Boolean
-        get() = TorState.ON == torState
+        get() = TorState.ON == currentTorState
 
     val isStarting: Boolean
-        get() = TorState.STARTING == torState
+        get() = TorState.STARTING == currentTorState
 
     val isStopping: Boolean
-        get() = TorState.STOPPING == torState
+        get() = TorState.STOPPING == currentTorState
 
     /**
      * Will set the state to that which is specified if it isn't already.
      *
      * @return Previous [TorStates.TorState]
      * */
-    fun setTorState(@TorState state: String): @TorState String {
-        val currentState = torState
-        if (torState != state) {
-            torState = state
-            broadcaster.broadcastTorState(torState)
+    internal fun setTorState(@TorState state: String): @TorState String {
+        val currentState = currentTorState
+        if (currentTorState != state) {
+            currentTorState = state
+            broadcaster.broadcastTorState(currentTorState)
         } else {
             broadcaster.broadcastDebug("TorState was already set to $currentState")
         }

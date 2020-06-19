@@ -19,8 +19,15 @@ import io.matthewnelson.topl_android_settings.TorStates
  */
 abstract class EventBroadcaster: TorStates() {
 
-    val state: State
-        get() = State(this)
+    private lateinit var stateMachine: TorStateMachine
+
+    val torStateMachine: TorStateMachine
+        get() = if (!::stateMachine.isInitialized) {
+            stateMachine = TorStateMachine(this)
+            stateMachine
+        } else {
+            stateMachine
+        }
 
     abstract fun broadcastBandwidth(upload: Long, download: Long, written: Long, read: Long)
 
