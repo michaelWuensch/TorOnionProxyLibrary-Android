@@ -24,8 +24,8 @@ class TorServiceSettings(private val defaults: TorSettings, context: Context): T
     override val disableNetwork: Boolean
         get() = prefs.getBoolean(BooleanKey.DISABLE_NETWORK, defaults.disableNetwork)
 
-    override val dnsPort: Int
-        get() = prefs.getInt(IntKey.DNS_PORT, defaults.dnsPort)
+    override val dnsPort: String
+        get() = prefs.getString(StringKey.DNS_PORT, defaults.dnsPort)
             ?: defaults.dnsPort
 
     override val customTorrc: String?
@@ -40,8 +40,8 @@ class TorServiceSettings(private val defaults: TorSettings, context: Context): T
     override val exitNodes: String?
         get() = prefs.getString(StringKey.EXIT_NODES, defaults.exitNodes)
 
-    override val httpTunnelPort: Int
-        get() = prefs.getInt(IntKey.HTTP_TUNNEL_PORT, defaults.httpTunnelPort)
+    override val httpTunnelPort: String
+        get() = prefs.getString(StringKey.HTTP_TUNNEL_PORT, defaults.httpTunnelPort)
             ?: defaults.httpTunnelPort
 
     override val listOfSupportedBridges: List<String>
@@ -75,7 +75,7 @@ class TorServiceSettings(private val defaults: TorSettings, context: Context): T
     override val relayNickname: String?
         get() = prefs.getString(StringKey.RELAY_NICKNAME, defaults.relayNickname)
 
-    override val relayPort: Int
+    override val relayPort: Int?
         get() = prefs.getInt(IntKey.RELAY_PORT, defaults.relayPort)
             ?: defaults.relayPort
 
@@ -89,8 +89,9 @@ class TorServiceSettings(private val defaults: TorSettings, context: Context): T
     override val hasBridges: Boolean
         get() = prefs.getBoolean(BooleanKey.HAS_BRIDGES, defaults.hasBridges)
 
-    override val hasConnectionPadding: Boolean
-        get() = prefs.getBoolean(BooleanKey.HAS_CONNECTION_PADDING, defaults.hasConnectionPadding)
+    override val connectionPadding: String
+        get() = prefs.getString(StringKey.HAS_CONNECTION_PADDING, defaults.connectionPadding)
+            ?: defaults.connectionPadding
 
     override val hasCookieAuthentication: Boolean
         get() = prefs.getBoolean(BooleanKey.HAS_COOKIE_AUTHENTICATION, defaults.hasCookieAuthentication)
@@ -131,8 +132,8 @@ class TorServiceSettings(private val defaults: TorSettings, context: Context): T
     override val runAsDaemon: Boolean
         get() = prefs.getBoolean(BooleanKey.RUN_AS_DAEMON, defaults.runAsDaemon)
 
-    override val transPort: Int?
-        get() = prefs.getInt(IntKey.TRANS_PORT, defaults.transPort)
+    override val transPort: String
+        get() = prefs.getString(StringKey.TRANS_PORT, defaults.transPort) ?: defaults.transPort
 
     override val useSocks5: Boolean
         get() = prefs.getBoolean(BooleanKey.USE_SOCKS5, defaults.useSocks5)

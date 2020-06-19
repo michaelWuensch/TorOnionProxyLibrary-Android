@@ -30,13 +30,13 @@ class TorServiceSettingsUnitTest: PrefsKeys() {
 
     @Test
     fun testInts() {
-        assertEquals(defaults.dnsPort, settings.dnsPort)
+        assertEquals(defaults.proxyPort, settings.proxyPort)
 
-        prefs.putInt(IntKey.DNS_PORT, -9999)
-        assertEquals(-9999, settings.dnsPort)
+        prefs.putInt(IntKey.PROXY_PORT, -9999)
+        assertEquals(-9999, settings.proxyPort)
 
-        prefs.remove(IntKey.DNS_PORT)
-        assertEquals(defaults.dnsPort, settings.dnsPort)
+        prefs.remove(IntKey.PROXY_PORT)
+        assertEquals(defaults.proxyPort, settings.proxyPort)
     }
 
     @Test
