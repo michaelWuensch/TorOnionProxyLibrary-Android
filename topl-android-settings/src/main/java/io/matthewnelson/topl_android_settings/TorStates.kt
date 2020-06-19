@@ -4,7 +4,12 @@ import androidx.annotation.StringDef
 
 abstract class TorStates {
 
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.VALUE_PARAMETER)
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.TYPE,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.PROPERTY
+    )
     @StringDef(
         TorState.OFF,
         TorState.ON,
