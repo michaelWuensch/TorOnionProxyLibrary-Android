@@ -1,40 +1,45 @@
 package io.matthewnelson.topl_android_settings
 
 /**
+ * This class is for defining default values for your torrc file.
+ *
  * Extend this class and define your own settings.
  *
  * Keep in mind that Orbot and TorBrowser are the 2 most widely used applications
- * using Tor, and to use settings that won't conflict (those settings are annotated
- * as such, and with further details).
+ * using Tor, and to use settings that won't conflict (those settings are documented
+ * as such, and contain further details).
  *
- * Comments contain pretty standard default values. Would highly recommend reading up
- * on what's what in the spec -> https://gitweb.torproject.org/torspec.git/tree/
+ * [Companion] contains pretty standard default values which'll get you a Socks5 proxy
+ * running, nothing more.
+ *
+ * Would *highly recommend* reading up on what's what in the docs:
+ *
+ *     https://2019.www.torproject.org/docs/tor-manual.html.en
  *
  * @sample [io.matthewnelson.topl_service_settings.TestTorSettings]
  * */
 abstract class TorSettings: SettingsConsts() {
 
     /**
-     * Constants for some settings. Handy for declaring pre-defined values when you extend
-     * this class to setup your own.
-     *
-     * The provided "default" values here are only a suggestion; see the spec for further detail.
+     * Handy constants for declaring pre-defined values when you extend this class to set
+     * things up if you're simply looking to use a Socks5 Proxy to connect to.
      * */
     companion object {
         const val DEFAULT__DISABLE_NETWORK = true
-        const val DEFAULT__CUSTOM_TORRC = ""
+        const val DEFAULT__DNS_PORT = "0"
         const val DEFAULT__ENTRY_NODES = ""
         const val DEFAULT__EXCLUDED_NODES = ""
         const val DEFAULT__EXIT_NODES = ""
+        const val DEFAULT__HTTP_TUNNEL_PORT = "0"
         const val DEFAULT__PROXY_HOST = ""
         const val DEFAULT__PROXY_PASSWORD = ""
-        const val DEFAULT__PROXY_SOCKS5_HOST = "127.0.0.1"
+        const val DEFAULT__PROXY_SOCKS5_HOST = "" // "127.0.0.1"
         const val DEFAULT__PROXY_TYPE = ""
         const val DEFAULT__PROXY_USER = ""
-        const val DEFAULT__REACHABLE_ADDRESS_PORTS = "*:80,*:443"
+        const val DEFAULT__REACHABLE_ADDRESS_PORTS = "" // "*:80,*:443"
         const val DEFAULT__RELAY_NICKNAME = ""
         const val DEFAULT__HAS_BRIDGES = false
-        const val DEFAULT__HAS_CONNECTION_PADDING = false
+        const val DEFAULT__HAS_CONNECTION_PADDING = ConnectionPadding.OFF
         const val DEFAULT__HAS_COOKIE_AUTHENTICATION = true
         const val DEFAULT__HAS_DEBUG_LOGS = false
         const val DEFAULT__HAS_DORMANT_CANCELED_BY_STARTUP = true
@@ -48,6 +53,7 @@ abstract class TorSettings: SettingsConsts() {
         const val DEFAULT__IS_AUTO_MAP_HOSTS_ON_RESOLVE = true
         const val DEFAULT__IS_RELAY = false
         const val DEFAULT__RUN_AS_DAEMON = true
+        const val DEFAULT__TRANS_PORT = "0"
         const val DEFAULT__USE_SOCKS5 = true
     }
 
@@ -57,13 +63,15 @@ abstract class TorSettings: SettingsConsts() {
     abstract val disableNetwork: Boolean
 
     /**
-     * TorBrowser and Orbot use 5400 by default. It may be wise to pick something
+     * TorBrowser and Orbot use "5400" by default. It may be wise to pick something
      * that won't conflict.
+     *
+     * See [DEFAULT__DNS_PORT]
      * */
-    abstract val dnsPort: Int
+    abstract val dnsPort: String
 
     /**
-     * See [DEFAULT__CUSTOM_TORRC]
+     * Default [java.null]
      * */
     abstract val customTorrc: String?
 
@@ -83,13 +91,20 @@ abstract class TorSettings: SettingsConsts() {
     abstract val exitNodes: String?
 
     /**
-     * TorBrowser and Orbot use 8218 by default. It may be wise to pick something
-     * that won't conflict.
+     * TorBrowser and Orbot use "8218" by default. It may be wise to pick something
+     * that won't conflict if you're using this setting.
+     *
+     * Docs: https://2019.www.torproject.org/docs/tor-manual.html.en#HTTPTunnelPort
+     *
+     * See [DEFAULT__HTTP_TUNNEL_PORT]
+     *
+     * TODO: Change to List<String> and update TorSettingsBuilder method for
+     *  multi-port support.
      * */
-    abstract val httpTunnelPort: Int
+    abstract val httpTunnelPort: String
 
     /**
-     * Must have the transport binaries for obfs4 and snowflake, depending
+     * Must have the transport binaries for obfs4 and/or snowflake, depending
      * on if you wish to include them in your bridges file to use.
      *
      * See [SettingsConsts.SupportedBridges] for options.
@@ -113,15 +128,13 @@ abstract class TorSettings: SettingsConsts() {
 
     /**
      * See [DEFAULT__PROXY_SOCKS5_HOST]
-     *
-     * For VPN things...
      * */
     abstract val proxySocks5Host: String?
 
     /**
      * Default = [java.null]
      *
-     * For VPN things... Try ((Math.random() * 1000) + 10000).toInt()
+     * Try ((Math.random() * 1000) + 10000).toInt()
      * */
     abstract val proxySocks5ServerPort: Int?
 
@@ -142,14 +155,26 @@ abstract class TorSettings: SettingsConsts() {
 
     /**
      * See [DEFAULT__RELAY_NICKNAME]
+     *
+     * If setting this value to something other than null or an empty String, see
+     * [relayPort] documentation.
      * */
     abstract val relayNickname: String?
 
     /**
      * TorBrowser and Orbot use 9001 by default. It may be wise to pick something
      * that won't conflict.
+     *
+     * This only gets used if you declare the following settings set as:
+     *   [hasReachableAddress] false
+     *   [hasBridges] false
+     *   [isRelay] true
+     *   [relayNickname] "your nickname"
+     *   [relayPort] some Int value
+     *
+     * Default = [java.null]
      * */
-    abstract val relayPort: Int
+    abstract val relayPort: Int?
 
     /**
      * Could be "auto" or a specified port, such as "9051".
@@ -162,6 +187,8 @@ abstract class TorSettings: SettingsConsts() {
     /**
      * TorBrowser and Orbot use "10.192.0.1/10", it may be wise to pick something
      * that won't conflict if you are using this setting.
+     *
+     * Docs: https://2019.www.torproject.org/docs/tor-manual.html.en#VirtualAddrNetworkIPv6
      * */
     abstract val virtualAddressNetwork: String?
 
@@ -173,7 +200,7 @@ abstract class TorSettings: SettingsConsts() {
     /**
      * See [DEFAULT__HAS_CONNECTION_PADDING]
      * */
-    abstract val hasConnectionPadding: Boolean
+    abstract val connectionPadding: @ConnectionPadding String
 
     /**
      * See [DEFAULT__HAS_COOKIE_AUTHENTICATION]
@@ -227,11 +254,15 @@ abstract class TorSettings: SettingsConsts() {
 
     /**
      * See [DEFAULT__IS_AUTO_MAP_HOSTS_ON_RESOLVE]
+     *
+     * Docs: https://2019.www.torproject.org/docs/tor-manual.html.en#AutomapHostsOnResolve
      * */
     abstract val isAutoMapHostsOnResolve: Boolean
 
     /**
      * See [DEFAULT__IS_RELAY]
+     *
+     * If setting this to true, see [relayPort] documentation.
      * */
     abstract val isRelay: Boolean
 
@@ -241,10 +272,18 @@ abstract class TorSettings: SettingsConsts() {
     abstract val runAsDaemon: Boolean
 
     /**
-     * Orbot and TorBrowser default to 9140. It may be wise to pick something
+     * Can be "auto", or a specified port such as "9141"
+     *
+     * See [listOfSupportedBridges] documentation.
+     *
+     * Orbot and TorBrowser default to "9140". It may be wise to pick something
      * that won't conflict.
+     *
+     * See [DEFAULT__TRANS_PORT]
+     *
+     * TODO: Change to a List<String>? to support multiple ports
      * */
-    abstract val transPort: Int?
+    abstract val transPort: String
 
     /**
      * See [DEFAULT__USE_SOCKS5]

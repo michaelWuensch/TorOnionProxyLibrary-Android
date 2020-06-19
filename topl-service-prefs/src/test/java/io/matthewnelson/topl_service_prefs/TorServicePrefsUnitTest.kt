@@ -24,15 +24,15 @@ class TorServicePrefsUnitTest: PrefsKeys() {
 
     @Test
     fun testInts_null() {
-        prefs.putInt(IntKey.DNS_PORT, null)
-        val result = prefs.getInt(IntKey.DNS_PORT, 9999)
+        prefs.putInt(IntKey.RELAY_PORT, null)
+        val result = prefs.getInt(IntKey.RELAY_PORT, 9999)
         assertEquals(null, result)
     }
 
     @Test
     fun testInts() {
-        prefs.putInt(IntKey.HTTP_TUNNEL_PORT, 8188)
-        val result = prefs.getInt(IntKey.HTTP_TUNNEL_PORT, null)
+        prefs.putInt(IntKey.PROXY_PORT, 8188)
+        val result = prefs.getInt(IntKey.PROXY_PORT, null)
         assertEquals(8188, result)
     }
 

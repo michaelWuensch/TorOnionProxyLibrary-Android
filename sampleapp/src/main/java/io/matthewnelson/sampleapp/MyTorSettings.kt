@@ -7,11 +7,11 @@ class MyTorSettings: TorSettings() {
     override val disableNetwork: Boolean
         get() = DEFAULT__DISABLE_NETWORK
 
-    override val dnsPort: Int
-        get() = 5401
+    override val dnsPort: String
+        get() = DEFAULT__DNS_PORT
 
     override val customTorrc: String?
-        get() = DEFAULT__CUSTOM_TORRC
+        get() = null
 
     override val entryNodes: String?
         get() = DEFAULT__ENTRY_NODES
@@ -22,8 +22,8 @@ class MyTorSettings: TorSettings() {
     override val exitNodes: String?
         get() = DEFAULT__EXIT_NODES
 
-    override val httpTunnelPort: Int
-        get() = 8118
+    override val httpTunnelPort: String
+        get() = DEFAULT__HTTP_TUNNEL_PORT
 
     override val listOfSupportedBridges: List<String>
         get() = arrayListOf(SupportedBridges.MEEK, SupportedBridges.OBFS4)
@@ -55,8 +55,8 @@ class MyTorSettings: TorSettings() {
     override val relayNickname: String?
         get() = DEFAULT__RELAY_NICKNAME
 
-    override val relayPort: Int
-        get() = 9005
+    override val relayPort: Int?
+        get() = null
 
     override val socksPort: String
         get() = "9051"
@@ -67,14 +67,14 @@ class MyTorSettings: TorSettings() {
     override val hasBridges: Boolean
         get() = DEFAULT__HAS_BRIDGES
 
-    override val hasConnectionPadding: Boolean
+    override val connectionPadding: String
         get() = DEFAULT__HAS_CONNECTION_PADDING
 
     override val hasCookieAuthentication: Boolean
         get() = DEFAULT__HAS_COOKIE_AUTHENTICATION
 
     override val hasDebugLogs: Boolean
-        get() = DEFAULT__HAS_DEBUG_LOGS
+        get() = false
 
     override val hasDormantCanceledByStartup: Boolean
         get() = DEFAULT__HAS_DORMANT_CANCELED_BY_STARTUP
@@ -109,8 +109,8 @@ class MyTorSettings: TorSettings() {
     override val runAsDaemon: Boolean
         get() = DEFAULT__RUN_AS_DAEMON
 
-    override val transPort: Int?
-        get() = 9141
+    override val transPort: String
+        get() = DEFAULT__TRANS_PORT
 
     override val useSocks5: Boolean
         get() = DEFAULT__USE_SOCKS5
