@@ -15,7 +15,6 @@ class MainActivity : AppCompatActivity() {
         val buttonStop = findViewById<Button>(R.id.button_stop)
         val buttonRestart = findViewById<Button>(R.id.button_restart)
         val buttonNewId = findViewById<Button>(R.id.button_new_identity)
-        TorServiceController.startTor()
 
         buttonStart.setOnClickListener {
             TorServiceController.startTor()

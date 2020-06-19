@@ -23,10 +23,10 @@ class TorServiceController private constructor() {
         private val geoip6AssetPath: String
     ) {
 
-        private lateinit var torConfig: TorConfigFiles
+        private lateinit var torConfigFiles: TorConfigFiles
 
         fun useCustomTorConfigFiles(torConfigFiles: TorConfigFiles): Builder {
-            torConfig = torConfigFiles
+            this.torConfigFiles = torConfigFiles
             return this
         }
 
@@ -37,9 +37,11 @@ class TorServiceController private constructor() {
             channelDescription: String,
             notificationID: Short
         ): NotificationBuilder {
-            require(channelName.isNotEmpty() && channelID.isNotEmpty()) {
-                "channelName & channelID must not be empty."
-            }
+            require(
+                channelName.isNotEmpty() &&
+                channelID.isNotEmpty() &&
+                channelDescription.isNotEmpty()
+            ) { "channelName & channelID must not be empty." }
 
             return NotificationBuilder(
                 this,
@@ -120,7 +122,7 @@ class TorServiceController private constructor() {
                 return this
             }
 
-            fun applyNotificationSettings(): Builder {
+            fun applySettings(): Builder {
                 ServiceNotification.initialize(serviceNotification)
                 return builder
             }
@@ -129,8 +131,8 @@ class TorServiceController private constructor() {
 
         fun build() {
             val torConfigFiles =
-                if (::torConfig.isInitialized) {
-                    torConfig
+                if (::torConfigFiles.isInitialized) {
+                    this.torConfigFiles
                 } else {
                     TorConfigFiles.createConfig(context.applicationContext)
                 }
