@@ -41,7 +41,6 @@ internal class TorService: Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? {
-        // TODO: Implement
         return null
     }
 
@@ -93,7 +92,7 @@ internal class TorService: Service() {
 
                 when (intent.getStringExtra(ACTION_EXTRAS_KEY)) {
                     ServiceAction.ACTION_STOP -> {
-                        // TODO: Implement
+                        stopSelf()
                     }
                     ServiceAction.ACTION_RESTART -> {
                         // TODO: Implement

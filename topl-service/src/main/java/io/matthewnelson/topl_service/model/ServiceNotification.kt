@@ -9,6 +9,7 @@ import android.os.Build
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationCompat.NotificationVisibility
 import io.matthewnelson.topl_service.R
 import io.matthewnelson.topl_service.service.TorService
 
@@ -18,10 +19,10 @@ internal class ServiceNotification(
     private val channelDescription: String,
     private val notificationID: Int,
 
-
     var activityWhenTapped: Class<*>? = null,
     var activityIntentKey: String? = null,
     var activityIntentExtras: String? = null,
+    var activityIntentRequestCode: Int = 0,
 
     @DrawableRes var imageOn: Int = R.drawable.tor_stat_on,
     @DrawableRes var imageOff: Int = R.drawable.tor_stat_off,
@@ -30,37 +31,42 @@ internal class ServiceNotification(
 
     @ColorRes var colorRes: Int = R.color.tor_channel_color_white,
 
+    @NotificationVisibility var visibility: Int = NotificationCompat.VISIBILITY_SECRET,
+
     var enableRestartButton: Boolean = false,
     var enableStopButton: Boolean = false
 ) {
     companion object {
-        private lateinit var notification: ServiceNotification
+        private lateinit var serviceNotification: ServiceNotification
 
-        fun initialize(serviceNotification: ServiceNotification) {
-            if (!::notification.isInitialized)
-                notification = serviceNotification
+        fun initialize(serviceNotificay: ServiceNotification) {
+            if (!::serviceNotification.isInitialized)
+                serviceNotification = serviceNotificay
         }
 
         fun get(): ServiceNotification {
-            if (!::notification.isInitialized)
-                notification = ServiceNotification(
+            if (!::serviceNotification.isInitialized)
+                serviceNotification = ServiceNotification(
                     "CHANGE ME",
                     "TorService Channel",
                     "BSG is a national treasure",
                     615615
                 )
 
-            return notification
+            return serviceNotification
         }
     }
 
-    private var contentTitle = "Tor"
+    private lateinit var notificationBuilder: NotificationCompat.Builder
 
+    /**
+     * Called once per application start in
+     * [io.matthewnelson.topl_service.TorServiceController.Builder.build]
+     * */
     fun setupNotificationChannel(context: Context) {
-        val nm: NotificationManager? = context
-            .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val nm: NotificationManager? = context.applicationContext
+                .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             val channel = NotificationChannel(
                 channelID,
                 channelName,
@@ -72,30 +78,43 @@ internal class ServiceNotification(
         }
     }
 
+    /**
+     * Called at [TorService.onCreate] and sets the [notificationBuilder] variable such that
+     * it can be re-used/updated throughout the lifecycle of the service.
+     * */
     fun startForegroundNotification(torService: TorService) {
-        val notificationBuilder = NotificationCompat.Builder(torService, channelID)
-            .setContentTitle(contentTitle)
-            .setContentText("Waiting...")
-            .setOngoing(true)
-            .setSound(null)
-            .setOnlyAlertOnce(true)
-            .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
-            .setGroup("Tor")
+        val builder = NotificationCompat.Builder(torService.applicationContext, channelID)
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
+            .setContentText("Waiting...")
+            .setContentTitle("Tor")
+            .setGroup("Tor")
+            .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
             .setGroupSummary(false)
-            .setSmallIcon(imageOff)
+            .setOngoing(true)
+            .setOnlyAlertOnce(true)
+            .setSmallIcon(imageOn)
+            .setSound(null)
+            .setVisibility(visibility)
 
         if (activityWhenTapped != null) {
-            val contentIntent = Intent(torService, activityWhenTapped)
-
-            if (!activityIntentKey.isNullOrEmpty() && !activityIntentExtras.isNullOrEmpty())
-                contentIntent.putExtra(activityIntentKey, activityIntentExtras)
-
-            val pendingIntent = PendingIntent
-                .getActivity(torService, 0, contentIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-            notificationBuilder.setContentIntent(pendingIntent)
+            builder.setContentIntent(getContentPendingIntent(torService))
         }
 
-        torService.startForeground(notificationID, notificationBuilder.build())
+        notificationBuilder = builder
+        torService.startForeground(notificationID, builder.build())
+    }
+
+    private fun getContentPendingIntent(torService: TorService): PendingIntent {
+        val contentIntent = Intent(torService.applicationContext, activityWhenTapped)
+
+        if (!activityIntentKey.isNullOrEmpty() && !activityIntentExtras.isNullOrEmpty())
+            contentIntent.putExtra(activityIntentKey, activityIntentExtras)
+
+        return PendingIntent.getActivity(
+            torService.applicationContext,
+            activityIntentRequestCode,
+            contentIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
     }
 }

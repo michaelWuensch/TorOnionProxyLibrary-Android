@@ -7,12 +7,13 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.matthewnelson.topl_service.model.ServiceNotification
-import io.matthewnelson.topl_service.service.ServiceActions
 import io.matthewnelson.topl_service.service.TorService
+import io.matthewnelson.topl_service.service.ServiceActions.ServiceAction
+import androidx.core.app.NotificationCompat.NotificationVisibility
 import io.matthewnelson.topl_android_settings.TorConfigFiles
 import io.matthewnelson.topl_android_settings.TorSettings
 
-class TorServiceController private constructor(): ServiceActions() {
+class TorServiceController private constructor() {
 
     class Builder(
         private val context: Context,
@@ -68,45 +69,53 @@ class TorServiceController private constructor(): ServiceActions() {
             fun setActivityToBeOpenedOnTap(
                 clazz: Class<*>,
                 intentExtrasKey: String?,
-                intentExtras: String?
+                intentExtras: String?,
+                intentRequestCode: Int?
             ): NotificationBuilder {
                 serviceNotification.activityWhenTapped = clazz
                 serviceNotification.activityIntentKey = intentExtrasKey
                 serviceNotification.activityIntentExtras = intentExtras
+                intentRequestCode?.let { serviceNotification.activityIntentRequestCode = it }
                 return this
             }
 
-            fun setNotificationImageTorOn(@DrawableRes drawableRes: Int): NotificationBuilder {
+            fun setImageTorOn(@DrawableRes drawableRes: Int): NotificationBuilder {
                 serviceNotification.imageOn = drawableRes
                 return this
             }
 
-            fun setNotificationImageTorOff(@DrawableRes drawableRes: Int): NotificationBuilder {
+            fun setImageTorOff(@DrawableRes drawableRes: Int): NotificationBuilder {
                 serviceNotification.imageOff = drawableRes
                 return this
             }
 
-            fun setNotificationImageDataTransfer(@DrawableRes drawableRes: Int): NotificationBuilder {
+            fun setImageTorDataTransfer(@DrawableRes drawableRes: Int): NotificationBuilder {
                 serviceNotification.imageData = drawableRes
                 return this
             }
 
-            fun setNotificationImageErrors(@DrawableRes drawableRes: Int): NotificationBuilder {
+            fun setImageTorErrors(@DrawableRes drawableRes: Int): NotificationBuilder {
                 serviceNotification.imageError = drawableRes
                 return this
             }
 
-            fun setNotificationColor(@ColorRes colorRes: Int): NotificationBuilder {
+            fun setColorWhenTorOn(@ColorRes colorRes: Int): NotificationBuilder {
                 serviceNotification.colorRes = colorRes
                 return this
             }
 
-            fun enableRestartButton(): NotificationBuilder {
+            fun setVisibility(@NotificationVisibility visibility: Int): NotificationBuilder {
+                if (visibility in -1..1)
+                    serviceNotification.visibility = visibility
+                return this
+            }
+
+            fun enableTorRestartButton(): NotificationBuilder {
                 serviceNotification.enableRestartButton = true
                 return this
             }
 
-            fun enableStopButton(): NotificationBuilder {
+            fun enableTorStopButton(): NotificationBuilder {
                 serviceNotification.enableStopButton = true
                 return this
             }
