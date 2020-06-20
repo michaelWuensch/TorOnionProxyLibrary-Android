@@ -25,7 +25,7 @@ class MyTorSettings: TorSettings() {
     override val httpTunnelPort: String
         get() = DEFAULT__HTTP_TUNNEL_PORT
 
-    override val listOfSupportedBridges: List<String>
+    override val listOfSupportedBridges: List<@SupportedBridges String>
         get() = arrayListOf(SupportedBridges.MEEK, SupportedBridges.OBFS4)
 
     override val proxyHost: String?
@@ -67,7 +67,7 @@ class MyTorSettings: TorSettings() {
     override val hasBridges: Boolean
         get() = DEFAULT__HAS_BRIDGES
 
-    override val connectionPadding: String
+    override val connectionPadding: @ConnectionPadding String
         get() = DEFAULT__HAS_CONNECTION_PADDING
 
     override val hasCookieAuthentication: Boolean
