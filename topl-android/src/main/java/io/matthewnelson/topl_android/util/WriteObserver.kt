@@ -47,7 +47,7 @@ class WriteObserver(file: File) : FileObserver(file.absolutePath, CLOSE_WRITE) {
             throw RuntimeException("Internal error has caused WriteObserver to not be reliable.", e)
         }
 
-    override fun onEvent(i: Int, s: String) {
+    override fun onEvent(i: Int, s: String?) {
         stopWatching()
         countDownLatch.countDown()
     }
