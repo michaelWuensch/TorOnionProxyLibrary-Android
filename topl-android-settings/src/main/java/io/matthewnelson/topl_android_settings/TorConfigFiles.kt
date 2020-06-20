@@ -17,19 +17,18 @@ import java.io.File
 import java.io.IOException
 
 /**
- * Holds Tor configuration information.
+ * Holds Tor configuration information for files and directories that Tor will use.
  *
  * See [Companion.createConfig] or [Builder] to instantiate.
- */
+ * */
 class TorConfigFiles private constructor(
     val geoIpFile: File,
     val geoIpv6File: File,
-    mTorrcFile: File,
+    torrcFile: File,
     val torExecutableFile: File,
     val hiddenServiceDir: File,
     val dataDir: File,
     val configDir: File,
-    val homeDir: File,
 
     /**
      * The <base32-encoded-fingerprint>.onion domain name for this hidden service.
@@ -48,7 +47,7 @@ class TorConfigFiles private constructor(
      * Only used when cookie authentication is enabled.
      *
      * @return [cookieAuthFile]
-     */
+     * */
     val cookieAuthFile: File,
     val libraryPath: File,
     val resolveConf: File,
@@ -61,7 +60,7 @@ class TorConfigFiles private constructor(
      * after a certain amount of time, then the startup has failed.
      *
      * This method returns how much time to wait in seconds until failing the startup.
-     */
+     * */
     val fileCreationTimeout: Int
 ) {
 
@@ -70,6 +69,10 @@ class TorConfigFiles private constructor(
         const val GEO_IPV_6_NAME = "geoip6"
         const val TORRC_NAME = "torrc"
         const val HIDDEN_SERVICE_NAME = "hiddenservice"
+        const val HOST_FILE_NAME = "hostname"
+        const val COOKIE_AUTH_FILE_NAME = "control_auth_cookie"
+        const val RESOLVE_CONF_FILE_NAME = "resolv.conf"
+        const val CONTROL_PORT_FILE_NAME = "control.txt"
 
         /**
          * If your .so file name is different, call [Builder.torExecutable] to set it
@@ -111,7 +114,7 @@ class TorConfigFiles private constructor(
     }
 
     private val configLock = Object()
-    var torrcFile = mTorrcFile
+    var torrcFile = torrcFile
         private set
 
     /**
@@ -119,40 +122,29 @@ class TorConfigFiles private constructor(
      * this method will attempt to resolve the config file by looking in the root of
      * the $configDir and then in $user.home directory
      *
-     * @throws [IOException] If torrc file is not resolved.
-     * @throws [SecurityException] if unable to access the file.
-     *
      * @return [torrcFile]
-     */
+     * @throws [IOException] If torrc file is not resolved.
+     * @throws [SecurityException] Unauthorized access to file/directory.
+     * */
     @Throws(IOException::class, SecurityException::class)
     fun resolveTorrcFile(): File {
-
         synchronized(configLock) {
-            if (!torrcFile.exists()) {
-                var tmpTorrcFile = File(configDir,
-                    TORRC_NAME
-                )
-
-                if (!tmpTorrcFile.exists()) {
-                    tmpTorrcFile = File(homeDir, ".$TORRC_NAME")
-
-                    if (!tmpTorrcFile.exists()) {
-                        torrcFile = File(configDir,
-                            TORRC_NAME
-                        )
-
-                        if (!torrcFile.createNewFile()) {
-                            throw IOException("Failed to create torrc file")
-                        }
-
-                    } else {
-                        torrcFile = tmpTorrcFile
-                    }
-                } else {
-                    torrcFile = tmpTorrcFile
-                }
+            if (torrcFile.exists()) {
+                return torrcFile
             }
-            return torrcFile
+
+            val tmpTorrcFile = File(configDir, TORRC_NAME)
+            if (tmpTorrcFile.exists()) {
+                torrcFile = tmpTorrcFile
+                return torrcFile
+            }
+
+            torrcFile = File(configDir, TORRC_NAME)
+            if (torrcFile.createNewFile()) {
+                return torrcFile
+            }
+
+            throw IOException("Failed to create torrc file")
         }
     }
 
@@ -166,7 +158,6 @@ class TorConfigFiles private constructor(
                 "dataDir=$dataDir, " +
                 "configDir=$configDir, " +
                 "installDir=$installDir, " +
-                "homeDir=$homeDir, " +
                 "hostnameFile=$hostnameFile, " +
                 "cookieAuthFile=$cookieAuthFile, " +
                 "libraryPath=$libraryPath }"
@@ -188,28 +179,12 @@ class TorConfigFiles private constructor(
         private lateinit var mTorrcFile: File
         private lateinit var mHiddenServiceDir: File
         private lateinit var mDataDir: File
-        private lateinit var mHomeDir: File
         private lateinit var mLibraryPath: File
         private lateinit var mCookieAuthFile: File
         private lateinit var mHostnameFile: File
         private lateinit var mResolveConf: File
         private lateinit var mControlPortFile: File
         private var mFileCreationTimeout = 0
-
-        /**
-         * Home directory of user.
-         *
-         * Default value: $home.user if $home.user environment property exists, otherwise
-         * $configDir. On Android, this will always default to $configDir.
-         *
-         * @param [homeDir] the home directory of the user
-         *
-         * @return [Builder]
-         */
-        fun homeDir(homeDir: File): Builder {
-            this.mHomeDir = homeDir
-            return this
-        }
 
         fun torExecutable(file: File): Builder {
             mTorExecutableFile = file
@@ -326,7 +301,7 @@ class TorConfigFiles private constructor(
          * @return [Builder]
          */
         fun fileCreationTimeout(timeoutSeconds: Int): Builder {
-                mFileCreationTimeout = timeoutSeconds
+            mFileCreationTimeout = timeoutSeconds
             return this
         }
 
@@ -336,39 +311,20 @@ class TorConfigFiles private constructor(
          * @return [TorConfigFiles]
          */
         fun build(): TorConfigFiles {
-            if (!::mHomeDir.isInitialized) {
-                val userHome = System.getProperty("user.home")
-                mHomeDir =
-                    if (userHome != null && "" != userHome && "/" != userHome)
-                        File(userHome)
-                    else
-                        configDir
-            }
-
             if (!::mTorExecutableFile.isInitialized)
-                mTorExecutableFile = File(installDir,
-                    torExecutableFileName
-                )
+                mTorExecutableFile = File(installDir, torExecutableFileName)
 
             if (!::mGeoIpFile.isInitialized)
-                mGeoIpFile = File(configDir,
-                    GEO_IP_NAME
-                )
+                mGeoIpFile = File(configDir, GEO_IP_NAME)
 
             if (!::mGeoIpv6File.isInitialized)
-                mGeoIpv6File = File(configDir,
-                    GEO_IPV_6_NAME
-                )
+                mGeoIpv6File = File(configDir, GEO_IPV_6_NAME)
 
             if (!::mTorrcFile.isInitialized)
-                mTorrcFile = File(configDir,
-                    TORRC_NAME
-                )
+                mTorrcFile = File(configDir, TORRC_NAME)
 
             if (!::mHiddenServiceDir.isInitialized)
-                mHiddenServiceDir = File(configDir,
-                    HIDDEN_SERVICE_NAME
-                )
+                mHiddenServiceDir = File(configDir, HIDDEN_SERVICE_NAME)
 
             if (!::mDataDir.isInitialized)
                 mDataDir = File(configDir, "lib/tor")
@@ -377,16 +333,16 @@ class TorConfigFiles private constructor(
                 mLibraryPath = mTorExecutableFile.parentFile
 
             if (!::mHostnameFile.isInitialized)
-                mHostnameFile = File(mDataDir, "hostname")
+                mHostnameFile = File(mDataDir, HOST_FILE_NAME)
 
             if (!::mCookieAuthFile.isInitialized)
-                mCookieAuthFile = File(mDataDir, "control_auth_cookie")
+                mCookieAuthFile = File(mDataDir, COOKIE_AUTH_FILE_NAME)
 
             if (!::mResolveConf.isInitialized)
-                mResolveConf = File(configDir, "resolv.conf")
+                mResolveConf = File(configDir, RESOLVE_CONF_FILE_NAME)
 
             if (!::mControlPortFile.isInitialized)
-                mControlPortFile = File(mDataDir, "control.txt")
+                mControlPortFile = File(mDataDir, CONTROL_PORT_FILE_NAME)
 
             if (mFileCreationTimeout <= 0)
                 mFileCreationTimeout = 15
@@ -399,7 +355,6 @@ class TorConfigFiles private constructor(
                 mHiddenServiceDir,
                 mDataDir,
                 configDir,
-                mHomeDir,
                 mHostnameFile,
                 mCookieAuthFile,
                 mLibraryPath,

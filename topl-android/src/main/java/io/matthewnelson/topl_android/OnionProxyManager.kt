@@ -724,13 +724,13 @@ class OnionProxyManager(
     private fun setEnvironmentArgsAndWorkingDirectoryForStart(processBuilder: ProcessBuilder) {
         processBuilder.directory(onionProxyContext.torConfigFiles.configDir)
         val environment = processBuilder.environment()
-        environment["HOME"] = onionProxyContext.torConfigFiles.homeDir.absolutePath
+        environment["HOME"] = onionProxyContext.torConfigFiles.configDir.absolutePath
     }
 
     private val environmentArgsForExec: Array<String>
         get() {
             val envArgs: MutableList<String> = ArrayList()
-            envArgs.add("HOME=" + onionProxyContext.torConfigFiles.homeDir.absolutePath)
+            envArgs.add("HOME=" + onionProxyContext.torConfigFiles.configDir.absolutePath)
             return envArgs.toTypedArray()
         }
 
