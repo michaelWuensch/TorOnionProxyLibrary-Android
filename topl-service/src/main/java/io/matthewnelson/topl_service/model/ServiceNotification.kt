@@ -29,7 +29,7 @@ internal class ServiceNotification(
     @DrawableRes var imageData: Int = R.drawable.tor_stat_dataxfer,
     @DrawableRes var imageError: Int = R.drawable.tor_stat_notifyerr,
 
-    @ColorRes var colorRes: Int = R.color.tor_channel_color_white,
+    @ColorRes var colorWhenOn: Int = R.color.tor_notification_color_white,
 
     @NotificationVisibility var visibility: Int = NotificationCompat.VISIBILITY_SECRET,
 
