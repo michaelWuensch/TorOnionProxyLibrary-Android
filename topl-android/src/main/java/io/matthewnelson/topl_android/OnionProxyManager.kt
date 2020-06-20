@@ -111,74 +111,6 @@ class OnionProxyManager(
         onionProxyContext.processId
 
     /**
-     * This is a blocking call that will try to start the Tor OP, connect it to the network
-     * and get it to be fully bootstrapped. Sometimes the bootstrap process just hangs for
-     * no apparent reason so the method will wait for the given time for bootstrap to finish
-     * and if it doesn't then will restart the bootstrap process the given number of repeats.
-     *
-     * @param [secondsBeforeTimeOut] Seconds to wait for boot strapping to finish
-     * @param [numberOfRetries] Num times to try recycling the Tor OP before giving up
-     * @return True if bootstrap succeeded, false if there is a problem or timeout.
-     * @throws [IllegalArgumentException] If values passed are out of specified bounds.
-     * @throws [InterruptedException] You know, if we are interrupted.
-     * @throws [IOException] TorControlConnection or File problems.
-     * @throws [SecurityException] See [OnionProxyContext.deleteDataDirExceptHiddenService]
-     * @throws [RuntimeException] See [OnionProxyContext.deleteDataDirExceptHiddenService]
-     */
-    @Synchronized
-    @Throws(
-        IllegalArgumentException::class,
-        InterruptedException::class,
-        IOException::class,
-        SecurityException::class,
-        RuntimeException::class
-    )
-    fun startWithRepeat(secondsBeforeTimeOut: Int, numberOfRetries: Int): Boolean {
-        require(secondsBeforeTimeOut > 0 && numberOfRetries > 0) {
-            "secondsBeforeTimeOut was less than 0 || numberOfRetries was less than 0"
-        }
-        return try {
-            for (retryCount in 0 until numberOfRetries) {
-                start()
-
-                // We will check every second to see if boot strapping has finally finished
-                for (secondsWaited in 0 until secondsBeforeTimeOut) {
-                    if (!isBootstrapped) {
-                        Thread.sleep(1000, 0)
-                    } else {
-                        eventBroadcaster.broadcastNotice("Tor started; process id = $torPid")
-                        return true
-                    }
-                }
-
-                // Bootstrapping isn't over so we need to restart and try again
-                stop()
-
-                // Experimentally we have found that if a Tor OP has run before and thus has
-                // cached descriptors and that when we try to start it again it won't start
-                // then deleting the cached data can fix this. But, if there is cached data and
-                // things do work then the Tor OP will start faster than it would if we delete
-                // everything.
-                //
-                // So our compromise is that we try to start the Tor OP 'as is' on the first
-                // round and after that we delete all the files.
-                //
-                // It can take a little bit for the Tor OP to detect the connection is dead and
-                // kill itself.
-                Thread.sleep(1000, 0)
-                onionProxyContext.deleteDataDirExceptHiddenService()
-            }
-            false
-        } finally {
-            // Make sure we return the Tor OP in some kind of consistent state, even if it's 'off'.
-            try {
-                if (!isRunning)
-                    stop()
-            } catch (e: NullPointerException) {}
-        }
-    }
-
-    /**
      * Returns the socks port on the IPv4 localhost address that the Tor OP is listening on
      *
      * @return Discovered socks port
@@ -352,9 +284,7 @@ class OnionProxyManager(
     val isRunning: Boolean
         get() = try {
             isBootstrapped && isNetworkEnabled
-        } catch (e: IOException) {
-            false
-        } catch (ee: NullPointerException) {
+        } catch (e: Exception) {
             false
         }
 
@@ -789,7 +719,7 @@ class OnionProxyManager(
                 controlConnection!!.setConf("DisableNetwork", if (isEnabled) "0" else "1")
                 true
             } catch (e: Exception) {
-                eventBroadcaster.broadcastDebug("error disabling network ${e.localizedMessage}")
+                eventBroadcaster.broadcastNotice("error disabling network ${e.localizedMessage}")
                 false
             }
         }
@@ -803,7 +733,7 @@ class OnionProxyManager(
                 controlConnection!!.signal(TorControlCommands.SIGNAL_NEWNYM)
                 true
             } catch (e: IOException) {
-                eventBroadcaster.broadcastDebug("error requesting newnym: ${e.localizedMessage}")
+                eventBroadcaster.broadcastNotice("error requesting newnym: ${e.localizedMessage}")
                 false
             }
         }
