@@ -7,10 +7,16 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.IBinder
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import io.matthewnelson.topl_android.OnionProxyContext
+import io.matthewnelson.topl_android.OnionProxyManager
 import io.matthewnelson.topl_service.model.ServiceNotification
 import io.matthewnelson.topl_android_settings.TorConfigFiles
 import io.matthewnelson.topl_android_settings.TorSettings
+import io.matthewnelson.topl_service.onionproxy.OnionProxyEventBroadcaster
+import io.matthewnelson.topl_service.onionproxy.OnionProxyEventListener
+import io.matthewnelson.topl_service.onionproxy.OnionProxyInstaller
 import io.matthewnelson.topl_service.service.ServiceActions.ServiceAction
+import io.matthewnelson.topl_service_settings.TorServiceSettings
 
 internal class TorService: Service() {
 
@@ -48,13 +54,34 @@ internal class TorService: Service() {
         super.onCreate()
         registerBroadcastReceiver(this)
         ServiceNotification.get().startForegroundNotification(this)
-        // TODO: Implement
+
+        // Setup TOPL
+        val torServiceSettings = TorServiceSettings(torSettings, this)
+        val onionProxyInstaller = OnionProxyInstaller(
+            this,
+            torConfigFiles,
+            buildConfigVersion,
+            geoipAssetPath,
+            geoip6AssetPath
+        )
+        val onionProxyContext = OnionProxyContext(
+            torConfigFiles,
+            onionProxyInstaller,
+            torServiceSettings
+        )
+        val onionProxyEventBroadcaster = OnionProxyEventBroadcaster(this, torServiceSettings)
+        onionProxyManager = OnionProxyManager(
+            this,
+            onionProxyContext,
+            onionProxyEventBroadcaster,
+            OnionProxyEventListener(this, onionProxyEventBroadcaster)
+        )
+        onionProxyManager.setup()
     }
 
     override fun onDestroy() {
-        unregisterBroadcastReceiver()
         super.onDestroy()
-        // TODO: Implement
+        unregisterBroadcastReceiver()
     }
 
     override fun onLowMemory() {
@@ -63,16 +90,46 @@ internal class TorService: Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // TODO: Implement
+        if (onionProxyManager.eventBroadcaster.torStateMachine.isOff)
+            Thread {
+                try {
+                    onionProxyManager.getNewSettingsBuilder()
+                        .updateTorSettings()
+                        .setGeoIpFiles()
+                        .finishAndWriteToTorrcFile()
+
+                    onionProxyManager.start()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }.start()
         return START_STICKY
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-        // TODO: Implement
-        stopSelf()
+        stopTor()
     }
 
+    private fun stopTor() {
+        Thread {
+            try {
+                onionProxyManager.stop()
+                stopSelf()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }.start()
+    }
+
+    ////////////
+    /// TOPL ///
+    ////////////
+    private lateinit var onionProxyManager: OnionProxyManager
+
+    /////////////////////////
+    /// BroadcastReceiver ///
+    /////////////////////////
     private val actionBR = ActionBroadcastReceiver()
     private lateinit var localBM: LocalBroadcastManager
 
@@ -92,7 +149,7 @@ internal class TorService: Service() {
 
                 when (intent.getStringExtra(ACTION_EXTRAS_KEY)) {
                     ServiceAction.ACTION_STOP -> {
-                        stopSelf()
+                        stopTor()
                     }
                     ServiceAction.ACTION_RESTART -> {
                         // TODO: Implement

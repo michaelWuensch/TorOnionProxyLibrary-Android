@@ -1,6 +1,7 @@
 package io.matthewnelson.topl_service.onionproxy
 
 import android.content.Context
+import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.matthewnelson.topl_android.broadcaster.DefaultEventBroadcaster
 import io.matthewnelson.topl_android_settings.TorSettings
@@ -10,10 +11,14 @@ class OnionProxyEventBroadcaster(
     private val torSettings: TorSettings
 ): DefaultEventBroadcaster(torSettings) {
 
+    private companion object {
+        const val TAG = "EventBroadcaster"
+    }
+
     private val broadcastManager = LocalBroadcastManager.getInstance(context)
 
     override fun broadcastBandwidth(upload: Long, download: Long, written: Long, read: Long) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "BANDWIDTH__upload: $upload, download: $download, written: $written, read: $read")
     }
 
     override fun broadcastDebug(msg: String) {
@@ -25,7 +30,7 @@ class OnionProxyEventBroadcaster(
     }
 
     override fun broadcastLogMessage(logMessage: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "LOG_MESSAGE__$logMessage")
     }
 
     override fun broadcastNotice(msg: String) {
@@ -33,6 +38,6 @@ class OnionProxyEventBroadcaster(
     }
 
     override fun broadcastTorState(@TorState state: String) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "TOR_STATE__$state")
     }
 }

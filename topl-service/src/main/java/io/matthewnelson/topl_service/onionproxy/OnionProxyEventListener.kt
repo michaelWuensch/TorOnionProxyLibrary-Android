@@ -1,5 +1,6 @@
 package io.matthewnelson.topl_service.onionproxy
 
+import android.util.Log
 import io.matthewnelson.topl_android.listener.BaseEventListener
 import io.matthewnelson.topl_service.service.TorService
 import net.freehaven.tor.control.TorControlCommands
@@ -8,6 +9,10 @@ internal class OnionProxyEventListener(
     private val torService: TorService,
     private val eventBroadcaster: OnionProxyEventBroadcaster
 ): BaseEventListener() {
+
+    private companion object {
+        const val TAG = "EventListener"
+    }
 
     override val CONTROL_COMMAND_EVENTS: Array<String>
         get() = arrayOf(
@@ -21,27 +26,27 @@ internal class OnionProxyEventListener(
         )
 
     override fun noticeMsg(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "NOTICE_MSG__$data")
     }
 
     override fun unrecognized(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "UNRECOGNIZED__$data")
     }
 
     override fun newConsensus(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "NEW_CONSENSUS__$data")
     }
 
     override fun connBw(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "CONN_BW__$data")
     }
 
     override fun circBandwidthUsed(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "CIR_BANDWIDTH_USED__$data")
     }
 
     override fun networkLiveness(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "NETWORK_LIVENESS__$data")
     }
 
     override fun onEvent(keyword: String?, data: String?) {
@@ -49,106 +54,106 @@ internal class OnionProxyEventListener(
     }
 
     override fun newDesc(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "NEW_DESC__$data")
     }
 
     override fun ns(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "NS__$data")
     }
 
     override fun guard(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "GUARD__$data")
     }
 
     override fun clientsSeen(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "CLIENTS_SEEN__$data")
     }
 
     override fun gotSignal(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "GOT_SIGNAL__$data")
     }
 
     override fun hsDescContent(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "HS_DESC_CONTENT__$data")
     }
 
     override fun transportLaunched(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "TRANSPORT_LAUNCHED__$data")
     }
 
     override fun bandwidthUsed(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "BANDWIDTH_USED__$data")
     }
 
     override fun addrMap(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "ADDR_MAP__$data")
     }
 
     override fun warnMsg(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "WARN_MSG__$data")
     }
 
     override fun statusGeneral(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "STATUS_GENERAL__$data")
     }
 
     override fun circuitStatusMinor(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "CIRCUIT_STATUS_MINOR__$data")
     }
 
     override fun errMsg(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "ERR_MSG__$data")
     }
 
     override fun streamStatus(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "STREAM_STATUS__$data")
     }
 
     override fun descChanged(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "DESC_CHANGED__$data")
     }
 
     override fun orConnStatus(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "OR_CONN_STATUS__$data")
     }
 
     override fun infoMsg(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "INFO_MSG__$data")
     }
 
     override fun hsDesc(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "HS_DESC__$data")
     }
 
     override fun statusClient(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "STATUS_CLIENT__$data")
     }
 
     override fun debugMsg(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "DEBUG_MSG__$data")
     }
 
     override fun streamBandwidthUsed(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "STREAM_BANDWIDTH_USED__$data")
     }
 
     override fun confChanged(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "CONF_CHANGED__$data")
     }
 
     override fun cellStats(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "CELL_STATS__$data")
     }
 
     override fun circuitStatus(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "CIRCUIT_STATUS__$data")
     }
 
     override fun buildTimeoutSet(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "BUILD_TIMEOUT_SET__$data")
     }
 
     override fun statusServer(data: String?) {
-        TODO("Not yet implemented")
+        Log.d(TAG, "STATUS_SERVER__$data")
     }
 }
