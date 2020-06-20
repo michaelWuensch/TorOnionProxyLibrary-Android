@@ -39,8 +39,9 @@ dependencies {
     implementation project(':topl-android-settings')
     implementation project(':topl-service-prefs')
     implementation project(':topl-service-settings')
-    implementation deps.kotlin.stdlib
+    implementation deps.androidx.core
     implementation deps.jtorctl
+    implementation deps.kotlin.stdlib
     implementation deps.slf4j.api
     implementation deps.slf4j.android
 

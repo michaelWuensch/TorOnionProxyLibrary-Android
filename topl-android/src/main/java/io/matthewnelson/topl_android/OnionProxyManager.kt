@@ -36,7 +36,10 @@ import io.matthewnelson.topl_android.broadcaster.DefaultEventBroadcaster
 import io.matthewnelson.topl_android.broadcaster.EventBroadcaster
 import io.matthewnelson.topl_android.listener.BaseEventListener
 import io.matthewnelson.topl_android.listener.DefaultEventListener
+import io.matthewnelson.topl_android.settings.TorSettingsBuilder
+import io.matthewnelson.topl_android.util.OnionProxyConsts.ConfigFile
 import io.matthewnelson.topl_android.util.FileUtilities
+import io.matthewnelson.topl_android.util.WriteObserver
 import io.matthewnelson.topl_android_settings.TorStates
 import net.freehaven.tor.control.TorControlCommands
 import net.freehaven.tor.control.TorControlConnection
@@ -95,6 +98,19 @@ class OnionProxyManager(
     private var controlPort = 0
 
     /**
+     * Sets up and installs any files needed to run tor. If the tor files are already on
+     * the system this does not need to be invoked.
+     */
+    @Throws(IOException::class)
+    fun setup() = onionProxyContext.torInstaller.setup()
+
+    fun getNewSettingsBuilder(): TorSettingsBuilder =
+        TorSettingsBuilder(onionProxyContext)
+
+    fun getProcessId(): String =
+        onionProxyContext.processId
+
+    /**
      * This is a blocking call that will try to start the Tor OP, connect it to the network
      * and get it to be fully bootstrapped. Sometimes the bootstrap process just hangs for
      * no apparent reason so the method will wait for the given time for bootstrap to finish
@@ -102,9 +118,7 @@ class OnionProxyManager(
      *
      * @param [secondsBeforeTimeOut] Seconds to wait for boot strapping to finish
      * @param [numberOfRetries] Num times to try recycling the Tor OP before giving up
-     *
      * @return True if bootstrap succeeded, false if there is a problem or timeout.
-     *
      * @throws [IllegalArgumentException] If values passed are out of specified bounds.
      * @throws [InterruptedException] You know, if we are interrupted.
      * @throws [IOException] TorControlConnection or File problems.
@@ -181,8 +195,7 @@ class OnionProxyManager(
             val socksIpPorts = try {
                 // This returns a set of space delimited quoted strings which could be Ipv4,
                 // Ipv6 or unix sockets.
-                controlConnection!!.getInfo("net/listeners/socks").split(" ".toRegex())
-                    .toTypedArray()
+                controlConnection!!.getInfo("net/listeners/socks").split(" ".toRegex()).toTypedArray()
             } catch (e: KotlinNullPointerException) {
                 eventBroadcaster.broadcastException(e.message, e)
                 throw NullPointerException(e.message)
@@ -206,15 +219,13 @@ class OnionProxyManager(
      *
      * @param [hiddenServicePort] The port that the hidden service will accept connections on
      * @param [localPort] The local port that the hidden service will relay connections to
-     *
      * @return The hidden service's onion address in the form X.onion.
-     *
-     * @throws [java.io.IOException] File errors
-     * @throws [RuntimeException] if unable to poll the file observer
+     * @throws [IOException] File errors
+     * @throws [RuntimeException] See [io.matthewnelson.topl_android.util.WriteObserver.poll]
      * @throws [IllegalStateException] If [controlConnection] is null (service isn't running)
-     * @throws [NullPointerException] If [controlConnection] is null
-     * @throws [SecurityException] File errors
-     * @throws [IllegalArgumentException] If unable to create the hostname directory observer
+     * @throws [NullPointerException] If [controlConnection] is null even after checking
+     * @throws [SecurityException] Unauthorized access to file/directory.
+     * @throws [IllegalArgumentException] See [io.matthewnelson.topl_android.util.WriteObserver.checkExists]
      */
     @Synchronized
     @Throws(
@@ -226,21 +237,20 @@ class OnionProxyManager(
         IllegalArgumentException::class)
     fun publishHiddenService(hiddenServicePort: Int, localPort: Int): String {
         checkNotNull(controlConnection) { "Service is not running." }
+        val hostnameFile = onionProxyContext.torConfigFiles.hostnameFile
 
         LOG.info("Creating hidden service")
-        if (!onionProxyContext.createHostnameFile())
+        if (!onionProxyContext.createNewFileIfDoesNotExist(ConfigFile.HOSTNAME_FILE))
             throw IOException("Could not create hostnameFile")
 
         // Watch for the hostname file being created/updated
-        val hostNameFileObserver = onionProxyContext.createHostnameDirObserver()
-        val hostnameFile = onionProxyContext.torConfigFiles.hostnameFile
-        val hostnameDir = hostnameFile.parentFile
-        if (!FileUtilities.setToReadOnlyPermissions(hostnameDir))
+        val hostNameFileObserver = onionProxyContext.createFileObserver(ConfigFile.HOSTNAME_FILE)
+        if (!onionProxyContext.setHostnameDirPermissionsToReadOnly())
             throw RuntimeException("Unable to set permissions on hostName dir")
 
         // Use the control connection to update the Tor config
         val config = listOf(
-            "HiddenServiceDir ${hostnameDir.absolutePath}",
+            "HiddenServiceDir ${hostnameFile.parentFile.absolutePath}",
             "HiddenServicePort $hiddenServicePort 127.0.0.1:$localPort"
         )
 
@@ -259,7 +269,8 @@ class OnionProxyManager(
         }
 
         // Publish the hidden service's onion hostname in transport properties
-        val hostname = String(FileUtilities.read(hostnameFile), Charsets.UTF_8).trim { it <= ' ' }
+        val hostname = String(onionProxyContext.readFile(ConfigFile.HOSTNAME_FILE), Charsets.UTF_8)
+            .trim { it <= ' ' }
         LOG.info("Hidden service config has completed.")
 
         return hostname
@@ -438,7 +449,7 @@ class OnionProxyManager(
      * Starts tor control service if it isn't already running.
      *
      * @throws [IOException] File errors
-     * @throws [SecurityException] File errors
+     * @throws [SecurityException] Unauthorized access to file/directory.
      */
     @Synchronized
     @Throws(IOException::class, SecurityException::class)
@@ -458,20 +469,14 @@ class OnionProxyManager(
         val hasExistingTorConnection = controlConnection != null
 
         if (!hasExistingTorConnection) {
-            val controlPortFile = onionProxyContext.torConfigFiles.controlPortFile
-            controlPortFile.delete()
-            if (!controlPortFile.parentFile.exists())
-                controlPortFile.parentFile.mkdirs()
 
-            val cookieAuthFile = onionProxyContext.torConfigFiles.cookieAuthFile
-            cookieAuthFile.delete()
-            if (!cookieAuthFile.parentFile.exists())
-                cookieAuthFile.parentFile.mkdirs()
+            onionProxyContext.deleteFile(ConfigFile.CONTROL_PORT_FILE)
+            onionProxyContext.deleteFile(ConfigFile.COOKIE_AUTH_FILE)
 
             torProcess = spawnTorProcess()
             controlConnection = try {
-                waitForControlPortFileCreation(controlPortFile)
-                connectToTorControlSocket(controlPortFile)
+                waitForFileCreation(ConfigFile.CONTROL_PORT_FILE)
+                connectToTorControlSocket()
             } catch (e: IOException) {
                 torProcess.destroy()
                 eventBroadcaster.torStateMachine.setTorState(TorState.OFF)
@@ -483,9 +488,8 @@ class OnionProxyManager(
         try {
             this.controlConnection = controlConnection
 
-            val cookieAuthFile = onionProxyContext.torConfigFiles.cookieAuthFile
-            waitForCookieAuthFileCreation(cookieAuthFile)
-            controlConnection!!.authenticate(FileUtilities.read(cookieAuthFile))
+            waitForFileCreation(ConfigFile.COOKIE_AUTH_FILE)
+            controlConnection!!.authenticate(onionProxyContext.readFile(ConfigFile.COOKIE_AUTH_FILE))
             eventBroadcaster.broadcastNotice("SUCCESS - authenticated tor control port.")
             if (hasExistingTorConnection) {
                 controlConnection.signal(TorControlCommands.SIGNAL_RELOAD)
@@ -523,14 +527,13 @@ class OnionProxyManager(
     /**
      * Finds existing tor control connection by trying to connect. Returns null if
      *
-     * @throws [SecurityException] File errors
+     * @throws [SecurityException] Unauthorized access to file/directory.
      */
     @Throws(SecurityException::class)
     private fun findExistingTorConnection(): TorControlConnection? {
-        val controlPortFile = onionProxyContext.torConfigFiles.controlPortFile
-        return if (controlPortFile.exists())
+        return if (onionProxyContext.torConfigFiles.controlPortFile.exists())
             try {
-                connectToTorControlSocket(controlPortFile)
+                connectToTorControlSocket()
             } catch (e: IOException) {
                 null
             }
@@ -543,14 +546,14 @@ class OnionProxyManager(
      * control connection.
      *
      * @throws [IOException] File errors
-     * @throws [SecurityException] File errors
+     * @throws [SecurityException] Unauthorized access to file/directory.
      * @throws [NullPointerException] If controlSocket was null even after setting it.
      */
     @Throws(IOException::class, SecurityException::class, NullPointerException::class)
-    private fun connectToTorControlSocket(controlPortFile: File): TorControlConnection {
+    private fun connectToTorControlSocket(): TorControlConnection {
         val controlConnection: TorControlConnection
         try {
-            val controlPortTokens = String(FileUtilities.read(controlPortFile))
+            val controlPortTokens = String(onionProxyContext.readFile(ConfigFile.CONTROL_PORT_FILE))
                 .trim { it <= ' ' }.split(":".toRegex()).toTypedArray()
             controlPort = controlPortTokens[1].toInt()
             eventBroadcaster.broadcastNotice("Connecting to control port: $controlPort")
@@ -564,7 +567,10 @@ class OnionProxyManager(
             eventBroadcaster.broadcastException(e.message, e)
             throw IOException(e.message)
         } catch (ee: ArrayIndexOutOfBoundsException) {
-            throw IOException("Failed to read control port: ${String(FileUtilities.read(controlPortFile))}")
+            throw IOException(
+                "Failed to read control port: " +
+                        String(onionProxyContext.readFile(ConfigFile.CONTROL_PORT_FILE))
+            )
         } catch (eee: KotlinNullPointerException) {
             eventBroadcaster.broadcastException(eee.message, eee)
             throw NullPointerException(eee.message)
@@ -579,17 +585,16 @@ class OnionProxyManager(
      * Spawns the tor native process from the existing Java process.
      *
      * @throws [IOException] File errors.
-     * @throws [SecurityException] File errors.
+     * @throws [SecurityException] Unauthorized access to file/directory.
      */
     @Throws(IOException::class, SecurityException::class)
     private fun spawnTorProcess(): Process {
-        val pid = onionProxyContext.processId
         val cmd = arrayOf(
             torExecutable().absolutePath,
             "-f",
             torrc().absolutePath,
             OWNER,
-            pid
+            getProcessId()
         )
         val processBuilder = ProcessBuilder(*cmd)
         setEnvironmentArgsAndWorkingDirectoryForStart(processBuilder)
@@ -608,62 +613,53 @@ class OnionProxyManager(
     }
 
     /**
-     * Waits for the control port file to be created by the Tor process.
+     * Waits for the controlPort or cookieAuth file to be created by the Tor process depending on
+     * which you send it. If there is any problem creating the file OR if the timeout for the file
+     * to be created is exceeded, then an IOException is thrown.
      *
      * @throws [IOException] File problems or timeout
-     * @throws [SecurityException] File problems
+     * @throws [SecurityException] Unauthorized access to file/directory.
+     * @throws [IllegalArgumentException] Method only accepts CONTROL_PORT_FILE or COOKIE_AUTH_FILE
+     * @throws [RuntimeException] See [io.matthewnelson.topl_android.util.WriteObserver.poll]
      */
-    @Throws(IOException::class, SecurityException::class)
-    private fun waitForControlPortFileCreation(controlPortFile: File) {
-        val controlPortStartTime = System.currentTimeMillis()
-        LOG.info("Waiting for control port")
-        val isCreated = controlPortFile.exists() || controlPortFile.createNewFile()
-
-        // TODO: need a moment here to create a new file before creating a FileObserver...
-
-        val controlPortFileObserver = onionProxyContext.createControlPortFileObserver()
-        if (!isCreated || controlPortFile.length() == 0L && !controlPortFileObserver.poll(
-                onionProxyContext.torConfigFiles.fileCreationTimeout.toLong(), TimeUnit.SECONDS
-            )
-        ) {
-            LOG.warn("Control port file not created")
-            FileUtilities.listFilesToLog(onionProxyContext.torConfigFiles.dataDir)
-            eventBroadcaster.broadcastNotice("Tor control port file not created")
-            eventBroadcaster.torStateMachine.setTorState(TorState.STOPPING)
-            throw IOException(
-                "Control port file not created: ${controlPortFile.absolutePath}, "
-                        + "len = ${controlPortFile.length()}"
-            )
+    @Throws(IOException::class,
+        SecurityException::class,
+        IllegalArgumentException::class,
+        RuntimeException::class
+    )
+    private fun waitForFileCreation(@ConfigFile onionProxyConst: String) {
+        val file = when (onionProxyConst) {
+            ConfigFile.CONTROL_PORT_FILE -> {
+                onionProxyContext.torConfigFiles.controlPortFile
+            }
+            ConfigFile.COOKIE_AUTH_FILE -> {
+                onionProxyContext.torConfigFiles.cookieAuthFile
+            }
+            else -> {
+                throw IllegalArgumentException(
+                    "$onionProxyConst is not a valid argument for method waitForFileCreation"
+                )
+            }
         }
-        LOG.info("Created control port file: time = " +
-                (System.currentTimeMillis() - controlPortStartTime) + "ms"
-        )
-    }
 
-    /**
-     * Waits for the cookie auth file to be created by the Tor process. If there is any problem creating the file OR
-     * if the timeout for the cookie auth file to be created is exceeded, then  an IOException is thrown.
-     */
-    @Throws(IOException::class)
-    private fun waitForCookieAuthFileCreation(cookieAuthFile: File) {
-        val cookieAuthStartTime = System.currentTimeMillis()
-        LOG.info("Waiting for cookie auth file")
-        val isCreated = cookieAuthFile.exists() || cookieAuthFile.createNewFile()
-        val cookieAuthFileObserver = onionProxyContext.createCookieAuthFileObserver()
-        if (!isCreated || cookieAuthFile.length() == 0L && !cookieAuthFileObserver.poll(
-                onionProxyContext.torConfigFiles.fileCreationTimeout.toLong(), TimeUnit.SECONDS
-            )
+        val startTime = System.currentTimeMillis()
+        LOG.info("Waiting for ${file.nameWithoutExtension} file")
+
+        val isCreated: Boolean = onionProxyContext.createNewFileIfDoesNotExist(onionProxyConst)
+        val fileObserver: WriteObserver? = onionProxyContext.createFileObserver(onionProxyConst)
+        val fileCreationTimeout = onionProxyContext.torConfigFiles.fileCreationTimeout
+        if (!isCreated || file.length() == 0L &&
+            fileObserver?.poll(fileCreationTimeout.toLong(), TimeUnit.SECONDS) != true
         ) {
-            LOG.warn("Cookie Auth file not created")
-            eventBroadcaster.broadcastNotice("Cookie Auth file not created")
+            eventBroadcaster.broadcastNotice("${file.nameWithoutExtension} not created")
             eventBroadcaster.torStateMachine.setTorState(TorState.STOPPING)
             throw IOException(
-                "Cookie Auth file not created: ${cookieAuthFile.absolutePath}, " +
-                        "len = ${cookieAuthFile.length()}"
+                "${file.nameWithoutExtension} not created: " +
+                        "${file.absolutePath}, len = ${file.length()}"
             )
         }
         LOG.info(
-            "Created cookie auth file: time = ${System.currentTimeMillis() - cookieAuthStartTime}ms"
+            "Created ${file.nameWithoutExtension}: time = ${System.currentTimeMillis()-startTime}ms"
         )
     }
 
@@ -701,7 +697,7 @@ class OnionProxyManager(
 
         if (!torExe.exists()) {
             eventBroadcaster.broadcastNotice("Tor executable not found")
-            eventBroadcaster.torStateMachine.setTorState(TorState.STOPPING)
+            eventBroadcaster.torStateMachine.setTorState(TorStates.TorState.STOPPING)
             LOG.error("Tor executable not found: ${torExe.absolutePath}")
             throw IOException("Tor executable not found")
         }
@@ -713,7 +709,7 @@ class OnionProxyManager(
         val torrc = onionProxyContext.torConfigFiles.torrcFile
         if (!torrc.exists()) {
             eventBroadcaster.broadcastNotice("Torrc not found")
-            eventBroadcaster.torStateMachine.setTorState(TorState.STOPPING)
+            eventBroadcaster.torStateMachine.setTorState(TorStates.TorState.STOPPING)
             LOG.error("Torrc not found: ${torrc.absolutePath}")
             throw IOException("Torrc not found")
         }
@@ -737,16 +733,6 @@ class OnionProxyManager(
             envArgs.add("HOME=" + onionProxyContext.torConfigFiles.homeDir.absolutePath)
             return envArgs.toTypedArray()
         }
-
-    /**
-     * Sets up and installs any files needed to run tor. If the tor files are already on
-     * the system this does not need to be invoked.
-     *
-     * @return true if tor installation is successful, otherwise false
-     */
-    @Throws(IOException::class)
-    fun setup() =
-        onionProxyContext.torInstaller.setup()
 
     val isIPv4LocalHostSocksPortOpen: Boolean
         get() = try {

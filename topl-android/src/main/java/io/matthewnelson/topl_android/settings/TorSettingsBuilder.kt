@@ -32,7 +32,7 @@ import java.util.*
  *
  * Calling [finishAndWriteToTorrcFile] will do just that.
  *
- * See [io.matthewnelson.topl_android.OnionProxyContext.newSettingsBuilder]
+ * See [io.matthewnelson.topl_android.OnionProxyManager.getNewSettingsBuilder]
  * */
 class TorSettingsBuilder(private val onionProxyContext: OnionProxyContext) {
 
