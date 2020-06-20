@@ -75,6 +75,8 @@ object FileUtilities {
 
     private val LOG: Logger = LoggerFactory.getLogger(FileUtilities::class.java)
 
+    // TODO: search commit history to see why this method name does not
+    //  properly represent what it is doing.
     fun setToReadOnlyPermissions(file: File): Boolean {
         return file.setReadable(false, false) &&
                 file.setWritable(false, false) &&
@@ -134,7 +136,7 @@ object FileUtilities {
             LOG.info(f.absolutePath)
     }
 
-    @Throws(IOException::class, SecurityException::class)
+    @Throws(IOException::class, EOFException::class, SecurityException::class)
     fun read(f: File): ByteArray {
         val b = ByteArray(f.length().toInt())
         val `in` = FileInputStream(f)
