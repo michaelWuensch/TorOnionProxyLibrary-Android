@@ -2,7 +2,7 @@ package io.matthewnelson.topl_service.service
 
 import androidx.annotation.StringDef
 
-abstract class ServiceActions {
+internal abstract class ActionConsts {
 
     @StringDef(
         ServiceAction.ACTION_START,
