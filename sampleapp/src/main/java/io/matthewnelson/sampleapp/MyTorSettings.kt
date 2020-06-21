@@ -2,6 +2,9 @@ package io.matthewnelson.sampleapp
 
 import io.matthewnelson.topl_android_settings.TorSettings
 
+/**
+ * See [TorSettings] for comments on what is what.
+ * */
 class MyTorSettings: TorSettings() {
 
     override val disableNetwork: Boolean

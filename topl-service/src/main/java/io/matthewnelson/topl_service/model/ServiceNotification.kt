@@ -13,6 +13,11 @@ import androidx.core.app.NotificationCompat.NotificationVisibility
 import io.matthewnelson.topl_service.R
 import io.matthewnelson.topl_service.service.TorService
 
+/**
+ * Everything to do with [TorService]'s notification.
+ *
+ * See [io.matthewnelson.topl_service.TorServiceController.Builder.NotificationBuilder]
+ * */
 internal class ServiceNotification(
     private val channelName: String,
     private val channelID: String,

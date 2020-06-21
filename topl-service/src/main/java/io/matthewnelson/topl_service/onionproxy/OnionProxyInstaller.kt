@@ -12,7 +12,16 @@ import io.matthewnelson.topl_service_prefs.TorServicePrefs
 import java.io.*
 import java.util.concurrent.TimeoutException
 
-class OnionProxyInstaller(
+/**
+ * Installs assets needed for Tor.
+ *
+ * @param [context]
+ * @param [torConfigFiles] [TorConfigFiles] to know where files/directories are
+ * @param [appVersionCode] To mitigate copying of geoip files to updates only. Use [BuildConfig.VERSION_CODE]
+ * @param [geoIpAssetPath] The path to geoip file within the application, ex: "common/geoip"
+ * @param [geoIp6AssetPath] The path to geoip6 file within the application, ex: "common/geoip6"
+ * */
+internal class OnionProxyInstaller(
     private val context: Context,
     private val torConfigFiles: TorConfigFiles,
     private val appVersionCode: Int,

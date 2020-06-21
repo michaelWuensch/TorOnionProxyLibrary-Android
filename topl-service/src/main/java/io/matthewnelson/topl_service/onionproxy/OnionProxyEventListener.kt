@@ -5,6 +5,18 @@ import io.matthewnelson.topl_android.listener.BaseEventListener
 import io.matthewnelson.topl_service.service.TorService
 import net.freehaven.tor.control.TorControlCommands
 
+/**
+ * [io.matthewnelson.topl_android.OnionProxyManager] registers this class in it's
+ * [io.matthewnelson.topl_android.OnionProxyManager.start] method such that messages from
+ * Tor get funneled here. They get modify as needed, then shipped to it's final destination.
+ *
+ * TODO: Decide whether or not I wish to ship it directly to
+ *  [io.matthewnelson.topl_service.TorServiceController.Companion] as a Flow so library
+ *  users can easily hook in, or if the EventBroadcaster should... (Might be too confusing).
+ *
+ *  @param [torService] [TorService] for context.
+ *  @param [eventBroadcaster] [OnionProxyEventBroadcaster] for broadcasting data.
+ * */
 internal class OnionProxyEventListener(
     private val torService: TorService,
     private val eventBroadcaster: OnionProxyEventBroadcaster

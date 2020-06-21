@@ -1,21 +1,32 @@
 package io.matthewnelson.topl_service.onionproxy
 
-import android.content.Context
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.matthewnelson.topl_android.broadcaster.DefaultEventBroadcaster
-import io.matthewnelson.topl_android_settings.TorSettings
+import io.matthewnelson.topl_service.service.TorService
+import io.matthewnelson.topl_service_settings.TorServiceSettings
 
-class OnionProxyEventBroadcaster(
-    private val context: Context,
-    private val torSettings: TorSettings
+/**
+ * [io.matthewnelson.topl_android.OnionProxyManager] utilizes this customized class for
+ * broadcasting things while it is operating (such as Tor's State, operation errors,
+ * debugging, etc).
+ *
+ * [OnionProxyEventListener] utilizes this class by sending it what Tor is spitting out
+ * (selectively curated, ofc).
+ *
+ * @param [torService] [TorService] for context.
+ * @param [torSettings] [TorServiceSettings]
+ * */
+internal class OnionProxyEventBroadcaster(
+    private val torService: TorService,
+    private val torSettings: TorServiceSettings
 ): DefaultEventBroadcaster(torSettings) {
 
-    private companion object {
-        const val TAG = "EventBroadcaster"
+    companion object {
+        private const val TAG = "EventBroadcaster"
     }
 
-    private val broadcastManager = LocalBroadcastManager.getInstance(context)
+    private val broadcastManager = LocalBroadcastManager.getInstance(torService.applicationContext)
 
     override fun broadcastBandwidth(upload: Long, download: Long, written: Long, read: Long) {
         Log.d(TAG, "BANDWIDTH__upload: $upload, download: $download, written: $written, read: $read")

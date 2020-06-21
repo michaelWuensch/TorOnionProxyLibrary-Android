@@ -24,9 +24,9 @@ class App: Application() {
                 "TorService Channel",
                 "Tor Channel",
                 "My Sample Application",
-                6156)
+                615)
             .setActivityToBeOpenedOnTap(MainActivity::class.java, null, null, null)
-            .applySettings()
+            .applyNotificationSettings()
             .build()
     }
 }

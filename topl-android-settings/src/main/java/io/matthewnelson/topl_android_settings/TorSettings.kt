@@ -16,7 +16,7 @@ package io.matthewnelson.topl_android_settings
  *
  *     https://2019.www.torproject.org/docs/tor-manual.html.en
  *
- * @sample [io.matthewnelson.topl_service_settings.TestTorSettings]
+ * @sample [io.matthewnelson.sampleapp.MyTorSettings]
  * */
 abstract class TorSettings: SettingsConsts() {
 
