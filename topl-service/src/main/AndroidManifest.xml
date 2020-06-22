@@ -1,0 +1,13 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="io.matthewnelson.topl_service">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <application>
+        <!-- Don't want to use stopWithTask b/c we need to interrupt the shutdown and -->
+        <!-- restart Tor if the user opens the application again before the service stops. -->
+        <service android:name="io.matthewnelson.topl_service.service.TorService"
+            android:enabled="true" android:exported="false" />
+    </application>
+</manifest>

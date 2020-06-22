@@ -1,0 +1,53 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion versions.compileSdk
+    buildToolsVersion "29.0.3"
+
+    defaultConfig {
+        applicationId "io.matthewnelson.sampleapp"
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.compileSdk
+        versionCode 1
+        versionName VERSION_NAME
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments disableAnalytics: 'true'
+        consumerProguardFiles 'proguard-rules.pro'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation project(':topl-core-base')
+    implementation project(':topl-service')
+    implementation deps.kotlin.stdlib
+    implementation deps.androidx.core
+    implementation deps.androidx.appCompat
+    implementation deps.androidx.constraintLayout
+
+    testImplementation deps.junit
+
+    androidTestImplementation deps.androidx.test.core
+    androidTestImplementation deps.androidx.test.espresso
+    androidTestImplementation deps.androidx.test.junit
+
+}

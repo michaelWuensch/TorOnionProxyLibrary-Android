@@ -1,3 +1,5 @@
-rootProject.name = 'topl-kotlin-android'
-include ':topl-android'
-include ':topl-android-settings'
+rootProject.name = 'TorOnionProxyLibrary-Android'
+include ':sampleapp'
+include ':topl-core'
+include ':topl-core-base'
+include ':topl-service'
