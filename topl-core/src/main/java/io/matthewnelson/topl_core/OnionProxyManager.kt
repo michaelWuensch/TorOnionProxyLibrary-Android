@@ -41,6 +41,7 @@ import io.matthewnelson.topl_core.util.OnionProxyConsts.ConfigFile
 import io.matthewnelson.topl_core.util.FileUtilities
 import io.matthewnelson.topl_core.util.WriteObserver
 import io.matthewnelson.topl_core_base.TorStates
+import net.freehaven.tor.control.EventListener
 import net.freehaven.tor.control.TorControlCommands
 import net.freehaven.tor.control.TorControlConnection
 import org.slf4j.Logger
@@ -61,20 +62,22 @@ import java.util.concurrent.TimeUnit
  *
  * This class began life as TorPlugin from the Briar Project
  *
- * @param [context] Context
+ * @param [context] Context.
  * @param [onionProxyContext] [OnionProxyContext]
- * @param [eventBroadcaster] [EventBroadcaster]? will fallback to defaults if null
- * @param [baseEventListener] [BaseEventListener]? will fallback to defaults if null
+ * @param [eventBroadcaster] [EventBroadcaster]? will fallback to defaults if null.
+ * @param [primaryEventListener] [BaseEventListener]? will fallback to defaults if null.
+ * @param [additionalEventListeners] Array<[EventListener]?>? add additional listeners at Tor [start].
  */
 class OnionProxyManager(
     private val context: Context,
     val onionProxyContext: OnionProxyContext,
     eventBroadcaster: EventBroadcaster?,
-    baseEventListener: BaseEventListener?
+    primaryEventListener: BaseEventListener?,
+    private val additionalEventListeners: Array<EventListener?>?
 ): TorStates() {
 
     val eventBroadcaster = eventBroadcaster ?: DefaultEventBroadcaster(onionProxyContext.torSettings)
-    private val eventListener = baseEventListener ?: DefaultEventListener()
+    private val eventListener = primaryEventListener ?: DefaultEventListener()
 
     private companion object {
         const val OWNER = "__OwningControllerProcess"
@@ -431,7 +434,15 @@ class OnionProxyManager(
 
             if (eventListener.CONTROL_COMMAND_EVENTS.isNotEmpty()) {
                 eventBroadcaster.broadcastNotice("adding control port event listener")
+
                 controlConnection.addRawEventListener(eventListener)
+                if (!additionalEventListeners.isNullOrEmpty())
+                    additionalEventListeners.forEach { listener ->
+                        listener?.let {
+                            controlConnection.addRawEventListener(it)
+                        }
+                    }
+
                 controlConnection.setEvents(listOf(*eventListener.CONTROL_COMMAND_EVENTS))
                 eventBroadcaster.broadcastNotice("SUCCESS added control port event listener")
             }
