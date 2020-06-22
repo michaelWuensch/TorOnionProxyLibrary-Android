@@ -8,22 +8,22 @@ This is a Fork of the <a href="https://github.com/thaliproject/Tor_Onion_Proxy_L
 It's been rebuilt from the ground up and engineered specifically for Android, where it was
 once multiplatform. It's been re-written in Kotlin, refactored to solve its concurrency
 issues (among many others), and documented (still a work in progress). There are still
-many `Exceptions` that I'm sure have been missed being documented, but it's an ongoing
-process to improve reliability.
+`Exceptions` that I'm sure I've missed annotating as there were little to none documented
+pre-refactor, but it's an ongoing process to improve reliability/usability.
 
 **What does it do?**  
 The `topl-core` module contains the guts of operations for setting up a file system
 in your application's data directory which Tor needs to run. It is the medium for which
 other libraries built atop it access the TorProcess. The `topl-core-base` module contains
 the base classes needed so that a library user of the `topl-service` module (or any other
-library built on top of `topl-core`), doesn't rely directly on core and only needs to
-import `topl-core-base` to set things up.
+library built on top of `topl-core`), won't need to rely directly on core and only needs to
+import `topl-core-base` to get things set up.
 
 The `topl-service` module is built atop the core modules and provide a simple way to embed
 Tor as a foreground service into your application. It abstracts the technical &
-difficult to understand things from `topl-core` away, and boils things down into an easy
-to implement/use Library. Documentation on this will be provided upon release (it's suuuuuuuper
-simple and customizable to your liking ;-D!).
+difficult to understand things from `topl-core` away, and boils them down to an easy
+to implement/use Library. Documentation on this will be provided upon release (it's
+suuuuuuuper simple to implement and customizable to your liking ;-D!).
 
 **What's the current Progress?**  
 Tor is running very reliably. Start/stop works great on API 16-29 (Still needs much
@@ -35,18 +35,18 @@ play around with it.
  - Import dependenies into your Android App.
  - Extend the `TorSettings` class (used to build the `torrc` file) and configure it to your
  liking (I've made it as easy as I could to understand and provide default values to use. See
- the `SampleApp`'s `MyTorSettings` class).
+ the `sampleapp: MyTorSettings` class, or the documentation in the `topl-core-base: TorSettings` class).
  - Initialize things by implementing the `TorServiceController.Builder` in your
  `Application` class' `onCreate` and customize it as desired.
  - Call `TorServiceController.startTor`/`stopTor`/`restartTor`/`newIdentity`
  - That's it...
  
 **Plans for more**  
- - Enabling the passing of commands directly to the TorProcess which gives you full control
+ - Enable the passing of commands directly to the TorProcess which gives you full control
  over it.
  - An `onSharedPreferenceChangedListener` so that when your users modify settings and you
- save them to SharedPreferences via the `TorServicePrefs` class, those settings which don't
- require a restart of the TorProcess will be applied automatically.
+ save them to SharedPreferences via the `topl-service: TorServicePrefs` class, those settings
+ will be applied immediately (if not requiring a restart of Tor, ofc).
  - Making Bridge support easier to use. Things are not yet hooked up for it in the `topl-service`
  module, but are working in `topl-core`.
  - Access control for authenticating to v3 Hidden Services.
@@ -55,7 +55,7 @@ play around with it.
  
  **How do I play with it now?**  
  - Clone the repo
- - Initilize the get submodules
+ - Initilize the git submodules
  - If you cannot run Bash scripts:
      - In the `topl-core` module's `build.gradle` file, comment out the `gradle.projectsEvaluated`
      block located at the bottom of the file.
