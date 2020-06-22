@@ -3,6 +3,7 @@ package io.matthewnelson.topl_service.onionproxy
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.matthewnelson.topl_core.broadcaster.DefaultEventBroadcaster
+import io.matthewnelson.topl_service.model.ServiceNotification
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.service.TorServiceSettings
 
@@ -26,10 +27,29 @@ internal class OnionProxyEventBroadcaster(
         private const val TAG = "EventBroadcaster"
     }
 
-    private val broadcastManager = LocalBroadcastManager.getInstance(torService.applicationContext)
+    private val broadcastManager = LocalBroadcastManager.getInstance(torService)
 
-    override fun broadcastBandwidth(upload: Long, download: Long, written: Long, read: Long) {
-        Log.d(TAG, "BANDWIDTH__upload: $upload, download: $download, written: $written, read: $read")
+    private var bytesRead = 0L
+    private var bytesWritten = 0L
+    override fun broadcastBandwidth(bytesRead: String, bytesWritten: String) {
+        val read =
+            try {
+                bytesRead.toLong()
+            } catch (e: NumberFormatException) {
+                this.bytesRead
+            }
+        val written =
+            try {
+                bytesWritten.toLong()
+            } catch (e: NumberFormatException) {
+                this.bytesWritten
+            }
+
+        if (read != this.bytesRead || written != this.bytesWritten) {
+            this.bytesRead = read
+            this.bytesWritten = written
+            ServiceNotification.get().updateBandwidth(this.bytesRead, this.bytesWritten)
+        }
     }
 
     override fun broadcastDebug(msg: String) {

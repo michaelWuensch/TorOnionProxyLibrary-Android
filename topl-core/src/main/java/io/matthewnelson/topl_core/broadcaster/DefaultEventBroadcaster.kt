@@ -28,7 +28,7 @@ open class DefaultEventBroadcaster(private val torSettings: TorSettings) : Event
         val LOG: Logger = LoggerFactory.getLogger(DefaultEventBroadcaster::class.java)
     }
 
-    override fun broadcastBandwidth(upload: Long, download: Long, written: Long, read: Long) {}
+    override fun broadcastBandwidth(bytesRead: String, bytesWritten: String) {}
 
     override fun broadcastDebug(msg: String) {
         if (torSettings.hasDebugLogs)

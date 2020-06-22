@@ -93,8 +93,13 @@ internal class OnionProxyEventListener(
         Log.d(TAG, "TRANSPORT_LAUNCHED__$data")
     }
 
+    // https://torproject.gitlab.io/torspec/control-spec/#bandwidth-used-in-the-last-second
     override fun bandwidthUsed(data: String?) {
-        Log.d(TAG, "BANDWIDTH_USED__$data")
+        if (data != null) {
+            val dataList = data.split(" ")
+            if (dataList.size == 2)
+                eventBroadcaster.broadcastBandwidth(dataList[0], dataList[1])
+        }
     }
 
     override fun addrMap(data: String?) {

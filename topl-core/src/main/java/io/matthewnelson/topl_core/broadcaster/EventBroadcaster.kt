@@ -29,7 +29,14 @@ abstract class EventBroadcaster: TorStates() {
             stateMachine
         }
 
-    abstract fun broadcastBandwidth(upload: Long, download: Long, written: Long, read: Long)
+    /**
+     * Used by the [io.matthewnelson.topl_core.listener.BaseEventListener] to pipe the
+     * connection bandwidth here.
+     *
+     * @param [bytesRead] bytes downloaded
+     * @param [bytesWritten] bytes uploaded
+     * */
+    abstract fun broadcastBandwidth(bytesRead: String, bytesWritten: String)
 
     abstract fun broadcastDebug(msg: String)
 

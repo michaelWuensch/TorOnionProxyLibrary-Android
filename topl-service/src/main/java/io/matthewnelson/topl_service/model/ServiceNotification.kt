@@ -12,6 +12,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.NotificationVisibility
 import io.matthewnelson.topl_service.R
 import io.matthewnelson.topl_service.service.TorService
+import java.text.NumberFormat
+import java.util.*
 
 /**
  * Everything to do with [TorService]'s notification.
@@ -63,7 +65,11 @@ internal class ServiceNotification(
     }
 
     private lateinit var notificationBuilder: NotificationCompat.Builder
+    private lateinit var notificationManager: NotificationManager
 
+    ////////////////////////////
+    /// Notification Channel ///
+    ////////////////////////////
     /**
      * Called once per application start in
      * [io.matthewnelson.topl_service.TorServiceController.Builder.build]
@@ -80,9 +86,15 @@ internal class ServiceNotification(
             channel.description = channelDescription
             channel.setSound(null, null)
             nm?.createNotificationChannel(channel)
+            nm?.let {
+                notificationManager = it
+            }
         }
     }
 
+    ///////////////////////////////////////
+    /// Initializing Foreground Service ///
+    ///////////////////////////////////////
     /**
      * Called at [TorService.onCreate] and sets the [notificationBuilder] variable such that
      * it can be re-used/updated throughout the lifecycle of the service.
@@ -122,4 +134,37 @@ internal class ServiceNotification(
             PendingIntent.FLAG_UPDATE_CURRENT
         )
     }
+
+    /////////////////
+    /// Bandwidth ///
+    /////////////////
+    private val numberFormat = NumberFormat.getInstance(Locale.getDefault())
+
+    fun updateBandwidth(download: Long, upload: Long) {
+        val builder = notificationBuilder
+        builder.setContentText("${formatBandwidth(download)} ↓ / ${formatBandwidth(upload)} ↑")
+
+        if (download == 0L && upload == 0L)
+            builder.setSmallIcon(imageOn)
+        else
+            builder.setSmallIcon(imageData)
+
+        if (::notificationManager.isInitialized)
+            notificationManager.notify(notificationID, builder.build())
+        notificationBuilder = builder
+    }
+
+    // Obtained from: https://gitweb.torproject.org/tor-android-service.git/tree/service/
+    //                src/main/java/org/torproject/android/service/TorEventHandler.java
+    // Original method name: formatCount()
+    private fun formatBandwidth(value: Long): String =
+        if (value < 1e6)
+            numberFormat.format(
+                Math.round( ( ( (value * 10 / 1024 ).toInt() ) /10 ).toFloat() )
+            ) + "kbps"
+        else
+            numberFormat.format(
+                Math.round( ( ( (value * 100 / 1024 / 1024).toInt() ) /100 ).toFloat() )
+            ) + "mbps"
+
 }
