@@ -1,6 +1,6 @@
 package io.matthewnelson.sampleapp
 
-import io.matthewnelson.topl_android_settings.TorSettings
+import io.matthewnelson.topl_core_base.TorSettings
 
 /**
  * See [TorSettings] for comments on what is what.

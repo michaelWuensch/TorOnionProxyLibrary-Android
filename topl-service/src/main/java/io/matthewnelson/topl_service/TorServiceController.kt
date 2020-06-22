@@ -10,8 +10,8 @@ import io.matthewnelson.topl_service.model.ServiceNotification
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.service.ActionConsts.ServiceAction
 import androidx.core.app.NotificationCompat.NotificationVisibility
-import io.matthewnelson.topl_android_settings.TorConfigFiles
-import io.matthewnelson.topl_android_settings.TorSettings
+import io.matthewnelson.topl_core_base.TorConfigFiles
+import io.matthewnelson.topl_core_base.TorSettings
 
 class TorServiceController private constructor() {
 
@@ -158,7 +158,7 @@ class TorServiceController private constructor() {
              * Defaults to Orbot/TorBrowser's icon.
              *
              * The small icon you wish to display when Tor's State is
-             * [io.matthewnelson.topl_android_settings.TorStates.TorState.ON].
+             * [io.matthewnelson.topl_core_base.TorStates.TorState.ON].
              *
              * See [Builder] for code samples.
              *
@@ -174,7 +174,7 @@ class TorServiceController private constructor() {
              * Defaults to Orbot/TorBrowser's icon.
              *
              * The small icon you wish to display when Tor's State is
-             * [io.matthewnelson.topl_android_settings.TorStates.TorState.OFF].
+             * [io.matthewnelson.topl_core_base.TorStates.TorState.OFF].
              *
              * See [Builder] for code samples.
              *
@@ -220,7 +220,7 @@ class TorServiceController private constructor() {
              * Defaults to white
              *
              * The color you wish to display when Tor's State is
-             * [io.matthewnelson.topl_android_settings.TorStates.TorState.ON].
+             * [io.matthewnelson.topl_core_base.TorStates.TorState.ON].
              *
              * See [Builder] for code samples.
              *

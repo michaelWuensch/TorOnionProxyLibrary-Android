@@ -7,11 +7,11 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.IBinder
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import io.matthewnelson.topl_android.OnionProxyContext
-import io.matthewnelson.topl_android.OnionProxyManager
+import io.matthewnelson.topl_core.OnionProxyContext
+import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_service.model.ServiceNotification
-import io.matthewnelson.topl_android_settings.TorConfigFiles
-import io.matthewnelson.topl_android_settings.TorSettings
+import io.matthewnelson.topl_core_base.TorConfigFiles
+import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.onionproxy.OnionProxyEventBroadcaster
 import io.matthewnelson.topl_service.onionproxy.OnionProxyEventListener
 import io.matthewnelson.topl_service.onionproxy.OnionProxyInstaller

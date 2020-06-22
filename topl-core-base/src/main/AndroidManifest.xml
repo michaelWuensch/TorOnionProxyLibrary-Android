@@ -1,2 +1,2 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="io.matthewnelson.topl_service_prefs" />
+    package="io.matthewnelson.topl_core_base" />

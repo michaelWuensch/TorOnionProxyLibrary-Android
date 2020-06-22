@@ -1,10 +1,10 @@
 package io.matthewnelson.topl_service.onionproxy
 
 import android.content.Context
-import io.matthewnelson.topl_android.util.FileUtilities
-import io.matthewnelson.topl_android.util.TorInstaller
-import io.matthewnelson.topl_android_settings.SettingsConsts.SupportedBridges
-import io.matthewnelson.topl_android_settings.TorConfigFiles
+import io.matthewnelson.topl_core.util.FileUtilities
+import io.matthewnelson.topl_core.util.TorInstaller
+import io.matthewnelson.topl_core_base.SettingsConsts.SupportedBridges
+import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_service.BuildConfig
 import io.matthewnelson.topl_service.R
 import io.matthewnelson.topl_service_prefs.PrefsKeys.ListKey

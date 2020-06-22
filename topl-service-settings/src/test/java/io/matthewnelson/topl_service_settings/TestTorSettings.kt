@@ -1,6 +1,6 @@
 package io.matthewnelson.topl_service_settings
 
-import io.matthewnelson.topl_android_settings.TorSettings
+import io.matthewnelson.topl_core_base.TorSettings
 
 class TestTorSettings: TorSettings() {
 

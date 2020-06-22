@@ -1,13 +1,13 @@
 package io.matthewnelson.topl_service.onionproxy
 
 import android.util.Log
-import io.matthewnelson.topl_android.listener.BaseEventListener
+import io.matthewnelson.topl_core.listener.BaseEventListener
 import io.matthewnelson.topl_service.service.TorService
 import net.freehaven.tor.control.TorControlCommands
 
 /**
- * [io.matthewnelson.topl_android.OnionProxyManager] registers this class in it's
- * [io.matthewnelson.topl_android.OnionProxyManager.start] method such that messages from
+ * [io.matthewnelson.topl_core.OnionProxyManager] registers this class in it's
+ * [io.matthewnelson.topl_core.OnionProxyManager.start] method such that messages from
  * Tor get funneled here. They get modify as needed, then shipped to it's final destination.
  *
  * TODO: Decide whether or not I wish to ship it directly to

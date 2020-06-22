@@ -1,7 +1,7 @@
 package io.matthewnelson.topl_service_settings
 
 import android.content.Context
-import io.matthewnelson.topl_android_settings.TorSettings
+import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service_prefs.PrefsKeys.IntKey
 import io.matthewnelson.topl_service_prefs.PrefsKeys.StringKey
 import io.matthewnelson.topl_service_prefs.PrefsKeys.ListKey
