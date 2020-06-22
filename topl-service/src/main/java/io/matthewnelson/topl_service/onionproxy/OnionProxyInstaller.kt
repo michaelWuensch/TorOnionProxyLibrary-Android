@@ -17,7 +17,7 @@ import java.util.concurrent.TimeoutException
  *
  * @param [torService] for context.
  * @param [torConfigFiles] [TorConfigFiles] to know where files/directories are.
- * @param [appVersionCode] Mitigate copying of geoip files to app updates only. Use [BuildConfig.VERSION_CODE].
+ * @param [buildConfigVersionCode] Mitigate copying of geoip files to app updates only. Use [BuildConfig.VERSION_CODE].
  * @param [geoIpAssetPath] The path to geoip file within the application, ex: "common/geoip"
  * @param [geoIp6AssetPath] The path to geoip6 file within the application, ex: "common/geoip6"
  *
@@ -26,7 +26,7 @@ import java.util.concurrent.TimeoutException
 internal class OnionProxyInstaller(
     private val torService: TorService,
     private val torConfigFiles: TorConfigFiles,
-    private val appVersionCode: Int,
+    private val buildConfigVersionCode: Int,
     private val geoIpAssetPath: String,
     private val geoIp6AssetPath: String
 ): TorInstaller() {
@@ -45,13 +45,16 @@ internal class OnionProxyInstaller(
             geoIp6FileCoppied = ""
 
         // If the app version has been increased, or if this is a debug build of topl-service
-        // module, copy over geoip assets then update SharedPreferences with the new appVersion
-        if (appVersionCode > prefs.getInt("APP_VERSION", -1) ?: -1 || BuildConfig.DEBUG) {
+        // module, copy over geoip assets then update SharedPreferences with the updated
+        // version code. Mitigates copying to be done only if a version upgrade is had.
+        if (buildConfigVersionCode > prefs.getInt("BUILD_CONFIG_VERSION_CODE", -1) ?: -1 ||
+            BuildConfig.DEBUG
+        ) {
             if (!::geoIpFileCoppied.isInitialized)
                 copyAsset(geoIpAssetPath, torConfigFiles.geoIpFile)
             if (!::geoIp6FileCoppied.isInitialized)
                 copyAsset(geoIp6AssetPath, torConfigFiles.geoIpv6File)
-            prefs.putInt("APP_VERSION", appVersionCode)
+            prefs.putInt("BUILD_CONFIG_VERSION_CODE", buildConfigVersionCode)
         }
     }
 

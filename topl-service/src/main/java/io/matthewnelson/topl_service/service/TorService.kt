@@ -16,28 +16,32 @@ import io.matthewnelson.topl_service.onionproxy.OnionProxyEventBroadcaster
 import io.matthewnelson.topl_service.onionproxy.OnionProxyEventListener
 import io.matthewnelson.topl_service.onionproxy.OnionProxyInstaller
 import io.matthewnelson.topl_service.service.ActionConsts.ServiceAction
+import net.freehaven.tor.control.EventListener
 
 internal class TorService: Service() {
 
     companion object {
         private lateinit var torConfigFiles: TorConfigFiles
         private lateinit var torSettings: TorSettings
-        private var buildConfigVersion: Int = -1
+        private var additionalEventListener: EventListener? = null
+        private var buildConfigVersionCode: Int = -1
         private lateinit var geoipAssetPath: String
         private lateinit var geoip6AssetPath: String
 
         fun initialize(
-            config: TorConfigFiles,
-            settings: TorSettings,
-            buildVersion: Int,
-            geoipPath: String,
-            geoip6Path: String
+            torConfigFiles: TorConfigFiles,
+            torSettings: TorSettings,
+            additionalEventListener: EventListener?,
+            buildConfigVersionCode: Int,
+            geoipAssetPath: String,
+            geoip6AssetPath: String
         ) {
-            torConfigFiles = config
-            torSettings = settings
-            buildConfigVersion = buildVersion
-            geoipAssetPath = geoipPath
-            geoip6AssetPath = geoip6Path
+            this.torConfigFiles = torConfigFiles
+            this.torSettings = torSettings
+            this.additionalEventListener = additionalEventListener
+            this.buildConfigVersionCode = buildConfigVersionCode
+            this.geoipAssetPath = geoipAssetPath
+            this.geoip6AssetPath = geoip6AssetPath
         }
 
         // Intents/LocalBroadcastManager
@@ -59,7 +63,7 @@ internal class TorService: Service() {
         val onionProxyInstaller = OnionProxyInstaller(
             this,
             torConfigFiles,
-            buildConfigVersion,
+            buildConfigVersionCode,
             geoipAssetPath,
             geoip6AssetPath
         )
@@ -69,11 +73,13 @@ internal class TorService: Service() {
             torServiceSettings
         )
         val onionProxyEventBroadcaster = OnionProxyEventBroadcaster(this, torServiceSettings)
+        val onionProxyEventListener = OnionProxyEventListener(this, onionProxyEventBroadcaster)
         onionProxyManager = OnionProxyManager(
             this,
             onionProxyContext,
             onionProxyEventBroadcaster,
-            OnionProxyEventListener(this, onionProxyEventBroadcaster)
+            onionProxyEventListener,
+            arrayOf(additionalEventListener)
         )
         onionProxyManager.setup()
     }

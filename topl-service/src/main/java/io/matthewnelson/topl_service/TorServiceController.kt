@@ -12,6 +12,7 @@ import io.matthewnelson.topl_service.service.ActionConsts.ServiceAction
 import androidx.core.app.NotificationCompat.NotificationVisibility
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
+import net.freehaven.tor.control.EventListener
 
 class TorServiceController private constructor() {
 
@@ -57,6 +58,7 @@ class TorServiceController private constructor() {
     ) {
 
         private lateinit var torConfigFiles: TorConfigFiles
+        private lateinit var additionalEventListener: EventListener
 
         /**
          * If you wish to customize the file structure of how Tor is installed in your app,
@@ -74,6 +76,26 @@ class TorServiceController private constructor() {
          * */
         fun useCustomTorConfigFiles(torConfigFiles: TorConfigFiles): Builder {
             this.torConfigFiles = torConfigFiles
+            return this
+        }
+
+        /**
+         * This will require adding the `jtorctl` library:
+         *
+         *  - Add `implementation "info.guardianproject:jtorctl:0.4"` to your dependencies block
+         *
+         * Extend the [EventListener] class and implement the overridden methods. It will be
+         * registered when Tor is started up so messages from Tor will be piped to it.
+         *
+         * This is limited to adding only 1 event listener. Also, see which
+         *
+         * See [io.matthewnelson.topl_service.onionproxy.OnionProxyEventListener] for an example
+         * and what `CONTROL_COMMAND_EVENTS` will be registered to be listened for.
+         *
+         * @param [jtorctlEventListener] [EventListener]
+         * */
+        fun addTorEventListener(jtorctlEventListener: EventListener): Builder {
+            this.additionalEventListener = jtorctlEventListener
             return this
         }
 
@@ -302,10 +324,16 @@ class TorServiceController private constructor() {
                 } else {
                     TorConfigFiles.createConfig(context.applicationContext)
                 }
+            val eventListener =
+                if (::additionalEventListener.isInitialized)
+                    this.additionalEventListener
+                else
+                    null
 
             TorService.initialize(
                 torConfigFiles,
                 torSettings,
+                eventListener,
                 buildConfigVersion,
                 geoipAssetPath,
                 geoip6AssetPath
