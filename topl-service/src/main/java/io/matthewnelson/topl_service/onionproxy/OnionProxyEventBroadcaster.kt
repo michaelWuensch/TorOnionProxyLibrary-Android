@@ -3,7 +3,9 @@ package io.matthewnelson.topl_service.onionproxy
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.matthewnelson.topl_core.broadcaster.DefaultEventBroadcaster
-import io.matthewnelson.topl_service.model.ServiceNotification
+import io.matthewnelson.topl_service.notification.NotificationConsts
+import io.matthewnelson.topl_service.notification.NotificationConsts.ImageState
+import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.service.TorServiceSettings
 
@@ -48,7 +50,12 @@ internal class OnionProxyEventBroadcaster(
         if (read != this.bytesRead || written != this.bytesWritten) {
             this.bytesRead = read
             this.bytesWritten = written
-            ServiceNotification.get().updateBandwidth(this.bytesRead, this.bytesWritten)
+            ServiceNotification.get().updateBandwidth(read, written)
+
+            if (read == 0L && written == 0L)
+                ServiceNotification.get().updateIcon(ImageState.ON)
+            else
+                ServiceNotification.get().updateIcon(ImageState.DATA)
         }
     }
 

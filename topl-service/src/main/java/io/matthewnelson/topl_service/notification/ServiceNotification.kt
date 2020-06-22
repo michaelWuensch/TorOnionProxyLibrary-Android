@@ -1,4 +1,4 @@
-package io.matthewnelson.topl_service.model
+package io.matthewnelson.topl_service.notification
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -42,7 +42,8 @@ internal class ServiceNotification(
 
     var enableRestartButton: Boolean = false,
     var enableStopButton: Boolean = false
-) {
+): NotificationConsts() {
+
     companion object {
         private lateinit var serviceNotification: ServiceNotification
 
@@ -66,6 +67,14 @@ internal class ServiceNotification(
 
     private lateinit var notificationBuilder: NotificationCompat.Builder
     private lateinit var notificationManager: NotificationManager
+    private val notifyLock = Object()
+
+    private fun notify(builder: NotificationCompat.Builder) {
+        notificationBuilder = builder
+        if (::notificationManager.isInitialized)
+            notificationManager.notify(notificationID, builder.build())
+    }
+
 
     ////////////////////////////
     /// Notification Channel ///
@@ -91,9 +100,10 @@ internal class ServiceNotification(
         }
     }
 
-    ///////////////////////////////////////
-    /// Initializing Foreground Service ///
-    ///////////////////////////////////////
+
+    //////////////////////////
+    /// Foreground Service ///
+    //////////////////////////
     /**
      * Called at [TorService.onCreate] and sets the [notificationBuilder] variable such that
      * it can be re-used/updated throughout the lifecycle of the service.
@@ -134,24 +144,18 @@ internal class ServiceNotification(
         )
     }
 
+
     /////////////////
     /// Bandwidth ///
     /////////////////
     private val numberFormat = NumberFormat.getInstance(Locale.getDefault())
 
-    fun updateBandwidth(download: Long, upload: Long) {
-        val builder = notificationBuilder
-        builder.setContentText("${formatBandwidth(download)} ↓ / ${formatBandwidth(upload)} ↑")
-
-        if (download == 0L && upload == 0L)
-            builder.setSmallIcon(imageOn)
-        else
-            builder.setSmallIcon(imageData)
-
-        if (::notificationManager.isInitialized)
-            notificationManager.notify(notificationID, builder.build())
-        notificationBuilder = builder
-    }
+    fun updateBandwidth(download: Long, upload: Long) =
+        synchronized(notifyLock) {
+            val builder = notificationBuilder
+            builder.setContentText("${formatBandwidth(download)} ↓ / ${formatBandwidth(upload)} ↑")
+            notify(builder)
+        }
 
     // Obtained from: https://gitweb.torproject.org/tor-android-service.git/tree/service/
     //                src/main/java/org/torproject/android/service/TorEventHandler.java
@@ -166,4 +170,28 @@ internal class ServiceNotification(
                 Math.round( ( ( (value * 100 / 1024 / 1024).toInt() ) /100 ).toFloat() )
             ) + "mbps"
 
+
+    ////////////
+    /// Icon ///
+    ////////////
+    fun updateIcon(@ImageState imageState: Int) =
+        synchronized(notifyLock) {
+            val builder = notificationBuilder
+            when (imageState) {
+                ImageState.ON -> {
+                    builder.setSmallIcon(imageOn)
+                }
+                ImageState.OFF -> {
+                    builder.setSmallIcon(imageOff)
+                }
+                ImageState.DATA -> {
+                    builder.setSmallIcon(imageData)
+                }
+                ImageState.ERROR -> {
+                    builder.setSmallIcon(imageError)
+                }
+                else -> {}
+            }
+            notify(builder)
+        }
 }
