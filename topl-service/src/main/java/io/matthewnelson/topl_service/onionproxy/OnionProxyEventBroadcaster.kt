@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.matthewnelson.topl_core.broadcaster.DefaultEventBroadcaster
 import io.matthewnelson.topl_service.service.TorService
-import io.matthewnelson.topl_service_settings.TorServiceSettings
+import io.matthewnelson.topl_service.service.TorServiceSettings
 
 /**
  * [io.matthewnelson.topl_core.OnionProxyManager] utilizes this customized class for

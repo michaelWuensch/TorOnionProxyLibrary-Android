@@ -1,25 +1,26 @@
-package io.matthewnelson.topl_service_settings
+package io.matthewnelson.topl_service.service
 
 import android.content.Context
 import io.matthewnelson.topl_core_base.TorSettings
-import io.matthewnelson.topl_service_prefs.PrefsKeys.IntKey
-import io.matthewnelson.topl_service_prefs.PrefsKeys.StringKey
-import io.matthewnelson.topl_service_prefs.PrefsKeys.ListKey
-import io.matthewnelson.topl_service_prefs.PrefsKeys.BooleanKey
-import io.matthewnelson.topl_service_prefs.TorServicePrefs
+import io.matthewnelson.topl_service.util.PrefsKeys.IntKey
+import io.matthewnelson.topl_service.util.PrefsKeys.StringKey
+import io.matthewnelson.topl_service.util.PrefsKeys.ListKey
+import io.matthewnelson.topl_service.util.PrefsKeys.BooleanKey
+import io.matthewnelson.topl_service.util.TorServicePrefs
 
 
 /**
  * This class is for enabling the updating of settings in a standardized manner
  * such that library users can simply instantiate [TorServicePrefs], change things,
- * and then call restartTor to have them applied.
+ * and then call [io.matthewnelson.topl_service.TorServiceController.restartTor] to have
+ * them applied to the Tor Process.
  *
  * @param [defaults] Default values to fall back on if nothing is returned from [TorServicePrefs]
- * @param [context] To instantiate [TorServicePrefs]
+ * @param [torService] To instantiate [TorServicePrefs]
  * */
-class TorServiceSettings(private val defaults: TorSettings, context: Context): TorSettings() {
+internal class TorServiceSettings(private val defaults: TorSettings, torService: TorService): TorSettings() {
 
-    private val prefs = TorServicePrefs(context)
+    private val prefs = TorServicePrefs(torService)
 
     override val disableNetwork: Boolean
         get() = prefs.getBoolean(BooleanKey.DISABLE_NETWORK, defaults.disableNetwork)

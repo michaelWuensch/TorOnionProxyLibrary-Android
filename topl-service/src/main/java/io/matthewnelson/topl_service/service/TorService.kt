@@ -16,7 +16,6 @@ import io.matthewnelson.topl_service.onionproxy.OnionProxyEventBroadcaster
 import io.matthewnelson.topl_service.onionproxy.OnionProxyEventListener
 import io.matthewnelson.topl_service.onionproxy.OnionProxyInstaller
 import io.matthewnelson.topl_service.service.ActionConsts.ServiceAction
-import io.matthewnelson.topl_service_settings.TorServiceSettings
 
 internal class TorService: Service() {
 

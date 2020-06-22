@@ -1,16 +1,16 @@
-package io.matthewnelson.topl_service_prefs
+package io.matthewnelson.topl_service.util
 
 import android.content.Context
 import android.content.SharedPreferences
 
 /**
  * This class provides a standardized way for library users to change settings used
- * by `TorService` (ultimately TOPL) such that the values expressed as default
- * `TorSettings` sent to `TorService` via the Builder can be updated and then used after
- * restarting Tor.
+ * by [io.matthewnelson.topl_service.service.TorService] such that the values expressed
+ * as default [io.matthewnelson.topl_core_base.TorSettings] when initializing things via
+ * the [io.matthewnelson.topl_service.TorServiceController.Builder] can be updated. The
+ * values saved to [TorServicePrefs] are always preferred over the defaults declared.
  *
- * See the `topl-service-settings` module's `TorServiceSettings` class, which uses the
- * default `TorSettings` to fall back on if nothing is in SharedPreferences.
+ * See [io.matthewnelson.topl_service.service.TorServiceSettings]
  * */
 class TorServicePrefs(context: Context): PrefsKeys() {
 

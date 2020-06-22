@@ -1,35 +1,37 @@
 package io.matthewnelson.topl_service.onionproxy
 
-import android.content.Context
 import io.matthewnelson.topl_core.util.FileUtilities
 import io.matthewnelson.topl_core.util.TorInstaller
 import io.matthewnelson.topl_core_base.SettingsConsts.SupportedBridges
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_service.BuildConfig
 import io.matthewnelson.topl_service.R
-import io.matthewnelson.topl_service_prefs.PrefsKeys.ListKey
-import io.matthewnelson.topl_service_prefs.TorServicePrefs
+import io.matthewnelson.topl_service.service.TorService
+import io.matthewnelson.topl_service.util.PrefsKeys.ListKey
+import io.matthewnelson.topl_service.util.TorServicePrefs
 import java.io.*
 import java.util.concurrent.TimeoutException
 
 /**
  * Installs assets needed for Tor.
  *
- * @param [context]
- * @param [torConfigFiles] [TorConfigFiles] to know where files/directories are
- * @param [appVersionCode] To mitigate copying of geoip files to updates only. Use [BuildConfig.VERSION_CODE]
+ * @param [torService] for context.
+ * @param [torConfigFiles] [TorConfigFiles] to know where files/directories are.
+ * @param [appVersionCode] Mitigate copying of geoip files to app updates only. Use [BuildConfig.VERSION_CODE].
  * @param [geoIpAssetPath] The path to geoip file within the application, ex: "common/geoip"
  * @param [geoIp6AssetPath] The path to geoip6 file within the application, ex: "common/geoip6"
+ *
+ * See [io.matthewnelson.topl_service.TorServiceController.Builder]
  * */
 internal class OnionProxyInstaller(
-    private val context: Context,
+    private val torService: TorService,
     private val torConfigFiles: TorConfigFiles,
     private val appVersionCode: Int,
     private val geoIpAssetPath: String,
     private val geoIp6AssetPath: String
 ): TorInstaller() {
 
-    private val prefs = TorServicePrefs(context)
+    private val prefs = TorServicePrefs(torService)
     private lateinit var geoIpFileCoppied: String
     private lateinit var geoIp6FileCoppied: String
 
@@ -55,7 +57,7 @@ internal class OnionProxyInstaller(
 
     private fun copyAsset(assetPath: String, file: File) {
         FileUtilities.copy(
-            context.assets.open(assetPath),
+            torService.assets.open(assetPath),
             file.outputStream()
         )
     }
@@ -97,7 +99,7 @@ internal class OnionProxyInstaller(
             if (bridgeType.toInt() == 1)
                 ByteArrayInputStream(userDefinedBridgeList.toByteArray())
             else
-                context.resources.openRawResource(R.raw.bridges)
+                torService.resources.openRawResource(R.raw.bridges)
         return SequenceInputStream(bridgeTypeStream, bridgeStream)
     }
 

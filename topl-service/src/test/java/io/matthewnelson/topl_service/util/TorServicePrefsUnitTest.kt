@@ -1,4 +1,4 @@
-package io.matthewnelson.topl_service_prefs
+package io.matthewnelson.topl_service.util
 
 import androidx.test.core.app.ApplicationProvider
 import org.junit.Assert.assertEquals

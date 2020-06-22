@@ -20,14 +20,14 @@ class TorServiceController private constructor() {
      * for your application. Call it in `Application.onCreate` and follow along.
      *
      * A note about the [TorSettings] you send this. Those are the default settings which
-     * [TorService] will fall back on if [io.matthewnelson.topl_service_prefs.TorServicePrefs]
-     * has nothing in it for that particular [io.matthewnelson.topl_service_prefs.PrefsKeys].
+     * [TorService] will fall back on if [io.matthewnelson.topl_service.util.TorServicePrefs]
+     * has nothing in it for that particular [io.matthewnelson.topl_service.util.PrefsKeys].
      * The settings get written to the `torrc` file everytime Tor is started (I plan to make this
      * less sledgehammer-ish in the future).
      *
      * To update settings while your application is running you need only to instantiate
-     * [io.matthewnelson.topl_service_prefs.TorServicePrefs] and save the data using the
-     * appropriately annotated method and [io.matthewnelson.topl_service_prefs.PrefsKeys], then
+     * [io.matthewnelson.topl_service.util.TorServicePrefs] and save the data using the
+     * appropriately annotated method and [io.matthewnelson.topl_service.util.PrefsKeys], then
      * restart Tor (for now... ;-D).
      *
      * I plan to implement a
@@ -35,7 +35,7 @@ class TorServiceController private constructor() {
      * immediately for the settings that don't require a restart, but a stable release comes first).
      *
      * You can see how the [TorSettings] sent here are used in [TorService] by looking at
-     * [io.matthewnelson.topl_service_settings.TorServiceSettings] and [TorService.onCreate].
+     * [io.matthewnelson.topl_service.util.TorServiceSettings] and [TorService.onCreate].
      *
      * @param [context] Context
      * @param [buildConfigVersion] send [BuildConfig.VERSION_CODE]. Mitigates copying of geoip
@@ -332,7 +332,7 @@ class TorServiceController private constructor() {
         }
 
         /**
-         * Starts the TorService. Does nothing if called before the builder has gone off.
+         * Starts [TorService]. Does nothing if called before the builder has gone off.
          * */
         fun startTor() {
             if (!::appContext.isInitialized) return
@@ -345,19 +345,19 @@ class TorServiceController private constructor() {
         }
 
         /**
-         * Stops the TorService. Does nothing if called before the builder has gone off.
+         * Stops [TorService]. Does nothing if called before the builder has gone off.
          * */
         fun stopTor() =
             broadcastAction(ServiceAction.ACTION_STOP)
 
         /**
-         * Restarts the TorService. Does nothing if called before the builder has gone off.
+         * Restarts Tor. Does nothing if called before the builder has gone off.
          * */
         fun restartTor() =
             broadcastAction(ServiceAction.ACTION_RESTART)
 
         /**
-         * Renews the identity. Does nothing if called before the builder has gone off.
+         * Changes identities. Does nothing if called before the builder has gone off.
          * */
         fun newIdentity() =
             broadcastAction(ServiceAction.ACTION_NEW_ID)
