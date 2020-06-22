@@ -253,6 +253,17 @@ class OnionProxyManager(
             } catch (eeee: IOException) {}
 
         } finally {
+
+            try {
+                controlConnection!!.removeRawEventListener(eventListener)
+                if (!additionalEventListeners.isNullOrEmpty())
+                    additionalEventListeners.forEach { listener ->
+                        listener?.let {
+                            controlConnection!!.removeRawEventListener(it)
+                        }
+                    }
+            } catch (e: KotlinNullPointerException) {}
+
             controlConnection = null
             if (controlSocket != null) {
                 try {
