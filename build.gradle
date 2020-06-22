@@ -1,18 +1,23 @@
+buildscript {
+    apply from: "$rootDir/gradle/dependencies.gradle"
+
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath deps.androidGradlePlugin
+        classpath deps.kotlin.gradlePlugin
+    }
+}
+
 allprojects  {
-  apply plugin: 'maven'
-  group = 'com.msopentech.thali'
-  version = '0.0.3'
+    repositories {
+        google()
+        jcenter()
+    }
 }
 
-subprojects {
-  repositories {
-    mavenLocal()
-    mavenCentral()
-    maven { url "https://repo.spring.io/plugins-release" }
-  }
+task clean(type: Delete) {
+  delete rootProject.buildDir
 }
-
-evaluationDependsOn ":universal"
-evaluationDependsOn ":java"
-
-

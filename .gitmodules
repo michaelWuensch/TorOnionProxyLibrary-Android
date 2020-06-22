@@ -1,3 +1,8 @@
-[submodule "external/pluto"]
-	path = external/pluto
-	url = https://github.com/guardianproject/pluto.git
+[submodule "external/AndroidPluggableTransports"]
+	path = external/AndroidPluggableTransports
+	url = https://github.com/guardianproject/AndroidPluggableTransports.git
+	branch = master
+[submodule "external/tor-android"]
+	path = external/tor-android
+	url = https://github.com/guardianproject/tor-android.git
+	ignore = all

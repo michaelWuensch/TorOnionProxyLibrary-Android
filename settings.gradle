@@ -1,2 +1,5 @@
-rootProject.name = 'project'
-include 'universal', 'java', 'android', 'android_tor_installer'
+rootProject.name = 'TorOnionProxyLibrary-Android'
+include ':sampleapp'
+include ':topl-core'
+include ':topl-core-base'
+include ':topl-service'
