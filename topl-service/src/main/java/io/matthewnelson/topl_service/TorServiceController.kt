@@ -23,8 +23,8 @@ class TorServiceController private constructor() {
      * A note about the [TorSettings] you send this. Those are the default settings which
      * [TorService] will fall back on if [io.matthewnelson.topl_service.util.TorServicePrefs]
      * has nothing in it for that particular [io.matthewnelson.topl_service.util.PrefsKeys].
-     * The settings get written to the `torrc` file everytime Tor is started (I plan to make this
-     * less sledgehammer-ish in the future).
+     * The settings get written to the `torrc` file every time Tor is started (I plan to make
+     * this less sledgehammer-ish in the future).
      *
      * To update settings while your application is running you need only to instantiate
      * [io.matthewnelson.topl_service.util.TorServicePrefs] and save the data using the
@@ -36,7 +36,7 @@ class TorServiceController private constructor() {
      * immediately for the settings that don't require a restart, but a stable release comes first).
      *
      * You can see how the [TorSettings] sent here are used in [TorService] by looking at
-     * [io.matthewnelson.topl_service.util.TorServiceSettings] and [TorService.onCreate].
+     * [io.matthewnelson.topl_service.service.TorServiceSettings] and [TorService.onCreate].
      *
      * @param [context] Context
      * @param [buildConfigVersion] send [BuildConfig.VERSION_CODE]. Mitigates copying of geoip
@@ -87,10 +87,13 @@ class TorServiceController private constructor() {
          * Extend the [EventListener] class and implement the overridden methods. It will be
          * registered when Tor is started up so messages from Tor will be piped to it.
          *
-         * This is limited to adding only 1 event listener. Also, see which
+         * This is limited to adding only 1 [EventListener], so calling this builder method
+         * multiple times will only register the last one when Tor starts.
          *
          * See [io.matthewnelson.topl_service.onionproxy.OnionProxyEventListener] for an example
          * and what `CONTROL_COMMAND_EVENTS` will be registered to be listened for.
+         *
+         * TODO: Provide ability to add more CONTROL_COMMAND_EVENTS if desired by library user.
          *
          * @param [jtorctlEventListener] [EventListener]
          * */
@@ -104,11 +107,11 @@ class TorServiceController private constructor() {
          *
          * See [Builder] for code samples.
          *
-         * @param [channelName] Your notification channel's name.
-         * @param [channelID] Your notification channel's ID.
-         * @param [channelDescription] Your notification channel's description.
-         * @param [notificationID] Your foreground notification's ID
-         * @return [NotificationBuilder]
+         * @param [channelName] Your notification channel's name (cannot be empty).
+         * @param [channelID] Your notification channel's ID (cannot be empty).
+         * @param [channelDescription] Your notification channel's description (cannot be empty).
+         * @param [notificationID] Your foreground notification's ID.
+         * @return [NotificationBuilder] to obtain methods specific to notification customization.
          * */
         @Throws(IllegalArgumentException::class)
         fun customizeNotification(
@@ -134,8 +137,17 @@ class TorServiceController private constructor() {
 
         /**
          * Where you get to customize how your foreground notification will look/function.
+         * Calling [customizeNotification] will return this class to you which provides methods
+         * specific to customization of notifications. Call [applyNotificationSettings] when done
+         * to return to [Builder] to continue with it's methods for customization.
          *
          * See [Builder] for code samples.
+         *
+         * @param [builder] [Builder] To return to it when calling [applyNotificationSettings]
+         * @param [channelName] Your notification channel's name.
+         * @param [channelID] Your notification channel's ID.
+         * @param [channelDescription] Your notification channel's description.
+         * @param [notificationID] Your foreground notification's ID.
          * */
         class NotificationBuilder(
             private val builder: Builder,
