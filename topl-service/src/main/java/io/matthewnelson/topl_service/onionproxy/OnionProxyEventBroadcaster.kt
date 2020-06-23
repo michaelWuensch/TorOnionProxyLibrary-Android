@@ -48,18 +48,18 @@ internal class OnionProxyEventBroadcaster(
             }
 
         // Only update the notification if proper State is had.
-        if (torState != TorState.ON && torNetworkState != TorNetworkState.ENABLED) return
+        if (torState == TorState.ON && torNetworkState == TorNetworkState.ENABLED)
 
-        if (read != this.bytesRead || written != this.bytesWritten) {
-            this.bytesRead = read
-            this.bytesWritten = written
-            ServiceNotification.get().updateBandwidth(read, written)
+            if (read != this.bytesRead || written != this.bytesWritten)
+                this.bytesRead = read
+                this.bytesWritten = written
+                ServiceNotification.get().updateBandwidth(read, written)
 
-            if (read == 0L && written == 0L)
-                ServiceNotification.get().updateIcon(torService, ImageState.ON)
-            else
-                ServiceNotification.get().updateIcon(torService, ImageState.DATA)
-        }
+                if (read == 0L && written == 0L)
+                    ServiceNotification.get().updateIcon(torService, ImageState.ON)
+                else
+                    ServiceNotification.get().updateIcon(torService, ImageState.DATA)
+
     }
 
     override fun broadcastDebug(msg: String) {
@@ -84,8 +84,12 @@ internal class OnionProxyEventBroadcaster(
         private set
     override fun broadcastTorState(@TorState state: String, @TorNetworkState networkState: String) {
         if (state != torState)
-            ServiceNotification.get().updateContentTitle(state)
             torState = state
+
+            // Need just a moment here for bandwidth to register torState != TorState.ON
+            // so the request isn't overwritten (even though everything's "synchronized").
+            Thread.sleep(100)
+            ServiceNotification.get().updateContentTitle(state)
 
         if (networkState != torNetworkState)
             torNetworkState = networkState
