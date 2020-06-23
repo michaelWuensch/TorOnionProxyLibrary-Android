@@ -13,6 +13,7 @@ See the Apache 2 License for the specific language governing permissions and lim
 package io.matthewnelson.topl_core.broadcaster
 
 import io.matthewnelson.topl_core_base.TorStates
+import java.util.*
 
 /**
  * Current Status of Tor
@@ -21,6 +22,11 @@ class TorStateMachine(private val broadcaster: EventBroadcaster): TorStates() {
 
     var currentTorState: @TorState String = TorState.OFF
         private set
+
+    var currentTorNetworkState: @TorNetworkState String = TorNetworkState.DISABLED
+        private set
+
+    private val stateLock = Object()
 
     val isOff: Boolean
         get() = TorState.OFF == currentTorState
@@ -34,19 +40,40 @@ class TorStateMachine(private val broadcaster: EventBroadcaster): TorStates() {
     val isStopping: Boolean
         get() = TorState.STOPPING == currentTorState
 
+    val isConnected: Boolean
+        get() = TorNetworkState.ENABLED == currentTorNetworkState
+
     /**
      * Will set the state to that which is specified if it isn't already.
      *
      * @return Previous [TorStates.TorState]
      * */
-    internal fun setTorState(@TorState state: String): @TorState String {
-        val currentState = currentTorState
-        if (currentTorState != state) {
-            currentTorState = state
-            broadcaster.broadcastTorState(currentTorState)
-        } else {
-            broadcaster.broadcastDebug("TorState was already set to $currentState")
+    internal fun setTorState(@TorState state: String): @TorState String =
+        synchronized(stateLock) {
+            val currentState = currentTorState
+            if (currentTorState != state) {
+                currentTorState = state
+                broadcaster.broadcastTorState(currentTorState, currentTorNetworkState)
+            } else {
+                broadcaster.broadcastDebug("TorState was already set to $currentState")
+            }
+            return currentState
         }
-        return currentState
-    }
+
+    /**
+     * Will set the network state to that which is specified if it isn't already.
+     *
+     * @return Previous [TorStates.TorNetworkState]
+     * */
+    internal fun setTorNetworkState(@TorNetworkState state: String): @TorNetworkState String =
+        synchronized(stateLock) {
+            val currentNetworkState = currentTorNetworkState
+            if (currentTorNetworkState != state) {
+                currentTorNetworkState = state
+                broadcaster.broadcastTorState(currentTorState, currentTorNetworkState)
+            } else {
+                broadcaster.broadcastDebug("TorNetworkState was already set to $currentNetworkState")
+            }
+            return currentNetworkState
+        }
 }
