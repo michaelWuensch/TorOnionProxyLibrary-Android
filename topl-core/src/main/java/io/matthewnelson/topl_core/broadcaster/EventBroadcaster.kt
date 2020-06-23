@@ -46,6 +46,6 @@ abstract class EventBroadcaster: TorStates() {
 
     abstract fun broadcastNotice(msg: String)
 
-    abstract fun broadcastTorState(@TorState state: String)
+    abstract fun broadcastTorState(@TorState state: String, @TorNetworkState networkState: String)
 
 }
