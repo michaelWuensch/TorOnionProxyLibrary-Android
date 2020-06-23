@@ -231,8 +231,7 @@ class OnionProxyManager(
         eventBroadcaster.torStateMachine.setTorState(TorState.STOPPING)
         eventBroadcaster.broadcastNotice("Using control port to shutdown Tor")
         try {
-            controlConnection!!.setConf("DisableNetwork", "1")
-            // Try shutting tor down properly first
+            disableNetwork(true)
             controlConnection!!.signal(TorControlCommands.SIGNAL_SHUTDOWN)
 
         } catch (e: KotlinNullPointerException) {
@@ -305,26 +304,26 @@ class OnionProxyManager(
     /**
      * Tells the Tor OP if it should accept network connections
      *
-     * @param [enable] If true then the Tor OP will accept SOCKS connections, otherwise not.
+     * @param [disable] If true then the Tor OP will **not** accept SOCKS connections, otherwise yes.
      * @throws [IOException] if having issues with TorControlConnection#setConf
-     * @throws [NullPointerException] if [controlConnection] is null even after checking.
+     * @throws [KotlinNullPointerException] if [controlConnection] is null even after checking.
      */
     @Synchronized
-    @Throws(IOException::class, NullPointerException::class)
-    fun enableNetwork(enable: Boolean) {
+    @Throws(IOException::class, KotlinNullPointerException::class)
+    fun disableNetwork(disable: Boolean) {
         if (controlConnection == null) return
 
-        eventBroadcaster.broadcastNotice("Enabling network: $enable")
+        eventBroadcaster.broadcastNotice("Disabling network: $disable")
 
         try {
-            controlConnection!!.setConf("DisableNetwork", if (enable) "0" else "1")
-        } catch (e: KotlinNullPointerException) {
-            eventBroadcaster.broadcastException(e.message, e)
-            throw NullPointerException(e.message)
-        } catch (ee: IOException) {
+            controlConnection!!.setConf("DisableNetwork", if (disable) "1" else "0")
+            eventBroadcaster.torStateMachine.setTorNetworkState(
+                if (disable) TorNetworkState.DISABLED else TorNetworkState.ENABLED
+            )
+        } catch (e: IOException) {
             LOG.warn("TorControlConnection is not responding properly to setConf.")
-            eventBroadcaster.broadcastException(ee.message, ee)
-            throw IOException(ee.message)
+            eventBroadcaster.broadcastException(e.message, e)
+            throw IOException(e.message)
         }
     }
 
@@ -458,7 +457,7 @@ class OnionProxyManager(
                 eventBroadcaster.broadcastNotice("SUCCESS added control port event listener")
             }
 
-            enableNetwork(true)
+            disableNetwork(false)
         } catch (e: Exception) {
             torProcess?.destroy()
             this.controlConnection = null
@@ -711,8 +710,8 @@ class OnionProxyManager(
                 resetBuffer.add("ExitNodes")
                 resetBuffer.add("StrictNodes")
                 controlConnection!!.resetConf(resetBuffer)
-                controlConnection!!.setConf("DisableNetwork", "1")
-                controlConnection!!.setConf("DisableNetwork", "0")
+                disableNetwork(true)
+                disableNetwork(false)
             } catch (ioe: Exception) {
                 LOG.error("Connection exception occurred resetting exits", ioe)
                 return false
@@ -723,28 +722,14 @@ class OnionProxyManager(
                 controlConnection!!.setConf("GeoIPv6File", onionProxyContext.torConfigFiles.geoIpv6File.canonicalPath)
                 controlConnection!!.setConf("ExitNodes", exitNodes)
                 controlConnection!!.setConf("StrictNodes", "1")
-                controlConnection!!.setConf("DisableNetwork", "1")
-                controlConnection!!.setConf("DisableNetwork", "0")
+                disableNetwork(true)
+                disableNetwork(false)
             } catch (ioe: Exception) {
                 LOG.error("Connection exception occurred resetting exits", ioe)
                 return false
             }
         }
         return true
-    }
-
-    fun disableNetwork(isEnabled: Boolean): Boolean {
-        return if (!hasControlConnection()) {
-            false
-        } else {
-            try {
-                controlConnection!!.setConf("DisableNetwork", if (isEnabled) "0" else "1")
-                true
-            } catch (e: Exception) {
-                eventBroadcaster.broadcastNotice("error disabling network ${e.localizedMessage}")
-                false
-            }
-        }
     }
 
     fun setNewIdentity(): Boolean {
@@ -848,15 +833,15 @@ class OnionProxyManager(
 
     private inner class NetworkStateReceiver : BroadcastReceiver() {
 
-        override fun onReceive(ctx: Context, i: Intent) {
+        override fun onReceive(context: Context, intent: Intent) {
 
             Thread(Runnable {
                 if (!isRunning) return@Runnable
 
-                var online = !i.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false)
-                if (online) {
+                var online = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false)
+                if (!online) {
                     // Some devices fail to set EXTRA_NO_CONNECTIVITY, double check
-                    val cm = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                    val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
                     val net = cm.activeNetworkInfo
                     if (net == null || !net.isConnected)
                         online = false
@@ -864,7 +849,7 @@ class OnionProxyManager(
                 LOG.info("Online: $online")
 
                 try {
-                    enableNetwork(online)
+                    disableNetwork(online)
                 } catch (e: Exception) {
                     LOG.warn(e.message, e)
                 }
