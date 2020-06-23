@@ -259,10 +259,12 @@ class TorServiceController private constructor() {
              * See [Builder] for code samples.
              *
              * @param [colorRes] Color resource id.
+             * @param [colorizeBackground] true = background is colorized, false = icon is colorized
              * @return [NotificationBuilder]
              * */
-            fun setColorWhenTorOn(@ColorRes colorRes: Int): NotificationBuilder {
+            fun setColorWhenTorOn(@ColorRes colorRes: Int, colorizeBackground: Boolean): NotificationBuilder {
                 serviceNotification.colorWhenOn = colorRes
+                serviceNotification.colorizeBackground = colorizeBackground
                 return this
             }
 
