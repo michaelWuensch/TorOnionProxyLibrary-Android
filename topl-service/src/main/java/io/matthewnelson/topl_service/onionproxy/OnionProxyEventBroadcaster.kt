@@ -47,15 +47,18 @@ internal class OnionProxyEventBroadcaster(
                 this.bytesWritten
             }
 
+        // Only update the notification if proper State is had.
+        if (torState != TorState.ON && torNetworkState != TorNetworkState.ENABLED) return
+
         if (read != this.bytesRead || written != this.bytesWritten) {
             this.bytesRead = read
             this.bytesWritten = written
             ServiceNotification.get().updateBandwidth(read, written)
 
             if (read == 0L && written == 0L)
-                ServiceNotification.get().updateIcon(ImageState.ON)
+                ServiceNotification.get().updateIcon(torService, ImageState.ON)
             else
-                ServiceNotification.get().updateIcon(ImageState.DATA)
+                ServiceNotification.get().updateIcon(torService, ImageState.DATA)
         }
     }
 
@@ -75,7 +78,22 @@ internal class OnionProxyEventBroadcaster(
         super.broadcastNotice(msg)
     }
 
-    override fun broadcastTorState(@TorState state: String) {
-        Log.d(TAG, "TOR_STATE__$state")
+    @TorState var torState: String  = TorState.OFF
+        private set
+    @TorNetworkState var torNetworkState: String = TorNetworkState.DISABLED
+        private set
+    override fun broadcastTorState(@TorState state: String, @TorNetworkState networkState: String) {
+        if (state != torState)
+            ServiceNotification.get().updateContentTitle(state)
+            torState = state
+
+        if (networkState != torNetworkState)
+            torNetworkState = networkState
+            if (networkState == TorNetworkState.DISABLED)
+                ServiceNotification.get().updateIcon(torService, ImageState.OFF)
+            else
+                ServiceNotification.get().updateIcon(torService, ImageState.ON)
+
+        super.broadcastTorState(state, networkState)
     }
 }

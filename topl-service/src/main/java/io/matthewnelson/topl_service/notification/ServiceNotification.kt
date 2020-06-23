@@ -10,6 +10,9 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.NotificationVisibility
+import androidx.core.content.ContextCompat
+import io.matthewnelson.topl_core_base.TorStates
+import io.matthewnelson.topl_core_base.TorStates.TorState
 import io.matthewnelson.topl_service.R
 import io.matthewnelson.topl_service.service.TorService
 import java.text.NumberFormat
@@ -35,8 +38,9 @@ internal class ServiceNotification(
     @DrawableRes var imageOff: Int = R.drawable.tor_stat_off,
     @DrawableRes var imageData: Int = R.drawable.tor_stat_dataxfer,
     @DrawableRes var imageError: Int = R.drawable.tor_stat_notifyerr,
+    var colorizeBackground: Boolean = false,
 
-    @ColorRes var colorWhenOn: Int = R.color.tor_notification_color_white,
+    @ColorRes var colorWhenOn: Int = R.color.tor_service_white,
 
     @NotificationVisibility var visibility: Int = NotificationCompat.VISIBILITY_SECRET,
 
@@ -111,20 +115,20 @@ internal class ServiceNotification(
     fun startForegroundNotification(torService: TorService) {
         val builder = NotificationCompat.Builder(torService.applicationContext, channelID)
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
-            .setContentText("Waiting...")
-            .setContentTitle("Tor")
-            .setGroup("Tor")
+            .setColorized(colorizeBackground)
+            .setContentText("Bootstrapped 0%")
+            .setContentTitle(TorState.OFF)
+            .setGroup("TorService")
             .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
             .setGroupSummary(false)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
-            .setSmallIcon(imageOn)
+            .setSmallIcon(imageOff)
             .setSound(null)
             .setVisibility(visibility)
 
-        if (activityWhenTapped != null) {
+        if (activityWhenTapped != null)
             builder.setContentIntent(getContentPendingIntent(torService))
-        }
 
         notificationBuilder = builder
         torService.startForeground(notificationID, builder.build())
@@ -174,15 +178,17 @@ internal class ServiceNotification(
     ////////////
     /// Icon ///
     ////////////
-    fun updateIcon(@ImageState imageState: Int) =
+    fun updateIcon(torService: TorService, @ImageState imageState: Int) =
         synchronized(notifyLock) {
             val builder = notificationBuilder
             when (imageState) {
                 ImageState.ON -> {
                     builder.setSmallIcon(imageOn)
+                    builder.color = ContextCompat.getColor(torService, colorWhenOn)
                 }
                 ImageState.OFF -> {
                     builder.setSmallIcon(imageOff)
+                    builder.color = ContextCompat.getColor(torService, R.color.tor_service_white)
                 }
                 ImageState.DATA -> {
                     builder.setSmallIcon(imageData)
@@ -192,6 +198,17 @@ internal class ServiceNotification(
                 }
                 else -> {}
             }
+            notify(builder)
+        }
+
+
+    /////////////////////
+    /// Content Title ///
+    /////////////////////
+    fun updateContentTitle(title: String) =
+        synchronized(notifyLock) {
+            val builder = notificationBuilder
+            builder.setContentTitle(title)
             notify(builder)
         }
 }
