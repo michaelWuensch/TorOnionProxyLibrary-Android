@@ -1,7 +1,6 @@
 package io.matthewnelson.topl_service.onionproxy
 
 import android.util.Log
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.matthewnelson.topl_core.broadcaster.DefaultEventBroadcaster
 import io.matthewnelson.topl_service.notification.NotificationConsts.ImageState
 import io.matthewnelson.topl_service.notification.ServiceNotification
@@ -28,7 +27,6 @@ internal class OnionProxyEventBroadcaster(
         private const val TAG = "EventBroadcaster"
     }
 
-    private val broadcastManager = LocalBroadcastManager.getInstance(torService)
     private val serviceNotification = ServiceNotification.get()
 
     private var bytesRead = 0L
@@ -80,8 +78,8 @@ internal class OnionProxyEventBroadcaster(
 
     private var bootstrapProgress = ""
     override fun broadcastNotice(msg: String) {
-        val msgSplit = msg.split(" ")
-        if (msgSplit[0] == "Bootstrapped") {
+        if (msg.contains("Bootstrapped")) {
+            val msgSplit = msg.split(" ")
             val bootstrapped = "${msgSplit[0]} ${msgSplit[1]}"
 
             if (bootstrapped != bootstrapProgress) {
@@ -89,10 +87,13 @@ internal class OnionProxyEventBroadcaster(
 
                 if (bootstrapped == "Bootstrapped 100%") {
                     serviceNotification.updateIcon(torService, ImageState.ENABLED)
+                    serviceNotification.addActions(torService)
                 }
 
                 bootstrapProgress = bootstrapped
             }
+        } else if (msg.contains("Rate limiting NEWYM")) {
+            val msgSplit = msg.split(":")
         }
         super.broadcastNotice(msg)
     }

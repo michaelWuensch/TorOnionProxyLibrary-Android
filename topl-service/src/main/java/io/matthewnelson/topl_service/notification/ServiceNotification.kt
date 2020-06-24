@@ -13,6 +13,7 @@ import androidx.core.app.NotificationCompat.NotificationVisibility
 import androidx.core.content.ContextCompat
 import io.matthewnelson.topl_core_base.TorStates.TorState
 import io.matthewnelson.topl_service.R
+import io.matthewnelson.topl_service.service.ActionConsts.ServiceAction
 import io.matthewnelson.topl_service.service.TorService
 import java.text.NumberFormat
 import java.util.*
@@ -142,6 +143,51 @@ internal class ServiceNotification(
             torService.applicationContext,
             activityIntentRequestCode,
             contentIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+    }
+
+
+    ///////////////
+    /// Actions ///
+    ///////////////
+    @Synchronized
+    fun addActions(torService: TorService) {
+        val builder = notificationBuilder
+        builder.addAction(
+            imageNetworkEnabled,
+            "New Identity",
+            getActionPendingIntent(torService, ServiceAction.ACTION_NEW_ID)
+        )
+
+        if (enableRestartButton)
+            builder.addAction(
+                imageNetworkEnabled,
+                "Restart Tor",
+                getActionPendingIntent(torService, ServiceAction.ACTION_RESTART)
+            )
+
+        if (enableStopButton)
+            builder.addAction(
+                imageNetworkEnabled,
+                "Stop Tor",
+                getActionPendingIntent(torService, ServiceAction.ACTION_STOP)
+            )
+
+        notify(builder)
+    }
+
+    private fun getActionPendingIntent(
+        torService: TorService,
+        @ServiceAction action: String
+    ): PendingIntent {
+        val intent = Intent(torService.applicationContext, TorService::class.java)
+        intent.action = action
+
+        return PendingIntent.getService(
+            torService.applicationContext,
+            0,
+            intent,
             PendingIntent.FLAG_UPDATE_CURRENT
         )
     }

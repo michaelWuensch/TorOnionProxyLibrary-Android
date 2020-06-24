@@ -1,6 +1,5 @@
 package io.matthewnelson.topl_service.service
 
-import android.content.Context
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.util.PrefsKeys.IntKey
 import io.matthewnelson.topl_service.util.PrefsKeys.StringKey

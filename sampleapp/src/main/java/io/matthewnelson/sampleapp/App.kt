@@ -27,6 +27,8 @@ class App: Application() {
                 615)
             .setActivityToBeOpenedOnTap(MainActivity::class.java, null, null, null)
             .setColorWhenTorOn(R.color.tor_service_connected, colorizeBackground = false)
+            .enableTorRestartButton()
+            .enableTorStopButton()
             .applyNotificationSettings()
             .build()
     }
