@@ -3,7 +3,6 @@ package io.matthewnelson.topl_service.onionproxy
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.matthewnelson.topl_core.broadcaster.DefaultEventBroadcaster
-import io.matthewnelson.topl_service.notification.NotificationConsts
 import io.matthewnelson.topl_service.notification.NotificationConsts.ImageState
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.TorService
@@ -30,6 +29,7 @@ internal class OnionProxyEventBroadcaster(
     }
 
     private val broadcastManager = LocalBroadcastManager.getInstance(torService)
+    private val serviceNotification = ServiceNotification.get()
 
     private var bytesRead = 0L
     private var bytesWritten = 0L
@@ -48,17 +48,19 @@ internal class OnionProxyEventBroadcaster(
             }
 
         // Only update the notification if proper State is had.
-        if (torState == TorState.ON && torNetworkState == TorNetworkState.ENABLED)
+        if (torStateMachine.isOn && torStateMachine.isConnected) {
 
-            if (read != this.bytesRead || written != this.bytesWritten)
+            if (read != this.bytesRead || written != this.bytesWritten) {
                 this.bytesRead = read
                 this.bytesWritten = written
-                ServiceNotification.get().updateBandwidth(read, written)
+                serviceNotification.updateBandwidth(read, written)
 
                 if (read == 0L && written == 0L)
-                    ServiceNotification.get().updateIcon(torService, ImageState.ON)
+                    serviceNotification.updateIcon(torService, ImageState.ENABLED)
                 else
-                    ServiceNotification.get().updateIcon(torService, ImageState.DATA)
+                    serviceNotification.updateIcon(torService, ImageState.DATA)
+            }
+        }
 
     }
 
@@ -78,25 +80,16 @@ internal class OnionProxyEventBroadcaster(
         super.broadcastNotice(msg)
     }
 
-    @TorState var torState: String  = TorState.OFF
-        private set
-    @TorNetworkState var torNetworkState: String = TorNetworkState.DISABLED
-        private set
     override fun broadcastTorState(@TorState state: String, @TorNetworkState networkState: String) {
-        if (state != torState)
-            torState = state
+        // Need just a moment here for bandwidth's notification updates to clear up so the
+        // notification builder containing the state change isn't overwritten.
+        Thread.sleep(50)
+        serviceNotification.updateContentTitle(state)
 
-            // Need just a moment here for bandwidth to register torState != TorState.ON
-            // so the request isn't overwritten (even though everything's "synchronized").
-            Thread.sleep(100)
-            ServiceNotification.get().updateContentTitle(state)
-
-        if (networkState != torNetworkState)
-            torNetworkState = networkState
-            if (networkState == TorNetworkState.DISABLED)
-                ServiceNotification.get().updateIcon(torService, ImageState.OFF)
-            else
-                ServiceNotification.get().updateIcon(torService, ImageState.ON)
+        if (torStateMachine.isConnected)
+            serviceNotification.updateIcon(torService, ImageState.ENABLED)
+        else
+            serviceNotification.updateIcon(torService, ImageState.DISABLED)
 
         super.broadcastTorState(state, networkState)
     }
