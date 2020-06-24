@@ -114,7 +114,7 @@ internal class ServiceNotification(
         val builder = NotificationCompat.Builder(torService.applicationContext, channelID)
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
             .setColorized(colorizeBackground)
-            .setContentText("Bootstrapped 0%")
+            .setContentText("Waiting...")
             .setContentTitle(TorState.OFF)
             .setGroup("TorService")
             .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
@@ -171,6 +171,17 @@ internal class ServiceNotification(
             numberFormat.format(
                 Math.round( ( ( (value * 100 / 1024 / 1024).toInt() ) /100 ).toFloat() )
             ) + "mbps"
+
+
+    /////////////////////
+    /// Bootstrapping ///
+    /////////////////////
+    @Synchronized
+    fun updateBootstrap(string: String) {
+        val builder = notificationBuilder
+        builder.setContentText(string)
+        notify(builder)
+    }
 
 
     /////////////////////

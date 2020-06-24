@@ -38,7 +38,8 @@ internal class OnionProxyEventListener(
         )
 
     override fun noticeMsg(data: String?) {
-        Log.d(TAG, "NOTICE_MSG__$data")
+        if (!data.isNullOrEmpty())
+            eventBroadcaster.broadcastNotice(data)
     }
 
     override fun unrecognized(data: String?) {
@@ -95,7 +96,7 @@ internal class OnionProxyEventListener(
 
     // https://torproject.gitlab.io/torspec/control-spec/#bandwidth-used-in-the-last-second
     override fun bandwidthUsed(data: String?) {
-        if (data != null) {
+        if (!data.isNullOrEmpty()) {
             val dataList = data.split(" ")
             if (dataList.size == 2)
                 eventBroadcaster.broadcastBandwidth(dataList[0], dataList[1])

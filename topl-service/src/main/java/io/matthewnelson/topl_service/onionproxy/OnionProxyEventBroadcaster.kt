@@ -48,8 +48,10 @@ internal class OnionProxyEventBroadcaster(
             }
 
         // Only update the notification if proper State is had.
-        if (torStateMachine.isOn && torStateMachine.isConnected) {
-
+        if (torStateMachine.isOn &&
+            torStateMachine.isConnected &&
+            bootstrapProgress == "Bootstrapped 100%"
+        ) {
             if (read != this.bytesRead || written != this.bytesWritten) {
                 this.bytesRead = read
                 this.bytesWritten = written
@@ -76,7 +78,22 @@ internal class OnionProxyEventBroadcaster(
         Log.d(TAG, "LOG_MESSAGE__$logMessage")
     }
 
+    private var bootstrapProgress = ""
     override fun broadcastNotice(msg: String) {
+        val msgSplit = msg.split(" ")
+        if (msgSplit[0] == "Bootstrapped") {
+            val bootstrapped = "${msgSplit[0]} ${msgSplit[1]}"
+
+            if (bootstrapped != bootstrapProgress) {
+                serviceNotification.updateBootstrap(bootstrapped)
+
+                if (bootstrapped == "Bootstrapped 100%") {
+                    serviceNotification.updateIcon(torService, ImageState.ENABLED)
+                }
+
+                bootstrapProgress = bootstrapped
+            }
+        }
         super.broadcastNotice(msg)
     }
 
@@ -86,9 +103,7 @@ internal class OnionProxyEventBroadcaster(
         Thread.sleep(50)
         serviceNotification.updateContentTitle(state)
 
-        if (torStateMachine.isConnected)
-            serviceNotification.updateIcon(torService, ImageState.ENABLED)
-        else
+        if (!torStateMachine.isConnected)
             serviceNotification.updateIcon(torService, ImageState.DISABLED)
 
         super.broadcastTorState(state, networkState)
