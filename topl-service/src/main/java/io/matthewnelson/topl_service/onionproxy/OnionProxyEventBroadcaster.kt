@@ -1,5 +1,6 @@
 package io.matthewnelson.topl_service.onionproxy
 
+import android.os.Build
 import android.util.Log
 import io.matthewnelson.topl_core.broadcaster.DefaultEventBroadcaster
 import io.matthewnelson.topl_service.notification.NotificationConsts.ImageState
@@ -98,10 +99,15 @@ internal class OnionProxyEventBroadcaster(
         super.broadcastNotice(msg)
     }
 
+    private var lastState = TorState.OFF
     override fun broadcastTorState(@TorState state: String, @TorNetworkState networkState: String) {
         // Need just a moment here for bandwidth's notification updates to clear up so the
         // notification builder containing the state change isn't overwritten.
-        Thread.sleep(50)
+        Thread.sleep(75)
+        if (lastState == TorState.ON && state != lastState) {
+            serviceNotification.removeActions(torService, state)
+        }
+        lastState = state
         serviceNotification.updateContentTitle(state)
 
         if (!torStateMachine.isConnected)

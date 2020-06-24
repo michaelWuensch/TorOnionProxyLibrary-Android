@@ -112,11 +112,19 @@ internal class ServiceNotification(
      * it can be re-used/updated throughout the lifecycle of the service.
      * */
     fun startForegroundNotification(torService: TorService) {
+        val builder = buildInitialNotification(torService, TorState.OFF)
+        torService.startForeground(notificationID, builder.build())
+    }
+
+    private fun buildInitialNotification(
+        torService: TorService,
+        title: String
+    ): NotificationCompat.Builder {
         val builder = NotificationCompat.Builder(torService.applicationContext, channelID)
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
             .setColorized(colorizeBackground)
             .setContentText("Waiting...")
-            .setContentTitle(TorState.OFF)
+            .setContentTitle(title)
             .setGroup("TorService")
             .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
             .setGroupSummary(false)
@@ -130,7 +138,7 @@ internal class ServiceNotification(
             builder.setContentIntent(getContentPendingIntent(torService))
 
         notificationBuilder = builder
-        torService.startForeground(notificationID, builder.build())
+        return builder
     }
 
     private fun getContentPendingIntent(torService: TorService): PendingIntent {
@@ -190,6 +198,12 @@ internal class ServiceNotification(
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT
         )
+    }
+
+    @Synchronized
+    fun removeActions(torService: TorService, @TorState state: String) {
+        val builder = buildInitialNotification(torService, state)
+        notify(builder)
     }
 
 
