@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Build
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.service.ActionConsts.ServiceAction
@@ -366,20 +365,10 @@ class TorServiceController private constructor() {
 
         private lateinit var appContext: Context
 
-        private fun broadcastAction(@ServiceAction actions: String) {
+        private fun sendAction(@ServiceAction action: String) {
             if (!::appContext.isInitialized) return
-            val broadcastIntent = Intent(TorService.FILTER)
-            broadcastIntent.putExtra(TorService.ACTION_EXTRAS_KEY, actions)
-            LocalBroadcastManager.getInstance(appContext).sendBroadcast(broadcastIntent)
-        }
-
-        /**
-         * Starts [TorService]. Does nothing if called before the builder has gone off.
-         * */
-        fun startTor() {
-            if (!::appContext.isInitialized) return
-
             val torServiceIntent = Intent(appContext.applicationContext, TorService::class.java)
+            torServiceIntent.action = action
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 appContext.startForegroundService(torServiceIntent)
             else
@@ -387,21 +376,45 @@ class TorServiceController private constructor() {
         }
 
         /**
-         * Stops [TorService]. Does nothing if called before the builder has gone off.
+         * Starts [TorService]. Does nothing if called before:
+         *
+         *  - Have not initialized [TorServiceController.Builder] by calling [Builder.build]
+         *  - Have not called [startTor].
          * */
-        fun stopTor() =
-            broadcastAction(ServiceAction.ACTION_STOP)
+        fun startTor() =
+            sendAction(ServiceAction.ACTION_START)
 
         /**
-         * Restarts Tor. Does nothing if called before the builder has gone off.
+         * Stops [TorService]. Does nothing if called before:
+         *
+         *  - Have not initialized [TorServiceController.Builder] by calling [Builder.build]
+         *  - Have not called [startTor].
          * */
-        fun restartTor() =
-            broadcastAction(ServiceAction.ACTION_RESTART)
+        fun stopTor() {
+            if (TorService.isServiceStarted)
+                sendAction(ServiceAction.ACTION_STOP)
+        }
 
         /**
-         * Changes identities. Does nothing if called before the builder has gone off.
+         * Restarts Tor. Does nothing if called before:
+         *
+         *  - Have not initialized [TorServiceController.Builder] by calling [Builder.build]
+         *  - Have not called [startTor].
          * */
-        fun newIdentity() =
-            broadcastAction(ServiceAction.ACTION_NEW_ID)
+        fun restartTor() {
+            if (TorService.isServiceStarted)
+                sendAction(ServiceAction.ACTION_RESTART)
+        }
+
+        /**
+         * Changes identities. Does nothing if called before:
+         *
+         *  - Have not initialized [TorServiceController.Builder] by calling [Builder.build]
+         *  - Have not called [startTor].
+         * */
+        fun newIdentity() {
+            if (TorService.isServiceStarted)
+                sendAction(ServiceAction.ACTION_NEW_ID)
+        }
     }
 }

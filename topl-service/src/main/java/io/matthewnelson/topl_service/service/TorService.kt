@@ -1,12 +1,8 @@
 package io.matthewnelson.topl_service.service
 
 import android.app.Service
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.IBinder
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.matthewnelson.topl_core.OnionProxyContext
 import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_service.notification.ServiceNotification
@@ -16,6 +12,7 @@ import io.matthewnelson.topl_service.onionproxy.OnionProxyEventBroadcaster
 import io.matthewnelson.topl_service.onionproxy.OnionProxyEventListener
 import io.matthewnelson.topl_service.onionproxy.OnionProxyInstaller
 import io.matthewnelson.topl_service.service.ActionConsts.ServiceAction
+import kotlinx.coroutines.*
 import net.freehaven.tor.control.EventListener
 
 internal class TorService: Service() {
@@ -44,9 +41,7 @@ internal class TorService: Service() {
             this.geoip6AssetPath = geoip6AssetPath
         }
 
-        // Intents/LocalBroadcastManager
-        const val FILTER = "io.matthewnelson.topl_service.service.TorService"
-        const val ACTION_EXTRAS_KEY = "SERVICE_ACTION_EXTRA"
+        var isServiceStarted = false
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -55,10 +50,10 @@ internal class TorService: Service() {
 
     override fun onCreate() {
         super.onCreate()
-        registerBroadcastReceiver(this)
+        isServiceStarted = true
         ServiceNotification.get().startForegroundNotification(this)
 
-        // Setup TOPL
+        // Instantiate TOPL
         val torServiceSettings = TorServiceSettings(torSettings, this)
         val onionProxyInstaller = OnionProxyInstaller(
             this,
@@ -81,23 +76,42 @@ internal class TorService: Service() {
             onionProxyEventListener,
             arrayOf(additionalEventListener)
         )
-        onionProxyManager.setup()
     }
 
     override fun onDestroy() {
+        supervisorJob.cancel()
+        isServiceStarted = false
         super.onDestroy()
-        unregisterBroadcastReceiver()
     }
 
     override fun onLowMemory() {
         super.onLowMemory()
-        // TODO: Implement
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (onionProxyManager.eventBroadcaster.torStateMachine.isOff)
-            Thread {
+        intent?.action?.let { executeAction(it) }
+        return START_STICKY
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        executeAction(ServiceAction.ACTION_STOP)
+    }
+
+    ////////////
+    /// TOPL ///
+    ////////////
+    private lateinit var onionProxyManager: OnionProxyManager
+    private val actionLock = Object()
+
+    /**
+     * Do not call directly. Use [executeAction].
+     * */
+    private fun startTor() =
+        synchronized(actionLock) {
+            if (!onionProxyManager.eventBroadcaster.torStateMachine.isOn) {
                 try {
+                    onionProxyManager.setup()
                     onionProxyManager.getNewSettingsBuilder()
                         .updateTorSettings()
                         .setGeoIpFiles()
@@ -107,62 +121,82 @@ internal class TorService: Service() {
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-            }.start()
-        return START_STICKY
-    }
+            }
+        }
 
-    override fun onTaskRemoved(rootIntent: Intent?) {
-        super.onTaskRemoved(rootIntent)
-        stopTor()
-    }
-
-    private fun stopTor() {
-        Thread {
+    /**
+     * Do not call directly. Use [executeAction].
+     * */
+    private fun stopTor(executeStopSelf: Boolean = true) =
+        synchronized(actionLock) {
             try {
                 onionProxyManager.stop()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-            stopSelf()
-        }.start()
+            if (executeStopSelf)
+                stopSelf()
+        }
+
+    private suspend fun restartTor() {
+        stopTor(executeStopSelf = false)
+        delay(1000)
+        startTor()
     }
 
-    ////////////
-    /// TOPL ///
-    ////////////
-    private lateinit var onionProxyManager: OnionProxyManager
+    /**
+     * Do not call directly. Use [executeAction].
+     * */
+    private fun newIdentity() =
+        synchronized(actionLock) {
+            try {
+                onionProxyManager.setNewIdentity()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
+            }
+        }
 
-    /////////////////////////
-    /// BroadcastReceiver ///
-    /////////////////////////
-    private val actionBR = ActionBroadcastReceiver()
-    private lateinit var localBM: LocalBroadcastManager
 
-    private fun registerBroadcastReceiver(torService: TorService) {
-        if (!::localBM.isInitialized)
-            localBM = LocalBroadcastManager.getInstance(torService)
-        localBM.registerReceiver(actionBR, IntentFilter(FILTER))
-    }
+    ///////////////
+    /// Actions ///
+    ///////////////
+    private val supervisorJob = SupervisorJob()
+    private val scopeDefault = CoroutineScope(Dispatchers.Default + supervisorJob)
+    private lateinit var startTorJob: Job
+    private lateinit var stopTorJob: Job
+    private lateinit var restartTorJob: Job
+    private lateinit var newIdentityJob: Job
 
-    private fun unregisterBroadcastReceiver() =
-        localBM.unregisterReceiver(actionBR)
-
-    private inner class ActionBroadcastReceiver: BroadcastReceiver() {
-
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent != null) {
-
-                when (intent.getStringExtra(ACTION_EXTRAS_KEY)) {
-                    ServiceAction.ACTION_STOP -> {
-                        stopTor()
-                    }
-                    ServiceAction.ACTION_RESTART -> {
-                        // TODO: Implement
-                    }
-                    ServiceAction.ACTION_NEW_ID -> {
-                        // TODO: Implement
-                    }
-                    else -> {}
+    /**
+     * All actions must go through here to be executed using a coroutine.
+     * */
+    private fun executeAction(action: String) {
+        when (action) {
+            ServiceAction.ACTION_START -> {
+                startTorJob = scopeDefault.launch {
+                    startTor()
+                }
+            }
+            ServiceAction.ACTION_STOP -> {
+                if (::stopTorJob.isInitialized && stopTorJob.isActive) return
+                if (::restartTorJob.isInitialized && restartTorJob.isActive) return
+                stopTorJob = scopeDefault.launch {
+                    stopTor()
+                }
+            }
+            ServiceAction.ACTION_RESTART -> {
+                if (::stopTorJob.isInitialized && stopTorJob.isActive) return
+                if (::restartTorJob.isInitialized && restartTorJob.isActive) return
+                restartTorJob = scopeDefault.launch {
+                    restartTor()
+                }
+            }
+            ServiceAction.ACTION_NEW_ID -> {
+                if (::stopTorJob.isInitialized && stopTorJob.isActive) return
+                if (::restartTorJob.isInitialized && restartTorJob.isActive) return
+                newIdentityJob = scopeDefault.launch {
+                    newIdentity()
                 }
             }
         }
