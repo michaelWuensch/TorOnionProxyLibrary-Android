@@ -189,39 +189,39 @@ class TorServiceController private constructor() {
             }
 
             /**
-             * Defaults to Orbot/TorBrowser's icon.
+             * Defaults to Orbot/TorBrowser's icon [R.drawable.tor_stat_network_enabled].
              *
-             * The small icon you wish to display when Tor's State is
-             * [io.matthewnelson.topl_core_base.TorStates.TorState.ON].
-             *
-             * See [Builder] for code samples.
-             *
-             * @param [drawableRes] Drawable resource id.
-             * @return [NotificationBuilder]
-             * */
-            fun setImageTorOn(@DrawableRes drawableRes: Int): NotificationBuilder {
-                serviceNotification.imageOn = drawableRes
-                return this
-            }
-
-            /**
-             * Defaults to Orbot/TorBrowser's icon.
-             *
-             * The small icon you wish to display when Tor's State is
-             * [io.matthewnelson.topl_core_base.TorStates.TorState.OFF].
+             * The small icon you wish to display when Tor's network state is
+             * [io.matthewnelson.topl_core_base.TorStates.TorNetworkState.ENABLED].
              *
              * See [Builder] for code samples.
              *
              * @param [drawableRes] Drawable resource id.
              * @return [NotificationBuilder]
              * */
-            fun setImageTorOff(@DrawableRes drawableRes: Int): NotificationBuilder {
-                serviceNotification.imageOff = drawableRes
+            fun setImageTorNetworkingEnabled(@DrawableRes drawableRes: Int): NotificationBuilder {
+                serviceNotification.imageNetworkEnabled = drawableRes
                 return this
             }
 
             /**
-             * Defaults to Orbot/TorBrowser's icon.
+             * Defaults to Orbot/TorBrowser's icon [R.drawable.tor_stat_network_disabled].
+             *
+             * The small icon you wish to display when Tor's network state is
+             * [io.matthewnelson.topl_core_base.TorStates.TorNetworkState.DISABLED].
+             *
+             * See [Builder] for code samples.
+             *
+             * @param [drawableRes] Drawable resource id.
+             * @return [NotificationBuilder]
+             * */
+            fun setImageTorNetworkingDisabled(@DrawableRes drawableRes: Int): NotificationBuilder {
+                serviceNotification.imageNetworkDisabled = drawableRes
+                return this
+            }
+
+            /**
+             * Defaults to Orbot/TorBrowser's icon [R.drawable.tor_stat_network_dataxfer].
              *
              * The small icon you wish to display when bandwidth is being used.
              *
@@ -231,12 +231,12 @@ class TorServiceController private constructor() {
              * @return [NotificationBuilder]
              * */
             fun setImageTorDataTransfer(@DrawableRes drawableRes: Int): NotificationBuilder {
-                serviceNotification.imageData = drawableRes
+                serviceNotification.imageDataTransfer = drawableRes
                 return this
             }
 
             /**
-             * Defaults to Orbot/TorBrowser's icon.
+             * Defaults to Orbot/TorBrowser's icon [R.drawable.tor_stat_notifyerr].
              *
              * The small icon you wish to display when Tor is having problems.
              *
@@ -251,10 +251,10 @@ class TorServiceController private constructor() {
             }
 
             /**
-             * Defaults to white
+             * Defaults to [R.color.tor_service_white]
              *
-             * The color you wish to display when Tor's State is
-             * [io.matthewnelson.topl_core_base.TorStates.TorState.ON].
+             * The color you wish to display when Tor's network state is
+             * [io.matthewnelson.topl_core_base.TorStates.TorNetworkState.ENABLED].
              *
              * See [Builder] for code samples.
              *
@@ -263,7 +263,7 @@ class TorServiceController private constructor() {
              * @return [NotificationBuilder]
              * */
             fun setColorWhenTorOn(@ColorRes colorRes: Int, colorizeBackground: Boolean): NotificationBuilder {
-                serviceNotification.colorWhenOn = colorRes
+                serviceNotification.colorWhenConnected = colorRes
                 serviceNotification.colorizeBackground = colorizeBackground
                 return this
             }

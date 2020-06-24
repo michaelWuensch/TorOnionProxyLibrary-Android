@@ -11,7 +11,6 @@ import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.NotificationVisibility
 import androidx.core.content.ContextCompat
-import io.matthewnelson.topl_core_base.TorStates
 import io.matthewnelson.topl_core_base.TorStates.TorState
 import io.matthewnelson.topl_service.R
 import io.matthewnelson.topl_service.service.TorService
@@ -34,13 +33,13 @@ internal class ServiceNotification(
     var activityIntentExtras: String? = null,
     var activityIntentRequestCode: Int = 0,
 
-    @DrawableRes var imageOn: Int = R.drawable.tor_stat_on,
-    @DrawableRes var imageOff: Int = R.drawable.tor_stat_off,
-    @DrawableRes var imageData: Int = R.drawable.tor_stat_dataxfer,
+    @DrawableRes var imageNetworkEnabled: Int = R.drawable.tor_stat_network_enabled,
+    @DrawableRes var imageNetworkDisabled: Int = R.drawable.tor_stat_network_disabled,
+    @DrawableRes var imageDataTransfer: Int = R.drawable.tor_stat_network_dataxfer,
     @DrawableRes var imageError: Int = R.drawable.tor_stat_notifyerr,
     var colorizeBackground: Boolean = false,
 
-    @ColorRes var colorWhenOn: Int = R.color.tor_service_white,
+    @ColorRes var colorWhenConnected: Int = R.color.tor_service_white,
 
     @NotificationVisibility var visibility: Int = NotificationCompat.VISIBILITY_SECRET,
 
@@ -71,7 +70,6 @@ internal class ServiceNotification(
 
     private lateinit var notificationBuilder: NotificationCompat.Builder
     private lateinit var notificationManager: NotificationManager
-    private val notifyLock = Object()
 
     private fun notify(builder: NotificationCompat.Builder) {
         notificationBuilder = builder
@@ -123,7 +121,7 @@ internal class ServiceNotification(
             .setGroupSummary(false)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
-            .setSmallIcon(imageOff)
+            .setSmallIcon(imageNetworkDisabled)
             .setSound(null)
             .setVisibility(visibility)
 
@@ -154,12 +152,12 @@ internal class ServiceNotification(
     /////////////////
     private val numberFormat = NumberFormat.getInstance(Locale.getDefault())
 
-    fun updateBandwidth(download: Long, upload: Long) =
-        synchronized(notifyLock) {
-            val builder = notificationBuilder
-            builder.setContentText("${formatBandwidth(download)} ↓ / ${formatBandwidth(upload)} ↑")
-            notify(builder)
-        }
+    @Synchronized
+    fun updateBandwidth(download: Long, upload: Long) {
+        val builder = notificationBuilder
+        builder.setContentText("${formatBandwidth(download)} ↓ / ${formatBandwidth(upload)} ↑")
+        notify(builder)
+    }
 
     // Obtained from: https://gitweb.torproject.org/tor-android-service.git/tree/service/
     //                src/main/java/org/torproject/android/service/TorEventHandler.java
@@ -175,40 +173,40 @@ internal class ServiceNotification(
             ) + "mbps"
 
 
-    ////////////
-    /// Icon ///
-    ////////////
-    fun updateIcon(torService: TorService, @ImageState imageState: Int) =
-        synchronized(notifyLock) {
-            val builder = notificationBuilder
-            when (imageState) {
-                ImageState.ON -> {
-                    builder.setSmallIcon(imageOn)
-                    builder.color = ContextCompat.getColor(torService, colorWhenOn)
-                }
-                ImageState.OFF -> {
-                    builder.setSmallIcon(imageOff)
-                    builder.color = ContextCompat.getColor(torService, R.color.tor_service_white)
-                }
-                ImageState.DATA -> {
-                    builder.setSmallIcon(imageData)
-                }
-                ImageState.ERROR -> {
-                    builder.setSmallIcon(imageError)
-                }
-                else -> {}
-            }
-            notify(builder)
-        }
-
-
     /////////////////////
     /// Content Title ///
     /////////////////////
-    fun updateContentTitle(title: String) =
-        synchronized(notifyLock) {
-            val builder = notificationBuilder
-            builder.setContentTitle(title)
-            notify(builder)
+    @Synchronized
+    fun updateContentTitle(title: String) {
+        val builder = notificationBuilder
+        builder.setContentTitle(title)
+        notify(builder)
+    }
+
+
+    ////////////
+    /// Icon ///
+    ////////////
+    @Synchronized
+    fun updateIcon(torService: TorService, @ImageState imageState: Int) {
+        val builder = notificationBuilder
+        when (imageState) {
+            ImageState.ENABLED -> {
+                builder.setSmallIcon(imageNetworkEnabled)
+                builder.color = ContextCompat.getColor(torService, colorWhenConnected)
+            }
+            ImageState.DISABLED -> {
+                builder.setSmallIcon(imageNetworkDisabled)
+                builder.color = ContextCompat.getColor(torService, R.color.tor_service_white)
+            }
+            ImageState.DATA -> {
+                builder.setSmallIcon(imageDataTransfer)
+            }
+            ImageState.ERROR -> {
+                builder.setSmallIcon(imageError)
+            }
+            else -> {}
         }
+        notify(builder)
+    }
 }
