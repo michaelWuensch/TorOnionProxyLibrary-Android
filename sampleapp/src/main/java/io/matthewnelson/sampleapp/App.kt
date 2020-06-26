@@ -9,24 +9,32 @@ class App: Application() {
     override fun onCreate() {
         super.onCreate()
 
-        setupTorServices(this)
+        setupTorServices()
     }
 
-    private fun setupTorServices(context: Context) {
+    private fun setupTorServices() {
         TorServiceController.Builder(
-            context.applicationContext,
+            this,
             BuildConfig.VERSION_CODE,
             MyTorSettings(),
             "common/geoip",
             "common/geoip6"
         )
             .customizeNotification(
-                "TorService Channel",
-                "Tor Channel",
-                "My Sample Application",
-                615)
-            .setActivityToBeOpenedOnTap(MainActivity::class.java, null, null, null)
-            .setColorWhenTorOn(R.color.tor_service_connected, colorizeBackground = false)
+                channelName = "TorService Channel",
+                channelDescription = "Tor Channel",
+                channelID = "My Sample Application",
+                notificationID = 615)
+            .setActivityToBeOpenedOnTap(
+                clazz = MainActivity::class.java,
+                intentExtrasKey = null,
+                intentExtras = null,
+                intentRequestCode = null
+            )
+            .setColorWhenTorOn(
+                colorRes = R.color.tor_service_connected,
+                colorizeBackground = false
+            )
             .enableTorRestartButton()
             .enableTorStopButton()
             .applyNotificationSettings()

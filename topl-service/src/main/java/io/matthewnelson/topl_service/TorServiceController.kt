@@ -1,5 +1,6 @@
 package io.matthewnelson.topl_service
 
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -37,7 +38,7 @@ class TorServiceController private constructor() {
      * You can see how the [TorSettings] sent here are used in [TorService] by looking at
      * [io.matthewnelson.topl_service.service.TorServiceSettings] and [TorService.onCreate].
      *
-     * @param [context] Context
+     * @param [application] Application
      * @param [buildConfigVersion] send [BuildConfig.VERSION_CODE]. Mitigates copying of geoip
      *   files to app updates only.
      * @param [torSettings] [TorSettings] used to create your torrc file on startup.
@@ -49,7 +50,7 @@ class TorServiceController private constructor() {
      * @sample [io.matthewnelson.sampleapp.App.setupTorServices]
      * */
     class Builder(
-        private val context: Context,
+        private val application: Application,
         private val buildConfigVersion: Int,
         private val torSettings: TorSettings,
         private val geoipAssetPath: String,
@@ -335,7 +336,7 @@ class TorServiceController private constructor() {
                 if (::torConfigFiles.isInitialized) {
                     this.torConfigFiles
                 } else {
-                    TorConfigFiles.createConfig(context.applicationContext)
+                    TorConfigFiles.createConfig(application.applicationContext)
                 }
             val eventListener =
                 if (::additionalEventListener.isInitialized)
@@ -352,9 +353,9 @@ class TorServiceController private constructor() {
                 geoip6AssetPath
             )
 
-            ServiceNotification.get().setupNotificationChannel(context.applicationContext)
+            ServiceNotification.get().setupNotificationChannel(application.applicationContext)
 
-            appContext = context.applicationContext
+            appContext = application.applicationContext
         }
     }
 
