@@ -32,6 +32,15 @@ internal class OnionProxyEventBroadcaster(
 
     companion object {
         private const val TAG = "EventBroadcaster"
+
+        /**
+         * Needed if ever calling [ServiceNotification.updateContentText] because bandwidth
+         * will need a second to stop updating the notification builder such that whatever
+         * ContentText we will be pushing doesn't get overwritten by a rogue update.
+         *
+         * Used in [broadcastTorState] && [displayMessageToContentText]
+         * */
+        const val timeForBandwidthUpdatesToClear = 75L
     }
 
     private val serviceNotification = ServiceNotification.get()
@@ -108,16 +117,6 @@ internal class OnionProxyEventBroadcaster(
                 Math.round( ( ( (value * 100 / 1024 / 1024).toInt() ) /100 ).toFloat() )
             ) + "mbps"
 
-    /**
-     * Needed if ever calling [ServiceNotification.updateContentText] because bandwidth
-     * will need a second to stop updating the notification builder such that whatever
-     * ContentText we will be pushing doesn't get overwritten by a rogue update.
-     *
-     * Used in [broadcastTorState] && [displayMessageToContentText]
-     * */
-    private suspend fun allowBandwidthUpdatesToClearUp(milliSeconds: Long = 75L) =
-        delay(milliSeconds)
-
 
     /////////////
     /// Debug ///
@@ -174,7 +173,7 @@ internal class OnionProxyEventBroadcaster(
                 else
                     msg
 
-                displayMessageToContentText(msgToShow, 3500L)
+            displayMessageToContentText(msgToShow, 3500L)
         }
         super.broadcastNotice(msg)
     }
@@ -186,7 +185,7 @@ internal class OnionProxyEventBroadcaster(
      * */
     private fun displayMessageToContentText(message: String, delayMilliSeconds: Long) {
         noticeMsgToContentTextJob = torService.scopeMain.launch {
-            allowBandwidthUpdatesToClearUp()
+            delay(timeForBandwidthUpdatesToClear)
             serviceNotification.updateContentText(message)
             delay(delayMilliSeconds)
 
@@ -206,21 +205,19 @@ internal class OnionProxyEventBroadcaster(
     private var lastState = TorState.OFF
 
     override fun broadcastTorState(@TorState state: String, @TorNetworkState networkState: String) {
-        // Because we're using `scopeMain` from TorService, which is scoped to a SupervisorJob,
-        // if `TorService` stops while the coroutine is active, it will be cancelled when cancelling
-        // the SupervisorJob in TorService's `onDestroy` call. ;-D
+        super.broadcastTorState(state, networkState)
+
         torService.scopeMain.launch {
-            allowBandwidthUpdatesToClearUp()
             if (lastState == TorState.ON && state != lastState) {
+                delay(timeForBandwidthUpdatesToClear)
                 serviceNotification.removeActions(torService, state)
+            } else {
+                serviceNotification.updateContentTitle(state)
             }
             lastState = state
-            serviceNotification.updateContentTitle(state)
 
             if (!torStateMachine.isConnected)
                 serviceNotification.updateIcon(torService, ImageState.DISABLED)
-
-            super.broadcastTorState(state, networkState)
         }
     }
 }

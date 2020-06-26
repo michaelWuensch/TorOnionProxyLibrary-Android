@@ -127,20 +127,18 @@ internal class TorService: Service() {
     /**
      * Do not call directly. Use [executeAction].
      * */
-    private fun stopTor(executeStopSelf: Boolean = true) =
+    private fun stopTor()  =
         synchronized(actionLock) {
             try {
                 onionProxyManager.stop()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-            if (executeStopSelf)
-                stopSelf()
         }
 
     private suspend fun restartTor() {
-        stopTor(executeStopSelf = false)
-        delay(1000)
+        stopTor()
+        delay(1000L)
         startTor()
     }
 
@@ -167,9 +165,9 @@ internal class TorService: Service() {
     private lateinit var newIdentityJob: Job
 
     /**
-     * All actions must go through here to be executed using a coroutine.
+     * Routes onStartCommand intent actions to here for execution.
      * */
-    private fun executeAction(action: String) {
+    private fun executeAction(@ServiceAction action: String) {
         when (action) {
             ServiceAction.ACTION_START -> {
                 startTorJob = scopeDefault.launch {
@@ -181,6 +179,12 @@ internal class TorService: Service() {
                 if (::restartTorJob.isInitialized && restartTorJob.isActive) return
                 stopTorJob = scopeDefault.launch {
                     stopTor()
+
+                    // Need a delay before calling stopSelf so that the coroutine which
+                    // removes notification actions isn't cancelled via the supervisorJob
+                    // being cancelled in onDestroy.
+                    delay(OnionProxyEventBroadcaster.timeForBandwidthUpdatesToClear * 3)
+                    stopSelf()
                 }
             }
             ServiceAction.ACTION_RESTART -> {
