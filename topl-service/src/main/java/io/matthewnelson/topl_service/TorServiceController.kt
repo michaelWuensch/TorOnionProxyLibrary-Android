@@ -254,7 +254,10 @@ class TorServiceController private constructor() {
              * Defaults to [R.color.tor_service_white]
              *
              * The color you wish to display when Tor's network state is
-             * [io.matthewnelson.topl_core_base.TorStates.TorNetworkState.ENABLED].
+             * [io.matthewnelson.topl_core_base.TorStates.TorNetworkState.ENABLED]. Note that
+             * if [colorizeBackground] is being passed a value of `true`, the notification will
+             * always be that color where as if it is passed `false`, the icon & action button
+             * colors will change with Tor's network state.
              *
              * See [Builder] for code samples.
              *
@@ -262,7 +265,7 @@ class TorServiceController private constructor() {
              * @param [colorizeBackground] true = background is colorized, false = icon is colorized
              * @return [NotificationBuilder]
              * */
-            fun setColorWhenTorOn(@ColorRes colorRes: Int, colorizeBackground: Boolean): NotificationBuilder {
+            fun setCustomColor(@ColorRes colorRes: Int, colorizeBackground: Boolean): NotificationBuilder {
                 serviceNotification.colorWhenConnected = colorRes
                 serviceNotification.colorizeBackground = colorizeBackground
                 return this

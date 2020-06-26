@@ -1,7 +1,6 @@
 package io.matthewnelson.sampleapp
 
 import android.app.Application
-import android.content.Context
 import io.matthewnelson.topl_service.TorServiceController
 
 class App: Application() {
@@ -31,9 +30,9 @@ class App: Application() {
                 intentExtras = null,
                 intentRequestCode = null
             )
-            .setColorWhenTorOn(
+            .setCustomColor(
                 colorRes = R.color.tor_service_connected,
-                colorizeBackground = false
+                colorizeBackground = true
             )
             .enableTorRestartButton()
             .enableTorStopButton()

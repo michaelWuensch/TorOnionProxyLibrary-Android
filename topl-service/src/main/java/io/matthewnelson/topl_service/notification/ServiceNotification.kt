@@ -134,6 +134,9 @@ internal class ServiceNotification(
             .setSound(null)
             .setVisibility(visibility)
 
+        if (colorizeBackground)
+            builder.color = ContextCompat.getColor(torService, colorWhenConnected)
+
         if (activityWhenTapped != null)
             builder.setContentIntent(getContentPendingIntent(torService))
 
@@ -238,11 +241,13 @@ internal class ServiceNotification(
         when (imageState) {
             ImageState.ENABLED -> {
                 builder.setSmallIcon(imageNetworkEnabled)
-                builder.color = ContextCompat.getColor(torService, colorWhenConnected)
+                if (!colorizeBackground)
+                    builder.color = ContextCompat.getColor(torService, colorWhenConnected)
             }
             ImageState.DISABLED -> {
                 builder.setSmallIcon(imageNetworkDisabled)
-                builder.color = ContextCompat.getColor(torService, R.color.tor_service_white)
+                if (!colorizeBackground)
+                    builder.color = ContextCompat.getColor(torService, R.color.tor_service_white)
             }
             ImageState.DATA -> {
                 builder.setSmallIcon(imageDataTransfer)
