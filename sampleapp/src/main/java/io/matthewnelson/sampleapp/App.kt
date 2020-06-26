@@ -14,11 +14,11 @@ class App: Application() {
 
     private fun setupTorServices() {
         TorServiceController.Builder(
-            this,
-            BuildConfig.VERSION_CODE,
-            MyTorSettings(),
-            "common/geoip",
-            "common/geoip6"
+            application = this,
+            buildConfigVersion = BuildConfig.VERSION_CODE,
+            torSettings = MyTorSettings(),
+            geoipAssetPath = "common/geoip",
+            geoip6AssetPath = "common/geoip6"
         )
             .customizeNotification(
                 channelName = "TorService Channel",
