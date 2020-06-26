@@ -12,6 +12,7 @@ See the Apache 2 License for the specific language governing permissions and lim
 */
 package io.matthewnelson.topl_core.settings
 
+import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.OnionProxyContext
 import io.matthewnelson.topl_core_base.SettingsConsts.ConnectionPadding
 import io.matthewnelson.topl_core_base.TorConfigFiles
@@ -508,6 +509,7 @@ class TorSettingsBuilder(private val onionProxyContext: OnionProxyContext) {
     }
 
     @SettingsConfig
+    @WorkerThread
     fun socksPortFromSettings(): TorSettingsBuilder {
         var socksPort = onionProxyContext.torSettings.socksPort
         if (socksPort.indexOf(':') != -1)
@@ -703,6 +705,7 @@ class TorSettingsBuilder(private val onionProxyContext: OnionProxyContext) {
     /**
      * Checks if the ascribed port is open.
      * */
+    @WorkerThread
     private fun isLocalPortOpen(port: Int): Boolean {
         val socket = Socket()
 
@@ -710,14 +713,11 @@ class TorSettingsBuilder(private val onionProxyContext: OnionProxyContext) {
             socket.connect(InetSocketAddress("127.0.0.1", port), 500)
             true
         } catch (e: Exception) {
-            e.printStackTrace()
             false
         } finally {
             try {
                 socket.close()
-            } catch (ee: Exception) {
-                ee.printStackTrace()
-            }
+            } catch (ee: Exception) {}
         }
     }
 }
