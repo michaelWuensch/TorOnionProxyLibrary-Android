@@ -84,6 +84,7 @@ class OnionProxyManager(
     companion object {
         private const val OWNER = "__OwningControllerProcess"
         private const val HOSTNAME_TIMEOUT = 30
+        private const val CONTROL_CONNECTION_NULL_MESSAGE = "TorControlConnection was null even after checking"
         const val NEWNYM_SUCCESS_MESSAGE = "You've changed Tor identities!"
         const val NEWNYM_RATE_LIMIT_PARTIAL_MESSAGE = "Rate limiting NEWNYM request: "
 
@@ -382,11 +383,10 @@ class OnionProxyManager(
             try {
                 val phase = controlConnection?.getInfo("status/bootstrap-phase")
                 if (phase != null && phase.contains("PROGRESS=100")) {
-                    LOG.info("Tor has already bootstrapped")
+                    LOG.info("isBootstrapped: true")
                     return true
                 }
             } catch (e: IOException) {
-                eventBroadcaster.broadcastException(e.message, e)
                 LOG.warn("Control connection is not responding properly to getInfo", e)
             }
             return false
@@ -743,33 +743,44 @@ class OnionProxyManager(
      * see if we've been rate limited. Being rate limited means we were **not** successful
      * in changing to a new identity, thus not broadcasting the success message.
      *
-     * If the [eventListener]'s [BaseEventListener.noticeMsg] is piping it's messages to
+     * If the [eventListener] you're using has it's [BaseEventListener.noticeMsg] being pipe to
      * the [EventBroadcaster.broadcastNotice], you will receive the message of being
      * rate limited. The [InternalEventListener] is used specifically for this purpose.
      * */
     @Synchronized
     suspend fun signalNewNym() {
         if (!hasControlConnection()) return
-        LOG.debug("Acquiring a ${TorControlCommands.SIGNAL_NEWNYM}")
+        if (!isBootstrapped) return
+
+        LOG.info("Attempting to acquire a new nym")
         val internalEventListener = InternalEventListener()
         try {
-            LOG.debug("Registering InternalEventListener")
+            LOG.info("Adding InternalEventListener to TorControlConnection")
             controlConnection!!.addRawEventListener(internalEventListener)
             delay(100)
         } catch (e: KotlinNullPointerException) {
-            LOG.error("TorControlConnection was null even after checking", e)
+            LOG.error(CONTROL_CONNECTION_NULL_MESSAGE, e)
             return
         }
 
-        // If signaling was successful
-        if (signalControlConnection(TorControlCommands.SIGNAL_NEWNYM)) {
-            delay(100)
-            // If no notice of rate limiting was received
-            if (!internalEventListener.doesBufferContainString(NEWNYM_RATE_LIMIT_PARTIAL_MESSAGE))
+        val signalSuccess =
+            try {
+                signalControlConnection(TorControlCommands.SIGNAL_NEWNYM)
+            } catch (e: NullPointerException) {
+                false
+            }
+
+        if (signalSuccess) {
+            delay(100) // Wait for a potential rate limiting notice to be picked up by the listener.
+            if (!internalEventListener.doesBufferContainString(NEWNYM_RATE_LIMIT_PARTIAL_MESSAGE)) {
+                LOG.info("Successfully acquired a new nym")
                 eventBroadcaster.broadcastNotice(
                     "${TorControlCommands.SIGNAL_NEWNYM}|$NEWNYM_SUCCESS_MESSAGE"
                 )
-        } else { // signaling was unsuccessful
+            } else {
+                LOG.info("Was rate limited when trying to acquire a new nym")
+            }
+        } else {
             eventBroadcaster.broadcastNotice(
                 "NOTICE: Failed to acquire a ${TorControlCommands.SIGNAL_NEWNYM}..."
             )
@@ -778,7 +789,7 @@ class OnionProxyManager(
             controlConnection!!.removeRawEventListener(internalEventListener)
         } catch (e: KotlinNullPointerException) {}
         finally {
-            LOG.debug("InternalEventListener removed")
+            LOG.info("InternalEventListener removed from TorControlConnection")
         }
     }
 
@@ -786,8 +797,7 @@ class OnionProxyManager(
      * Sends a signal to the  [TorControlConnection]
      *
      * @param [torControlSignalCommand] See [TorControlCommands] for acceptable `SIGNAL_` values.
-     * @return `true` if the signal was received by [TorControlConnection], `false` if not or if
-     *   a [controlConnection] has not been established (ie, is null/Tor is not running).
+     * @return `true` if the signal was received by [TorControlConnection], `false` if not.
      * */
     fun signalControlConnection(torControlSignalCommand: String): Boolean {
         return if (!hasControlConnection()) {
@@ -800,7 +810,7 @@ class OnionProxyManager(
                 LOG.warn("Control connection is not responding properly to signal", e)
                 false
             } catch (ee: KotlinNullPointerException) {
-                LOG.error("TorControlConnection was null even after checking")
+                LOG.error(CONTROL_CONNECTION_NULL_MESSAGE, ee)
                 false
             }
         }
@@ -837,16 +847,19 @@ class OnionProxyManager(
      * See the
      * <a href="https://torproject.gitlab.io/torspec/control-spec/#getinfo" target="_blank">tor_spec</a>
      * for accepted queries.
+     *
+     * @param [queryCommand] What data you are querying the [TorControlConnection] for
      * */
-    fun getInfo(info: String): String? {
+    fun getInfo(queryCommand: String): String? {
         return if (!hasControlConnection()) {
             null
         } else try {
-            controlConnection!!.getInfo(info)
+            controlConnection!!.getInfo(queryCommand)
         } catch (e: IOException) {
             LOG.warn("Control connection is not responding properly to getInfo", e)
             null
         } catch (ee: KotlinNullPointerException) {
+            LOG.error(CONTROL_CONNECTION_NULL_MESSAGE, ee)
             null
         }
     }
