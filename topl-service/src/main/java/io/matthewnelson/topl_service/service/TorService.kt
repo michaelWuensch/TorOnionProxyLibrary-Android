@@ -3,6 +3,7 @@ package io.matthewnelson.topl_service.service
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.OnionProxyContext
 import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_service.notification.ServiceNotification
@@ -41,7 +42,11 @@ internal class TorService: Service() {
             this.geoip6AssetPath = geoip6AssetPath
         }
 
-        var isServiceStarted = false
+        // Needed to inhibit all TorServiceController methods except for startTor()
+        // from sending working such that startService isn't called and Tor doesn't
+        // properly start up.
+        var isTorStarted = false
+            private set
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -50,7 +55,6 @@ internal class TorService: Service() {
 
     override fun onCreate() {
         super.onCreate()
-        isServiceStarted = true
         ServiceNotification.get().startForegroundNotification(this)
 
         // Instantiate TOPL
@@ -80,7 +84,6 @@ internal class TorService: Service() {
 
     override fun onDestroy() {
         supervisorJob.cancel()
-        isServiceStarted = false
         super.onDestroy()
     }
 
@@ -102,55 +105,38 @@ internal class TorService: Service() {
     /// TOPL ///
     ////////////
     private lateinit var onionProxyManager: OnionProxyManager
-    private val actionLock = Object()
 
     /**
-     * Do not call directly. Use [executeAction].
+     * Do not call directly, use [executeAction].
      * */
-    private fun startTor() =
-        synchronized(actionLock) {
-            if (!onionProxyManager.eventBroadcaster.torStateMachine.isOn) {
-                try {
-                    onionProxyManager.setup()
-                    onionProxyManager.getNewSettingsBuilder()
-                        .updateTorSettings()
-                        .setGeoIpFiles()
-                        .finishAndWriteToTorrcFile()
-
-                    onionProxyManager.start()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-        }
-
-    /**
-     * Do not call directly. Use [executeAction].
-     * */
-    private fun stopTor()  =
-        synchronized(actionLock) {
+    @WorkerThread
+    private fun startTor() {
+        if (!onionProxyManager.eventBroadcaster.torStateMachine.isOn) {
             try {
-                onionProxyManager.stop()
+                onionProxyManager.setup()
+                onionProxyManager.getNewSettingsBuilder()
+                    .updateTorSettings()
+                    .setGeoIpFiles()
+                    .finishAndWriteToTorrcFile()
+
+                onionProxyManager.start()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
-
-    private suspend fun restartTor() {
-        stopTor()
-        delay(1000L)
-        startTor()
     }
 
-    private fun newIdentity() =
-        synchronized(actionLock) {
-            if (::stopTorJob.isInitialized && stopTorJob.isActive) return
-            if (::restartTorJob.isInitialized && restartTorJob.isActive) return
-            if (::newIdentityJob.isInitialized && newIdentityJob.isActive) return
-            newIdentityJob = scopeDefault.launch {
-                onionProxyManager.signalNewNym()
-            }
+    /**
+     * Do not call directly, use [executeAction].
+     * */
+    @WorkerThread
+    private fun stopTor() {
+        try {
+            onionProxyManager.stop()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
+    }
 
 
     ///////////////
@@ -159,43 +145,45 @@ internal class TorService: Service() {
     private val supervisorJob = SupervisorJob()
     private val scopeDefault = CoroutineScope(Dispatchers.Default + supervisorJob)
     val scopeMain = CoroutineScope(Dispatchers.Main + supervisorJob)
-    private lateinit var startTorJob: Job
-    private lateinit var stopTorJob: Job
-    private lateinit var restartTorJob: Job
-    private lateinit var newIdentityJob: Job
+    private lateinit var executeActionJob: Job
 
     /**
-     * Routes onStartCommand intent actions to here for execution.
+     * Route all [ActionConsts.ServiceAction]s here for execution.
+     *
+     * @param [action] A [ServiceAction]
      * */
     private fun executeAction(@ServiceAction action: String) {
-        when (action) {
-            ServiceAction.ACTION_START -> {
-                startTorJob = scopeDefault.launch {
-                    startTor()
-                }
+        scopeMain.launch {
+            if (::executeActionJob.isInitialized && executeActionJob.isActive) {
+                executeActionJob.join()
+                delay(100L)
             }
-            ServiceAction.ACTION_STOP -> {
-                if (::stopTorJob.isInitialized && stopTorJob.isActive) return
-                if (::restartTorJob.isInitialized && restartTorJob.isActive) return
-                stopTorJob = scopeDefault.launch {
-                    stopTor()
 
-                    // Need a delay before calling stopSelf so that the coroutine which
-                    // removes notification actions isn't cancelled via the supervisorJob
-                    // being cancelled in onDestroy.
-                    delay(OnionProxyEventBroadcaster.timeForBandwidthUpdatesToClear * 3)
-                    stopSelf()
+            executeActionJob = scopeDefault.launch {
+                when (action) {
+                    ServiceAction.ACTION_START -> {
+                        startTor()
+                        isTorStarted = true
+                    }
+                    ServiceAction.ACTION_STOP -> {
+                        isTorStarted = false
+                        stopTor()
+
+                        // Need a delay before calling stopSelf so that the coroutine which
+                        // removes notification actions isn't cancelled via the supervisorJob
+                        // being cancelled in onDestroy.
+                        delay(200L)
+                        stopSelf()
+                    }
+                    ServiceAction.ACTION_RESTART -> {
+                        stopTor()
+                        delay(1000L)
+                        startTor()
+                    }
+                    ServiceAction.ACTION_NEW_ID -> {
+                        onionProxyManager.signalNewNym()
+                    }
                 }
-            }
-            ServiceAction.ACTION_RESTART -> {
-                if (::stopTorJob.isInitialized && stopTorJob.isActive) return
-                if (::restartTorJob.isInitialized && restartTorJob.isActive) return
-                restartTorJob = scopeDefault.launch {
-                    restartTor()
-                }
-            }
-            ServiceAction.ACTION_NEW_ID -> {
-                newIdentity()
             }
         }
     }

@@ -376,44 +376,43 @@ class TorServiceController private constructor() {
         }
 
         /**
-         * Starts [TorService]. Does nothing if called before:
+         * Starts [TorService]. Does nothing if called prior to:
          *
-         *  - Have not initialized [TorServiceController.Builder] by calling [Builder.build]
-         *  - Have not called [startTor].
+         *  - Initializing [TorServiceController.Builder] by calling [Builder.build]
          * */
         fun startTor() =
             sendAction(ServiceAction.ACTION_START)
 
         /**
-         * Stops [TorService]. Does nothing if called before:
+         * Stops [TorService]. Does nothing if called prior to:
          *
-         *  - Have not initialized [TorServiceController.Builder] by calling [Builder.build]
-         *  - Have not called [startTor].
+         *  - Initializing [TorServiceController.Builder] by calling [Builder.build]
+         *  - Calling [startTor]
          * */
         fun stopTor() {
-            if (TorService.isServiceStarted)
+            if (TorService.isTorStarted)
                 sendAction(ServiceAction.ACTION_STOP)
         }
 
         /**
-         * Restarts Tor. Does nothing if called before:
+         * Restarts Tor. Does nothing if called prior to:
          *
-         *  - Have not initialized [TorServiceController.Builder] by calling [Builder.build]
-         *  - Have not called [startTor].
+         *  - Initializing [TorServiceController.Builder] by calling [Builder.build]
+         *  - Calling [startTor]
          * */
         fun restartTor() {
-            if (TorService.isServiceStarted)
+            if (TorService.isTorStarted)
                 sendAction(ServiceAction.ACTION_RESTART)
         }
 
         /**
-         * Changes identities. Does nothing if called before:
+         * Changes identities. Does nothing if called prior to:
          *
-         *  - Have not initialized [TorServiceController.Builder] by calling [Builder.build]
-         *  - Have not called [startTor].
+         *  - Initializing [TorServiceController.Builder] by calling [Builder.build]
+         *  - Calling [startTor]
          * */
         fun newIdentity() {
-            if (TorService.isServiceStarted)
+            if (TorService.isTorStarted)
                 sendAction(ServiceAction.ACTION_NEW_ID)
         }
     }

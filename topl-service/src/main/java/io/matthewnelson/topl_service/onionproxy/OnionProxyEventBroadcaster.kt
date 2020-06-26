@@ -1,6 +1,5 @@
 package io.matthewnelson.topl_service.onionproxy
 
-import android.util.Log
 import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_core.broadcaster.DefaultEventBroadcaster
 import io.matthewnelson.topl_service.notification.NotificationConsts.ImageState
@@ -29,19 +28,6 @@ internal class OnionProxyEventBroadcaster(
     private val torService: TorService,
     private val torServiceSettings: TorServiceSettings
 ): DefaultEventBroadcaster(torServiceSettings) {
-
-    companion object {
-        private const val TAG = "EventBroadcaster"
-
-        /**
-         * Needed if ever calling [ServiceNotification.updateContentText] because bandwidth
-         * will need a second to stop updating the notification builder such that whatever
-         * ContentText we will be pushing doesn't get overwritten by a rogue update.
-         *
-         * Used in [broadcastTorState] && [displayMessageToContentText]
-         * */
-        const val timeForBandwidthUpdatesToClear = 75L
-    }
 
     private val serviceNotification = ServiceNotification.get()
 
@@ -87,8 +73,8 @@ internal class OnionProxyEventBroadcaster(
     }
 
     /**
-     * Do a check for if a message is being displayed in the contentText of the,
-     * notification allowing it to remain there unabated until the coroutine
+     * Do a check for if a message is being displayed in the contentText of the
+     * notification, allowing it to remain there unabated until the coroutine
      * finishes.
      * */
     private fun updateBandwidth(download: Long, upload: Long) {
@@ -137,9 +123,7 @@ internal class OnionProxyEventBroadcaster(
     ///////////////////
     /// LogMessages ///
     ///////////////////
-    override fun broadcastLogMessage(logMessage: String?) {
-        Log.d(TAG, "LOG_MESSAGE__$logMessage")
-    }
+    override fun broadcastLogMessage(logMessage: String?) {}
 
 
     ///////////////
@@ -149,6 +133,8 @@ internal class OnionProxyEventBroadcaster(
     private var bootstrapProgress = ""
 
     override fun broadcastNotice(msg: String) {
+
+        // BOOTSTRAPPED
         if (msg.contains("Bootstrapped")) {
             val msgSplit = msg.split(" ")
             val bootstrapped = "${msgSplit[0]} ${msgSplit[1]}"
@@ -163,15 +149,17 @@ internal class OnionProxyEventBroadcaster(
 
                 bootstrapProgress = bootstrapped
             }
-        } else if (msg.contains(TorControlCommands.SIGNAL_NEWNYM)) {
-            if (::noticeMsgToContentTextJob.isInitialized && noticeMsgToContentTextJob.isActive)
-                noticeMsgToContentTextJob.cancel()
 
+        // NEWNYM
+        } else if (msg.contains(TorControlCommands.SIGNAL_NEWNYM)) {
             val msgToShow =
                 if (msg.contains(OnionProxyManager.NEWNYM_SUCCESS_MESSAGE))
                     OnionProxyManager.NEWNYM_SUCCESS_MESSAGE
                 else
                     msg
+
+            if (::noticeMsgToContentTextJob.isInitialized && noticeMsgToContentTextJob.isActive)
+                noticeMsgToContentTextJob.cancel()
 
             displayMessageToContentText(msgToShow, 3500L)
         }
@@ -185,7 +173,6 @@ internal class OnionProxyEventBroadcaster(
      * */
     private fun displayMessageToContentText(message: String, delayMilliSeconds: Long) {
         noticeMsgToContentTextJob = torService.scopeMain.launch {
-            delay(timeForBandwidthUpdatesToClear)
             serviceNotification.updateContentText(message)
             delay(delayMilliSeconds)
 
@@ -207,17 +194,14 @@ internal class OnionProxyEventBroadcaster(
     override fun broadcastTorState(@TorState state: String, @TorNetworkState networkState: String) {
         super.broadcastTorState(state, networkState)
 
-        torService.scopeMain.launch {
-            if (lastState == TorState.ON && state != lastState) {
-                delay(timeForBandwidthUpdatesToClear)
-                serviceNotification.removeActions(torService, state)
-            } else {
-                serviceNotification.updateContentTitle(state)
-            }
-            lastState = state
+        if (lastState == TorState.ON && state != lastState)
+            serviceNotification.removeActions(torService, state)
+        else
+            serviceNotification.updateContentTitle(state)
 
-            if (!torStateMachine.isConnected)
-                serviceNotification.updateIcon(torService, ImageState.DISABLED)
-        }
+        lastState = state
+
+        if (!torStateMachine.isConnected)
+            serviceNotification.updateIcon(torService, ImageState.DISABLED)
     }
 }
