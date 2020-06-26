@@ -207,37 +207,11 @@ internal class ServiceNotification(
     }
 
 
-    /////////////////
-    /// Bandwidth ///
-    /////////////////
-    private val numberFormat = NumberFormat.getInstance(Locale.getDefault())
-
-    @Synchronized
-    fun updateBandwidth(download: Long, upload: Long) {
-        val builder = notificationBuilder
-        builder.setContentText("${formatBandwidth(download)} ↓ / ${formatBandwidth(upload)} ↑")
-        notify(builder)
-    }
-
-    // Obtained from: https://gitweb.torproject.org/tor-android-service.git/tree/service/
-    //                src/main/java/org/torproject/android/service/TorEventHandler.java
-    // Original method name: formatCount()
-    private fun formatBandwidth(value: Long): String =
-        if (value < 1e6)
-            numberFormat.format(
-                Math.round( ( ( (value * 10 / 1024 ).toInt() ) /10 ).toFloat() )
-            ) + "kbps"
-        else
-            numberFormat.format(
-                Math.round( ( ( (value * 100 / 1024 / 1024).toInt() ) /100 ).toFloat() )
-            ) + "mbps"
-
-
     /////////////////////
-    /// Bootstrapping ///
+    /// Content Text ///
     /////////////////////
     @Synchronized
-    fun updateBootstrap(string: String) {
+    fun updateContentText(string: String) {
         val builder = notificationBuilder
         builder.setContentText(string)
         notify(builder)

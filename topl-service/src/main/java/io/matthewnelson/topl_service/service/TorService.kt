@@ -144,16 +144,13 @@ internal class TorService: Service() {
         startTor()
     }
 
-    /**
-     * Do not call directly. Use [executeAction].
-     * */
     private fun newIdentity() =
         synchronized(actionLock) {
-            try {
-                onionProxyManager.setNewIdentity()
-            } catch (e: Exception) {
-                e.printStackTrace()
-                false
+            if (::stopTorJob.isInitialized && stopTorJob.isActive) return
+            if (::restartTorJob.isInitialized && restartTorJob.isActive) return
+            if (::newIdentityJob.isInitialized && newIdentityJob.isActive) return
+            newIdentityJob = scopeDefault.launch {
+                onionProxyManager.signalNewNym()
             }
         }
 
@@ -163,6 +160,7 @@ internal class TorService: Service() {
     ///////////////
     private val supervisorJob = SupervisorJob()
     private val scopeDefault = CoroutineScope(Dispatchers.Default + supervisorJob)
+    val scopeMain = CoroutineScope(Dispatchers.Main + supervisorJob)
     private lateinit var startTorJob: Job
     private lateinit var stopTorJob: Job
     private lateinit var restartTorJob: Job
@@ -193,11 +191,7 @@ internal class TorService: Service() {
                 }
             }
             ServiceAction.ACTION_NEW_ID -> {
-                if (::stopTorJob.isInitialized && stopTorJob.isActive) return
-                if (::restartTorJob.isInitialized && restartTorJob.isActive) return
-                newIdentityJob = scopeDefault.launch {
-                    newIdentity()
-                }
+                newIdentity()
             }
         }
     }

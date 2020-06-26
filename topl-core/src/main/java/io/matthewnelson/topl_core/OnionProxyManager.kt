@@ -36,11 +36,13 @@ import io.matthewnelson.topl_core.broadcaster.DefaultEventBroadcaster
 import io.matthewnelson.topl_core.broadcaster.EventBroadcaster
 import io.matthewnelson.topl_core.listener.BaseEventListener
 import io.matthewnelson.topl_core.listener.DefaultEventListener
+import io.matthewnelson.topl_core.listener.InternalEventListener
 import io.matthewnelson.topl_core.settings.TorSettingsBuilder
 import io.matthewnelson.topl_core.util.OnionProxyConsts.ConfigFile
 import io.matthewnelson.topl_core.util.FileUtilities
 import io.matthewnelson.topl_core.util.WriteObserver
 import io.matthewnelson.topl_core_base.TorStates
+import kotlinx.coroutines.delay
 import net.freehaven.tor.control.EventListener
 import net.freehaven.tor.control.TorControlCommands
 import net.freehaven.tor.control.TorControlConnection
@@ -79,11 +81,13 @@ class OnionProxyManager(
     val eventBroadcaster = eventBroadcaster ?: DefaultEventBroadcaster(onionProxyContext.torSettings)
     private val eventListener = primaryEventListener ?: DefaultEventListener()
 
-    private companion object {
-        const val OWNER = "__OwningControllerProcess"
-        const val HOSTNAME_TIMEOUT = 30
+    companion object {
+        private const val OWNER = "__OwningControllerProcess"
+        private const val HOSTNAME_TIMEOUT = 30
+        const val NEWNYM_SUCCESS_MESSAGE = "You've changed Tor identities!"
+        const val NEWNYM_RATE_LIMIT_PARTIAL_MESSAGE = "Rate limiting NEWNYM request: "
 
-        val LOG: Logger = LoggerFactory.getLogger(OnionProxyManager::class.java)
+        private val LOG: Logger = LoggerFactory.getLogger(OnionProxyManager::class.java)
     }
 
     @Volatile
@@ -732,6 +736,80 @@ class OnionProxyManager(
         return true
     }
 
+    /**
+     * Will signal for a NewNym, then broadcast [NEWNYM_SUCCESS_MESSAGE] if successful.
+     *
+     * Because there is no way to easily ascertain success we have to add a listener to
+     * see if we've been rate limited. Being rate limited means we were **not** successful
+     * in changing to a new identity, thus not broadcasting the success message.
+     *
+     * If the [eventListener]'s [BaseEventListener.noticeMsg] is piping it's messages to
+     * the [EventBroadcaster.broadcastNotice], you will receive the message of being
+     * rate limited. The [InternalEventListener] is used specifically for this purpose.
+     * */
+    @Synchronized
+    suspend fun signalNewNym() {
+        if (!hasControlConnection()) return
+        LOG.debug("Acquiring a ${TorControlCommands.SIGNAL_NEWNYM}")
+        val internalEventListener = InternalEventListener()
+        try {
+            LOG.debug("Registering InternalEventListener")
+            controlConnection!!.addRawEventListener(internalEventListener)
+            delay(100)
+        } catch (e: KotlinNullPointerException) {
+            LOG.error("TorControlConnection was null even after checking", e)
+            return
+        }
+
+        // If signaling was successful
+        if (signalControlConnection(TorControlCommands.SIGNAL_NEWNYM)) {
+            delay(100)
+            // If no notice of rate limiting was received
+            if (!internalEventListener.doesBufferContainString(NEWNYM_RATE_LIMIT_PARTIAL_MESSAGE))
+                eventBroadcaster.broadcastNotice(
+                    "${TorControlCommands.SIGNAL_NEWNYM}|$NEWNYM_SUCCESS_MESSAGE"
+                )
+        } else { // signaling was unsuccessful
+            eventBroadcaster.broadcastNotice(
+                "NOTICE: Failed to acquire a ${TorControlCommands.SIGNAL_NEWNYM}..."
+            )
+        }
+        try {
+            controlConnection!!.removeRawEventListener(internalEventListener)
+        } catch (e: KotlinNullPointerException) {}
+        finally {
+            LOG.debug("InternalEventListener removed")
+        }
+    }
+
+    /**
+     * Sends a signal to the  [TorControlConnection]
+     *
+     * @param [torControlSignalCommand] See [TorControlCommands] for acceptable `SIGNAL_` values.
+     * @return `true` if the signal was received by [TorControlConnection], `false` if not or if
+     *   a [controlConnection] has not been established (ie, is null/Tor is not running).
+     * */
+    fun signalControlConnection(torControlSignalCommand: String): Boolean {
+        return if (!hasControlConnection()) {
+            false
+        } else {
+            return try {
+                controlConnection!!.signal(torControlSignalCommand)
+                true
+            } catch (e: IOException) {
+                LOG.warn("Control connection is not responding properly to signal", e)
+                false
+            } catch (ee: KotlinNullPointerException) {
+                LOG.error("TorControlConnection was null even after checking")
+                false
+            }
+        }
+    }
+
+    // TODO: This does not work properly because of rate limiting. The signal successfully
+    //  sends which won't throw an IOException, but the success of attaining a new identity
+    //  is dependant on whether or not you've been Rate Limited so the returned value of true
+    //  actually means that the signal was successfully sent, not that a new nym was ascertained.
     fun setNewIdentity(): Boolean {
         return if (!hasControlConnection()) {
             false
@@ -755,17 +833,20 @@ class OnionProxyManager(
             return if (pidS.isNullOrEmpty()) -1 else Integer.valueOf(pidS)
         }
 
+    /**
+     * See the
+     * <a href="https://torproject.gitlab.io/torspec/control-spec/#getinfo" target="_blank">tor_spec</a>
+     * for accepted queries.
+     * */
     fun getInfo(info: String): String? {
         return if (!hasControlConnection()) {
             null
         } else try {
             controlConnection!!.getInfo(info)
         } catch (e: IOException) {
-            eventBroadcaster.broadcastException(e.message, e)
             LOG.warn("Control connection is not responding properly to getInfo", e)
             null
         } catch (ee: KotlinNullPointerException) {
-            eventBroadcaster.broadcastException(ee.message, ee)
             null
         }
     }

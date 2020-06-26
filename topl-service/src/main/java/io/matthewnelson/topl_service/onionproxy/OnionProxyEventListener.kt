@@ -29,12 +29,18 @@ internal class OnionProxyEventListener(
     override val CONTROL_COMMAND_EVENTS: Array<String>
         get() = arrayOf(
             TorControlCommands.EVENT_CIRCUIT_STATUS,
+            TorControlCommands.EVENT_CIRCUIT_STATUS_MINOR,
+            TorControlCommands.EVENT_STREAM_STATUS,
             TorControlCommands.EVENT_OR_CONN_STATUS,
+            TorControlCommands.EVENT_BANDWIDTH_USED,
             TorControlCommands.EVENT_NOTICE_MSG,
             TorControlCommands.EVENT_WARN_MSG,
             TorControlCommands.EVENT_ERR_MSG,
-            TorControlCommands.EVENT_BANDWIDTH_USED,
-            TorControlCommands.EVENT_STATUS_CLIENT
+            TorControlCommands.EVENT_NEW_DESC,
+            TorControlCommands.EVENT_STATUS_GENERAL,
+            TorControlCommands.EVENT_STATUS_CLIENT,
+            TorControlCommands.EVENT_NEWCONSENSUS,
+            TorControlCommands.EVENT_TRANSPORT_LAUNCHED
         )
 
     override fun noticeMsg(data: String?) {

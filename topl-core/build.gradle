@@ -39,6 +39,8 @@ dependencies {
     implementation project(':topl-core-base')
     implementation deps.androidx.core
     implementation deps.jtorctl
+    implementation deps.kotlin.coroutinesAndroid
+    implementation deps.kotlin.coroutinesCore
     implementation deps.kotlin.stdlib
     implementation deps.slf4j.api
     implementation deps.slf4j.android
