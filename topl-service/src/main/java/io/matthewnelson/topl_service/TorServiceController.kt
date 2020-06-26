@@ -38,7 +38,7 @@ class TorServiceController private constructor() {
      * You can see how the [TorSettings] sent here are used in [TorService] by looking at
      * [io.matthewnelson.topl_service.service.TorServiceSettings] and [TorService.onCreate].
      *
-     * @param [application] Application
+     * @param [application] [Application], for obtaining
      * @param [buildConfigVersion] send [BuildConfig.VERSION_CODE]. Mitigates copying of geoip
      *   files to app updates only.
      * @param [torSettings] [TorSettings] used to create your torrc file on startup.
@@ -290,10 +290,12 @@ class TorServiceController private constructor() {
              *
              * See [Builder] for code samples.
              *
+             * @param [enable] Boolean, automatically set to true but provides cleaner option
+             *   for implementor to query SharedPreferences for user's settings (if desired).
              * @return [NotificationBuilder]
              * */
-            fun enableTorRestartButton(): NotificationBuilder {
-                serviceNotification.enableRestartButton = true
+            fun enableTorRestartButton(enable: Boolean = true): NotificationBuilder {
+                serviceNotification.enableRestartButton = enable
                 return this
             }
 
@@ -304,10 +306,12 @@ class TorServiceController private constructor() {
              *
              * See [Builder] for code samples.
              *
+             * @param [enable] Boolean, automatically set to true but provides cleaner option
+             *   for implementor to query SharedPreferences for user's settings (if desired).
              * @return [NotificationBuilder]
              * */
-            fun enableTorStopButton(): NotificationBuilder {
-                serviceNotification.enableStopButton = true
+            fun enableTorStopButton(enable: Boolean = true): NotificationBuilder {
+                serviceNotification.enableStopButton = enable
                 return this
             }
 
