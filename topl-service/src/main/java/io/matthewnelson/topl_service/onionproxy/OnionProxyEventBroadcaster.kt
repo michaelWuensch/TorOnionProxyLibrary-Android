@@ -176,9 +176,12 @@ internal class OnionProxyEventBroadcaster(
             serviceNotification.updateContentText(message)
             delay(delayMilliSeconds)
 
-            // If we're still connected, publish the last bandwidth
-            // broadcast to overwrite the message.
-            if (!torStateMachine.isNetworkDisabled)
+            // Publish the last bandwidth broadcast to overwrite the message.
+            if (torStateMachine.isNetworkDisabled)
+                serviceNotification.updateContentText(
+                    getFormattedBandwidthString(0L, 0L)
+                )
+            else
                 serviceNotification.updateContentText(
                     getFormattedBandwidthString(bytesRead, bytesWritten)
                 )
