@@ -177,13 +177,13 @@ internal class OnionProxyEventBroadcaster(
             delay(delayMilliSeconds)
 
             // Publish the last bandwidth broadcast to overwrite the message.
-            if (torStateMachine.isNetworkDisabled)
-                serviceNotification.updateContentText(
-                    getFormattedBandwidthString(0L, 0L)
-                )
-            else
+            if (!torStateMachine.isNetworkDisabled)
                 serviceNotification.updateContentText(
                     getFormattedBandwidthString(bytesRead, bytesWritten)
+                )
+            else if (torStateMachine.isNetworkDisabled && bootstrapProgress == "Bootstrapped 100%")
+                serviceNotification.updateContentText(
+                    getFormattedBandwidthString(0L, 0L)
                 )
         }
     }
@@ -197,10 +197,12 @@ internal class OnionProxyEventBroadcaster(
     override fun broadcastTorState(@TorState state: String, @TorNetworkState networkState: String) {
         super.broadcastTorState(state, networkState)
 
-        if (lastState == TorState.ON && state != lastState)
+        if (lastState == TorState.ON && state != lastState) {
+            bootstrapProgress = ""
             serviceNotification.removeActions(torService, state)
-        else
+        } else {
             serviceNotification.updateContentTitle(state)
+        }
 
         lastState = state
 
