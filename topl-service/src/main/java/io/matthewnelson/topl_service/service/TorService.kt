@@ -143,7 +143,6 @@ internal class TorService: Service() {
     /// Actions ///
     ///////////////
     private val supervisorJob = SupervisorJob()
-    private val scopeDefault = CoroutineScope(Dispatchers.Default + supervisorJob)
     val scopeMain = CoroutineScope(Dispatchers.Main + supervisorJob)
     private lateinit var executeActionJob: Job
 
@@ -159,7 +158,7 @@ internal class TorService: Service() {
                 delay(100L)
             }
 
-            executeActionJob = scopeDefault.launch {
+            executeActionJob = launch(Dispatchers.IO) {
                 when (action) {
                     ServiceAction.ACTION_START -> {
                         startTor()
