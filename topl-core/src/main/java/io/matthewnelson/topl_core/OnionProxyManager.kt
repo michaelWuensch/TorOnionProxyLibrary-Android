@@ -320,7 +320,7 @@ class OnionProxyManager(
 
             if (networkIsSetToDisable == disable) return
 
-            LOG.info("Disabling network: $disable")
+            LOG.info("Setting Tor conf DisableNetwork: $disable")
 
             try {
                 controlConnection!!.setConf("DisableNetwork", if (disable) "1" else "0")

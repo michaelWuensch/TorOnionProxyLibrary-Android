@@ -20,16 +20,15 @@ internal class NetworkStateReceiver(
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context != null) {
             if (!initializeConnectivityManager(context)) return
+            if (onionProxyManager.eventBroadcaster.torStateMachine.isOff) return
 
             val info = connectivityManager.activeNetworkInfo
             networkConnectivity = info != null && info.isConnected
 
-            if (!onionProxyManager.eventBroadcaster.torStateMachine.isOff) {
-                CoroutineScope(Dispatchers.Main).launch(Dispatchers.IO) {
-                    try {
-                        onionProxyManager.disableNetwork(!networkConnectivity)
-                    } catch (e: Exception) {}
-                }
+            CoroutineScope(Dispatchers.Main).launch(Dispatchers.IO) {
+                try {
+                    onionProxyManager.disableNetwork(!networkConnectivity)
+                } catch (e: Exception) {}
             }
         }
     }
