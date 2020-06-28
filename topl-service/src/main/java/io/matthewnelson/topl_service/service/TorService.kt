@@ -72,8 +72,8 @@ internal class TorService: Service() {
         onionProxyManager = OnionProxyManager(
             this,
             onionProxyContext,
-            onionProxyEventBroadcaster,
-            onionProxyEventListener
+            onionProxyEventListener,
+            onionProxyEventBroadcaster
         )
     }
 

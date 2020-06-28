@@ -34,7 +34,6 @@ import io.matthewnelson.topl_core.broadcaster.BaseEventBroadcaster
 import io.matthewnelson.topl_core.broadcaster.DefaultEventBroadcaster
 import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_core.listener.BaseEventListener
-import io.matthewnelson.topl_core.listener.DefaultEventListener
 import io.matthewnelson.topl_core.receiver.NetworkStateReceiver
 import io.matthewnelson.topl_core.settings.TorSettingsBuilder
 import io.matthewnelson.topl_core.util.OnionProxyConsts.ConfigFile
@@ -63,18 +62,17 @@ import java.util.concurrent.TimeUnit
  *
  * @param [context] Context.
  * @param [onionProxyContext] [OnionProxyContext]
- * @param [eventBroadcaster] [BaseEventBroadcaster]? will fallback to defaults if null.
- * @param [eventListener] [BaseEventListener]? will fallback to defaults if null.
+ * @param [eventListener] [BaseEventListener] for processing Tor OP messages.
+ * @param [eventBroadcaster] [BaseEventBroadcaster]? will fallback to [DefaultEventBroadcaster] if null.
  */
 class OnionProxyManager(
     private val context: Context,
     val onionProxyContext: OnionProxyContext,
-    eventBroadcaster: BaseEventBroadcaster?,
-    eventListener: BaseEventListener?
+    private val eventListener: BaseEventListener,
+    eventBroadcaster: BaseEventBroadcaster?
 ): TorStates() {
 
     val eventBroadcaster = eventBroadcaster ?: DefaultEventBroadcaster(onionProxyContext.torSettings)
-    private val eventListener = eventListener ?: DefaultEventListener()
 
     companion object {
         private const val OWNER = "__OwningControllerProcess"
