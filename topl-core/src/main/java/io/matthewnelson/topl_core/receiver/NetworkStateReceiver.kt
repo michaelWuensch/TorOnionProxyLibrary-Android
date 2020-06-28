@@ -26,7 +26,9 @@ internal class NetworkStateReceiver(
 
             if (!onionProxyManager.eventBroadcaster.torStateMachine.isOff) {
                 CoroutineScope(Dispatchers.Main).launch(Dispatchers.IO) {
-                    onionProxyManager.disableNetwork(!networkConnectivity)
+                    try {
+                        onionProxyManager.disableNetwork(!networkConnectivity)
+                    } catch (e: Exception) {}
                 }
             }
         }

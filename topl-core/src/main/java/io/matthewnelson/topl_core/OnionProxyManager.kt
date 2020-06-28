@@ -40,7 +40,6 @@ import io.matthewnelson.topl_core.util.OnionProxyConsts.ConfigFile
 import io.matthewnelson.topl_core.util.FileUtilities
 import io.matthewnelson.topl_core.util.WriteObserver
 import io.matthewnelson.topl_core_base.TorStates
-import kotlinx.coroutines.delay
 import net.freehaven.tor.control.EventListener
 import net.freehaven.tor.control.TorControlCommands
 import net.freehaven.tor.control.TorControlConnection
@@ -291,7 +290,7 @@ class OnionProxyManager(
     @get:Synchronized
     val isRunning: Boolean
         get() = try {
-            isBootstrapped && isNetworkEnabled
+            isBootstrapped && !isNetworkDisabled
         } catch (e: Exception) {
             false
         }
@@ -310,10 +309,17 @@ class OnionProxyManager(
      */
     @Throws(IOException::class, KotlinNullPointerException::class)
     fun disableNetwork(disable: Boolean) {
-        if (controlConnection == null) return
-        if (disable == eventBroadcaster.torStateMachine.isNetworkDisabled) return
-
         synchronized(disableNetworkLock) {
+            if (controlConnection == null) return
+
+            val networkIsSetToDisable = try {
+                isNetworkDisabled
+            } catch (e: Exception) {
+                !disable
+            }
+
+            if (networkIsSetToDisable == disable) return
+
             LOG.info("Disabling network: $disable")
 
             try {
@@ -325,22 +331,25 @@ class OnionProxyManager(
                 LOG.warn("TorControlConnection is not responding properly to setConf.")
                 eventBroadcaster.broadcastException(e.message, e)
                 throw IOException(e.message)
+            } catch (ee: KotlinNullPointerException) {
+                eventBroadcaster.broadcastException(ee.message, ee)
+                throw NullPointerException(ee.message)
             }
         }
     }
 
     /**
-     * Specifies if Tor OP is accepting network connections
+     * Specifies if Tor OP is accepting network connections.
      *
-     * @return True if network is enabled (that doesn't mean that the device is online, only that the Tor OP is trying to connect to the network)
-     * @throws [java.io.IOException]
-     * @throws [NullPointerException] if [controlConnection] is null
+     * @return True = "DisableNetwork 1" (network disabled), false = "DisableNetwork 0" (network enabled)
+     * @throws [IOException] if [TorControlConnection] is not responding to getConf.
+     * @throws [NullPointerException] if [controlConnection] is null.
      */
     @get:Throws(IOException::class, NullPointerException::class)
     @get:Synchronized
-    private val isNetworkEnabled: Boolean
+    private val isNetworkDisabled: Boolean
         get() {
-            if (controlConnection == null) return false
+            if (controlConnection == null) return true
 
             val disableNetworkSettingValues = try {
                 controlConnection!!.getConf("DisableNetwork")
@@ -353,15 +362,15 @@ class OnionProxyManager(
                 throw IOException(ee.message)
             }
 
-            var result = false
+            var result = true
 
             // It's theoretically possible for us to get multiple values back, if even one is
-            // false then we will assume all are false
+            // "DisableNetwork 1" then we will assume all are "DisableNetwork 1"
             for (configEntry in disableNetworkSettingValues) {
                 result = if (configEntry.value == "1") {
-                    return false
+                    return true
                 } else {
-                    true
+                    false
                 }
             }
             return result
