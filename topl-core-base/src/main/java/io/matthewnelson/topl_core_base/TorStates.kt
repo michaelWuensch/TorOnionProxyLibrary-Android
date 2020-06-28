@@ -16,13 +16,31 @@ abstract class TorStates {
         TorState.STARTING,
         TorState.STOPPING
     )
-    @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
+    @Retention(AnnotationRetention.SOURCE)
     annotation class TorState {
         companion object {
-            const val OFF = "TOR_STATE_OFF"
-            const val ON = "TOR_STATE_ON"
-            const val STARTING = "TOR_STATE_STARTING"
-            const val STOPPING = "TOR_STATE_STOPPING"
+            const val OFF = "Tor: Off"
+            const val ON = "Tor: On"
+            const val STARTING = "Tor: Starting"
+            const val STOPPING = "Tor: Stopping"
+        }
+    }
+
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.TYPE,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.PROPERTY
+    )
+    @StringDef(
+        TorNetworkState.ENABLED,
+        TorNetworkState.DISABLED
+    )
+    @Retention(AnnotationRetention.SOURCE)
+    annotation class TorNetworkState {
+        companion object {
+            const val ENABLED = "Network: enabled"
+            const val DISABLED = "Network: disabled"
         }
     }
 }

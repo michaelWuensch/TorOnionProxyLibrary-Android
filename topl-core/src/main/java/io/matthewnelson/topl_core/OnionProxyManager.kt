@@ -27,15 +27,14 @@ See the Apache 2 License for the specific language governing permissions and lim
 */
 package io.matthewnelson.topl_core
 
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import io.matthewnelson.topl_core.broadcaster.DefaultEventBroadcaster
 import io.matthewnelson.topl_core.broadcaster.EventBroadcaster
 import io.matthewnelson.topl_core.listener.BaseEventListener
 import io.matthewnelson.topl_core.listener.DefaultEventListener
+import io.matthewnelson.topl_core.receiver.NetworkStateReceiver
 import io.matthewnelson.topl_core.settings.TorSettingsBuilder
 import io.matthewnelson.topl_core.util.OnionProxyConsts.ConfigFile
 import io.matthewnelson.topl_core.util.FileUtilities
@@ -72,22 +71,24 @@ class OnionProxyManager(
     private val context: Context,
     val onionProxyContext: OnionProxyContext,
     eventBroadcaster: EventBroadcaster?,
-    primaryEventListener: BaseEventListener?,
-    private val additionalEventListeners: Array<EventListener?>?
+    primaryEventListener: BaseEventListener?
 ): TorStates() {
 
     val eventBroadcaster = eventBroadcaster ?: DefaultEventBroadcaster(onionProxyContext.torSettings)
     private val eventListener = primaryEventListener ?: DefaultEventListener()
 
-    private companion object {
-        const val OWNER = "__OwningControllerProcess"
-        const val HOSTNAME_TIMEOUT = 30
+    companion object {
+        private const val OWNER = "__OwningControllerProcess"
+        private const val HOSTNAME_TIMEOUT = 30
+        private const val CONTROL_CONNECTION_NULL_MESSAGE = "TorControlConnection was null even after checking"
+        const val NEWNYM_SUCCESS_MESSAGE = "You've changed Tor identities!"
+        const val NEWNYM_RATE_LIMIT_PARTIAL_MSG = "Rate limiting NEWNYM request: "
 
-        val LOG: Logger = LoggerFactory.getLogger(OnionProxyManager::class.java)
+        private val LOG: Logger = LoggerFactory.getLogger(OnionProxyManager::class.java)
     }
 
     @Volatile
-    private var networkStateReceiver: BroadcastReceiver? = null
+    private var networkStateReceiver: NetworkStateReceiver? = null
 
     @Volatile
     private var controlSocket: Socket? = null
@@ -231,12 +232,10 @@ class OnionProxyManager(
         eventBroadcaster.torStateMachine.setTorState(TorState.STOPPING)
         eventBroadcaster.broadcastNotice("Using control port to shutdown Tor")
         try {
-            controlConnection!!.setConf("DisableNetwork", "1")
-            // Try shutting tor down properly first
+            disableNetwork(true)
             controlConnection!!.signal(TorControlCommands.SIGNAL_SHUTDOWN)
 
         } catch (e: KotlinNullPointerException) {
-            // TODO: May need to resync TorSettings...
             eventBroadcaster.broadcastException(e.message, e)
             eventBroadcaster.torStateMachine.setTorState(TorState.OFF)
             throw NullPointerException(e.message)
@@ -256,12 +255,6 @@ class OnionProxyManager(
 
             try {
                 controlConnection!!.removeRawEventListener(eventListener)
-                if (!additionalEventListeners.isNullOrEmpty())
-                    additionalEventListeners.forEach { listener ->
-                        listener?.let {
-                            controlConnection!!.removeRawEventListener(it)
-                        }
-                    }
             } catch (e: KotlinNullPointerException) {}
 
             controlConnection = null
@@ -297,49 +290,66 @@ class OnionProxyManager(
     @get:Synchronized
     val isRunning: Boolean
         get() = try {
-            isBootstrapped && isNetworkEnabled
+            isBootstrapped && !isNetworkDisabled
         } catch (e: Exception) {
             false
         }
 
+    private val disableNetworkLock = Object()
     /**
-     * Tells the Tor OP if it should accept network connections
+     * Tells the Tor OP if it should accept network connections.
      *
-     * @param [enable] If true then the Tor OP will accept SOCKS connections, otherwise not.
+     * Whenever setting Tor's Conf to `DisableNetwork X`, ONLY use this method to do it
+     * such that [EventBroadcaster.torStateMachine] will reflect the proper
+     * [TorStates.TorNetworkState].
+     *
+     * @param [disable] If true then the Tor OP will **not** accept SOCKS connections, otherwise yes.
      * @throws [IOException] if having issues with TorControlConnection#setConf
-     * @throws [NullPointerException] if [controlConnection] is null even after checking.
+     * @throws [KotlinNullPointerException] if [controlConnection] is null even after checking.
      */
-    @Synchronized
-    @Throws(IOException::class, NullPointerException::class)
-    fun enableNetwork(enable: Boolean) {
-        if (controlConnection == null) return
+    @Throws(IOException::class, KotlinNullPointerException::class)
+    fun disableNetwork(disable: Boolean) {
+        synchronized(disableNetworkLock) {
+            if (controlConnection == null) return
 
-        eventBroadcaster.broadcastNotice("Enabling network: $enable")
+            val networkIsSetToDisable = try {
+                isNetworkDisabled
+            } catch (e: Exception) {
+                !disable
+            }
 
-        try {
-            controlConnection!!.setConf("DisableNetwork", if (enable) "0" else "1")
-        } catch (e: KotlinNullPointerException) {
-            eventBroadcaster.broadcastException(e.message, e)
-            throw NullPointerException(e.message)
-        } catch (ee: IOException) {
-            LOG.warn("TorControlConnection is not responding properly to setConf.")
-            eventBroadcaster.broadcastException(ee.message, ee)
-            throw IOException(ee.message)
+            if (networkIsSetToDisable == disable) return
+
+            LOG.info("Setting Tor conf DisableNetwork: $disable")
+
+            try {
+                controlConnection!!.setConf("DisableNetwork", if (disable) "1" else "0")
+                eventBroadcaster.torStateMachine.setTorNetworkState(
+                    if (disable) TorNetworkState.DISABLED else TorNetworkState.ENABLED
+                )
+            } catch (e: IOException) {
+                LOG.warn("TorControlConnection is not responding properly to setConf.")
+                eventBroadcaster.broadcastException(e.message, e)
+                throw IOException(e.message)
+            } catch (ee: KotlinNullPointerException) {
+                eventBroadcaster.broadcastException(ee.message, ee)
+                throw NullPointerException(ee.message)
+            }
         }
     }
 
     /**
-     * Specifies if Tor OP is accepting network connections
+     * Specifies if Tor OP is accepting network connections.
      *
-     * @return True if network is enabled (that doesn't mean that the device is online, only that the Tor OP is trying to connect to the network)
-     * @throws [java.io.IOException]
-     * @throws [NullPointerException] if [controlConnection] is null
+     * @return True = "DisableNetwork 1" (network disabled), false = "DisableNetwork 0" (network enabled)
+     * @throws [IOException] if [TorControlConnection] is not responding to getConf.
+     * @throws [NullPointerException] if [controlConnection] is null.
      */
     @get:Throws(IOException::class, NullPointerException::class)
     @get:Synchronized
-    private val isNetworkEnabled: Boolean
+    private val isNetworkDisabled: Boolean
         get() {
-            if (controlConnection == null) return false
+            if (controlConnection == null) return true
 
             val disableNetworkSettingValues = try {
                 controlConnection!!.getConf("DisableNetwork")
@@ -352,15 +362,15 @@ class OnionProxyManager(
                 throw IOException(ee.message)
             }
 
-            var result = false
+            var result = true
 
             // It's theoretically possible for us to get multiple values back, if even one is
-            // false then we will assume all are false
+            // "DisableNetwork 1" then we will assume all are "DisableNetwork 1"
             for (configEntry in disableNetworkSettingValues) {
                 result = if (configEntry.value == "1") {
-                    return false
+                    return true
                 } else {
-                    true
+                    false
                 }
             }
             return result
@@ -379,11 +389,10 @@ class OnionProxyManager(
             try {
                 val phase = controlConnection?.getInfo("status/bootstrap-phase")
                 if (phase != null && phase.contains("PROGRESS=100")) {
-                    LOG.info("Tor has already bootstrapped")
+                    LOG.info("isBootstrapped: true")
                     return true
                 }
             } catch (e: IOException) {
-                eventBroadcaster.broadcastException(e.message, e)
                 LOG.warn("Control connection is not responding properly to getInfo", e)
             }
             return false
@@ -447,18 +456,11 @@ class OnionProxyManager(
                 eventBroadcaster.broadcastNotice("adding control port event listener")
 
                 controlConnection.addRawEventListener(eventListener)
-                if (!additionalEventListeners.isNullOrEmpty())
-                    additionalEventListeners.forEach { listener ->
-                        listener?.let {
-                            controlConnection.addRawEventListener(it)
-                        }
-                    }
-
                 controlConnection.setEvents(listOf(*eventListener.CONTROL_COMMAND_EVENTS))
                 eventBroadcaster.broadcastNotice("SUCCESS added control port event listener")
             }
 
-            enableNetwork(true)
+            disableNetwork(false)
         } catch (e: Exception) {
             torProcess?.destroy()
             this.controlConnection = null
@@ -468,7 +470,7 @@ class OnionProxyManager(
 
         eventBroadcaster.torStateMachine.setTorState(TorState.ON)
 
-        networkStateReceiver = NetworkStateReceiver()
+        networkStateReceiver = NetworkStateReceiver(this)
 
         @Suppress("DEPRECATION")
         val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
@@ -661,7 +663,7 @@ class OnionProxyManager(
         val torrc = onionProxyContext.torConfigFiles.torrcFile
         if (!torrc.exists()) {
             eventBroadcaster.broadcastNotice("Torrc not found")
-            eventBroadcaster.torStateMachine.setTorState(TorStates.TorState.STOPPING)
+            eventBroadcaster.torStateMachine.setTorState(TorState.STOPPING)
             LOG.error("Torrc not found: ${torrc.absolutePath}")
             throw IOException("Torrc not found")
         }
@@ -711,8 +713,8 @@ class OnionProxyManager(
                 resetBuffer.add("ExitNodes")
                 resetBuffer.add("StrictNodes")
                 controlConnection!!.resetConf(resetBuffer)
-                controlConnection!!.setConf("DisableNetwork", "1")
-                controlConnection!!.setConf("DisableNetwork", "0")
+                disableNetwork(true)
+                disableNetwork(false)
             } catch (ioe: Exception) {
                 LOG.error("Connection exception occurred resetting exits", ioe)
                 return false
@@ -723,8 +725,8 @@ class OnionProxyManager(
                 controlConnection!!.setConf("GeoIPv6File", onionProxyContext.torConfigFiles.geoIpv6File.canonicalPath)
                 controlConnection!!.setConf("ExitNodes", exitNodes)
                 controlConnection!!.setConf("StrictNodes", "1")
-                controlConnection!!.setConf("DisableNetwork", "1")
-                controlConnection!!.setConf("DisableNetwork", "0")
+                disableNetwork(true)
+                disableNetwork(false)
             } catch (ioe: Exception) {
                 LOG.error("Connection exception occurred resetting exits", ioe)
                 return false
@@ -733,20 +735,81 @@ class OnionProxyManager(
         return true
     }
 
-    fun disableNetwork(isEnabled: Boolean): Boolean {
+    /**
+     * Will signal for a NewNym, then broadcast [NEWNYM_SUCCESS_MESSAGE] if successful.
+     *
+     * Because there is no way to easily ascertain success, a listener has to be added to
+     * see if we've been rate limited. Being rate limited means we were **not** successful
+     * when signaling NEWNYM, so we don't want to broadcast the success message.
+     *
+     * If the [eventListener] you're instantiating [OnionProxyManager] with has it's
+     * [BaseEventListener.noticeMsg] being piped to the [EventBroadcaster.broadcastNotice],
+     * you will receive the message of being rate limited. The [InternalEventListener] is
+     * used specifically for this purpose.
+     * */
+    @Synchronized
+    suspend fun signalNewNym() {
+        if (!hasControlConnection() || !isBootstrapped) return
+        if (networkStateReceiver?.networkConnectivity != true) {
+            eventBroadcaster.broadcastNotice("NEWNYM: No network connectivity")
+            return
+        }
+
+        LOG.info("Attempting to acquire a new nym")
+        eventListener.beginWatchingNoticeMsgs()
+
+        val signalSuccess =
+            try {
+                signalControlConnection(TorControlCommands.SIGNAL_NEWNYM)
+            } catch (e: NullPointerException) {
+                false
+            }
+
+        val rateLimited = eventListener.doesNoticeMsgBufferContain(NEWNYM_RATE_LIMIT_PARTIAL_MSG)
+
+        if (signalSuccess) {
+            if (!rateLimited) {
+                LOG.info("Successfully acquired a new nym")
+                eventBroadcaster.broadcastNotice(
+                    "${TorControlCommands.SIGNAL_NEWNYM}|$NEWNYM_SUCCESS_MESSAGE"
+                )
+            } else {
+                LOG.info("Was rate limited when trying to acquire a new nym")
+            }
+        } else {
+            eventBroadcaster.broadcastNotice(
+                "NOTICE: Failed to acquire a ${TorControlCommands.SIGNAL_NEWNYM}..."
+            )
+        }
+    }
+
+    /**
+     * Sends a signal to the  [TorControlConnection]
+     *
+     * @param [torControlSignalCommand] See [TorControlCommands] for acceptable `SIGNAL_` values.
+     * @return `true` if the signal was received by [TorControlConnection], `false` if not.
+     * */
+    fun signalControlConnection(torControlSignalCommand: String): Boolean {
         return if (!hasControlConnection()) {
             false
         } else {
-            try {
-                controlConnection!!.setConf("DisableNetwork", if (isEnabled) "0" else "1")
+            return try {
+                controlConnection!!.signal(torControlSignalCommand)
                 true
-            } catch (e: Exception) {
-                eventBroadcaster.broadcastNotice("error disabling network ${e.localizedMessage}")
+            } catch (e: IOException) {
+                LOG.warn("Control connection is not responding properly to signal", e)
+                false
+            } catch (ee: KotlinNullPointerException) {
+                LOG.error(CONTROL_CONNECTION_NULL_MESSAGE, ee)
                 false
             }
         }
     }
 
+    // TODO: This does not work properly because of rate limiting. The signal successfully
+    //  sends which won't throw an IOException, but the success of attaining a new identity
+    //  is dependant on whether or not you've been Rate Limited so the returned value of true
+    //  actually means that the signal was successfully sent, not that a new nym was ascertained.
     fun setNewIdentity(): Boolean {
         return if (!hasControlConnection()) {
             false
@@ -770,17 +833,23 @@ class OnionProxyManager(
             return if (pidS.isNullOrEmpty()) -1 else Integer.valueOf(pidS)
         }
 
-    fun getInfo(info: String): String? {
+    /**
+     * See the
+     * <a href="https://torproject.gitlab.io/torspec/control-spec/#getinfo" target="_blank">tor_spec</a>
+     * for accepted queries.
+     *
+     * @param [queryCommand] What data you are querying the [TorControlConnection] for
+     * */
+    fun getInfo(queryCommand: String): String? {
         return if (!hasControlConnection()) {
             null
         } else try {
-            controlConnection!!.getInfo(info)
+            controlConnection!!.getInfo(queryCommand)
         } catch (e: IOException) {
-            eventBroadcaster.broadcastException(e.message, e)
             LOG.warn("Control connection is not responding properly to getInfo", e)
             null
         } catch (ee: KotlinNullPointerException) {
-            eventBroadcaster.broadcastException(ee.message, ee)
+            LOG.error(CONTROL_CONNECTION_NULL_MESSAGE, ee)
             null
         }
     }
@@ -845,32 +914,5 @@ class OnionProxyManager(
         } catch (e: Exception) {
             null
         }
-
-    private inner class NetworkStateReceiver : BroadcastReceiver() {
-
-        override fun onReceive(ctx: Context, i: Intent) {
-
-            Thread(Runnable {
-                if (!isRunning) return@Runnable
-
-                var online = !i.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false)
-                if (online) {
-                    // Some devices fail to set EXTRA_NO_CONNECTIVITY, double check
-                    val cm = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-                    val net = cm.activeNetworkInfo
-                    if (net == null || !net.isConnected)
-                        online = false
-                }
-                LOG.info("Online: $online")
-
-                try {
-                    enableNetwork(online)
-                } catch (e: Exception) {
-                    LOG.warn(e.message, e)
-                }
-
-            }).start()
-        }
-    }
 
 }

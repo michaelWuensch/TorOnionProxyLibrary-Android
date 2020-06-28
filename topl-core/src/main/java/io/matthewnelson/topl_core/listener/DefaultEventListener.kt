@@ -74,8 +74,10 @@ open class DefaultEventListener: BaseEventListener() {
 
     override fun transportLaunched(data: String?) {}
 
-    override fun noticeMsg(data: String?) =
+    override fun noticeMsg(data: String?) {
         LOG.info("NOTICE: ${data ?: "null"}")
+        super.noticeMsg(data)
+    }
 
     override fun warnMsg(data: String?) =
         LOG.warn("WARNING: ${data ?: ""}")

@@ -12,6 +12,7 @@ See the Apache 2 License for the specific language governing permissions and lim
 */
 package io.matthewnelson.topl_core.broadcaster
 
+import android.util.Log
 import io.matthewnelson.topl_core_base.TorSettings
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -28,7 +29,7 @@ open class DefaultEventBroadcaster(private val torSettings: TorSettings) : Event
         val LOG: Logger = LoggerFactory.getLogger(DefaultEventBroadcaster::class.java)
     }
 
-    override fun broadcastBandwidth(upload: Long, download: Long, written: Long, read: Long) {}
+    override fun broadcastBandwidth(bytesRead: String, bytesWritten: String) {}
 
     override fun broadcastDebug(msg: String) {
         if (torSettings.hasDebugLogs)
@@ -57,5 +58,10 @@ open class DefaultEventBroadcaster(private val torSettings: TorSettings) : Event
             broadcastLogMessage(msg)
     }
 
-    override fun broadcastTorState(@TorState state: String) {}
+    override fun broadcastTorState(@TorState state: String, @TorNetworkState networkState: String) {
+        val message = "TOR_STATE|$state|$networkState"
+        if (torSettings.hasDebugLogs)
+            LOG.debug(message)
+        broadcastLogMessage(message)
+    }
 }

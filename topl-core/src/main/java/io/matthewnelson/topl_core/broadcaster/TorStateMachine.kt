@@ -19,8 +19,8 @@ import io.matthewnelson.topl_core_base.TorStates
  */
 class TorStateMachine(private val broadcaster: EventBroadcaster): TorStates() {
 
-    var currentTorState: @TorState String = TorState.OFF
-        private set
+    private var currentTorState: @TorState String = TorState.OFF
+    private var currentTorNetworkState: @TorNetworkState String = TorNetworkState.DISABLED
 
     val isOff: Boolean
         get() = TorState.OFF == currentTorState
@@ -34,19 +34,40 @@ class TorStateMachine(private val broadcaster: EventBroadcaster): TorStates() {
     val isStopping: Boolean
         get() = TorState.STOPPING == currentTorState
 
+    val isNetworkDisabled: Boolean
+        get() = TorNetworkState.DISABLED == currentTorNetworkState
+
     /**
      * Will set the state to that which is specified if it isn't already.
      *
      * @return Previous [TorStates.TorState]
      * */
+    @Synchronized
     internal fun setTorState(@TorState state: String): @TorState String {
         val currentState = currentTorState
         if (currentTorState != state) {
             currentTorState = state
-            broadcaster.broadcastTorState(currentTorState)
+            broadcaster.broadcastTorState(currentTorState, currentTorNetworkState)
         } else {
             broadcaster.broadcastDebug("TorState was already set to $currentState")
         }
         return currentState
+    }
+
+    /**
+     * Will set the network state to that which is specified if it isn't already.
+     *
+     * @return Previous [TorStates.TorNetworkState]
+     * */
+    @Synchronized
+    internal fun setTorNetworkState(@TorNetworkState state: String): @TorNetworkState String {
+        val currentNetworkState = currentTorNetworkState
+        if (currentTorNetworkState != state) {
+            currentTorNetworkState = state
+            broadcaster.broadcastTorState(currentTorState, currentTorNetworkState)
+        } else {
+            broadcaster.broadcastDebug("TorNetworkState was already set to $currentNetworkState")
+        }
+        return currentNetworkState
     }
 }

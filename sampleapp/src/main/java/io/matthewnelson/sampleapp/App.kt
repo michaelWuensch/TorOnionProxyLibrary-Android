@@ -1,7 +1,6 @@
 package io.matthewnelson.sampleapp
 
 import android.app.Application
-import android.content.Context
 import io.matthewnelson.topl_service.TorServiceController
 
 class App: Application() {
@@ -9,23 +8,34 @@ class App: Application() {
     override fun onCreate() {
         super.onCreate()
 
-        setupTorServices(this)
+        setupTorServices()
     }
 
-    private fun setupTorServices(context: Context) {
+    private fun setupTorServices() {
         TorServiceController.Builder(
-            context.applicationContext,
-            BuildConfig.VERSION_CODE,
-            MyTorSettings(),
-            "common/geoip",
-            "common/geoip6"
+            application = this,
+            buildConfigVersion = BuildConfig.VERSION_CODE,
+            torSettings = MyTorSettings(),
+            geoipAssetPath = "common/geoip",
+            geoip6AssetPath = "common/geoip6"
         )
             .customizeNotification(
-                "TorService Channel",
-                "Tor Channel",
-                "My Sample Application",
-                615)
-            .setActivityToBeOpenedOnTap(MainActivity::class.java, null, null, null)
+                channelName = "TorService Channel",
+                channelDescription = "Tor Channel",
+                channelID = "My Sample Application",
+                notificationID = 615)
+            .setActivityToBeOpenedOnTap(
+                clazz = MainActivity::class.java,
+                intentExtrasKey = null,
+                intentExtras = null,
+                intentRequestCode = null
+            )
+            .setCustomColor(
+                colorRes = R.color.tor_service_connected,
+                colorizeBackground = true
+            )
+            .enableTorRestartButton()
+            .enableTorStopButton()
             .applyNotificationSettings()
             .build()
     }
