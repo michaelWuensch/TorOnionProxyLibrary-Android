@@ -41,6 +41,7 @@ internal class OnionProxyEventListener(
     override fun noticeMsg(data: String?) {
         if (!data.isNullOrEmpty())
             eventBroadcaster.broadcastNotice(data)
+        super.noticeMsg(data)
     }
 
     override fun unrecognized(data: String?) {}

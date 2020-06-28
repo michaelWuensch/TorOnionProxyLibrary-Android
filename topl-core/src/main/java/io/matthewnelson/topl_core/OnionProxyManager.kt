@@ -34,7 +34,6 @@ import io.matthewnelson.topl_core.broadcaster.DefaultEventBroadcaster
 import io.matthewnelson.topl_core.broadcaster.EventBroadcaster
 import io.matthewnelson.topl_core.listener.BaseEventListener
 import io.matthewnelson.topl_core.listener.DefaultEventListener
-import io.matthewnelson.topl_core.listener.InternalEventListener
 import io.matthewnelson.topl_core.receiver.NetworkStateReceiver
 import io.matthewnelson.topl_core.settings.TorSettingsBuilder
 import io.matthewnelson.topl_core.util.OnionProxyConsts.ConfigFile
@@ -73,8 +72,7 @@ class OnionProxyManager(
     private val context: Context,
     val onionProxyContext: OnionProxyContext,
     eventBroadcaster: EventBroadcaster?,
-    primaryEventListener: BaseEventListener?,
-    private val additionalEventListeners: Array<EventListener?>?
+    primaryEventListener: BaseEventListener?
 ): TorStates() {
 
     val eventBroadcaster = eventBroadcaster ?: DefaultEventBroadcaster(onionProxyContext.torSettings)
@@ -85,7 +83,7 @@ class OnionProxyManager(
         private const val HOSTNAME_TIMEOUT = 30
         private const val CONTROL_CONNECTION_NULL_MESSAGE = "TorControlConnection was null even after checking"
         const val NEWNYM_SUCCESS_MESSAGE = "You've changed Tor identities!"
-        const val NEWNYM_RATE_LIMIT_PARTIAL_MESSAGE = "Rate limiting NEWNYM request: "
+        const val NEWNYM_RATE_LIMIT_PARTIAL_MSG = "Rate limiting NEWNYM request: "
 
         private val LOG: Logger = LoggerFactory.getLogger(OnionProxyManager::class.java)
     }
@@ -239,7 +237,6 @@ class OnionProxyManager(
             controlConnection!!.signal(TorControlCommands.SIGNAL_SHUTDOWN)
 
         } catch (e: KotlinNullPointerException) {
-            // TODO: May need to resync TorSettings...
             eventBroadcaster.broadcastException(e.message, e)
             eventBroadcaster.torStateMachine.setTorState(TorState.OFF)
             throw NullPointerException(e.message)
@@ -259,12 +256,6 @@ class OnionProxyManager(
 
             try {
                 controlConnection!!.removeRawEventListener(eventListener)
-                if (!additionalEventListeners.isNullOrEmpty())
-                    additionalEventListeners.forEach { listener ->
-                        listener?.let {
-                            controlConnection!!.removeRawEventListener(it)
-                        }
-                    }
             } catch (e: KotlinNullPointerException) {}
 
             controlConnection = null
@@ -456,13 +447,6 @@ class OnionProxyManager(
                 eventBroadcaster.broadcastNotice("adding control port event listener")
 
                 controlConnection.addRawEventListener(eventListener)
-                if (!additionalEventListeners.isNullOrEmpty())
-                    additionalEventListeners.forEach { listener ->
-                        listener?.let {
-                            controlConnection.addRawEventListener(it)
-                        }
-                    }
-
                 controlConnection.setEvents(listOf(*eventListener.CONTROL_COMMAND_EVENTS))
                 eventBroadcaster.broadcastNotice("SUCCESS added control port event listener")
             }
@@ -763,15 +747,7 @@ class OnionProxyManager(
         }
 
         LOG.info("Attempting to acquire a new nym")
-        val internalEventListener = InternalEventListener()
-        try {
-            LOG.info("Adding InternalEventListener to TorControlConnection")
-            controlConnection!!.addRawEventListener(internalEventListener)
-            delay(100)
-        } catch (e: KotlinNullPointerException) {
-            LOG.error(CONTROL_CONNECTION_NULL_MESSAGE, e)
-            return
-        }
+        eventListener.beginWatchingNoticeMsgs()
 
         val signalSuccess =
             try {
@@ -780,9 +756,10 @@ class OnionProxyManager(
                 false
             }
 
+        val rateLimited = eventListener.doesNoticeMsgBufferContain(NEWNYM_RATE_LIMIT_PARTIAL_MSG)
+
         if (signalSuccess) {
-            delay(100) // Wait for a potential rate limiting notice to be picked up by the listener.
-            if (!internalEventListener.doesBufferContainString(NEWNYM_RATE_LIMIT_PARTIAL_MESSAGE)) {
+            if (!rateLimited) {
                 LOG.info("Successfully acquired a new nym")
                 eventBroadcaster.broadcastNotice(
                     "${TorControlCommands.SIGNAL_NEWNYM}|$NEWNYM_SUCCESS_MESSAGE"
@@ -794,12 +771,6 @@ class OnionProxyManager(
             eventBroadcaster.broadcastNotice(
                 "NOTICE: Failed to acquire a ${TorControlCommands.SIGNAL_NEWNYM}..."
             )
-        }
-        try {
-            controlConnection!!.removeRawEventListener(internalEventListener)
-        } catch (e: KotlinNullPointerException) {}
-        finally {
-            LOG.info("InternalEventListener removed from TorControlConnection")
         }
     }
 

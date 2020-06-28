@@ -14,14 +14,12 @@ import io.matthewnelson.topl_service.onionproxy.OnionProxyEventListener
 import io.matthewnelson.topl_service.onionproxy.OnionProxyInstaller
 import io.matthewnelson.topl_service.service.ActionConsts.ServiceAction
 import kotlinx.coroutines.*
-import net.freehaven.tor.control.EventListener
 
 internal class TorService: Service() {
 
     companion object {
         private lateinit var torConfigFiles: TorConfigFiles
         private lateinit var torSettings: TorSettings
-        private var additionalEventListener: EventListener? = null
         private var buildConfigVersionCode: Int = -1
         private lateinit var geoipAssetPath: String
         private lateinit var geoip6AssetPath: String
@@ -29,14 +27,12 @@ internal class TorService: Service() {
         fun initialize(
             torConfigFiles: TorConfigFiles,
             torSettings: TorSettings,
-            additionalEventListener: EventListener?,
             buildConfigVersionCode: Int,
             geoipAssetPath: String,
             geoip6AssetPath: String
         ) {
             this.torConfigFiles = torConfigFiles
             this.torSettings = torSettings
-            this.additionalEventListener = additionalEventListener
             this.buildConfigVersionCode = buildConfigVersionCode
             this.geoipAssetPath = geoipAssetPath
             this.geoip6AssetPath = geoip6AssetPath
@@ -77,8 +73,7 @@ internal class TorService: Service() {
             this,
             onionProxyContext,
             onionProxyEventBroadcaster,
-            onionProxyEventListener,
-            arrayOf(additionalEventListener)
+            onionProxyEventListener
         )
     }
 
