@@ -13,7 +13,6 @@ See the Apache 2 License for the specific language governing permissions and lim
 package io.matthewnelson.topl_core.broadcaster
 
 import io.matthewnelson.topl_core_base.TorStates
-import java.util.*
 
 /**
  * Current Status of Tor
@@ -35,8 +34,8 @@ class TorStateMachine(private val broadcaster: EventBroadcaster): TorStates() {
     val isStopping: Boolean
         get() = TorState.STOPPING == currentTorState
 
-    val isConnected: Boolean
-        get() = TorNetworkState.ENABLED == currentTorNetworkState
+    val isNetworkDisabled: Boolean
+        get() = TorNetworkState.DISABLED == currentTorNetworkState
 
     /**
      * Will set the state to that which is specified if it isn't already.

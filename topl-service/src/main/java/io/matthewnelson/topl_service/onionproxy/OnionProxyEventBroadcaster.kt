@@ -54,7 +54,7 @@ internal class OnionProxyEventBroadcaster(
 
         // Only update the notification if proper State is had & we're bootstrapped.
         if (torStateMachine.isOn &&
-            torStateMachine.isConnected &&
+            !torStateMachine.isNetworkDisabled &&
             bootstrapProgress == "Bootstrapped 100%"
         ) {
             if (read != this.bytesRead || written != this.bytesWritten) {
@@ -178,7 +178,7 @@ internal class OnionProxyEventBroadcaster(
 
             // If we're still connected, publish the last bandwidth
             // broadcast to overwrite the message.
-            if (torStateMachine.isConnected)
+            if (!torStateMachine.isNetworkDisabled)
                 serviceNotification.updateContentText(
                     getFormattedBandwidthString(bytesRead, bytesWritten)
                 )
@@ -201,7 +201,7 @@ internal class OnionProxyEventBroadcaster(
 
         lastState = state
 
-        if (!torStateMachine.isConnected)
+        if (torStateMachine.isNetworkDisabled)
             serviceNotification.updateIcon(torService, ImageState.DISABLED)
     }
 }

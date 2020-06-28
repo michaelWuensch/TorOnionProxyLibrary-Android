@@ -15,8 +15,6 @@ import io.matthewnelson.topl_core_base.TorStates.TorState
 import io.matthewnelson.topl_service.R
 import io.matthewnelson.topl_service.service.ActionConsts.ServiceAction
 import io.matthewnelson.topl_service.service.TorService
-import java.text.NumberFormat
-import java.util.*
 
 /**
  * Everything to do with [TorService]'s notification.
@@ -162,6 +160,9 @@ internal class ServiceNotification(
     ///////////////
     /// Actions ///
     ///////////////
+    var actionsPresent = false
+        private set
+
     @Synchronized
     fun addActions(torService: TorService) {
         val builder = notificationBuilder
@@ -185,6 +186,7 @@ internal class ServiceNotification(
                 getActionPendingIntent(torService, ServiceAction.ACTION_STOP)
             )
 
+        actionsPresent = true
         notify(builder)
     }
 
@@ -206,6 +208,7 @@ internal class ServiceNotification(
     @Synchronized
     fun removeActions(torService: TorService, @TorState state: String) {
         val builder = buildInitialNotification(torService, state)
+        actionsPresent = false
         notify(builder)
     }
 
