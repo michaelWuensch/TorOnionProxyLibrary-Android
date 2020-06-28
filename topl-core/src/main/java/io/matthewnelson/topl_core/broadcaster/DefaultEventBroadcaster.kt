@@ -12,7 +12,6 @@ See the Apache 2 License for the specific language governing permissions and lim
 */
 package io.matthewnelson.topl_core.broadcaster
 
-import android.util.Log
 import io.matthewnelson.topl_core_base.TorSettings
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -21,9 +20,9 @@ import java.io.StringWriter
 
 /**
  * Override this class to implement [broadcastBandwidth], [broadcastLogMessage],
- * and [broadcastTorState] or extend [EventBroadcaster] and create your own.
+ * and [broadcastTorState] or extend [BaseEventBroadcaster] and create your own.
  * */
-open class DefaultEventBroadcaster(private val torSettings: TorSettings) : EventBroadcaster() {
+open class DefaultEventBroadcaster(private val torSettings: TorSettings) : BaseEventBroadcaster() {
 
     private companion object {
         val LOG: Logger = LoggerFactory.getLogger(DefaultEventBroadcaster::class.java)

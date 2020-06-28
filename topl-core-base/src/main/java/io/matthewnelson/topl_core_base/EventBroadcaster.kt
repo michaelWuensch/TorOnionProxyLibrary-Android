@@ -10,31 +10,16 @@ MERCHANTABLITY OR NON-INFRINGEMENT.
 
 See the Apache 2 License for the specific language governing permissions and limitations under the License.
 */
-package io.matthewnelson.topl_core.broadcaster
-
-import io.matthewnelson.topl_core_base.TorStates
+package io.matthewnelson.topl_core_base
 
 /**
  * Service for sending event logs to the system
  */
 abstract class EventBroadcaster: TorStates() {
 
-    private lateinit var stateMachine: TorStateMachine
-
-    val torStateMachine: TorStateMachine
-        get() = if (!::stateMachine.isInitialized) {
-            stateMachine = TorStateMachine(this)
-            stateMachine
-        } else {
-            stateMachine
-        }
-
     /**
-     * Used by the [io.matthewnelson.topl_core.listener.BaseEventListener] to pipe the
-     * connection bandwidth here.
-     *
-     * @param [bytesRead] bytes downloaded
-     * @param [bytesWritten] bytes uploaded
+     * [bytesRead] bytes downloaded
+     * [bytesWritten] bytes uploaded
      * */
     abstract fun broadcastBandwidth(bytesRead: String, bytesWritten: String)
 

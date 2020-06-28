@@ -30,8 +30,9 @@ package io.matthewnelson.topl_core
 import android.content.Context
 import android.content.IntentFilter
 import android.net.ConnectivityManager
+import io.matthewnelson.topl_core.broadcaster.BaseEventBroadcaster
 import io.matthewnelson.topl_core.broadcaster.DefaultEventBroadcaster
-import io.matthewnelson.topl_core.broadcaster.EventBroadcaster
+import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_core.listener.BaseEventListener
 import io.matthewnelson.topl_core.listener.DefaultEventListener
 import io.matthewnelson.topl_core.receiver.NetworkStateReceiver
@@ -40,7 +41,6 @@ import io.matthewnelson.topl_core.util.OnionProxyConsts.ConfigFile
 import io.matthewnelson.topl_core.util.FileUtilities
 import io.matthewnelson.topl_core.util.WriteObserver
 import io.matthewnelson.topl_core_base.TorStates
-import net.freehaven.tor.control.EventListener
 import net.freehaven.tor.control.TorControlCommands
 import net.freehaven.tor.control.TorControlConnection
 import org.slf4j.Logger
@@ -63,19 +63,18 @@ import java.util.concurrent.TimeUnit
  *
  * @param [context] Context.
  * @param [onionProxyContext] [OnionProxyContext]
- * @param [eventBroadcaster] [EventBroadcaster]? will fallback to defaults if null.
- * @param [primaryEventListener] [BaseEventListener]? will fallback to defaults if null.
- * @param [additionalEventListeners] Array<[EventListener]?>? add additional listeners at Tor [start].
+ * @param [eventBroadcaster] [BaseEventBroadcaster]? will fallback to defaults if null.
+ * @param [eventListener] [BaseEventListener]? will fallback to defaults if null.
  */
 class OnionProxyManager(
     private val context: Context,
     val onionProxyContext: OnionProxyContext,
-    eventBroadcaster: EventBroadcaster?,
-    primaryEventListener: BaseEventListener?
+    eventBroadcaster: BaseEventBroadcaster?,
+    eventListener: BaseEventListener?
 ): TorStates() {
 
     val eventBroadcaster = eventBroadcaster ?: DefaultEventBroadcaster(onionProxyContext.torSettings)
-    private val eventListener = primaryEventListener ?: DefaultEventListener()
+    private val eventListener = eventListener ?: DefaultEventListener()
 
     companion object {
         private const val OWNER = "__OwningControllerProcess"
@@ -300,7 +299,7 @@ class OnionProxyManager(
      * Tells the Tor OP if it should accept network connections.
      *
      * Whenever setting Tor's Conf to `DisableNetwork X`, ONLY use this method to do it
-     * such that [EventBroadcaster.torStateMachine] will reflect the proper
+     * such that [BaseEventBroadcaster.torStateMachine] will reflect the proper
      * [TorStates.TorNetworkState].
      *
      * @param [disable] If true then the Tor OP will **not** accept SOCKS connections, otherwise yes.
