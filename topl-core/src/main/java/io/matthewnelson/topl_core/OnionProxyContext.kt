@@ -47,10 +47,6 @@ class OnionProxyContext(
     val torSettings: TorSettings
 ) {
 
-    private companion object {
-        val LOG: Logger = LoggerFactory.getLogger(OnionProxyContext::class.java)
-    }
-
     /**
      * No `isInitialized` checks necessary because everything in this class is marked as
      * `private` or `internal`, so no methods can be used prior to instantiating
@@ -69,8 +65,8 @@ class OnionProxyContext(
     private val hostnameFileLock = Object()
 
     /**
-     * Creates an observer for the file referenced. See [ConfigFile] annotation
-     * class for accepted arguments.
+     * Creates an observer for the file referenced. See [ConfigFile] annotation class for
+     * accepted arguments.
      *
      * @param [onionProxyConst] String that defines what file a [WriteObserver] is created for.
      * @return A WriteObserver for the appropriate file referenced.
@@ -79,6 +75,7 @@ class OnionProxyContext(
      */
     @Throws(IllegalArgumentException::class, SecurityException::class)
     internal fun createFileObserver(@ConfigFile onionProxyConst: String): WriteObserver {
+        broadcastLogger.debug("Creating FileObserver for $onionProxyConst")
         return when (onionProxyConst) {
             ConfigFile.CONTROL_PORT_FILE -> {
                 synchronized(controlPortFileLock) {
@@ -96,14 +93,20 @@ class OnionProxyContext(
                 }
             }
             else -> {
-                throw IllegalArgumentException(
-                    "$onionProxyConst is not a valid argument for method createFileObserver"
-                )
+                throw IllegalArgumentException("$onionProxyConst is not a valid argument")
             }
         }
     }
 
+    /**
+     * Creates an empty file if the provided one does not exist.
+     *
+     * @return True if file exists or is created successfully, otherwise false.
+     * @throws [SecurityException] Unauthorized access to file/directory.
+     * */
+    @Throws(IllegalArgumentException::class, SecurityException::class)
     internal fun createNewFileIfDoesNotExist(@ConfigFile onionProxyConst: String): Boolean {
+        broadcastLogger.debug("Creating file if DNE for $onionProxyConst")
         return when (onionProxyConst) {
             ConfigFile.CONTROL_PORT_FILE -> {
                 synchronized(controlPortFileLock) {
@@ -121,9 +124,7 @@ class OnionProxyContext(
                 }
             }
             else -> {
-                throw IllegalArgumentException(
-                    "$onionProxyConst is not a valid argument for method createNewFileIfDoesNotExist"
-                )
+                throw IllegalArgumentException("$onionProxyConst is not a valid argument")
             }
         }
     }
@@ -139,6 +140,7 @@ class OnionProxyContext(
      * */
     @Throws(SecurityException::class, IllegalArgumentException::class)
     internal fun deleteFile(@ConfigFile onionProxyConst: String): Boolean {
+        broadcastLogger.debug("Deleting file for $onionProxyConst")
         return when (onionProxyConst) {
             ConfigFile.CONTROL_PORT_FILE -> {
                 synchronized(controlPortFileLock) {
@@ -151,20 +153,19 @@ class OnionProxyContext(
                 }
             }
             ConfigFile.HOSTNAME_FILE -> {
-                synchronized(controlPortFileLock) {
+                synchronized(hostnameFileLock) {
                     torConfigFiles.hostnameFile.delete()
                 }
             }
             else -> {
-                throw IllegalArgumentException(
-                    "$onionProxyConst is not a valid argument for method deleteFile"
-                )
+                throw IllegalArgumentException("$onionProxyConst is not a valid argument")
             }
         }
     }
 
     @Throws(IOException::class, EOFException::class, SecurityException::class)
     internal fun readFile(@ConfigFile onionProxyConst: String): ByteArray {
+        broadcastLogger.debug("Reading file for $onionProxyConst")
         return when (onionProxyConst) {
             ConfigFile.CONTROL_PORT_FILE -> {
                 synchronized(controlPortFileLock) {
@@ -182,9 +183,7 @@ class OnionProxyContext(
                 }
             }
             else -> {
-                throw IllegalArgumentException(
-                    "$onionProxyConst is not a valid argument for method readFile"
-                )
+                throw IllegalArgumentException("$onionProxyConst is not a valid argument")
             }
         }
     }
@@ -225,7 +224,6 @@ class OnionProxyContext(
     ////////////////////
     /// HostnameFile ///
     ////////////////////
-
     @Throws(SecurityException::class)
     internal fun setHostnameDirPermissionsToReadOnly(): Boolean =
         synchronized(hostnameFileLock) {
@@ -261,15 +259,10 @@ class OnionProxyContext(
     internal val processId: String
         get() = Process.myPid().toString()
 
-    /**
-     * Creates an empty file if the provided one does not exist.
-     *
-     * @return True if file exists or is created successfully, otherwise false.
-     * @throws [SecurityException] Unauthorized access to file/directory.
-     * */
+    @Throws(SecurityException::class)
     private fun createNewFileIfDoesNotExist(file: File): Boolean {
         if (!file.parentFile.exists() && !file.parentFile.mkdirs()) {
-            LOG.warn("Could not create ${file.nameWithoutExtension} parent directory")
+            broadcastLogger.warn("Could not create ${file.nameWithoutExtension} parent directory")
             return false
         }
 
@@ -277,7 +270,7 @@ class OnionProxyContext(
             val exists = if (file.exists()) true else file.createNewFile()
             exists
         } catch (e: IOException) {
-            LOG.warn("Could not create ${file.nameWithoutExtension}")
+            broadcastLogger.warn("Could not create ${file.nameWithoutExtension}")
             false
         }
     }
