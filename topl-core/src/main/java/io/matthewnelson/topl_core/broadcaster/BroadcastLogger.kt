@@ -17,7 +17,7 @@ import io.matthewnelson.topl_core_base.TorStates.TorNetworkState
  * Library is causing problems in your App you need only set [TorSettings.hasDebugLogs] to
  * `true` for a Debug build of your App.
  *
- * See helper method [io.matthewnelson.topl_core.OnionProxyManager.getBroadcastLogger].
+ * See helper method [io.matthewnelson.topl_core.OnionProxyManager.createBroadcastLogger].
  *
  * @param [eventBroadcaster] To broadcast after Logging (if enabled)
  * @param [buildConfigDebug] Use `BuildConfig.DEBUG`

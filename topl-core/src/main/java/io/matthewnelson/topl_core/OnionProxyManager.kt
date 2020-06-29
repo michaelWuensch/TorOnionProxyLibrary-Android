@@ -90,6 +90,7 @@ class OnionProxyManager(
     /// BroadcastLogger ///
     ///////////////////////
     private val buildConfigDebug = buildConfigDebug ?: BuildConfig.DEBUG
+    private val broadcastLogger = createBroadcastLogger(OnionProxyManager::class.java)
 
     /**
      * Helper method for instantiating a [BroadcastLogger] for your class with the values
@@ -97,14 +98,12 @@ class OnionProxyManager(
      *
      * @param [clazz] To initialize the `TAG` with your class' name.
      * */
-    fun getBroadcastLogger(clazz: Class<*>) =
+    fun createBroadcastLogger(clazz: Class<*>) =
         BroadcastLogger(clazz, eventBroadcaster, buildConfigDebug, onionProxyContext.torSettings)
 
     init {
-        onionProxyContext.initBroadcastLogger(getBroadcastLogger(OnionProxyContext::class.java))
+        onionProxyContext.initBroadcastLogger(createBroadcastLogger(OnionProxyContext::class.java))
     }
-
-    private val broadcastLogger = getBroadcastLogger(OnionProxyManager::class.java)
 
     /**
      * Sets up and installs any files needed to run tor. If the tor files are already on
@@ -115,7 +114,7 @@ class OnionProxyManager(
 
     fun getNewSettingsBuilder(): TorSettingsBuilder {
         val torSettingsBuilder = TorSettingsBuilder(onionProxyContext)
-        torSettingsBuilder.initBroadcastLogger(getBroadcastLogger(TorSettingsBuilder::class.java))
+        torSettingsBuilder.initBroadcastLogger(createBroadcastLogger(TorSettingsBuilder::class.java))
         return torSettingsBuilder
     }
 
@@ -123,7 +122,7 @@ class OnionProxyManager(
         onionProxyContext.processId
 
     val torStateMachine =
-        TorStateMachine(getBroadcastLogger(TorStateMachine::class.java))
+        TorStateMachine(createBroadcastLogger(TorStateMachine::class.java))
 
     @Volatile
     private var networkStateReceiver: NetworkStateReceiver? = null
