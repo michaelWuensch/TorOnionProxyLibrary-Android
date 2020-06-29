@@ -68,17 +68,6 @@ class OnionProxyContext(
     private val resolvConfFileLock = Object()
     private val hostnameFileLock = Object()
 
-    // Try creating the data dir upon instantiation. Everything hinges on it.
-    // TODO: Move this to initBroadcastLogger
-    init {
-        try {
-            createDataDir()
-        } catch (e: SecurityException) {
-            e.printStackTrace()
-            LOG.warn("Could not create directory dataDir upon instantiation")
-        }
-    }
-
     /**
      * Creates an observer for the file referenced. See [ConfigFile] annotation
      * class for accepted arguments.

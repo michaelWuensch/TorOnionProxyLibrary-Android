@@ -103,6 +103,11 @@ class OnionProxyManager(
 
     init {
         onionProxyContext.initBroadcastLogger(createBroadcastLogger(OnionProxyContext::class.java))
+        try {
+            onionProxyContext.createDataDir()
+        } catch (e: SecurityException) {
+            broadcastLogger.exception(e)
+        }
     }
 
     /**
