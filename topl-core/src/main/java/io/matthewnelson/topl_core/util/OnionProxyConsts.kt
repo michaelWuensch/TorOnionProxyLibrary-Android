@@ -1,8 +1,9 @@
 package io.matthewnelson.topl_core.util
 
 import androidx.annotation.StringDef
+import io.matthewnelson.topl_core_base.TorStates
 
-internal abstract class OnionProxyConsts {
+internal abstract class OnionProxyConsts: TorStates() {
 
     @StringDef(
         ConfigFile.CONTROL_PORT_FILE,

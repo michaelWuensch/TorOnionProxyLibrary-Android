@@ -14,6 +14,8 @@ package io.matthewnelson.topl_core.settings
 
 import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.OnionProxyContext
+import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
+import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_core_base.SettingsConsts.ConnectionPadding
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
@@ -33,9 +35,17 @@ import java.util.*
  *
  * Calling [finishAndWriteToTorrcFile] will do just that.
  *
- * See [io.matthewnelson.topl_core.OnionProxyManager.getNewSettingsBuilder]
+ * It is highly recommended to obtain a new [TorSettingsBuilder] from
+ * [io.matthewnelson.topl_core.OnionProxyManager.getNewSettingsBuilder] so that
+ * [broadcastLogger] can be set.
  * */
 class TorSettingsBuilder(private val onionProxyContext: OnionProxyContext) {
+
+    private var broadcastLogger: BroadcastLogger? = null
+    internal fun initBroadcastLogger(torSettingsBuilderBroadcastLogger: BroadcastLogger) {
+        if (broadcastLogger == null)
+            broadcastLogger = torSettingsBuilderBroadcastLogger
+    }
 
     private var buffer = StringBuffer()
 

@@ -27,6 +27,7 @@ internal class OnionProxyInstaller(
     private val torService: TorService,
     private val torConfigFiles: TorConfigFiles,
     private val buildConfigVersionCode: Int,
+    private val buildConfigDebug: Boolean,
     private val geoIpAssetPath: String,
     private val geoIp6AssetPath: String
 ): TorInstaller() {
@@ -48,7 +49,7 @@ internal class OnionProxyInstaller(
         // module, copy over geoip assets then update SharedPreferences with the updated
         // version code. Mitigates copying to be done only if a version upgrade is had.
         if (buildConfigVersionCode > prefs.getInt("BUILD_CONFIG_VERSION_CODE", -1) ?: -1 ||
-            BuildConfig.DEBUG
+            buildConfigDebug
         ) {
             if (!::geoIpFileCoppied.isInitialized)
                 copyAsset(geoIpAssetPath, torConfigFiles.geoIpFile)

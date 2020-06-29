@@ -10,8 +10,10 @@ import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.service.ActionConsts.ServiceAction
 import androidx.core.app.NotificationCompat.NotificationVisibility
+import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
+import io.matthewnelson.topl_service.onionproxy.OnionProxyEventBroadcaster
 import net.freehaven.tor.control.EventListener
 
 class TorServiceController private constructor() {
@@ -58,6 +60,38 @@ class TorServiceController private constructor() {
     ) {
 
         private lateinit var torConfigFiles: TorConfigFiles
+        private var appEventBroadcaster: EventBroadcaster? = null
+
+        /**
+         * On published releases of this Library, this value will **always** be `false`. You
+         * can change it for your application via the [Builder.setBuildConfigDebug] method.
+         *
+         * See [io.matthewnelson.topl_core.broadcaster.BroadcastLogger]
+         * */
+        private var buildConfigDebug = BuildConfig.DEBUG
+
+        /**
+         * This makes it such that on your Application's **Debug** builds, the `topl-core` and
+         * `topl-service` modules will provide you with Logcat messages.
+         *
+         * For your **Release** builds, no Logcat messaging will be provided but you
+         * will still get them if you set your own [EventBroadcaster] via
+         * [Builder.setEventBroadcaster]
+         *
+         * @param [buildConfigDebug] Send [BuildConfig.DEBUG]
+         * */
+        fun setBuildConfigDebug(buildConfigDebug: Boolean): Builder {
+            this.buildConfigDebug = buildConfigDebug
+            return this
+        }
+
+        /**
+         * Get broadcasts piped to your Application to do with them what you desire.
+         * */
+        fun setEventBroadcaster(eventBroadcaster: EventBroadcaster): Builder {
+            appEventBroadcaster = eventBroadcaster
+            return this
+        }
 
         /**
          * If you wish to customize the file structure of how Tor is installed in your app,
@@ -326,9 +360,12 @@ class TorServiceController private constructor() {
                 torConfigFiles,
                 torSettings,
                 buildConfigVersion,
+                buildConfigDebug,
                 geoipAssetPath,
                 geoip6AssetPath
             )
+
+            OnionProxyEventBroadcaster.initAppEventBroadcaster(appEventBroadcaster)
 
             ServiceNotification.get().setupNotificationChannel(application.applicationContext)
 

@@ -12,13 +12,12 @@ See the Apache 2 License for the specific language governing permissions and lim
 */
 package io.matthewnelson.topl_core.broadcaster
 
-import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_core_base.TorStates
 
 /**
  * Current Status of Tor
  */
-class TorStateMachine(private val broadcaster: EventBroadcaster): TorStates() {
+class TorStateMachine(private val broadcastLogger: BroadcastLogger): TorStates() {
 
     private var currentTorState: @TorState String = TorState.OFF
     private var currentTorNetworkState: @TorNetworkState String = TorNetworkState.DISABLED
@@ -48,9 +47,9 @@ class TorStateMachine(private val broadcaster: EventBroadcaster): TorStates() {
         val currentState = currentTorState
         if (currentTorState != state) {
             currentTorState = state
-            broadcaster.broadcastTorState(currentTorState, currentTorNetworkState)
+            broadcastLogger.torState(currentTorState, currentTorNetworkState)
         } else {
-            broadcaster.broadcastDebug("TorState was already set to $currentState")
+            broadcastLogger.debug("TorState was already set to $currentState")
         }
         return currentState
     }
@@ -65,9 +64,9 @@ class TorStateMachine(private val broadcaster: EventBroadcaster): TorStates() {
         val currentNetworkState = currentTorNetworkState
         if (currentTorNetworkState != state) {
             currentTorNetworkState = state
-            broadcaster.broadcastTorState(currentTorState, currentTorNetworkState)
+            broadcastLogger.torState(currentTorState, currentTorNetworkState)
         } else {
-            broadcaster.broadcastDebug("TorNetworkState was already set to $currentNetworkState")
+            broadcastLogger.debug("TorNetworkState was already set to $currentNetworkState")
         }
         return currentNetworkState
     }

@@ -1,7 +1,7 @@
 package io.matthewnelson.topl_service.onionproxy
 
 import io.matthewnelson.topl_core.OnionProxyManager
-import io.matthewnelson.topl_core.broadcaster.DefaultEventBroadcaster
+import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_service.notification.NotificationConsts.ImageState
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.TorService
@@ -27,7 +27,15 @@ import java.util.*
 internal class OnionProxyEventBroadcaster(
     private val torService: TorService,
     private val torServiceSettings: TorServiceSettings
-): DefaultEventBroadcaster(torServiceSettings) {
+): EventBroadcaster() {
+
+    companion object {
+        private var appEventBroadcaster: EventBroadcaster? = null
+        fun initAppEventBroadcaster(eventBroadcaster: EventBroadcaster?) {
+            if (appEventBroadcaster == null)
+                appEventBroadcaster = eventBroadcaster
+        }
+    }
 
     private val serviceNotification = ServiceNotification.get()
 
@@ -53,8 +61,8 @@ internal class OnionProxyEventBroadcaster(
             }
 
         // Only update the notification if proper State is had & we're bootstrapped.
-        if (torStateMachine.isOn &&
-            !torStateMachine.isNetworkDisabled &&
+        if (torState == TorState.ON &&
+            torNetworkState == TorNetworkState.ENABLED &&
             bootstrapProgress == "Bootstrapped 100%"
         ) {
             if (read != this.bytesRead || written != this.bytesWritten) {
@@ -70,6 +78,7 @@ internal class OnionProxyEventBroadcaster(
             }
         }
 
+        appEventBroadcaster?.broadcastBandwidth(bytesRead, bytesWritten)
     }
 
     /**
@@ -108,7 +117,8 @@ internal class OnionProxyEventBroadcaster(
     /// Debug ///
     /////////////
     override fun broadcastDebug(msg: String) {
-        super.broadcastDebug(msg)
+        if (torServiceSettings.hasDebugLogs)
+            appEventBroadcaster?.broadcastDebug(msg)
     }
 
 
@@ -116,14 +126,18 @@ internal class OnionProxyEventBroadcaster(
     /// Exceptions ///
     //////////////////
     override fun broadcastException(msg: String?, e: Exception) {
-        super.broadcastException(msg, e)
+        // TODO: Setup notification Error handling
+        if (torServiceSettings.hasDebugLogs)
+            appEventBroadcaster?.broadcastException(msg, e)
     }
 
 
     ///////////////////
     /// LogMessages ///
     ///////////////////
-    override fun broadcastLogMessage(logMessage: String?) {}
+    override fun broadcastLogMessage(logMessage: String?) {
+        appEventBroadcaster?.broadcastLogMessage(logMessage)
+    }
 
 
     ///////////////
@@ -163,7 +177,8 @@ internal class OnionProxyEventBroadcaster(
 
             displayMessageToContentText(msgToShow, 3500L)
         }
-        super.broadcastNotice(msg)
+
+        appEventBroadcaster?.broadcastNotice(msg)
     }
 
     /**
@@ -177,14 +192,14 @@ internal class OnionProxyEventBroadcaster(
             delay(delayMilliSeconds)
 
             // Publish the last bandwidth broadcast to overwrite the message.
-            if (!torStateMachine.isNetworkDisabled)
+            if (torNetworkState == TorNetworkState.ENABLED) {
                 serviceNotification.updateContentText(
                     getFormattedBandwidthString(bytesRead, bytesWritten)
                 )
-            else if (torStateMachine.isNetworkDisabled && bootstrapProgress == "Bootstrapped 100%")
-                serviceNotification.updateContentText(
-                    getFormattedBandwidthString(0L, 0L)
-                )
+            } else {
+                if (bootstrapProgress == "Bootstrapped 100%")
+                    serviceNotification.updateContentText(getFormattedBandwidthString(0L, 0L))
+            }
         }
     }
 
@@ -192,21 +207,25 @@ internal class OnionProxyEventBroadcaster(
     ////////////////
     /// TorState ///
     ////////////////
-    private var lastState = TorState.OFF
+    @Volatile
+    private var torState = TorState.OFF
+    @Volatile
+    private var torNetworkState = TorNetworkState.DISABLED
 
     override fun broadcastTorState(@TorState state: String, @TorNetworkState networkState: String) {
-        super.broadcastTorState(state, networkState)
-
-        if (lastState == TorState.ON && state != lastState) {
+        if (torState == TorState.ON && state != torState) {
             bootstrapProgress = ""
             serviceNotification.removeActions(torService, state)
         } else {
             serviceNotification.updateContentTitle(state)
         }
 
-        lastState = state
+        torState = state
+        torNetworkState = networkState
 
-        if (torStateMachine.isNetworkDisabled)
+        if (networkState == TorNetworkState.DISABLED)
             serviceNotification.updateIcon(torService, ImageState.DISABLED)
+
+        appEventBroadcaster?.broadcastTorState(state, networkState)
     }
 }

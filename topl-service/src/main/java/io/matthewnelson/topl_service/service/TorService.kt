@@ -9,6 +9,7 @@ import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
+import io.matthewnelson.topl_service.BuildConfig
 import io.matthewnelson.topl_service.onionproxy.OnionProxyEventBroadcaster
 import io.matthewnelson.topl_service.onionproxy.OnionProxyEventListener
 import io.matthewnelson.topl_service.onionproxy.OnionProxyInstaller
@@ -21,6 +22,7 @@ internal class TorService: Service() {
         private lateinit var torConfigFiles: TorConfigFiles
         private lateinit var torSettings: TorSettings
         private var buildConfigVersionCode: Int = -1
+        private var buildConfigDebug: Boolean? = null
         private lateinit var geoipAssetPath: String
         private lateinit var geoip6AssetPath: String
 
@@ -28,12 +30,14 @@ internal class TorService: Service() {
             torConfigFiles: TorConfigFiles,
             torSettings: TorSettings,
             buildConfigVersionCode: Int,
+            buildConfigDebug: Boolean,
             geoipAssetPath: String,
             geoip6AssetPath: String
         ) {
             this.torConfigFiles = torConfigFiles
             this.torSettings = torSettings
             this.buildConfigVersionCode = buildConfigVersionCode
+            this.buildConfigDebug = buildConfigDebug
             this.geoipAssetPath = geoipAssetPath
             this.geoip6AssetPath = geoip6AssetPath
         }
@@ -59,6 +63,7 @@ internal class TorService: Service() {
             this,
             torConfigFiles,
             buildConfigVersionCode,
+            buildConfigDebug ?: BuildConfig.DEBUG,
             geoipAssetPath,
             geoip6AssetPath
         )
@@ -73,7 +78,8 @@ internal class TorService: Service() {
             this,
             onionProxyContext,
             onionProxyEventListener,
-            onionProxyEventBroadcaster
+            onionProxyEventBroadcaster,
+            buildConfigDebug
         )
     }
 
@@ -106,7 +112,7 @@ internal class TorService: Service() {
      * */
     @WorkerThread
     private fun startTor() {
-        if (!onionProxyManager.eventBroadcaster.torStateMachine.isOn) {
+        if (!onionProxyManager.torStateMachine.isOn) {
             try {
                 onionProxyManager.setup()
                 onionProxyManager.getNewSettingsBuilder()

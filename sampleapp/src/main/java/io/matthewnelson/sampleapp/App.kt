@@ -19,6 +19,7 @@ class App: Application() {
             geoipAssetPath = "common/geoip",
             geoip6AssetPath = "common/geoip6"
         )
+
             .customizeNotification(
                 channelName = "TorService Channel",
                 channelDescription = "Tor Channel",
@@ -37,6 +38,8 @@ class App: Application() {
             .enableTorRestartButton()
             .enableTorStopButton()
             .applyNotificationSettings()
+
+            .setBuildConfigDebug(buildConfigDebug = BuildConfig.DEBUG)
             .build()
     }
 }

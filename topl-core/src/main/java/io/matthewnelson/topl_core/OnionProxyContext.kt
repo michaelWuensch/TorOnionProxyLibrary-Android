@@ -13,6 +13,7 @@ See the Apache 2 License for the specific language governing permissions and lim
 package io.matthewnelson.topl_core
 
 import android.os.Process
+import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_core.util.OnionProxyConsts.ConfigFile
 import io.matthewnelson.topl_core.util.FileUtilities
@@ -50,6 +51,17 @@ class OnionProxyContext(
         val LOG: Logger = LoggerFactory.getLogger(OnionProxyContext::class.java)
     }
 
+    /**
+     * No `isInitialized` checks necessary because everything in this class is marked as
+     * `private` or `internal`, so no methods can be used prior to instantiating
+     * [OnionProxyManager] where [initBroadcastLogger] is called immediately.
+     * */
+    private lateinit var broadcastLogger: BroadcastLogger
+    internal fun initBroadcastLogger(onionProxyContextBroadcastLogger: BroadcastLogger) {
+        if (!::broadcastLogger.isInitialized)
+            broadcastLogger = onionProxyContextBroadcastLogger
+    }
+
     private val controlPortFileLock = Object()
     private val cookieAuthFileLock = Object()
     private val dataDirLock = Object()
@@ -57,6 +69,7 @@ class OnionProxyContext(
     private val hostnameFileLock = Object()
 
     // Try creating the data dir upon instantiation. Everything hinges on it.
+    // TODO: Move this to initBroadcastLogger
     init {
         try {
             createDataDir()
