@@ -225,6 +225,8 @@ internal class OnionProxyEventBroadcaster(
 
         if (networkState == TorNetworkState.DISABLED)
             serviceNotification.updateIcon(torService, ImageState.DISABLED)
+        else
+            serviceNotification.updateIcon(torService, ImageState.ENABLED)
 
         appEventBroadcaster?.broadcastTorState(state, networkState)
     }
