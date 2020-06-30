@@ -6,6 +6,7 @@ import android.os.IBinder
 import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.OnionProxyContext
 import io.matthewnelson.topl_core.OnionProxyManager
+import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
@@ -49,6 +50,8 @@ internal class TorService: Service() {
             private set
     }
 
+    private lateinit var broadcastLogger: BroadcastLogger
+
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
@@ -56,31 +59,8 @@ internal class TorService: Service() {
     override fun onCreate() {
         super.onCreate()
         ServiceNotification.get().startForegroundNotification(this)
-
-        // Instantiate TOPL
-        val torServiceSettings = TorServiceSettings(torSettings, this)
-        val onionProxyInstaller = OnionProxyInstaller(
-            this,
-            torConfigFiles,
-            buildConfigVersionCode,
-            buildConfigDebug ?: BuildConfig.DEBUG,
-            geoipAssetPath,
-            geoip6AssetPath
-        )
-        val onionProxyContext = OnionProxyContext(
-            torConfigFiles,
-            onionProxyInstaller,
-            torServiceSettings
-        )
-        val onionProxyEventBroadcaster = OnionProxyEventBroadcaster(this, torServiceSettings)
-        val onionProxyEventListener = OnionProxyEventListener(this, onionProxyEventBroadcaster)
-        onionProxyManager = OnionProxyManager(
-            this,
-            onionProxyContext,
-            onionProxyEventListener,
-            onionProxyEventBroadcaster,
-            buildConfigDebug
-        )
+        initTOPLAndroid()
+        broadcastLogger = onionProxyManager.createBroadcastLogger(TorService::class.java)
     }
 
     override fun onDestroy() {
@@ -107,6 +87,32 @@ internal class TorService: Service() {
     ////////////
     private lateinit var onionProxyManager: OnionProxyManager
 
+    private fun initTOPLAndroid() {
+        val torServiceSettings = TorServiceSettings(torSettings, this)
+        val onionProxyInstaller = OnionProxyInstaller(
+            this,
+            torConfigFiles,
+            buildConfigVersionCode,
+            buildConfigDebug ?: BuildConfig.DEBUG,
+            geoipAssetPath,
+            geoip6AssetPath
+        )
+        val onionProxyContext = OnionProxyContext(
+            torConfigFiles,
+            onionProxyInstaller,
+            torServiceSettings
+        )
+        val onionProxyEventBroadcaster = OnionProxyEventBroadcaster(this, torServiceSettings)
+        val onionProxyEventListener = OnionProxyEventListener(this, onionProxyEventBroadcaster)
+        onionProxyManager = OnionProxyManager(
+            this,
+            onionProxyContext,
+            onionProxyEventListener,
+            onionProxyEventBroadcaster,
+            buildConfigDebug
+        )
+    }
+
     /**
      * Do not call directly, use [executeAction].
      * */
@@ -122,7 +128,7 @@ internal class TorService: Service() {
 
                 onionProxyManager.start()
             } catch (e: Exception) {
-                e.printStackTrace()
+                broadcastLogger.exception(e)
             }
         }
     }
@@ -135,7 +141,7 @@ internal class TorService: Service() {
         try {
             onionProxyManager.stop()
         } catch (e: Exception) {
-            e.printStackTrace()
+            broadcastLogger.exception(e)
         }
     }
 
