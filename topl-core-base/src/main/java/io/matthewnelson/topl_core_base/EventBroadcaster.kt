@@ -13,24 +13,65 @@ See the Apache 2 License for the specific language governing permissions and lim
 package io.matthewnelson.topl_core_base
 
 /**
- * Service for sending event logs to the system
+ * Service for sending event logs to the system.
+ *
+ * Both `topl-core` and `topl-service` utilize this class to broadcast messages. There are 2
+ * formats to the messages that get broadcast.
+ *
+ *  - If a class within either module is broadcasting something, it will look like:
+ *      - TYPE|ClassName|Message
+ *  - If it is a broadcast from Tor, it will simply be a message with no format.
+ *
+ *  This allows for easier separation of messages based on the type, process or class
  */
 abstract class EventBroadcaster: TorStates() {
 
     /**
-     * [bytesRead] bytes downloaded
-     * [bytesWritten] bytes uploaded
+     * Broadcast from Tor only:
+     *  - (bytesRead as a string, bytesWritten as a string)
+     *
+     * [bytesRead] = bytes downloaded
+     * [bytesWritten] = bytes uploaded
      * */
     abstract fun broadcastBandwidth(bytesRead: String, bytesWritten: String)
 
+    /**
+     * Broadcast from modules:
+     *  - ("DEBUG|ClassName|msg")
+     *
+     * Broadcast from Tor:
+     *  - ("msg")
+     * */
     abstract fun broadcastDebug(msg: String)
 
+    /**
+     * Broadcast from modules:
+     *  - (EXCEPTION|ClassName|msg, e)
+     *
+     * Broadcast from Tor:
+     *  - (msg, e)
+     * */
     abstract fun broadcastException(msg: String?, e: Exception)
 
+    /**
+     * Not yet implemented in either module.
+     * */
     abstract fun broadcastLogMessage(logMessage: String?)
 
+    /**
+     * Broadcast from modules:
+     *  - ("NOTICE|ClassName|msg")
+     *  - ("WARN|ClassName|msg")
+     *
+     * Broadcast from Tor:
+     *  - (msg)
+     * */
     abstract fun broadcastNotice(msg: String)
 
+    /**
+     * Only used by modules:
+     *  - (TorState as a string, TorNetworkState as a string)
+     * */
     abstract fun broadcastTorState(@TorState state: String, @TorNetworkState networkState: String)
 
 }
