@@ -20,8 +20,6 @@ import io.matthewnelson.topl_core.util.FileUtilities
 import io.matthewnelson.topl_core.util.TorInstaller
 import io.matthewnelson.topl_core.util.WriteObserver
 import io.matthewnelson.topl_core_base.TorConfigFiles
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.io.*
 
 /**
