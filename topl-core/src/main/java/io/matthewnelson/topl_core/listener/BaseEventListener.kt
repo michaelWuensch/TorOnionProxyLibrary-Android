@@ -13,6 +13,12 @@ abstract class BaseEventListener: EventListener() {
      * See [TorControlCommands.EVENT_NAMES] values. These are **REQUIRED**
      * for registering them in [io.matthewnelson.topl_core.OnionProxyManager.start]
      * which allows you full control over what you wish to listen for.
+     *
+     * WARNING: Be careful as to what events your are attempting to listen for. If
+     * jtorctl has not implemented that event yet it will crash.
+     *
+     * See <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/issues/14" target="_blank">this issue</a>
+     * for more details.
      * */
     abstract val CONTROL_COMMAND_EVENTS: Array<String>
 

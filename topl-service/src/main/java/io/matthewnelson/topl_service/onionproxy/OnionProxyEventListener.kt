@@ -34,7 +34,6 @@ internal class OnionProxyEventListener(
             TorControlCommands.EVENT_NEW_DESC,
             TorControlCommands.EVENT_STATUS_GENERAL,
             TorControlCommands.EVENT_STATUS_CLIENT,
-            TorControlCommands.EVENT_NEWCONSENSUS,
             TorControlCommands.EVENT_TRANSPORT_LAUNCHED
         )
 
