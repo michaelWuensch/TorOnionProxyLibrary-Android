@@ -795,14 +795,17 @@ class OnionProxyManager(
     /**
      * Will signal for a NewNym, then broadcast [NEWNYM_SUCCESS_MESSAGE] if successful.
      *
-     * Because there is no way to easily ascertain success, a listener has to be added to
+     * Because there is no way to easily ascertain success, we need to check
      * see if we've been rate limited. Being rate limited means we were **not** successful
      * when signaling NEWNYM, so we don't want to broadcast the success message.
      *
+     * See [BaseEventListener] for more information on how this is done via calling the
+     * [BaseEventListener.beginWatchingNoticeMsgs] & [BaseEventListener.doesNoticeMsgBufferContain]
+     * methods.
+     *
      * If the [eventListener] you're instantiating [OnionProxyManager] with has it's
      * [BaseEventListener.noticeMsg] being piped to the [EventBroadcaster.broadcastNotice],
-     * you will receive the message of being rate limited. The [InternalEventListener] is
-     * used specifically for this purpose.
+     * you will receive the message of being rate limited.
      * */
     @Synchronized
     suspend fun signalNewNym() {
