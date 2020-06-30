@@ -63,7 +63,7 @@ internal class OnionProxyEventBroadcaster(
         // Only update the notification if proper State is had & we're bootstrapped.
         if (torState == TorState.ON &&
             torNetworkState == TorNetworkState.ENABLED &&
-            bootstrapProgress == "Bootstrapped 100%"
+            isBootstrappingComplete()
         ) {
             if (read != this.bytesRead || written != this.bytesWritten) {
                 this.bytesRead = read
@@ -145,6 +145,8 @@ internal class OnionProxyEventBroadcaster(
     ///////////////
     private lateinit var noticeMsgToContentTextJob: Job
     private var bootstrapProgress = ""
+    private fun isBootstrappingComplete(): Boolean =
+        bootstrapProgress == "Bootstrapped 100%"
 
     override fun broadcastNotice(msg: String) {
 
@@ -156,7 +158,7 @@ internal class OnionProxyEventBroadcaster(
             if (bootstrapped != bootstrapProgress) {
                 serviceNotification.updateContentText(bootstrapped)
 
-                if (bootstrapped == "Bootstrapped 100%") {
+                if (isBootstrappingComplete()) {
                     serviceNotification.updateIcon(torService, ImageState.ENABLED)
                     serviceNotification.addActions(torService)
                 }
@@ -204,7 +206,7 @@ internal class OnionProxyEventBroadcaster(
                     getFormattedBandwidthString(bytesRead, bytesWritten)
                 )
             } else {
-                if (bootstrapProgress == "Bootstrapped 100%")
+                if (isBootstrappingComplete())
                     serviceNotification.updateContentText(getFormattedBandwidthString(0L, 0L))
             }
         }
@@ -235,7 +237,9 @@ internal class OnionProxyEventBroadcaster(
             torNetworkState = networkState
             serviceNotification.updateIcon(torService, ImageState.DISABLED)
         } else {
-            serviceNotification.updateIcon(torService, ImageState.ENABLED)
+            if (isBootstrappingComplete())
+                serviceNotification.updateIcon(torService, ImageState.ENABLED)
+
             // Update torNetworkState _after_ setting the icon to `enabled` so bandwidth changes
             // occur afterwards and this won't overwrite ImageState.DATA
             torNetworkState = networkState
