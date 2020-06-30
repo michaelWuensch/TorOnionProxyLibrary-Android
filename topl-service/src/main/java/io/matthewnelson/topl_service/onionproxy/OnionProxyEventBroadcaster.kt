@@ -126,7 +126,13 @@ internal class OnionProxyEventBroadcaster(
     /// Exceptions ///
     //////////////////
     override fun broadcastException(msg: String?, e: Exception) {
-        // TODO: Setup notification Error handling
+        if (!msg.isNullOrEmpty())
+            if (msg.contains(TorService::class.java.simpleName)) {
+                serviceNotification.updateIcon(torService, ImageState.ERROR)
+                val splitMsg = msg.split("|")
+                if (splitMsg.size > 2 && splitMsg[2].isNotEmpty())
+                    serviceNotification.updateContentText(splitMsg[2])
+            }
         if (torServiceSettings.hasDebugLogs)
             appEventBroadcaster?.broadcastException(msg, e)
     }
