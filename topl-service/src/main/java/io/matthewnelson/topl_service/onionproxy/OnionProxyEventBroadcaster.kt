@@ -228,12 +228,18 @@ internal class OnionProxyEventBroadcaster(
         }
 
         torState = state
-        torNetworkState = networkState
 
-        if (networkState == TorNetworkState.DISABLED)
+        if (networkState == TorNetworkState.DISABLED) {
+            // Update torNetworkState _before_ setting the icon to `disabled` so bandwidth won't
+            // overwrite the icon with an update
+            torNetworkState = networkState
             serviceNotification.updateIcon(torService, ImageState.DISABLED)
-        else
+        } else {
             serviceNotification.updateIcon(torService, ImageState.ENABLED)
+            // Update torNetworkState _after_ setting the icon to `enabled` so bandwidth changes
+            // occur afterwards and this won't overwrite ImageState.DATA
+            torNetworkState = networkState
+        }
 
         appEventBroadcaster?.broadcastTorState(state, networkState)
     }
