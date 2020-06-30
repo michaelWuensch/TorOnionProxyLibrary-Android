@@ -42,8 +42,6 @@ import io.matthewnelson.topl_core.util.WriteObserver
 import io.matthewnelson.topl_core_base.TorStates
 import net.freehaven.tor.control.TorControlCommands
 import net.freehaven.tor.control.TorControlConnection
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.io.*
 import java.net.Socket
 import java.util.*
@@ -79,11 +77,9 @@ class OnionProxyManager(
     companion object {
         private const val OWNER = "__OwningControllerProcess"
         private const val HOSTNAME_TIMEOUT = 30
-        private const val CONTROL_CONNECTION_NULL_MESSAGE = "TorControlConnection was null even after checking"
         const val NEWNYM_SUCCESS_MESSAGE = "You've changed Tor identities!"
+        const val NEWNYM_NO_NETWORK = "No network, cannot change Tor identities"
         const val NEWNYM_RATE_LIMIT_PARTIAL_MSG = "Rate limiting NEWNYM request: "
-
-        private val LOG: Logger = LoggerFactory.getLogger(OnionProxyManager::class.java)
     }
 
     ///////////////////////
@@ -162,10 +158,10 @@ class OnionProxyManager(
                 // Ipv6 or unix sockets.
                 controlConnection!!.getInfo("net/listeners/socks").split(" ".toRegex()).toTypedArray()
             } catch (e: KotlinNullPointerException) {
-                eventBroadcaster.broadcastException(e.message, e)
+                broadcastLogger.warn("TorControlConnection was null even after checking.")
                 throw NullPointerException(e.message)
             } catch (ee: IOException) {
-                LOG.warn("Control connection is not responding properly to getInfo", ee)
+                broadcastLogger.warn("Control connection is not responding properly to getInfo")
                 throw IOException(ee.message)
             }
 
@@ -204,7 +200,7 @@ class OnionProxyManager(
         checkNotNull(controlConnection) { "Service is not running." }
         val hostnameFile = onionProxyContext.torConfigFiles.hostnameFile
 
-        LOG.info("Creating hidden service")
+        broadcastLogger.notice("Creating hidden service")
         if (!onionProxyContext.createNewFileIfDoesNotExist(ConfigFile.HOSTNAME_FILE))
             throw IOException("Could not create hostnameFile")
 
@@ -223,9 +219,10 @@ class OnionProxyManager(
             controlConnection!!.setConf(config)
             controlConnection!!.saveConf()
         } catch (e: KotlinNullPointerException) {
-            eventBroadcaster.broadcastException(e.message, e)
+            broadcastLogger.warn("TorControlConnection was null even after checking.")
             throw NullPointerException(e.message)
         }
+        // TODO: catch IOException from not responding to signals.
 
         // Wait for the hostname file to be created/updated
         if (!hostNameFileObserver.poll(HOSTNAME_TIMEOUT.toLong(), TimeUnit.SECONDS)) {
@@ -236,7 +233,7 @@ class OnionProxyManager(
         // Publish the hidden service's onion hostname in transport properties
         val hostname = String(onionProxyContext.readFile(ConfigFile.HOSTNAME_FILE), Charsets.UTF_8)
             .trim { it <= ' ' }
-        LOG.info("Hidden service config has completed.")
+        broadcastLogger.notice("Hidden service configuration completed.")
 
         return hostname
     }
@@ -245,13 +242,14 @@ class OnionProxyManager(
      * Kills the Tor OP Process. Once you have called this method nothing is going
      * to work until you either call startWithRepeat or start
      *
-     * @throws [NullPointerException] If controlConnection magically changes to null.
+     * @throws [NullPointerException] If [controlConnection] magically changes to null.
+     * @throws [IOException] If [controlConnection] is not responding to `shutdownTor`.
      */
     @Synchronized
-    @Throws(NullPointerException::class)
+    @Throws(NullPointerException::class, IOException::class)
     fun stop() {
         if (controlConnection == null) {
-            eventBroadcaster.broadcastNotice("Stop command called but no TorControlConnection exists.")
+            broadcastLogger.notice("Stop command called but no TorControlConnection exists.")
 
             // Re-sync state if it's out of whack
             torStateMachine.setTorState(TorState.OFF)
@@ -259,26 +257,28 @@ class OnionProxyManager(
         }
 
         torStateMachine.setTorState(TorState.STOPPING)
-        eventBroadcaster.broadcastNotice("Using control port to shutdown Tor")
+        broadcastLogger.debug("Using control port to shutdown Tor")
         try {
             disableNetwork(true)
             controlConnection!!.signal(TorControlCommands.SIGNAL_SHUTDOWN)
-
         } catch (e: KotlinNullPointerException) {
-            eventBroadcaster.broadcastException(e.message, e)
-            torStateMachine.setTorState(TorState.OFF)
+            torStateMachine.setTorState(TorState.ON)
+            broadcastLogger.warn("TorControlConnection was null even after checking.")
             throw NullPointerException(e.message)
         } catch (ee: IOException) {
-            eventBroadcaster.broadcastException(ee.message, ee)
-            eventBroadcaster.broadcastNotice("Failed to shutdown Tor properly. Sending HALT signal.")
+            broadcastLogger.warn("TorControlConnection not responding to signal. Trying to HALT.")
 
             try {
                 controlConnection!!.shutdownTor(TorControlCommands.SIGNAL_HALT)
             } catch (eee: KotlinNullPointerException) {
-                eventBroadcaster.broadcastException(eee.message, eee)
-                torStateMachine.setTorState(TorState.OFF)
+                broadcastLogger.warn("TorControlConnection was null even after checking.")
+                torStateMachine.setTorState(TorState.ON)
                 throw NullPointerException(eee.message)
-            } catch (eeee: IOException) {}
+            } catch (eeee: IOException) {
+                broadcastLogger.warn("TorControlConnection not responding to shutdownTor.")
+                torStateMachine.setTorState(TorState.ON)
+                throw IOException(eeee.message)
+            }
 
         } finally {
 
@@ -305,7 +305,11 @@ class OnionProxyManager(
                 // There is a race condition where if someone calls stop before
                 // installAndStartTorOp is done then we could get an exception because
                 // the network state receiver might not be properly registered.
-                LOG.info("Someone tried to call stop before registering the receiver finished", e)
+                broadcastLogger.exception(
+                    IllegalArgumentException(
+                        "Someone tried calling stop before registering of NetworkStateReceiver", e
+                    )
+                )
             }
         }
     }
@@ -349,7 +353,7 @@ class OnionProxyManager(
 
             if (networkIsSetToDisable == disable) return
 
-            LOG.info("Setting Tor conf DisableNetwork: $disable")
+            broadcastLogger.debug("Setting Tor conf DisableNetwork: $disable")
 
             try {
                 controlConnection!!.setConf("DisableNetwork", if (disable) "1" else "0")
@@ -357,11 +361,10 @@ class OnionProxyManager(
                     if (disable) TorNetworkState.DISABLED else TorNetworkState.ENABLED
                 )
             } catch (e: IOException) {
-                LOG.warn("TorControlConnection is not responding properly to setConf.")
-                eventBroadcaster.broadcastException(e.message, e)
+                broadcastLogger.warn("TorControlConnection is not responding properly to setConf.")
                 throw IOException(e.message)
             } catch (ee: KotlinNullPointerException) {
-                eventBroadcaster.broadcastException(ee.message, ee)
+                broadcastLogger.warn("TorControlConnection was null even after checking.")
                 throw NullPointerException(ee.message)
             }
         }
@@ -383,11 +386,10 @@ class OnionProxyManager(
             val disableNetworkSettingValues = try {
                 controlConnection!!.getConf("DisableNetwork")
             } catch (e: KotlinNullPointerException) {
-                eventBroadcaster.broadcastException(e.message, e)
+                broadcastLogger.warn("TorControlConnection was null even after checking.")
                 throw NullPointerException(e.message)
             } catch (ee: IOException) {
-                LOG.warn("TorControlConnection is not responding properly to getConf.")
-                eventBroadcaster.broadcastException(ee.message, ee)
+                broadcastLogger.warn("TorControlConnection is not responding properly to getConf.")
                 throw IOException(ee.message)
             }
 
@@ -418,11 +420,11 @@ class OnionProxyManager(
             try {
                 val phase = controlConnection?.getInfo("status/bootstrap-phase")
                 if (phase != null && phase.contains("PROGRESS=100")) {
-                    LOG.info("isBootstrapped: true")
+                    broadcastLogger.debug("isBootstrapped: true")
                     return true
                 }
             } catch (e: IOException) {
-                LOG.warn("Control connection is not responding properly to getInfo", e)
+                broadcastLogger.warn("TorControlConnection is not responding properly to getInfo.")
             }
             return false
         }
@@ -432,12 +434,14 @@ class OnionProxyManager(
      *
      * @throws [IOException] File errors
      * @throws [SecurityException] Unauthorized access to file/directory.
+     * @throws [IllegalArgumentException] if [onionProxyContext] methods are passed incorrect
+     *   [ConfigFile] string values
      */
     @Synchronized
-    @Throws(IOException::class, SecurityException::class)
+    @Throws(IOException::class, SecurityException::class, IllegalArgumentException::class)
     fun start() {
         if (controlConnection != null) {
-            eventBroadcaster.broadcastNotice("Start command called but TorControlConnection already exists.")
+            broadcastLogger.notice("Start command called but TorControlConnection already exists")
 
             // Re-sync state if it's out of whack
             torStateMachine.setTorState(TorState.ON)
@@ -452,40 +456,50 @@ class OnionProxyManager(
 
         if (!hasExistingTorConnection) {
 
-            onionProxyContext.deleteFile(ConfigFile.CONTROL_PORT_FILE)
-            onionProxyContext.deleteFile(ConfigFile.COOKIE_AUTH_FILE)
+            try {
+                onionProxyContext.deleteFile(ConfigFile.CONTROL_PORT_FILE)
+                onionProxyContext.deleteFile(ConfigFile.COOKIE_AUTH_FILE)
+            } catch (e: Exception) {
+                torStateMachine.setTorState(TorState.OFF)
+                throw IOException(e.message)
+            }
 
-            torProcess = spawnTorProcess()
+            torProcess = try {
+                spawnTorProcess()
+            } catch (e: Exception) {
+                torStateMachine.setTorState(TorState.OFF)
+                throw IOException(e)
+            }
+
             controlConnection = try {
                 waitForFileCreation(ConfigFile.CONTROL_PORT_FILE)
                 connectToTorControlSocket()
-            } catch (e: IOException) {
+            } catch (e: Exception) {
                 torProcess.destroy()
                 torStateMachine.setTorState(TorState.OFF)
                 throw IOException(e.message)
             }
         } else {
-            LOG.info("Using existing Tor Process")
+            broadcastLogger.debug("Using already existing TorProcess")
         }
         try {
             this.controlConnection = controlConnection
 
             waitForFileCreation(ConfigFile.COOKIE_AUTH_FILE)
             controlConnection!!.authenticate(onionProxyContext.readFile(ConfigFile.COOKIE_AUTH_FILE))
-            eventBroadcaster.broadcastNotice("SUCCESS - authenticated tor control port.")
+            broadcastLogger.debug("Authentication to TorControlConnection port successful")
             if (hasExistingTorConnection) {
                 controlConnection.signal(TorControlCommands.SIGNAL_RELOAD)
-                eventBroadcaster.broadcastNotice("Reloaded configuration file")
+                broadcastLogger.debug("Reloaded configuration file")
             }
             controlConnection.takeOwnership()
             controlConnection.resetConf(setOf(OWNER))
-            eventBroadcaster.broadcastNotice("Took ownership of tor control port.")
+            broadcastLogger.debug("Took ownership of Control Port")
 
             if (eventListener.CONTROL_COMMAND_EVENTS.isNotEmpty()) {
-                eventBroadcaster.broadcastNotice("adding control port event listener")
-
+                broadcastLogger.debug("Adding EventListener to Tor Process")
                 controlConnection.addRawEventListener(eventListener)
-                eventBroadcaster.broadcastNotice("SUCCESS added control port event listener")
+                broadcastLogger.debug("Setting ControlCommand Events to listen for")
                 controlConnection.setEvents(listOf(*eventListener.CONTROL_COMMAND_EVENTS))
             }
 
@@ -494,6 +508,7 @@ class OnionProxyManager(
             torProcess?.destroy()
             this.controlConnection = null
             torStateMachine.setTorState(TorState.OFF)
+            broadcastLogger.warn("Failed to start Tor")
             throw IOException(e.message)
         }
 
@@ -504,7 +519,7 @@ class OnionProxyManager(
         @Suppress("DEPRECATION")
         val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
         context.registerReceiver(networkStateReceiver, filter)
-        LOG.info("Completed starting of tor")
+        broadcastLogger.notice("Completed starting of Tor")
     }
 
     /**
@@ -539,26 +554,30 @@ class OnionProxyManager(
             val controlPortTokens = String(onionProxyContext.readFile(ConfigFile.CONTROL_PORT_FILE))
                 .trim { it <= ' ' }.split(":".toRegex()).toTypedArray()
             controlPort = controlPortTokens[1].toInt()
-            eventBroadcaster.broadcastNotice("Connecting to control port: $controlPort")
+            broadcastLogger.notice("Connecting to Control Port: $controlPort")
             controlSocket = Socket(
                 controlPortTokens[0].split("=".toRegex()).toTypedArray()[1],
                 controlPort
             )
             controlConnection = TorControlConnection(controlSocket!!)
-            eventBroadcaster.broadcastNotice("SUCCESS connected to Tor control port.")
+            broadcastLogger.notice("Successfully connected to Control Port")
         } catch (e: IOException) {
-            eventBroadcaster.broadcastException(e.message, e)
+            broadcastLogger.warn("Failed to connect to Control Port.")
             throw IOException(e.message)
         } catch (ee: ArrayIndexOutOfBoundsException) {
+            broadcastLogger.warn("Failed to connect to Control Port.")
             throw IOException(
                 "Failed to read control port: " +
                         String(onionProxyContext.readFile(ConfigFile.CONTROL_PORT_FILE))
             )
         } catch (eee: KotlinNullPointerException) {
-            eventBroadcaster.broadcastException(eee.message, eee)
+            broadcastLogger.warn("controlSocket was null even after being properly set")
             throw NullPointerException(eee.message)
         }
         if (onionProxyContext.torSettings.hasDebugLogs) {
+            // TODO: think about changing this to something other than System.out. Maybe
+            //  try to pipe it to the BroadcastLogger to keep it out of Logcat on release
+            //  builds?
             controlConnection.setDebugging(System.out)
         }
         return controlConnection
@@ -570,8 +589,14 @@ class OnionProxyManager(
      * @throws [IOException] File errors.
      * @throws [SecurityException] Unauthorized access to file/directory.
      */
-    @Throws(IOException::class, SecurityException::class)
+    @Throws(
+        SecurityException::class,
+        IOException::class
+    )
     private fun spawnTorProcess(): Process {
+
+        // We want this to throw exceptions if files do not exist so we can propogate
+        // the exceptions to where start was called.
         val cmd = arrayOf(
             torExecutable().absolutePath,
             "-f",
@@ -581,11 +606,12 @@ class OnionProxyManager(
         )
         val processBuilder = ProcessBuilder(*cmd)
         setEnvironmentArgsAndWorkingDirectoryForStart(processBuilder)
-        LOG.info("Starting process")
+        broadcastLogger.debug("Spawning Tor Process")
+
         val torProcess: Process = try {
             processBuilder.start()
-        } catch (e: SecurityException) {
-            LOG.warn(e.toString(), e)
+        } catch (e: Exception) {
+            broadcastLogger.warn("ProcessBuilder failed to start.")
             throw IOException(e)
         }
 
@@ -605,7 +631,8 @@ class OnionProxyManager(
      * @throws [IllegalArgumentException] Method only accepts CONTROL_PORT_FILE or COOKIE_AUTH_FILE
      * @throws [RuntimeException] See [io.matthewnelson.topl_core.util.WriteObserver.poll]
      */
-    @Throws(IOException::class,
+    @Throws(
+        IOException::class,
         SecurityException::class,
         IllegalArgumentException::class,
         RuntimeException::class
@@ -619,14 +646,12 @@ class OnionProxyManager(
                 onionProxyContext.torConfigFiles.cookieAuthFile
             }
             else -> {
-                throw IllegalArgumentException(
-                    "$onionProxyConst is not a valid argument for method waitForFileCreation"
-                )
+                throw IllegalArgumentException("$onionProxyConst is not a valid argument")
             }
         }
 
         val startTime = System.currentTimeMillis()
-        LOG.info("Waiting for ${file.nameWithoutExtension} file")
+        broadcastLogger.notice("Waiting for ${file.nameWithoutExtension} file")
 
         val isCreated: Boolean = onionProxyContext.createNewFileIfDoesNotExist(onionProxyConst)
         val fileObserver: WriteObserver? = onionProxyContext.createFileObserver(onionProxyConst)
@@ -634,14 +659,13 @@ class OnionProxyManager(
         if (!isCreated || file.length() == 0L &&
             fileObserver?.poll(fileCreationTimeout.toLong(), TimeUnit.SECONDS) != true
         ) {
-            eventBroadcaster.broadcastNotice("${file.nameWithoutExtension} not created")
+            broadcastLogger.warn("${file.nameWithoutExtension} not created")
             torStateMachine.setTorState(TorState.STOPPING)
             throw IOException(
-                "${file.nameWithoutExtension} not created: " +
-                        "${file.absolutePath}, len = ${file.length()}"
+                "${file.nameWithoutExtension} not created: ${file.absolutePath}, len = ${file.length()}"
             )
         }
-        LOG.info(
+        broadcastLogger.notice(
             "Created ${file.nameWithoutExtension}: time = ${System.currentTimeMillis()-startTime}ms"
         )
     }
@@ -654,17 +678,16 @@ class OnionProxyManager(
                     while (scanner.hasNextLine()) {
                         val line = scanner.nextLine()
                         if (isError) {
-                            LOG.error(line)
-                            eventBroadcaster.broadcastException(line, Exception())
+                            broadcastLogger.exception(IOException("Error with $line"))
                         } else {
-                            LOG.info(line)
+                            broadcastLogger.notice(line)
                         }
                     }
                 } finally {
                     try {
                         inputStream.close()
                     } catch (e: IOException) {
-                        LOG.error("Couldn't close input stream in eatStream", e)
+                        broadcastLogger.exception(IOException("Could not close input stream", e))
                     }
                 }
             }
@@ -676,13 +699,13 @@ class OnionProxyManager(
         var torExe = onionProxyContext.torConfigFiles.torExecutableFile
         //Try removing platform specific extension
         if (!torExe.exists())
-            torExe = File(torExe.parent, "tor")
+            // Named to match GuardianProject's binaries, just in case someone
+            //  forgets to create/set a custom TorConfigFile if using their dependency.
+            torExe = File(torExe.parent, "libtor.so")
 
         if (!torExe.exists()) {
-            eventBroadcaster.broadcastNotice("Tor executable not found")
-            torStateMachine.setTorState(TorStates.TorState.STOPPING)
-            LOG.error("Tor executable not found: ${torExe.absolutePath}")
-            throw IOException("Tor executable not found")
+            torStateMachine.setTorState(TorState.STOPPING)
+            throw IOException("Tor executable file not found")
         }
         return torExe
     }
@@ -691,10 +714,8 @@ class OnionProxyManager(
     private fun torrc(): File {
         val torrc = onionProxyContext.torConfigFiles.torrcFile
         if (!torrc.exists()) {
-            eventBroadcaster.broadcastNotice("Torrc not found")
             torStateMachine.setTorState(TorState.STOPPING)
-            LOG.error("Torrc not found: ${torrc.absolutePath}")
-            throw IOException("Torrc not found")
+            throw IOException("Torrc file not found")
         }
         return torrc
     }
@@ -702,8 +723,10 @@ class OnionProxyManager(
     /**
      * Sets environment variables and working directory needed for Tor
      *
-     * @param [processBuilder] we will call start on this to run Tor
+     * @param [processBuilder] we will call start on this to run Tor.
+     * @throws [SecurityException] Unauthorized access to the ProcessBuilder's environment.
      */
+    @Throws(SecurityException::class)
     private fun setEnvironmentArgsAndWorkingDirectoryForStart(processBuilder: ProcessBuilder) {
         processBuilder.directory(onionProxyContext.torConfigFiles.configDir)
         val environment = processBuilder.environment()
@@ -744,8 +767,10 @@ class OnionProxyManager(
                 controlConnection!!.resetConf(resetBuffer)
                 disableNetwork(true)
                 disableNetwork(false)
-            } catch (ioe: Exception) {
-                LOG.error("Connection exception occurred resetting exits", ioe)
+            } catch (e: Exception) {
+                broadcastLogger.exception(
+                    IOException("Connection exception occurred resetting exits", e)
+                )
                 return false
             }
         } else {
@@ -756,8 +781,10 @@ class OnionProxyManager(
                 controlConnection!!.setConf("StrictNodes", "1")
                 disableNetwork(true)
                 disableNetwork(false)
-            } catch (ioe: Exception) {
-                LOG.error("Connection exception occurred resetting exits", ioe)
+            } catch (e: Exception) {
+                broadcastLogger.exception(
+                    IOException("Connection exception occurred resetting exits", e)
+                )
                 return false
             }
         }
@@ -780,11 +807,11 @@ class OnionProxyManager(
     suspend fun signalNewNym() {
         if (!hasControlConnection() || !isBootstrapped) return
         if (networkStateReceiver?.networkConnectivity != true) {
-            eventBroadcaster.broadcastNotice("NEWNYM: No network connectivity")
+            broadcastLogger.notice("NEWNYM: $NEWNYM_NO_NETWORK")
             return
         }
 
-        LOG.info("Attempting to acquire a new nym")
+        broadcastLogger.debug("Attempting to acquire a new nym")
         eventListener.beginWatchingNoticeMsgs()
 
         val signalSuccess =
@@ -798,15 +825,15 @@ class OnionProxyManager(
 
         if (signalSuccess) {
             if (!rateLimited) {
-                LOG.info("Successfully acquired a new nym")
+                broadcastLogger.debug("Successfully acquired a new nym")
                 eventBroadcaster.broadcastNotice(
                     "${TorControlCommands.SIGNAL_NEWNYM}|$NEWNYM_SUCCESS_MESSAGE"
                 )
             } else {
-                LOG.info("Was rate limited when trying to acquire a new nym")
+                broadcastLogger.debug("Was rate limited when trying to acquire a new nym")
             }
         } else {
-            eventBroadcaster.broadcastNotice(
+            broadcastLogger.notice(
                 "NOTICE: Failed to acquire a ${TorControlCommands.SIGNAL_NEWNYM}..."
             )
         }
@@ -826,10 +853,10 @@ class OnionProxyManager(
                 controlConnection!!.signal(torControlSignalCommand)
                 true
             } catch (e: IOException) {
-                LOG.warn("Control connection is not responding properly to signal", e)
+                broadcastLogger.warn("Control connection is not responding properly to signal")
                 false
             } catch (ee: KotlinNullPointerException) {
-                LOG.error(CONTROL_CONNECTION_NULL_MESSAGE, ee)
+                broadcastLogger.exception(ee)
                 false
             }
         }
@@ -847,7 +874,7 @@ class OnionProxyManager(
                 controlConnection!!.signal(TorControlCommands.SIGNAL_NEWNYM)
                 true
             } catch (e: IOException) {
-                eventBroadcaster.broadcastNotice("error requesting newnym: ${e.localizedMessage}")
+                broadcastLogger.notice("error requesting newnym: ${e.localizedMessage}")
                 false
             }
         }
@@ -875,10 +902,10 @@ class OnionProxyManager(
         } else try {
             controlConnection!!.getInfo(queryCommand)
         } catch (e: IOException) {
-            LOG.warn("Control connection is not responding properly to getInfo", e)
+            broadcastLogger.warn("Control connection is not responding properly to getInfo")
             null
         } catch (ee: KotlinNullPointerException) {
-            LOG.error(CONTROL_CONNECTION_NULL_MESSAGE, ee)
+            broadcastLogger.exception(ee)
             null
         }
     }
@@ -890,17 +917,16 @@ class OnionProxyManager(
             controlConnection!!.signal(TorControlCommands.SIGNAL_RELOAD)
             return true
         } catch (e: IOException) {
-            LOG.warn("TorControlConnection is not responding properly to signal.")
-            eventBroadcaster.broadcastException(e.message, e)
+            broadcastLogger.warn("TorControlConnection is not responding properly to signal")
         } catch (ee: KotlinNullPointerException) {
-            eventBroadcaster.broadcastException(ee.message, ee)
+            broadcastLogger.exception(ee)
         }
 
         try {
             restartTorProcess()
             return true
         } catch (e: Exception) {
-            eventBroadcaster.broadcastException(e.message, e)
+            broadcastLogger.exception(e)
         }
 
         return false

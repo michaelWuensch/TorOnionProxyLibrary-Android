@@ -167,10 +167,17 @@ internal class OnionProxyEventBroadcaster(
         // NEWNYM
         } else if (msg.contains(TorControlCommands.SIGNAL_NEWNYM)) {
             val msgToShow =
-                if (msg.contains(OnionProxyManager.NEWNYM_SUCCESS_MESSAGE))
-                    OnionProxyManager.NEWNYM_SUCCESS_MESSAGE
-                else
-                    msg
+                when {
+                    msg.contains(OnionProxyManager.NEWNYM_SUCCESS_MESSAGE) -> {
+                        OnionProxyManager.NEWNYM_SUCCESS_MESSAGE
+                    }
+                    msg.contains(OnionProxyManager.NEWNYM_NO_NETWORK) -> {
+                        OnionProxyManager.NEWNYM_NO_NETWORK
+                    }
+                    else -> {
+                        msg
+                    }
+                }
 
             if (::noticeMsgToContentTextJob.isInitialized && noticeMsgToContentTextJob.isActive)
                 noticeMsgToContentTextJob.cancel()
