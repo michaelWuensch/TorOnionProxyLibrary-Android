@@ -111,6 +111,9 @@ internal class TorService: Service() {
             onionProxyEventBroadcaster,
             buildConfigDebug
         )
+        onionProxyInstaller.initBroadcastLogger(
+            onionProxyManager.createBroadcastLogger(OnionProxyInstaller::class.java)
+        )
     }
 
     /**

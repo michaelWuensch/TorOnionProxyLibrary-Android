@@ -68,7 +68,7 @@ import java.util.concurrent.TimeUnit
  * */
 class OnionProxyManager(
     private val context: Context,
-    private val onionProxyContext: OnionProxyContext,
+    val onionProxyContext: OnionProxyContext,
     private val eventListener: BaseEventListener,
     private val eventBroadcaster: EventBroadcaster,
     buildConfigDebug: Boolean?

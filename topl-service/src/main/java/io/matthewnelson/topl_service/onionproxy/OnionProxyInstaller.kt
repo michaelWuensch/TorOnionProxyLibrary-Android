@@ -1,5 +1,6 @@
 package io.matthewnelson.topl_service.onionproxy
 
+import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core.util.FileUtilities
 import io.matthewnelson.topl_core.util.TorInstaller
 import io.matthewnelson.topl_core_base.SettingsConsts.SupportedBridges
@@ -35,6 +36,11 @@ internal class OnionProxyInstaller(
     private val prefs = TorServicePrefs(torService)
     private lateinit var geoIpFileCoppied: String
     private lateinit var geoIp6FileCoppied: String
+    private var broadcastLogger: BroadcastLogger? = null
+    fun initBroadcastLogger(onionProxyBroadcastLogger: BroadcastLogger) {
+        if (broadcastLogger == null)
+            broadcastLogger = onionProxyBroadcastLogger
+    }
 
     @Throws(IOException::class, SecurityException::class)
     override fun setup() {
@@ -45,9 +51,9 @@ internal class OnionProxyInstaller(
             copyAsset(geoIp6AssetPath, torConfigFiles.geoIpv6File)
             geoIp6FileCoppied = ""
 
-        // If the app version has been increased, or if this is a debug build of topl-service
-        // module, copy over geoip assets then update SharedPreferences with the updated
-        // version code. Mitigates copying to be done only if a version upgrade is had.
+        // If the app version has been increased, or if this is a debug build, copy over
+        // geoip assets then update SharedPreferences with the new version code. This
+        // mitigates copying to be done only if a version upgrade is had.
         if (buildConfigVersionCode > prefs.getInt("BUILD_CONFIG_VERSION_CODE", -1) ?: -1 ||
             buildConfigDebug
         ) {
@@ -59,11 +65,17 @@ internal class OnionProxyInstaller(
         }
     }
 
+    @Throws(IOException::class)
     private fun copyAsset(assetPath: String, file: File) {
-        FileUtilities.copy(
-            torService.assets.open(assetPath),
-            file.outputStream()
-        )
+        try {
+            FileUtilities.copy(
+                torService.assets.open(assetPath),
+                file.outputStream()
+            )
+            broadcastLogger?.debug("Asset copied from $assetPath -> ${file.name}")
+        } catch (e: Exception) {
+            throw IOException("Failed copying asset from $assetPath", e)
+        }
     }
 
     @Throws(IOException::class, TimeoutException::class)
@@ -86,6 +98,7 @@ internal class OnionProxyInstaller(
 
             If length is greater than 9, then we know this is a custom bridge
         * */
+        // TODO: Completely refactor how bridges work.
         val userDefinedBridgeList: String =
             prefs.getList(ListKey.LIST_OF_SUPPORTED_BRIDGES, arrayListOf()).joinToString()
         var bridgeType = (if (userDefinedBridgeList.length > 9) 1 else 0).toByte()
