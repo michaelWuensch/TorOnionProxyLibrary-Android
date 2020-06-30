@@ -164,7 +164,7 @@ internal class OnionProxyEventBroadcaster(
             if (bootstrapped != bootstrapProgress) {
                 serviceNotification.updateContentText(bootstrapped)
 
-                if (isBootstrappingComplete()) {
+                if (bootstrapped == "Bootstrapped 100%") {
                     serviceNotification.updateIcon(torService, ImageState.ENABLED)
                     serviceNotification.addActions(torService)
                 }
