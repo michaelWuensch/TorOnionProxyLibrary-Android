@@ -38,12 +38,12 @@ class TorServiceController private constructor() {
      * immediately for the settings that don't require a restart, but a stable release comes first).
      *
      * You can see how the [TorSettings] sent here are used in [TorService] by looking at
-     * [io.matthewnelson.topl_service.service.TorServiceSettings] and [TorService.onCreate].
+     * [io.matthewnelson.topl_service.service.TorServiceSettings] and [TorService.initTOPLAndroid].
      *
-     * @param [application] [Application], for obtaining
+     * @param [application] [Application], for obtaining context.
      * @param [buildConfigVersion] send [BuildConfig.VERSION_CODE]. Mitigates copying of geoip
      *   files to app updates only.
-     * @param [torSettings] [TorSettings] used to create your torrc file on startup.
+     * @param [torSettings] [TorSettings] used to create your torrc file on start of Tor.
      * @param [geoipAssetPath] The path to where you have your geoip file located (ex: in
      *   assets/common directory, send this variable "common/geoip").
      * @param [geoip6AssetPath] The path to where you have your geoip6 file located (ex: in
@@ -60,23 +60,21 @@ class TorServiceController private constructor() {
     ) {
 
         private lateinit var torConfigFiles: TorConfigFiles
-        private var appEventBroadcaster: EventBroadcaster? = null
+        private lateinit var appEventBroadcaster: EventBroadcaster
 
-        /**
-         * On published releases of this Library, this value will **always** be `false`. You
-         * can change it for your application via the [Builder.setBuildConfigDebug] method.
-         *
-         * See [io.matthewnelson.topl_core.broadcaster.BroadcastLogger]
-         * */
+        // On published releases of this Library, this value will **always** be `false`.
         private var buildConfigDebug = BuildConfig.DEBUG
 
         /**
          * This makes it such that on your Application's **Debug** builds, the `topl-core` and
-         * `topl-service` modules will provide you with Logcat messages.
+         * `topl-service` modules will provide you with Logcat messages (when
+         * [TorSettings.hasDebugLogs] is enabled).
          *
-         * For your **Release** builds, no Logcat messaging will be provided but you
-         * will still get them if you set your own [EventBroadcaster] via
-         * [Builder.setEventBroadcaster]
+         * For your **Release** builds no Logcat messaging will be provided, but you
+         * will still get the same messages sent to your [EventBroadcaster] if you set it
+         * via [Builder.setEventBroadcaster].
+         *
+         * See [io.matthewnelson.topl_core.broadcaster.BroadcastLogger] for more info.
          *
          * @param [buildConfigDebug] Send [BuildConfig.DEBUG]
          * */
@@ -349,12 +347,11 @@ class TorServiceController private constructor() {
          * See [Builder] for code samples.
          * */
         fun build() {
-            val torConfigFiles =
-                if (::torConfigFiles.isInitialized) {
+            val torConfigFiles: TorConfigFiles =
+                if (::torConfigFiles.isInitialized)
                     this.torConfigFiles
-                } else {
+                else
                     TorConfigFiles.createConfig(application.applicationContext)
-                }
 
             TorService.initialize(
                 torConfigFiles,
@@ -365,7 +362,13 @@ class TorServiceController private constructor() {
                 geoip6AssetPath
             )
 
-            OnionProxyEventBroadcaster.initAppEventBroadcaster(appEventBroadcaster)
+            val eventBroadcaster: EventBroadcaster? =
+                if (::appEventBroadcaster.isInitialized)
+                    this.appEventBroadcaster
+                else
+                    null
+
+            OnionProxyEventBroadcaster.initAppEventBroadcaster(eventBroadcaster)
 
             ServiceNotification.get().setupNotificationChannel(application.applicationContext)
 
