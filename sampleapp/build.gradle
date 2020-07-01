@@ -51,3 +51,44 @@ dependencies {
     androidTestImplementation deps.androidx.test.junit
 
 }
+
+task updatePluggableTransportsSubmodule(type: Exec) {
+    workingDir "$rootDir"
+    commandLine "scripts/pull_latest_transports.sh"
+}
+
+task copyPluggableTransports(type: Copy, dependsOn: updatePluggableTransportsSubmodule) {
+    from("$rootDir/external/AndroidPluggableTransports/APTDispatchLibrary-MeekObfs4-Legacy/src/main/libs")
+    into("src/main/jniLibs")
+    rename { filename ->
+        filename.replace "$filename", 'libObfs4proxy.so'
+    }
+}
+
+task buildTorBinaries(type: Exec) {
+    workingDir "$rootDir"
+    commandLine 'scripts/update_tor_binaries.sh', 'build'
+}
+
+task copyTorBinaries(type: Copy, dependsOn: buildTorBinaries) {
+    from("$rootDir/external/tor-android/tor-android-binary/src/main/libs")
+    into("src/main/jniLibs")
+    rename { filename ->
+        filename.replace "$filename", 'libTor.so'
+    }
+}
+
+task updateTorBinaries(type: Exec, dependsOn: copyTorBinaries) {
+    workingDir "$rootDir"
+    commandLine 'scripts/update_tor_binaries.sh', 'update_versions_file'
+}
+
+task checkForTorBinaryUpdate(type: Exec) {
+    workingDir "$rootDir"
+    commandLine 'scripts/update_tor_binaries.sh', 'check_for_update'
+}
+
+gradle.projectsEvaluated {
+    preBuild.dependsOn(checkForTorBinaryUpdate)
+    preBuild.dependsOn(copyPluggableTransports)
+}
