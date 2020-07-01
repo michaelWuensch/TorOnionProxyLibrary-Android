@@ -36,13 +36,12 @@ import io.matthewnelson.topl_core.receiver.NetworkStateReceiver
 import io.matthewnelson.topl_core.settings.TorSettingsBuilder
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core.broadcaster.TorStateMachine
-import io.matthewnelson.topl_core.util.OnionProxyConsts.ConfigFile
 import io.matthewnelson.topl_core.util.FileUtilities
+import io.matthewnelson.topl_core.util.CoreConsts
 import io.matthewnelson.topl_core.util.TorInstaller
 import io.matthewnelson.topl_core.util.WriteObserver
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
-import io.matthewnelson.topl_core_base.TorStates
 import net.freehaven.tor.control.TorControlCommands
 import net.freehaven.tor.control.TorControlConnection
 import java.io.*
@@ -78,7 +77,7 @@ class OnionProxyManager(
     private val eventListener: BaseEventListener,
     private val eventBroadcaster: EventBroadcaster,
     buildConfigDebug: Boolean?
-): TorStates() {
+): CoreConsts() {
 
     private val buildConfigDebug = buildConfigDebug ?: BuildConfig.DEBUG
     private val onionProxyContext = OnionProxyContext(torConfigFiles, torInstaller, torSettings)
@@ -346,7 +345,7 @@ class OnionProxyManager(
      *
      * Whenever setting Tor's Conf to `DisableNetwork X`, ONLY use this method to do it
      * such that [torStateMachine] will reflect the proper
-     * [TorStates.TorNetworkState].
+     * [io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState].
      *
      * @param [disable] If true then the Tor OP will **not** accept SOCKS connections, otherwise yes.
      * @throws [IOException] if having issues with TorControlConnection#setConf
@@ -445,7 +444,7 @@ class OnionProxyManager(
      * @throws [IOException] File errors
      * @throws [SecurityException] Unauthorized access to file/directory.
      * @throws [IllegalArgumentException] if [onionProxyContext] methods are passed incorrect
-     *   [ConfigFile] string values
+     *   [CoreConsts.ConfigFile] string values
      */
     @Synchronized
     @Throws(IOException::class, SecurityException::class, IllegalArgumentException::class)

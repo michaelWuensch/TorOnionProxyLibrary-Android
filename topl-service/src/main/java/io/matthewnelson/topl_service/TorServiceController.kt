@@ -39,7 +39,7 @@ class TorServiceController private constructor(): ServiceConsts() {
      *
      * You can see how the [TorSettings] sent here are used in [TorService] by looking at
      * [io.matthewnelson.topl_service.onionproxy.ServiceTorSettings] and
-     * [TorService.initTOPLAndroid].
+     * [TorService.initTOPLCore].
      *
      * @param [application] [Application], for obtaining context.
      * @param [buildConfigVersion] send [BuildConfig.VERSION_CODE]. Mitigates copying of geoip
@@ -201,7 +201,7 @@ class TorServiceController private constructor(): ServiceConsts() {
              * Defaults to Orbot/TorBrowser's icon [R.drawable.tor_stat_network_enabled].
              *
              * The small icon you wish to display when Tor's network state is
-             * [io.matthewnelson.topl_core_base.TorStates.TorNetworkState.ENABLED].
+             * [io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState.ENABLED].
              *
              * See [Builder] for code samples.
              *
@@ -217,7 +217,7 @@ class TorServiceController private constructor(): ServiceConsts() {
              * Defaults to Orbot/TorBrowser's icon [R.drawable.tor_stat_network_disabled].
              *
              * The small icon you wish to display when Tor's network state is
-             * [io.matthewnelson.topl_core_base.TorStates.TorNetworkState.DISABLED].
+             * [io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState.DISABLED].
              *
              * See [Builder] for code samples.
              *
@@ -263,7 +263,7 @@ class TorServiceController private constructor(): ServiceConsts() {
              * Defaults to [R.color.tor_service_white]
              *
              * The color you wish to display when Tor's network state is
-             * [io.matthewnelson.topl_core_base.TorStates.TorNetworkState.ENABLED]. Note that
+             * [io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState.ENABLED]. Note that
              * if [colorizeBackground] is being passed a value of `true`, the notification will
              * always be that color where as if it is passed `false`, the icon & action button
              * colors will change with Tor's network state.

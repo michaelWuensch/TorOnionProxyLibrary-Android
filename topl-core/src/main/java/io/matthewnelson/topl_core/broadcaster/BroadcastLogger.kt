@@ -1,10 +1,9 @@
 package io.matthewnelson.topl_core.broadcaster
 
 import android.util.Log
+import io.matthewnelson.topl_core.util.CoreConsts
 import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_core_base.TorSettings
-import io.matthewnelson.topl_core_base.TorStates.TorState
-import io.matthewnelson.topl_core_base.TorStates.TorNetworkState
 
 /**
  * This class is for standardizing broadcast messages across all classes for this Library.
@@ -28,7 +27,7 @@ class BroadcastLogger(
     private val eventBroadcaster: EventBroadcaster,
     private val buildConfigDebug: Boolean,
     private val torSettings: TorSettings
-) {
+): CoreConsts() {
 
     private val TAG = clazz.simpleName
     private fun toLogcat(): Boolean =
@@ -37,25 +36,25 @@ class BroadcastLogger(
     fun debug(msg: String) {
         if (toLogcat())
             Log.d(TAG, msg)
-        eventBroadcaster.broadcastDebug("DEBUG|$TAG|$msg")
+        eventBroadcaster.broadcastDebug("${BroadcastType.DEBUG}|$TAG|$msg")
     }
 
     fun exception(e: Exception) {
         if (toLogcat())
             Log.e(TAG, e.message, e)
-        eventBroadcaster.broadcastException("EXCEPTION|$TAG|${e.message}", e)
+        eventBroadcaster.broadcastException("${BroadcastType.EXCEPTION}|$TAG|${e.message}", e)
     }
 
     fun notice(msg: String) {
         if (toLogcat())
             Log.i(TAG, msg)
-        eventBroadcaster.broadcastNotice("NOTICE|$TAG|$msg")
+        eventBroadcaster.broadcastNotice("${BroadcastType.NOTICE}|$TAG|$msg")
     }
 
     fun warn(msg: String) {
         if (toLogcat())
             Log.w(TAG, msg)
-        eventBroadcaster.broadcastNotice("WARN|$TAG|$msg")
+        eventBroadcaster.broadcastNotice("${BroadcastType.WARN}|$TAG|$msg")
     }
 
     fun torState(@TorState state: String, @TorNetworkState networkState: String) {

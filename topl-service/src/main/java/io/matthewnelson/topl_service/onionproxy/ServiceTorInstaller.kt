@@ -2,7 +2,6 @@ package io.matthewnelson.topl_service.onionproxy
 
 import io.matthewnelson.topl_core.util.FileUtilities
 import io.matthewnelson.topl_core.util.TorInstaller
-import io.matthewnelson.topl_core_base.SettingsConsts.SupportedBridges
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_service.BuildConfig
 import io.matthewnelson.topl_service.R

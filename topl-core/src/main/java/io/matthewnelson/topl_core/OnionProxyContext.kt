@@ -15,8 +15,8 @@ package io.matthewnelson.topl_core
 import android.os.Process
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core_base.TorSettings
-import io.matthewnelson.topl_core.util.OnionProxyConsts.ConfigFile
 import io.matthewnelson.topl_core.util.FileUtilities
+import io.matthewnelson.topl_core.util.CoreConsts
 import io.matthewnelson.topl_core.util.TorInstaller
 import io.matthewnelson.topl_core.util.WriteObserver
 import io.matthewnelson.topl_core_base.TorConfigFiles
@@ -38,13 +38,12 @@ import java.io.*
  * @param [torConfigFiles] [TorConfigFiles] Tor file/directory info used for running/installing Tor
  * @param [torInstaller] [TorInstaller]
  * @param [torSettings] [TorSettings] Basically your torrc file
- * @param [broadcastLogger] for broadcasting/logging
  */
 internal class OnionProxyContext(
     val torConfigFiles: TorConfigFiles,
     val torInstaller: TorInstaller,
     val torSettings: TorSettings
-) {
+): CoreConsts() {
 
     // Gets initialized in OnionProxyManager _immediately_ after
     // OnionProxyContext is instantiated.
@@ -61,8 +60,8 @@ internal class OnionProxyContext(
     private val hostnameFileLock = Object()
 
     /**
-     * Creates an observer for the file referenced. See [ConfigFile] annotation class for
-     * accepted arguments.
+     * Creates an observer for the file referenced. See [CoreConsts.ConfigFile] annotation class
+     * for accepted arguments.
      *
      * @param [onionProxyConst] String that defines what file a [WriteObserver] is created for.
      * @return A WriteObserver for the appropriate file referenced.
@@ -95,8 +94,10 @@ internal class OnionProxyContext(
     }
 
     /**
-     * Creates an empty file if the provided one does not exist.
+     * Creates an empty file if the provided one does not exist. See [CoreConsts.ConfigFile]
+     * annotation class for accepted arguments.
      *
+     * @param [onionProxyConst] String that defines what file is to be created.
      * @return True if file exists or is created successfully, otherwise false.
      * @throws [SecurityException] Unauthorized access to file/directory.
      * */
@@ -126,10 +127,10 @@ internal class OnionProxyContext(
     }
 
     /**
-     * Deletes the referenced file.See [ConfigFile] annotation class for
-     * accepted arguments.
+     * Deletes the referenced file. See [CoreConsts.ConfigFile] annotation class
+     * for accepted arguments.
      *
-     * @param [onionProxyConst] String that defines what file to delete.
+     * @param [onionProxyConst] String that defines what file is to be delete.
      * @return True if it was deleted, false if it failed.
      * @throws [SecurityException] Unauthorized access to file/directory.
      * @throws [IllegalArgumentException]
@@ -159,6 +160,16 @@ internal class OnionProxyContext(
         }
     }
 
+    /**
+     * Reads the referenced file. See [CoreConsts.ConfigFile] annotation class
+     * for accepted arguments.
+     *
+     * @param [onionProxyConst] String that defines what file is to be read.
+     * @return The contents of the file.
+     * @throws [IOException] Errors while reading file.
+     * @throws [EOFException] Errors while reading file.
+     * @throws [SecurityException] Unauthorized access to file/directory.
+     * */
     @Throws(IOException::class, EOFException::class, SecurityException::class)
     fun readFile(@ConfigFile onionProxyConst: String): ByteArray {
         broadcastLogger.debug("Reading file for $onionProxyConst")
@@ -202,7 +213,7 @@ internal class OnionProxyContext(
     /**
      * Deletes the configured tor data directory, except for hiddenservices.
      *
-     * @throws [RuntimeException]
+     * @throws [RuntimeException] Was unable to delete a file.
      * @throws [SecurityException] Unauthorized access to file/directory.
      */
     @Throws(RuntimeException::class, SecurityException::class)

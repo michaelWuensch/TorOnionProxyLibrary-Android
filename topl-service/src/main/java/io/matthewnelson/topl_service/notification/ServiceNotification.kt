@@ -11,7 +11,6 @@ import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.NotificationVisibility
 import androidx.core.content.ContextCompat
-import io.matthewnelson.topl_core_base.TorStates.TorState
 import io.matthewnelson.topl_service.R
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.ServiceConsts

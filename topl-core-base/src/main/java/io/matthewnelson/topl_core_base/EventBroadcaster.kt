@@ -22,9 +22,11 @@ package io.matthewnelson.topl_core_base
  *      - TYPE|ClassName|Message
  *  - If it is a broadcast from Tor, it will simply be a message with no format.
  *
- *  This allows for easier separation of messages based on the type, process or class
+ * See [BaseConsts.BroadcastType]s
+ *
+ * This allows for easier separation of messages based on the type, process or class
  */
-abstract class EventBroadcaster: TorStates() {
+abstract class EventBroadcaster: BaseConsts() {
 
     /**
      * Broadcast from Tor only:

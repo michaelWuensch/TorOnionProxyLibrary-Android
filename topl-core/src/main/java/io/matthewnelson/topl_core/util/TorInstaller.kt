@@ -17,7 +17,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.util.concurrent.TimeoutException
 
-abstract class TorInstaller {
+abstract class TorInstaller: CoreConsts() {
 
     /**
      * This gets set as soon as [io.matthewnelson.topl_core.OnionProxyManager] is instantiated,

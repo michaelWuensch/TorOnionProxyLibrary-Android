@@ -12,12 +12,12 @@ See the Apache 2 License for the specific language governing permissions and lim
 */
 package io.matthewnelson.topl_core.broadcaster
 
-import io.matthewnelson.topl_core_base.TorStates
+import io.matthewnelson.topl_core.util.CoreConsts
 
 /**
- * Current Status of Tor
+ * Current State of Tor
  */
-class TorStateMachine(private val broadcastLogger: BroadcastLogger): TorStates() {
+class TorStateMachine(private val broadcastLogger: BroadcastLogger): CoreConsts() {
 
     private var currentTorState: @TorState String = TorState.OFF
     private var currentTorNetworkState: @TorNetworkState String = TorNetworkState.DISABLED
@@ -40,7 +40,8 @@ class TorStateMachine(private val broadcastLogger: BroadcastLogger): TorStates()
     /**
      * Will set the state to that which is specified if it isn't already.
      *
-     * @return Previous [TorStates.TorState]
+     * @param [state] [io.matthewnelson.topl_core_base.BaseConsts.TorState]
+     * @return Previous [io.matthewnelson.topl_core_base.BaseConsts.TorState]
      * */
     @Synchronized
     internal fun setTorState(@TorState state: String): @TorState String {
@@ -57,13 +58,14 @@ class TorStateMachine(private val broadcastLogger: BroadcastLogger): TorStates()
     /**
      * Will set the network state to that which is specified if it isn't already.
      *
-     * @return Previous [TorStates.TorNetworkState]
+     * @param [networkState] [io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState]
+     * @return Previous [io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState]
      * */
     @Synchronized
-    internal fun setTorNetworkState(@TorNetworkState state: String): @TorNetworkState String {
+    internal fun setTorNetworkState(@TorNetworkState networkState: String): @TorNetworkState String {
         val currentNetworkState = currentTorNetworkState
-        if (currentTorNetworkState != state) {
-            currentTorNetworkState = state
+        if (currentTorNetworkState != networkState) {
+            currentTorNetworkState = networkState
             broadcastLogger.torState(currentTorState, currentTorNetworkState)
         } else {
             broadcastLogger.debug("TorNetworkState was already set to $currentNetworkState")

@@ -15,7 +15,7 @@ package io.matthewnelson.topl_core.settings
 import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.OnionProxyContext
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
-import io.matthewnelson.topl_core_base.SettingsConsts.ConnectionPadding
+import io.matthewnelson.topl_core.util.CoreConsts
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
 import java.io.*
@@ -46,7 +46,7 @@ import java.util.*
 class TorSettingsBuilder internal constructor(
     private val onionProxyContext: OnionProxyContext,
     private val broadcastLogger: BroadcastLogger
-) {
+): CoreConsts() {
 
     private var buffer = StringBuffer()
 
