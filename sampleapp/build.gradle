@@ -3,8 +3,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
+    packagingOptions {
+        exclude 'META-INF/*.kotlin_module'
+        exclude 'META-INF/*.version'
+    }
     compileSdkVersion versions.compileSdk
-    buildToolsVersion "29.0.3"
+    buildToolsVersion versions.buildTools
 
     defaultConfig {
         applicationId "io.matthewnelson.sampleapp"
