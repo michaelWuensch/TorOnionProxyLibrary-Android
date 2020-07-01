@@ -42,8 +42,6 @@ dependencies {
     implementation deps.kotlin.coroutinesAndroid
     implementation deps.kotlin.coroutinesCore
     implementation deps.kotlin.stdlib
-    implementation deps.slf4j.api
-    implementation deps.slf4j.android
 
     testImplementation deps.junit
 

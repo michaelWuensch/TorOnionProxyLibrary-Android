@@ -65,15 +65,12 @@ http://www.gnu.org/licenses/lgpl.html
  */
 package io.matthewnelson.topl_core.util
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.io.*
+import java.util.logging.Logger
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
 object FileUtilities {
-
-    private val LOG: Logger = LoggerFactory.getLogger(FileUtilities::class.java)
 
     // TODO: search commit history to see why this method name does not
     //  properly represent what it is doing.
@@ -132,8 +129,6 @@ object FileUtilities {
         if (f.isDirectory)
             for (child in f.listFiles())
                 listFilesToLog(child)
-        else
-            LOG.info(f.absolutePath)
     }
 
     @Throws(IOException::class, EOFException::class, SecurityException::class)
