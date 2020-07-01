@@ -90,11 +90,7 @@ class TorConfigFiles private constructor(
          * */
         fun createConfig(context: Context, configDir: File, dataDir: File? = null): TorConfigFiles {
             val installDir = File(context.applicationInfo.nativeLibraryDir)
-            val builder =
-                Builder(
-                    installDir,
-                    configDir
-                )
+            val builder = Builder(installDir, configDir)
             if (dataDir != null)
                 builder.dataDir(dataDir)
             return builder.build()
@@ -107,10 +103,7 @@ class TorConfigFiles private constructor(
          * @param context Context
          * */
         fun createConfig(context: Context): TorConfigFiles =
-            createConfig(
-                context,
-                context.getDir("torservice", Context.MODE_PRIVATE)
-            )
+            createConfig(context, context.getDir("torservice", Context.MODE_PRIVATE))
     }
 
     private val configLock = Object()
