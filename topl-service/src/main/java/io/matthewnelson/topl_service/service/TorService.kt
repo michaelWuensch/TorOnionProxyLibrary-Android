@@ -10,10 +10,10 @@ import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.BuildConfig
-import io.matthewnelson.topl_service.onionproxy.OnionProxyEventBroadcaster
-import io.matthewnelson.topl_service.onionproxy.OnionProxyEventListener
-import io.matthewnelson.topl_service.onionproxy.OnionProxyInstaller
-import io.matthewnelson.topl_service.onionproxy.TorServiceSettings
+import io.matthewnelson.topl_service.onionproxy.ServiceEventBroadcaster
+import io.matthewnelson.topl_service.onionproxy.ServiceEventListener
+import io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller
+import io.matthewnelson.topl_service.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.service.ActionConsts.ServiceAction
 import kotlinx.coroutines.*
 
@@ -88,12 +88,8 @@ internal class TorService: Service() {
     private lateinit var onionProxyManager: OnionProxyManager
 
     private fun initTOPLAndroid() {
-        val torServiceSettings =
-            TorServiceSettings(
-                torSettings,
-                this
-            )
-        val onionProxyInstaller = OnionProxyInstaller(
+        val serviceTorSettings = ServiceTorSettings(torSettings, this)
+        val serviceTorInstaller = ServiceTorInstaller(
             this,
             torConfigFiles,
             buildConfigVersionCode,
@@ -101,15 +97,15 @@ internal class TorService: Service() {
             geoipAssetPath,
             geoip6AssetPath
         )
-        val onionProxyEventBroadcaster = OnionProxyEventBroadcaster(this, torServiceSettings)
-        val onionProxyEventListener = OnionProxyEventListener(this, onionProxyEventBroadcaster)
+        val serviceEventBroadcaster = ServiceEventBroadcaster(this, serviceTorSettings)
+        val serviceEventListener = ServiceEventListener(this, serviceEventBroadcaster)
         onionProxyManager = OnionProxyManager(
             this,
             torConfigFiles,
-            onionProxyInstaller,
-            torServiceSettings,
-            onionProxyEventListener,
-            onionProxyEventBroadcaster,
+            serviceTorInstaller,
+            serviceTorSettings,
+            serviceEventListener,
+            serviceEventBroadcaster,
             buildConfigDebug
         )
     }

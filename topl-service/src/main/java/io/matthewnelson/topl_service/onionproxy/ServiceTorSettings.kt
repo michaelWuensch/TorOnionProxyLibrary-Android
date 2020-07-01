@@ -18,7 +18,7 @@ import io.matthewnelson.topl_service.util.TorServicePrefs
  * @param [defaults] Default values to fall back on if nothing is returned from [TorServicePrefs]
  * @param [torService] To instantiate [TorServicePrefs]
  * */
-internal class TorServiceSettings(private val defaults: TorSettings, torService: TorService): TorSettings() {
+internal class ServiceTorSettings(private val defaults: TorSettings, torService: TorService): TorSettings() {
 
     private val prefs = TorServicePrefs(torService)
 

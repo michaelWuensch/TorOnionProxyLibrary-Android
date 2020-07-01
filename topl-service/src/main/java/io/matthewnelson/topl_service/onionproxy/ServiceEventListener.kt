@@ -14,11 +14,11 @@ import net.freehaven.tor.control.TorControlCommands
  *  users can easily hook in, or if the EventBroadcaster should... (Might be too confusing).
  *
  *  @param [torService] [TorService] for context.
- *  @param [eventBroadcaster] [OnionProxyEventBroadcaster] for broadcasting data.
+ *  @param [eventBroadcaster] [ServiceEventBroadcaster] for broadcasting data.
  * */
-internal class OnionProxyEventListener(
+internal class ServiceEventListener(
     private val torService: TorService,
-    private val eventBroadcaster: OnionProxyEventBroadcaster
+    private val eventBroadcaster: ServiceEventBroadcaster
 ): BaseEventListener() {
 
     override val CONTROL_COMMAND_EVENTS: Array<String>

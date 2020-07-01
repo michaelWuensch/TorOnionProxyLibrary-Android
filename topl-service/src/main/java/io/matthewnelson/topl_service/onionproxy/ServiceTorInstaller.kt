@@ -24,7 +24,7 @@ import java.util.concurrent.TimeoutException
  *
  * See [io.matthewnelson.topl_service.TorServiceController.Builder]
  * */
-internal class OnionProxyInstaller(
+internal class ServiceTorInstaller(
     private val torService: TorService,
     private val torConfigFiles: TorConfigFiles,
     private val buildConfigVersionCode: Int,

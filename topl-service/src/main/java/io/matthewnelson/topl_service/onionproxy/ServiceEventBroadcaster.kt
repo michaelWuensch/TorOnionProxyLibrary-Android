@@ -17,15 +17,15 @@ import java.util.*
  * broadcasting things while it is operating (such as Tor's State, operation errors,
  * debugging, etc).
  *
- * [OnionProxyEventListener] utilizes this class by sending it what Tor is spitting out
+ * [ServiceEventListener] utilizes this class by sending it what Tor is spitting out
  * (selectively curated, ofc).
  *
  * @param [torService] [TorService] for context.
- * @param [torServiceSettings] [TorServiceSettings]
+ * @param [serviceTorSettings] [ServiceTorSettings]
  * */
-internal class OnionProxyEventBroadcaster(
+internal class ServiceEventBroadcaster(
     private val torService: TorService,
-    private val torServiceSettings: TorServiceSettings
+    private val serviceTorSettings: ServiceTorSettings
 ): EventBroadcaster() {
 
     companion object {
@@ -116,7 +116,7 @@ internal class OnionProxyEventBroadcaster(
     /// Debug ///
     /////////////
     override fun broadcastDebug(msg: String) {
-        if (torServiceSettings.hasDebugLogs)
+        if (serviceTorSettings.hasDebugLogs)
             appEventBroadcaster?.broadcastDebug(msg)
     }
 
@@ -132,7 +132,7 @@ internal class OnionProxyEventBroadcaster(
                 if (splitMsg.size > 2 && splitMsg[2].isNotEmpty())
                     serviceNotification.updateContentText(splitMsg[2])
             }
-        if (torServiceSettings.hasDebugLogs)
+        if (serviceTorSettings.hasDebugLogs)
             appEventBroadcaster?.broadcastException(msg, e)
     }
 

@@ -13,7 +13,7 @@ import androidx.core.app.NotificationCompat.NotificationVisibility
 import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
-import io.matthewnelson.topl_service.onionproxy.OnionProxyEventBroadcaster
+import io.matthewnelson.topl_service.onionproxy.ServiceEventBroadcaster
 
 class TorServiceController private constructor() {
 
@@ -367,7 +367,7 @@ class TorServiceController private constructor() {
                 else
                     null
 
-            OnionProxyEventBroadcaster.initAppEventBroadcaster(eventBroadcaster)
+            ServiceEventBroadcaster.initAppEventBroadcaster(eventBroadcaster)
 
             ServiceNotification.get().setupNotificationChannel(application.applicationContext)
 
