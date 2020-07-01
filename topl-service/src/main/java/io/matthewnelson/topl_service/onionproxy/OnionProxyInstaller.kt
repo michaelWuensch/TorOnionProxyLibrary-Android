@@ -1,6 +1,5 @@
 package io.matthewnelson.topl_service.onionproxy
 
-import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core.util.FileUtilities
 import io.matthewnelson.topl_core.util.TorInstaller
 import io.matthewnelson.topl_core_base.SettingsConsts.SupportedBridges
@@ -18,7 +17,8 @@ import java.util.concurrent.TimeoutException
  *
  * @param [torService] for context.
  * @param [torConfigFiles] [TorConfigFiles] to know where files/directories are.
- * @param [buildConfigVersionCode] Mitigate copying of geoip files to app updates only. Use [BuildConfig.VERSION_CODE].
+ * @param [buildConfigVersionCode] Use [BuildConfig.VERSION_CODE]
+ * @param [buildConfigDebug] Use [BuildConfig.DEBUG]
  * @param [geoIpAssetPath] The path to geoip file within the application, ex: "common/geoip"
  * @param [geoIp6AssetPath] The path to geoip6 file within the application, ex: "common/geoip6"
  *
@@ -34,44 +34,42 @@ internal class OnionProxyInstaller(
 ): TorInstaller() {
 
     private val prefs = TorServicePrefs(torService)
-    private lateinit var geoIpFileCoppied: String
-    private lateinit var geoIp6FileCoppied: String
-    private var broadcastLogger: BroadcastLogger? = null
-    fun initBroadcastLogger(onionProxyBroadcastLogger: BroadcastLogger) {
-        if (broadcastLogger == null)
-            broadcastLogger = onionProxyBroadcastLogger
+    private lateinit var geoIpFileCopied: String
+    private lateinit var geoIpv6FileCopied: String
+
+    // broadcastLogger is available from TorInstaller and is instantiated as soon as
+    // OnionProxyManager gets initialized.
+//    private lateinit var broadcastLogger: BroadcastLogger
+
+    companion object {
+        private const val VERSION_CODE = "BUILD_CONFIG_VERSION_CODE"
     }
 
     @Throws(IOException::class, SecurityException::class)
     override fun setup() {
         if (!torConfigFiles.geoIpFile.exists())
             copyAsset(geoIpAssetPath, torConfigFiles.geoIpFile)
-            geoIpFileCoppied = ""
+            geoIpFileCopied = ""
         if (!torConfigFiles.geoIpv6File.exists())
             copyAsset(geoIp6AssetPath, torConfigFiles.geoIpv6File)
-            geoIp6FileCoppied = ""
+            geoIpv6FileCopied = ""
 
         // If the app version has been increased, or if this is a debug build, copy over
         // geoip assets then update SharedPreferences with the new version code. This
         // mitigates copying to be done only if a version upgrade is had.
-        if (buildConfigVersionCode > prefs.getInt("BUILD_CONFIG_VERSION_CODE", -1) ?: -1 ||
-            buildConfigDebug
-        ) {
-            if (!::geoIpFileCoppied.isInitialized)
+        if (buildConfigVersionCode > prefs.getInt(VERSION_CODE, -1) ?: -1 || buildConfigDebug) {
+            if (!::geoIpFileCopied.isInitialized)
                 copyAsset(geoIpAssetPath, torConfigFiles.geoIpFile)
-            if (!::geoIp6FileCoppied.isInitialized)
+            if (!::geoIpv6FileCopied.isInitialized)
                 copyAsset(geoIp6AssetPath, torConfigFiles.geoIpv6File)
-            prefs.putInt("BUILD_CONFIG_VERSION_CODE", buildConfigVersionCode)
+            prefs.putInt(VERSION_CODE, buildConfigVersionCode)
         }
     }
 
     @Throws(IOException::class)
     private fun copyAsset(assetPath: String, file: File) {
         try {
-            FileUtilities.copy(
-                torService.assets.open(assetPath),
-                file.outputStream()
-            )
+            FileUtilities.copy(torService.assets.open(assetPath), file.outputStream())
             broadcastLogger?.debug("Asset copied from $assetPath -> ${file.name}")
         } catch (e: Exception) {
             throw IOException("Failed copying asset from $assetPath", e)

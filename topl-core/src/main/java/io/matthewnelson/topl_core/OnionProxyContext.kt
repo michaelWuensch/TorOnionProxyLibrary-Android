@@ -38,22 +38,20 @@ import java.io.*
  * @param [torConfigFiles] [TorConfigFiles] Tor file/directory info used for running/installing Tor
  * @param [torInstaller] [TorInstaller]
  * @param [torSettings] [TorSettings] Basically your torrc file
+ * @param [broadcastLogger] for broadcasting/logging
  */
-class OnionProxyContext(
+internal class OnionProxyContext(
     val torConfigFiles: TorConfigFiles,
     val torInstaller: TorInstaller,
     val torSettings: TorSettings
 ) {
 
-    /**
-     * No `isInitialized` checks necessary because everything in this class is marked as
-     * `private` or `internal`, so no methods can be used prior to instantiating
-     * [OnionProxyManager] where [initBroadcastLogger] is called immediately.
-     * */
+    // Gets initialized in OnionProxyManager _immediately_ after
+    // OnionProxyContext is instantiated.
     private lateinit var broadcastLogger: BroadcastLogger
-    internal fun initBroadcastLogger(onionProxyContextBroadcastLogger: BroadcastLogger) {
+    fun initBroadcastLogger(onionProxyBroadcastLogger: BroadcastLogger) {
         if (!::broadcastLogger.isInitialized)
-            broadcastLogger = onionProxyContextBroadcastLogger
+            broadcastLogger = onionProxyBroadcastLogger
     }
 
     private val controlPortFileLock = Object()
@@ -72,7 +70,7 @@ class OnionProxyContext(
      * @throws [SecurityException] See [WriteObserver.checkExists]
      */
     @Throws(IllegalArgumentException::class, SecurityException::class)
-    internal fun createFileObserver(@ConfigFile onionProxyConst: String): WriteObserver {
+    fun createFileObserver(@ConfigFile onionProxyConst: String): WriteObserver {
         broadcastLogger.debug("Creating FileObserver for $onionProxyConst")
         return when (onionProxyConst) {
             ConfigFile.CONTROL_PORT_FILE -> {
@@ -103,7 +101,7 @@ class OnionProxyContext(
      * @throws [SecurityException] Unauthorized access to file/directory.
      * */
     @Throws(IllegalArgumentException::class, SecurityException::class)
-    internal fun createNewFileIfDoesNotExist(@ConfigFile onionProxyConst: String): Boolean {
+    fun createNewFileIfDoesNotExist(@ConfigFile onionProxyConst: String): Boolean {
         broadcastLogger.debug("Creating file if DNE for $onionProxyConst")
         return when (onionProxyConst) {
             ConfigFile.CONTROL_PORT_FILE -> {
@@ -137,7 +135,7 @@ class OnionProxyContext(
      * @throws [IllegalArgumentException]
      * */
     @Throws(SecurityException::class, IllegalArgumentException::class)
-    internal fun deleteFile(@ConfigFile onionProxyConst: String): Boolean {
+    fun deleteFile(@ConfigFile onionProxyConst: String): Boolean {
         broadcastLogger.debug("Deleting file for $onionProxyConst")
         return when (onionProxyConst) {
             ConfigFile.CONTROL_PORT_FILE -> {
@@ -162,7 +160,7 @@ class OnionProxyContext(
     }
 
     @Throws(IOException::class, EOFException::class, SecurityException::class)
-    internal fun readFile(@ConfigFile onionProxyConst: String): ByteArray {
+    fun readFile(@ConfigFile onionProxyConst: String): ByteArray {
         broadcastLogger.debug("Reading file for $onionProxyConst")
         return when (onionProxyConst) {
             ConfigFile.CONTROL_PORT_FILE -> {
@@ -196,7 +194,7 @@ class OnionProxyContext(
      * @throws [SecurityException] Unauthorized access to file/directory.
      */
     @Throws(SecurityException::class)
-    internal fun createDataDir(): Boolean =
+    fun createDataDir(): Boolean =
         synchronized(dataDirLock) {
             return torConfigFiles.dataDir.exists() || torConfigFiles.dataDir.mkdirs()
         }
@@ -208,7 +206,7 @@ class OnionProxyContext(
      * @throws [SecurityException] Unauthorized access to file/directory.
      */
     @Throws(RuntimeException::class, SecurityException::class)
-    internal fun deleteDataDirExceptHiddenService() =
+    fun deleteDataDirExceptHiddenService() =
         synchronized(dataDirLock) {
             for (file in torConfigFiles.dataDir.listFiles())
                 if (file.isDirectory)
@@ -223,7 +221,7 @@ class OnionProxyContext(
     /// HostnameFile ///
     ////////////////////
     @Throws(SecurityException::class)
-    internal fun setHostnameDirPermissionsToReadOnly(): Boolean =
+    fun setHostnameDirPermissionsToReadOnly(): Boolean =
         synchronized(hostnameFileLock) {
             FileUtilities.setToReadOnlyPermissions(torConfigFiles.hostnameFile.parentFile)
         }
@@ -239,7 +237,7 @@ class OnionProxyContext(
      * @throws [IOException] from FileWriter
      */
     @Throws(IOException::class)
-    internal fun createQuad9NameserverFile(): File =
+    fun createQuad9NameserverFile(): File =
         synchronized(resolvConfFileLock) {
             val file = torConfigFiles.resolveConf
             val writer = BufferedWriter(FileWriter(file))
@@ -254,7 +252,7 @@ class OnionProxyContext(
      *
      * @return process id
      */
-    internal val processId: String
+    val processId: String
         get() = Process.myPid().toString()
 
     @Throws(SecurityException::class)

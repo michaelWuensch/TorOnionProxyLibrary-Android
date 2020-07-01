@@ -16,7 +16,6 @@ internal class NetworkStateReceiver(
     private val broadcastLogger =
         onionProxyManager.createBroadcastLogger(NetworkStateReceiver::class.java)
 
-
     private lateinit var connectivityManager: ConnectivityManager
     var networkConnectivity = true
         private set

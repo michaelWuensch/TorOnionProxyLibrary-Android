@@ -5,7 +5,6 @@ import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_service.notification.NotificationConsts.ImageState
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.TorService
-import io.matthewnelson.topl_service.service.TorServiceSettings
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

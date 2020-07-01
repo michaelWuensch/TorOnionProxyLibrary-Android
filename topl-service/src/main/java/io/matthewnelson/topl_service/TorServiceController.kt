@@ -14,7 +14,6 @@ import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.onionproxy.OnionProxyEventBroadcaster
-import net.freehaven.tor.control.EventListener
 
 class TorServiceController private constructor() {
 

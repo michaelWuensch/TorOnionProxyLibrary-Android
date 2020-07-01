@@ -3,7 +3,7 @@ package io.matthewnelson.topl_core.util
 import androidx.annotation.StringDef
 import io.matthewnelson.topl_core_base.TorStates
 
-internal abstract class OnionProxyConsts: TorStates() {
+abstract class OnionProxyConsts: TorStates() {
 
     @StringDef(
         ConfigFile.CONTROL_PORT_FILE,
@@ -11,11 +11,11 @@ internal abstract class OnionProxyConsts: TorStates() {
         ConfigFile.HOSTNAME_FILE
     )
     @Retention(AnnotationRetention.SOURCE)
-    annotation class ConfigFile {
+    internal annotation class ConfigFile {
         companion object {
-            const val CONTROL_PORT_FILE = "CONTROL_PORT_FILE"
-            const val COOKIE_AUTH_FILE = "COOKIE_AUTH_FILE"
-            const val HOSTNAME_FILE = "HOSTNAME_FILE"
+            const val CONTROL_PORT_FILE = "control_port_file"
+            const val COOKIE_AUTH_FILE = "cookie_auth_file"
+            const val HOSTNAME_FILE = "hostname_file"
         }
     }
 }

@@ -4,7 +4,6 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import androidx.annotation.WorkerThread
-import io.matthewnelson.topl_core.OnionProxyContext
 import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_service.notification.ServiceNotification
@@ -14,6 +13,7 @@ import io.matthewnelson.topl_service.BuildConfig
 import io.matthewnelson.topl_service.onionproxy.OnionProxyEventBroadcaster
 import io.matthewnelson.topl_service.onionproxy.OnionProxyEventListener
 import io.matthewnelson.topl_service.onionproxy.OnionProxyInstaller
+import io.matthewnelson.topl_service.onionproxy.TorServiceSettings
 import io.matthewnelson.topl_service.service.ActionConsts.ServiceAction
 import kotlinx.coroutines.*
 
@@ -88,7 +88,11 @@ internal class TorService: Service() {
     private lateinit var onionProxyManager: OnionProxyManager
 
     private fun initTOPLAndroid() {
-        val torServiceSettings = TorServiceSettings(torSettings, this)
+        val torServiceSettings =
+            TorServiceSettings(
+                torSettings,
+                this
+            )
         val onionProxyInstaller = OnionProxyInstaller(
             this,
             torConfigFiles,
@@ -97,22 +101,16 @@ internal class TorService: Service() {
             geoipAssetPath,
             geoip6AssetPath
         )
-        val onionProxyContext = OnionProxyContext(
-            torConfigFiles,
-            onionProxyInstaller,
-            torServiceSettings
-        )
         val onionProxyEventBroadcaster = OnionProxyEventBroadcaster(this, torServiceSettings)
         val onionProxyEventListener = OnionProxyEventListener(this, onionProxyEventBroadcaster)
         onionProxyManager = OnionProxyManager(
             this,
-            onionProxyContext,
+            torConfigFiles,
+            onionProxyInstaller,
+            torServiceSettings,
             onionProxyEventListener,
             onionProxyEventBroadcaster,
             buildConfigDebug
-        )
-        onionProxyInstaller.initBroadcastLogger(
-            onionProxyManager.createBroadcastLogger(OnionProxyInstaller::class.java)
         )
     }
 

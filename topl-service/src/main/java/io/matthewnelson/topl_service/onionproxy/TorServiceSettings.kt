@@ -1,6 +1,7 @@
-package io.matthewnelson.topl_service.service
+package io.matthewnelson.topl_service.onionproxy
 
 import io.matthewnelson.topl_core_base.TorSettings
+import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.PrefsKeys.IntKey
 import io.matthewnelson.topl_service.util.PrefsKeys.StringKey
 import io.matthewnelson.topl_service.util.PrefsKeys.ListKey
