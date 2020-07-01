@@ -8,14 +8,14 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.TorService
-import io.matthewnelson.topl_service.service.ActionConsts.ServiceAction
 import androidx.core.app.NotificationCompat.NotificationVisibility
 import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.onionproxy.ServiceEventBroadcaster
+import io.matthewnelson.topl_service.util.ServiceConsts
 
-class TorServiceController private constructor() {
+class TorServiceController private constructor(): ServiceConsts() {
 
     /**
      * The [TorServiceController.Builder] is where you get to customize how [TorService] works
@@ -23,13 +23,14 @@ class TorServiceController private constructor() {
      *
      * A note about the [TorSettings] you send this. Those are the default settings which
      * [TorService] will fall back on if [io.matthewnelson.topl_service.util.TorServicePrefs]
-     * has nothing in it for that particular [io.matthewnelson.topl_service.util.PrefsKeys].
+     * has nothing in it for that particular [ServiceConsts].PrefKey.
+     *
      * The settings get written to the `torrc` file every time Tor is started (I plan to make
      * this less sledgehammer-ish in the future).
      *
      * To update settings while your application is running you need only to instantiate
      * [io.matthewnelson.topl_service.util.TorServicePrefs] and save the data using the
-     * appropriately annotated method and [io.matthewnelson.topl_service.util.PrefsKeys], then
+     * appropriately annotated method and [ServiceConsts].PrefKey, then
      * restart Tor (for now... ;-D).
      *
      * I plan to implement a
@@ -37,7 +38,8 @@ class TorServiceController private constructor() {
      * immediately for the settings that don't require a restart, but a stable release comes first).
      *
      * You can see how the [TorSettings] sent here are used in [TorService] by looking at
-     * [io.matthewnelson.topl_service.service.TorServiceSettings] and [TorService.initTOPLAndroid].
+     * [io.matthewnelson.topl_service.onionproxy.ServiceTorSettings] and
+     * [TorService.initTOPLAndroid].
      *
      * @param [application] [Application], for obtaining context.
      * @param [buildConfigVersion] send [BuildConfig.VERSION_CODE]. Mitigates copying of geoip

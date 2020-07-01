@@ -13,8 +13,8 @@ import androidx.core.app.NotificationCompat.NotificationVisibility
 import androidx.core.content.ContextCompat
 import io.matthewnelson.topl_core_base.TorStates.TorState
 import io.matthewnelson.topl_service.R
-import io.matthewnelson.topl_service.service.ActionConsts.ServiceAction
 import io.matthewnelson.topl_service.service.TorService
+import io.matthewnelson.topl_service.util.ServiceConsts
 
 /**
  * Everything to do with [TorService]'s notification.
@@ -44,7 +44,7 @@ internal class ServiceNotification(
 
     var enableRestartButton: Boolean = false,
     var enableStopButton: Boolean = false
-): NotificationConsts() {
+): ServiceConsts() {
 
     companion object {
         private lateinit var serviceNotification: ServiceNotification
@@ -239,23 +239,23 @@ internal class ServiceNotification(
     /// Icon ///
     ////////////
     @Synchronized
-    fun updateIcon(torService: TorService, @ImageState imageState: Int) {
+    fun updateIcon(torService: TorService, @NotificationImage notificationImage: Int) {
         val builder = notificationBuilder
-        when (imageState) {
-            ImageState.ENABLED -> {
+        when (notificationImage) {
+            NotificationImage.ENABLED -> {
                 builder.setSmallIcon(imageNetworkEnabled)
                 if (!colorizeBackground)
                     builder.color = ContextCompat.getColor(torService, colorWhenConnected)
             }
-            ImageState.DISABLED -> {
+            NotificationImage.DISABLED -> {
                 builder.setSmallIcon(imageNetworkDisabled)
                 if (!colorizeBackground)
                     builder.color = ContextCompat.getColor(torService, R.color.tor_service_white)
             }
-            ImageState.DATA -> {
+            NotificationImage.DATA -> {
                 builder.setSmallIcon(imageDataTransfer)
             }
-            ImageState.ERROR -> {
+            NotificationImage.ERROR -> {
                 builder.setSmallIcon(imageError)
             }
             else -> {}

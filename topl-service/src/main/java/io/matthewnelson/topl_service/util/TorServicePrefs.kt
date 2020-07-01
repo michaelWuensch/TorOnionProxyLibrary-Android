@@ -10,9 +10,9 @@ import android.content.SharedPreferences
  * the [io.matthewnelson.topl_service.TorServiceController.Builder] can be updated. The
  * values saved to [TorServicePrefs] are always preferred over the defaults declared.
  *
- * See [io.matthewnelson.topl_service.service.TorServiceSettings]
+ * See [io.matthewnelson.topl_service.onionproxy.ServiceTorSettings]
  * */
-class TorServicePrefs(context: Context): PrefsKeys() {
+class TorServicePrefs(context: Context): ServiceConsts() {
 
     companion object {
         const val TOR_SERVICE_PREFS_NAME = "TorServicePrefs"
@@ -20,26 +20,31 @@ class TorServicePrefs(context: Context): PrefsKeys() {
         const val NULL_STRING_VALUE = "NULL_STRING_VALUE"
     }
 
-    private val prefs: SharedPreferences = context.getSharedPreferences(TOR_SERVICE_PREFS_NAME, Context.MODE_PRIVATE)
+    private val prefs: SharedPreferences =
+        context.getSharedPreferences(TOR_SERVICE_PREFS_NAME, Context.MODE_PRIVATE)
 
-    fun contains(@BooleanKey @IntKey @ListKey @StringKey prefsKey: String): Boolean =
-        prefs.contains(prefsKey)
 
-    fun remove(@BooleanKey @IntKey @ListKey @StringKey prefsKey: String) =
-        prefs.edit().remove(prefsKey).apply()
-
+    /////////////////
+    /// Listeners ///
+    /////////////////
     fun registerListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) =
         prefs.registerOnSharedPreferenceChangeListener(listener)
 
     fun unregisterListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) =
         prefs.unregisterOnSharedPreferenceChangeListener(listener)
 
-    // Read
-    fun getBoolean(@BooleanKey booleanKey: String, defValue: Boolean): Boolean {
+
+    /////////////
+    /// Query ///
+    /////////////
+    fun contains(@PrefKeyBoolean @PrefKeyInt @PrefKeyList @PrefKeyString prefsKey: String): Boolean =
+        prefs.contains(prefsKey)
+
+    fun getBoolean(@PrefKeyBoolean booleanKey: String, defValue: Boolean): Boolean {
         return prefs.getBoolean(booleanKey, defValue)
     }
 
-    fun getInt(@IntKey intKey: String, defValue: Int?): Int? {
+    fun getInt(@PrefKeyInt intKey: String, defValue: Int?): Int? {
         val value = prefs.getInt(intKey, defValue ?: NULL_INT_VALUE)
         return if (value == NULL_INT_VALUE) {
             null
@@ -48,7 +53,7 @@ class TorServicePrefs(context: Context): PrefsKeys() {
         }
     }
 
-    fun getList(@ListKey listKey: String, defValue: List<String>): List<String> {
+    fun getList(@PrefKeyList listKey: String, defValue: List<String>): List<String> {
         val csv: String = prefs.getString(listKey, defValue.joinToString()) ?: defValue.joinToString()
         return if (csv.trim().isEmpty()) {
             defValue
@@ -57,7 +62,7 @@ class TorServicePrefs(context: Context): PrefsKeys() {
         }
     }
 
-    fun getString(@StringKey stringKey: String, defValue: String?): String? {
+    fun getString(@PrefKeyString stringKey: String, defValue: String?): String? {
         val value = prefs.getString(stringKey, defValue ?: NULL_STRING_VALUE)
         return if (value == NULL_STRING_VALUE) {
             null
@@ -67,26 +72,34 @@ class TorServicePrefs(context: Context): PrefsKeys() {
     }
 
 
-    // Write
-    fun putBoolean(@BooleanKey booleanKey: String, value: Boolean) {
+    //////////////
+    /// Modify ///
+    //////////////
+    fun remove(@PrefKeyBoolean @PrefKeyInt @PrefKeyList @PrefKeyString prefsKey: String) {
+        val editor = prefs.edit().remove(prefsKey)
+        if (!editor.commit())
+            editor.apply()
+    }
+
+    fun putBoolean(@PrefKeyBoolean booleanKey: String, value: Boolean) {
         val editor = prefs.edit().putBoolean(booleanKey, value)
         if (!editor.commit())
             editor.apply()
     }
 
-    fun putInt(@IntKey intKey: String, value: Int?) {
+    fun putInt(@PrefKeyInt intKey: String, value: Int?) {
         val editor = prefs.edit().putInt(intKey, value ?: NULL_INT_VALUE)
         if (!editor.commit())
             editor.apply()
     }
 
-    fun putList(@ListKey listKey: String, value: List<String>) {
+    fun putList(@PrefKeyList listKey: String, value: List<String>) {
         val editor = prefs.edit().putString(listKey, value.joinToString())
         if (!editor.commit())
             editor.apply()
     }
 
-    fun putString(@StringKey stringKey: String, value: String?) {
+    fun putString(@PrefKeyString stringKey: String, value: String?) {
         val editor = prefs.edit().putString(stringKey, value ?: NULL_STRING_VALUE)
         if (!editor.commit())
             editor.apply()

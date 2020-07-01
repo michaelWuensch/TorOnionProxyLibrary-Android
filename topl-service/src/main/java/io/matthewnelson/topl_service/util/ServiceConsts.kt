@@ -1,29 +1,34 @@
 package io.matthewnelson.topl_service.util
 
+import androidx.annotation.IntDef
 import androidx.annotation.StringDef
 
-abstract class PrefsKeys {
+abstract class ServiceConsts {
 
+
+    ///////////////////////
+    /// TorServicePrefs ///
+    ///////////////////////
     @StringDef(
-        BooleanKey.DISABLE_NETWORK,
-        BooleanKey.HAS_BRIDGES,
-        BooleanKey.HAS_COOKIE_AUTHENTICATION,
-        BooleanKey.HAS_DEBUG_LOGS,
-        BooleanKey.HAS_DORMANT_CANCELED_BY_STARTUP,
-        BooleanKey.HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL,
-        BooleanKey.HAS_OPEN_PROXY_ON_ALL_INTERFACES,
-        BooleanKey.HAS_REACHABLE_ADDRESS,
-        BooleanKey.HAS_REDUCED_CONNECTION_PADDING,
-        BooleanKey.HAS_SAFE_SOCKS,
-        BooleanKey.HAS_STRICT_NODES,
-        BooleanKey.HAS_TEST_SOCKS,
-        BooleanKey.IS_AUTO_MAP_HOSTS_ON_RESOLVE,
-        BooleanKey.IS_RELAY,
-        BooleanKey.RUN_AS_DAEMON,
-        BooleanKey.USE_SOCKS5
-        )
+        PrefKeyBoolean.DISABLE_NETWORK,
+        PrefKeyBoolean.HAS_BRIDGES,
+        PrefKeyBoolean.HAS_COOKIE_AUTHENTICATION,
+        PrefKeyBoolean.HAS_DEBUG_LOGS,
+        PrefKeyBoolean.HAS_DORMANT_CANCELED_BY_STARTUP,
+        PrefKeyBoolean.HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL,
+        PrefKeyBoolean.HAS_OPEN_PROXY_ON_ALL_INTERFACES,
+        PrefKeyBoolean.HAS_REACHABLE_ADDRESS,
+        PrefKeyBoolean.HAS_REDUCED_CONNECTION_PADDING,
+        PrefKeyBoolean.HAS_SAFE_SOCKS,
+        PrefKeyBoolean.HAS_STRICT_NODES,
+        PrefKeyBoolean.HAS_TEST_SOCKS,
+        PrefKeyBoolean.IS_AUTO_MAP_HOSTS_ON_RESOLVE,
+        PrefKeyBoolean.IS_RELAY,
+        PrefKeyBoolean.RUN_AS_DAEMON,
+        PrefKeyBoolean.USE_SOCKS5
+    )
     @Retention(AnnotationRetention.SOURCE)
-    annotation class BooleanKey {
+    annotation class PrefKeyBoolean {
         companion object {
             // Keys for returning Booleans
             const val DISABLE_NETWORK = "DISABLE_NETWORK"
@@ -46,12 +51,12 @@ abstract class PrefsKeys {
     }
 
     @StringDef(
-        IntKey.PROXY_PORT,
-        IntKey.PROXY_SOCKS5_SERVER_PORT,
-        IntKey.RELAY_PORT
+        PrefKeyInt.PROXY_PORT,
+        PrefKeyInt.PROXY_SOCKS5_SERVER_PORT,
+        PrefKeyInt.RELAY_PORT
     )
     @Retention(AnnotationRetention.SOURCE)
-    annotation class IntKey {
+    annotation class PrefKeyInt {
         companion object {
             // Keys for returning Ints
             const val PROXY_PORT = "PROXY_PORT"
@@ -61,10 +66,10 @@ abstract class PrefsKeys {
     }
 
     @StringDef(
-        ListKey.LIST_OF_SUPPORTED_BRIDGES
+        PrefKeyList.LIST_OF_SUPPORTED_BRIDGES
     )
     @Retention(AnnotationRetention.SOURCE)
-    annotation class ListKey {
+    annotation class PrefKeyList {
         companion object {
             // Keys for returning Lists
             const val LIST_OF_SUPPORTED_BRIDGES = "LIST_OF_SUPPORTED_BRIDGES"
@@ -72,26 +77,26 @@ abstract class PrefsKeys {
     }
 
     @StringDef(
-        StringKey.DNS_PORT,
-        StringKey.CUSTOM_TORRC,
-        StringKey.ENTRY_NODES,
-        StringKey.EXCLUDED_NODES,
-        StringKey.EXIT_NODES,
-        StringKey.HTTP_TUNNEL_PORT,
-        StringKey.PROXY_HOST,
-        StringKey.PROXY_PASSWORD,
-        StringKey.PROXY_SOCKS5_HOST,
-        StringKey.PROXY_TYPE,
-        StringKey.PROXY_USER,
-        StringKey.REACHABLE_ADDRESS_PORTS,
-        StringKey.RELAY_NICKNAME,
-        StringKey.SOCKS_PORT,
-        StringKey.VIRTUAL_ADDRESS_NETWORK,
-        StringKey.HAS_CONNECTION_PADDING,
-        StringKey.TRANS_PORT
+        PrefKeyString.DNS_PORT,
+        PrefKeyString.CUSTOM_TORRC,
+        PrefKeyString.ENTRY_NODES,
+        PrefKeyString.EXCLUDED_NODES,
+        PrefKeyString.EXIT_NODES,
+        PrefKeyString.HTTP_TUNNEL_PORT,
+        PrefKeyString.PROXY_HOST,
+        PrefKeyString.PROXY_PASSWORD,
+        PrefKeyString.PROXY_SOCKS5_HOST,
+        PrefKeyString.PROXY_TYPE,
+        PrefKeyString.PROXY_USER,
+        PrefKeyString.REACHABLE_ADDRESS_PORTS,
+        PrefKeyString.RELAY_NICKNAME,
+        PrefKeyString.SOCKS_PORT,
+        PrefKeyString.VIRTUAL_ADDRESS_NETWORK,
+        PrefKeyString.HAS_CONNECTION_PADDING,
+        PrefKeyString.TRANS_PORT
     )
     @Retention(AnnotationRetention.SOURCE)
-    annotation class StringKey {
+    annotation class PrefKeyString {
         companion object {
             // Keys for returning Strings
             const val DNS_PORT = "DNS_PORT"
@@ -111,6 +116,46 @@ abstract class PrefsKeys {
             const val VIRTUAL_ADDRESS_NETWORK = "VIRTUAL_ADDRESS_NETWORK"
             const val HAS_CONNECTION_PADDING = "HAS_CONNECTION_PADDING"
             const val TRANS_PORT = "TRANS_PORT"
+        }
+    }
+
+
+    //////////////////////////
+    /// NotificationImages ///
+    //////////////////////////
+    @IntDef(
+        NotificationImage.ENABLED,
+        NotificationImage.DISABLED,
+        NotificationImage.DATA,
+        NotificationImage.ERROR
+    )
+    @Retention(AnnotationRetention.SOURCE)
+    internal annotation class NotificationImage {
+        companion object {
+            const val ENABLED = 0
+            const val DISABLED = 1
+            const val DATA = 2
+            const val ERROR = 3
+        }
+    }
+
+
+    //////////////////////
+    /// ServiceActions ///
+    //////////////////////
+    @StringDef(
+        ServiceAction.ACTION_START,
+        ServiceAction.ACTION_STOP,
+        ServiceAction.ACTION_RESTART,
+        ServiceAction.ACTION_NEW_ID
+    )
+    @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
+    internal annotation class ServiceAction {
+        companion object {
+            const val ACTION_START = "ACTION_START"
+            const val ACTION_STOP = "ACTION_STOP"
+            const val ACTION_RESTART = "ACTION_RESTART"
+            const val ACTION_NEW_ID = "ACTION_NEW_ID"
         }
     }
 }

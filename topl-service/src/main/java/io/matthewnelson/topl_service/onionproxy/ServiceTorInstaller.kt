@@ -7,7 +7,7 @@ import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_service.BuildConfig
 import io.matthewnelson.topl_service.R
 import io.matthewnelson.topl_service.service.TorService
-import io.matthewnelson.topl_service.util.PrefsKeys.ListKey
+import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyList
 import io.matthewnelson.topl_service.util.TorServicePrefs
 import java.io.*
 import java.util.concurrent.TimeoutException
@@ -98,7 +98,7 @@ internal class ServiceTorInstaller(
         * */
         // TODO: Completely refactor how bridges work.
         val userDefinedBridgeList: String =
-            prefs.getList(ListKey.LIST_OF_SUPPORTED_BRIDGES, arrayListOf()).joinToString()
+            prefs.getList(PrefKeyList.LIST_OF_SUPPORTED_BRIDGES, arrayListOf()).joinToString()
         var bridgeType = (if (userDefinedBridgeList.length > 9) 1 else 0).toByte()
         // Terrible hack. Must keep in sync with topl::addBridgesFromResources.
         if (bridgeType.toInt() == 0) {

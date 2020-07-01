@@ -2,9 +2,9 @@ package io.matthewnelson.topl_service.onionproxy
 
 import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_core_base.EventBroadcaster
-import io.matthewnelson.topl_service.notification.NotificationConsts.ImageState
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.TorService
+import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -71,9 +71,9 @@ internal class ServiceEventBroadcaster(
                 updateBandwidth(read, written)
 
                 if (read == 0L && written == 0L)
-                    serviceNotification.updateIcon(torService, ImageState.ENABLED)
+                    serviceNotification.updateIcon(torService, NotificationImage.ENABLED)
                 else
-                    serviceNotification.updateIcon(torService, ImageState.DATA)
+                    serviceNotification.updateIcon(torService, NotificationImage.DATA)
             }
         }
 
@@ -127,7 +127,7 @@ internal class ServiceEventBroadcaster(
     override fun broadcastException(msg: String?, e: Exception) {
         if (!msg.isNullOrEmpty())
             if (msg.contains(TorService::class.java.simpleName)) {
-                serviceNotification.updateIcon(torService, ImageState.ERROR)
+                serviceNotification.updateIcon(torService, NotificationImage.ERROR)
                 val splitMsg = msg.split("|")
                 if (splitMsg.size > 2 && splitMsg[2].isNotEmpty())
                     serviceNotification.updateContentText(splitMsg[2])
@@ -164,7 +164,7 @@ internal class ServiceEventBroadcaster(
                 serviceNotification.updateContentText(bootstrapped)
 
                 if (bootstrapped == "Bootstrapped 100%") {
-                    serviceNotification.updateIcon(torService, ImageState.ENABLED)
+                    serviceNotification.updateIcon(torService, NotificationImage.ENABLED)
                     serviceNotification.addActions(torService)
                 }
 
@@ -240,10 +240,10 @@ internal class ServiceEventBroadcaster(
             // Update torNetworkState _before_ setting the icon to `disabled` so bandwidth won't
             // overwrite the icon with an update
             torNetworkState = networkState
-            serviceNotification.updateIcon(torService, ImageState.DISABLED)
+            serviceNotification.updateIcon(torService, NotificationImage.DISABLED)
         } else {
             if (isBootstrappingComplete())
-                serviceNotification.updateIcon(torService, ImageState.ENABLED)
+                serviceNotification.updateIcon(torService, NotificationImage.ENABLED)
 
             // Update torNetworkState _after_ setting the icon to `enabled` so bandwidth changes
             // occur afterwards and this won't overwrite ImageState.DATA

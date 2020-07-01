@@ -14,7 +14,7 @@ import io.matthewnelson.topl_service.onionproxy.ServiceEventBroadcaster
 import io.matthewnelson.topl_service.onionproxy.ServiceEventListener
 import io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller
 import io.matthewnelson.topl_service.onionproxy.ServiceTorSettings
-import io.matthewnelson.topl_service.service.ActionConsts.ServiceAction
+import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import kotlinx.coroutines.*
 
 internal class TorService: Service() {
@@ -59,7 +59,7 @@ internal class TorService: Service() {
     override fun onCreate() {
         super.onCreate()
         ServiceNotification.get().startForegroundNotification(this)
-        initTOPLAndroid()
+        initTOPLCore()
         broadcastLogger = onionProxyManager.createBroadcastLogger(TorService::class.java)
     }
 
@@ -82,12 +82,12 @@ internal class TorService: Service() {
         executeAction(ServiceAction.ACTION_STOP)
     }
 
-    ////////////
-    /// TOPL ///
-    ////////////
+    /////////////////
+    /// TOPL-Core ///
+    /////////////////
     private lateinit var onionProxyManager: OnionProxyManager
 
-    private fun initTOPLAndroid() {
+    private fun initTOPLCore() {
         val serviceTorSettings = ServiceTorSettings(torSettings, this)
         val serviceTorInstaller = ServiceTorInstaller(
             this,
@@ -151,7 +151,7 @@ internal class TorService: Service() {
     private lateinit var executeActionJob: Job
 
     /**
-     * Route all [ActionConsts.ServiceAction]s here for execution.
+     * Route all [ServiceAction]s here for execution.
      *
      * @param [action] A [ServiceAction]
      * */
