@@ -32,7 +32,8 @@ internal class ServiceTorInstaller(
     private val geoIp6AssetPath: String
 ): TorInstaller() {
 
-    private val prefs = TorServicePrefs(torService)
+    private val torServicePrefs = TorServicePrefs(torService)
+    private val localPrefs = TorService.getLocalPrefs(torService.applicationContext)
     private lateinit var geoIpFileCopied: String
     private lateinit var geoIpv6FileCopied: String
 
@@ -41,7 +42,8 @@ internal class ServiceTorInstaller(
 //    private lateinit var broadcastLogger: BroadcastLogger
 
     companion object {
-        private const val VERSION_CODE = "BUILD_CONFIG_VERSION_CODE"
+        const val TOR_INSTALL_PREFS_NAME = "TOR_INSTALLER"
+        private const val APP_VERSION_CODE = "APP_VERSION_CODE"
     }
 
     @Throws(IOException::class, SecurityException::class)
@@ -56,12 +58,12 @@ internal class ServiceTorInstaller(
         // If the app version has been increased, or if this is a debug build, copy over
         // geoip assets then update SharedPreferences with the new version code. This
         // mitigates copying to be done only if a version upgrade is had.
-        if (buildConfigVersionCode > prefs.getInt(VERSION_CODE, -1) ?: -1 || buildConfigDebug) {
+        if (buildConfigVersionCode > localPrefs.getInt(APP_VERSION_CODE, -1) || buildConfigDebug) {
             if (!::geoIpFileCopied.isInitialized)
                 copyAsset(geoIpAssetPath, torConfigFiles.geoIpFile)
             if (!::geoIpv6FileCopied.isInitialized)
                 copyAsset(geoIp6AssetPath, torConfigFiles.geoIpv6File)
-            prefs.putInt(VERSION_CODE, buildConfigVersionCode)
+            localPrefs.edit().putInt(APP_VERSION_CODE, buildConfigVersionCode).apply()
         }
     }
 
@@ -97,7 +99,7 @@ internal class ServiceTorInstaller(
         * */
         // TODO: Completely refactor how bridges work.
         val userDefinedBridgeList: String =
-            prefs.getList(PrefKeyList.LIST_OF_SUPPORTED_BRIDGES, arrayListOf()).joinToString()
+            torServicePrefs.getList(PrefKeyList.LIST_OF_SUPPORTED_BRIDGES, arrayListOf()).joinToString()
         var bridgeType = (if (userDefinedBridgeList.length > 9) 1 else 0).toByte()
         // Terrible hack. Must keep in sync with topl::addBridgesFromResources.
         if (bridgeType.toInt() == 0) {

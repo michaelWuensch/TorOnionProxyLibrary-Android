@@ -1,7 +1,9 @@
 package io.matthewnelson.topl_service.service
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.IBinder
 import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.OnionProxyManager
@@ -48,6 +50,9 @@ internal class TorService: Service() {
         // properly start up.
         var isTorStarted = false
             private set
+
+        fun getLocalPrefs(context: Context): SharedPreferences =
+            context.getSharedPreferences("TorServiceLocalPrefs", Context.MODE_PRIVATE)
     }
 
     private lateinit var broadcastLogger: BroadcastLogger
