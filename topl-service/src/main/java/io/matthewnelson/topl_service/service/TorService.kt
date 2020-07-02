@@ -75,15 +75,22 @@ internal class TorService: Service() {
 
     override fun onLowMemory() {
         super.onLowMemory()
+        broadcastLogger.warn("Low memory")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        intent?.action?.let { executeAction(it) }
+        intent?.action?.let {
+            broadcastLogger.debug("Executing ServiceAction: $it")
+            executeAction(it)
+        }
         return START_STICKY
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
+        // TODO: add to debug message if Controller option for disabling stop on task removed
+        //  when the feature gets implemented.
+        broadcastLogger.debug("Task has been removed")
         executeAction(ServiceAction.ACTION_STOP)
     }
 
