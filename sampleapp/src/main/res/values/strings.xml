@@ -1,3 +1,9 @@
 <resources>
 <!--    <string name="app_name">SampleApp</string>   See build.gradle buildTypes -->
+    <string name="button_start">Start</string>
+    <string name="button_stop">Stop</string>
+    <string name="button_restart">Restart</string>
+    <string name="button_new_identity">New Identity</string>
+    <string name="button_debugging_disable">Disable Debugging</string>
+    <string name="button_debugging_enable">Enable Debugging</string>
 </resources>
