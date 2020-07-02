@@ -51,10 +51,16 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation project(':topl-core-base')
     implementation project(':topl-service')
-    implementation deps.kotlin.stdlib
-    implementation deps.androidx.core
     implementation deps.androidx.appCompat
+    implementation deps.androidx.core
     implementation deps.androidx.constraintLayout
+    implementation deps.androidx.lifecycle.commonJava8
+    implementation deps.androidx.lifecycle.liveData
+    implementation deps.androidx.lifecycle.reactiveStreams
+    implementation deps.androidx.recyclerView
+    implementation deps.kotlin.coroutinesCore
+    implementation deps.kotlin.coroutinesAndroid
+    implementation deps.kotlin.stdlib
 
     testImplementation deps.junit
 
