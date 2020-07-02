@@ -645,7 +645,8 @@ class OnionProxyManager(
      *
      * @throws [IOException] File problems or timeout
      * @throws [SecurityException] Unauthorized access to file/directory.
-     * @throws [IllegalArgumentException] Method only accepts CONTROL_PORT_FILE or COOKIE_AUTH_FILE
+     * @throws [IllegalArgumentException] Method only accepts
+     *   [CoreConsts.ConfigFile.CONTROL_PORT_FILE] or [CoreConsts.ConfigFile.COOKIE_AUTH_FILE]
      * @throws [RuntimeException] See [io.matthewnelson.topl_core.util.WriteObserver.poll]
      */
     @Throws(
@@ -654,8 +655,8 @@ class OnionProxyManager(
         IllegalArgumentException::class,
         RuntimeException::class
     )
-    private fun waitForFileCreation(@ConfigFile onionProxyConst: String) {
-        val file = when (onionProxyConst) {
+    private fun waitForFileCreation(@ConfigFile configFileReference: String) {
+        val file = when (configFileReference) {
             ConfigFile.CONTROL_PORT_FILE -> {
                 torConfigFiles.controlPortFile
             }
@@ -663,29 +664,30 @@ class OnionProxyManager(
                 torConfigFiles.cookieAuthFile
             }
             else -> {
-                throw IllegalArgumentException("$onionProxyConst is not a valid argument")
+                throw IllegalArgumentException("$configFileReference is not a valid argument")
             }
         }
 
         val startTime = System.currentTimeMillis()
-        broadcastLogger.notice("Waiting for ${file.nameWithoutExtension} file")
+        broadcastLogger.notice("Waiting for $configFileReference")
 
-        val isCreated: Boolean = onionProxyContext.createNewFileIfDoesNotExist(onionProxyConst)
-        val fileObserver: WriteObserver? = onionProxyContext.createFileObserver(onionProxyConst)
+        val isCreated: Boolean = onionProxyContext.createNewFileIfDoesNotExist(configFileReference)
+        val fileObserver: WriteObserver? = onionProxyContext.createFileObserver(configFileReference)
         val fileCreationTimeout = torConfigFiles.fileCreationTimeout
         if (!isCreated || file.length() == 0L &&
             fileObserver?.poll(fileCreationTimeout.toLong(), TimeUnit.SECONDS) != true
         ) {
             torStateMachine.setTorState(TorState.STOPPING)
             throw IOException(
-                "${file.nameWithoutExtension} not created: ${file.absolutePath}, len = ${file.length()}"
+                "$configFileReference not created: ${file.absolutePath}, len = ${file.length()}"
             )
         }
         broadcastLogger.debug(
-            "Created ${file.nameWithoutExtension}: time = ${System.currentTimeMillis()-startTime}ms"
+            "Created $configFileReference: time = ${System.currentTimeMillis()-startTime}ms"
         )
     }
 
+    // TODO: Re-work using coroutines
     private fun eatStream(inputStream: InputStream, isError: Boolean) {
         object : Thread() {
             override fun run() {

@@ -63,15 +63,15 @@ internal class OnionProxyContext(
      * Creates an observer for the file referenced. See [CoreConsts.ConfigFile] annotation class
      * for accepted arguments.
      *
-     * @param [onionProxyConst] String that defines what file a [WriteObserver] is created for.
+     * @param [configFileReference] String that defines what file a [WriteObserver] is created for.
      * @return A WriteObserver for the appropriate file referenced.
-     * @throws [IllegalArgumentException] If [onionProxyConst] is an invalid argument, or null file.
+     * @throws [IllegalArgumentException] If [configFileReference] is an invalid argument, or null file.
      * @throws [SecurityException] See [WriteObserver.checkExists]
      */
     @Throws(IllegalArgumentException::class, SecurityException::class)
-    fun createFileObserver(@ConfigFile onionProxyConst: String): WriteObserver {
-        broadcastLogger.debug("Creating FileObserver for $onionProxyConst")
-        return when (onionProxyConst) {
+    fun createFileObserver(@ConfigFile configFileReference: String): WriteObserver {
+        broadcastLogger.debug("Creating FileObserver for $configFileReference")
+        return when (configFileReference) {
             ConfigFile.CONTROL_PORT_FILE -> {
                 synchronized(controlPortFileLock) {
                     WriteObserver(torConfigFiles.controlPortFile)
@@ -88,7 +88,7 @@ internal class OnionProxyContext(
                 }
             }
             else -> {
-                throw IllegalArgumentException("$onionProxyConst is not a valid argument")
+                throw IllegalArgumentException("$configFileReference is not a valid argument")
             }
         }
     }
@@ -97,14 +97,14 @@ internal class OnionProxyContext(
      * Creates an empty file if the provided one does not exist. See [CoreConsts.ConfigFile]
      * annotation class for accepted arguments.
      *
-     * @param [onionProxyConst] String that defines what file is to be created.
+     * @param [configFileReference] String that defines what file is to be created.
      * @return True if file exists or is created successfully, otherwise false.
      * @throws [SecurityException] Unauthorized access to file/directory.
      * */
     @Throws(IllegalArgumentException::class, SecurityException::class)
-    fun createNewFileIfDoesNotExist(@ConfigFile onionProxyConst: String): Boolean {
-        broadcastLogger.debug("Creating file if DNE for $onionProxyConst")
-        return when (onionProxyConst) {
+    fun createNewFileIfDoesNotExist(@ConfigFile configFileReference: String): Boolean {
+        broadcastLogger.debug("Creating $configFileReference if DNE")
+        return when (configFileReference) {
             ConfigFile.CONTROL_PORT_FILE -> {
                 synchronized(controlPortFileLock) {
                     createNewFileIfDoesNotExist(torConfigFiles.controlPortFile)
@@ -121,7 +121,7 @@ internal class OnionProxyContext(
                 }
             }
             else -> {
-                throw IllegalArgumentException("$onionProxyConst is not a valid argument")
+                throw IllegalArgumentException("$configFileReference is not a valid argument")
             }
         }
     }
@@ -130,15 +130,15 @@ internal class OnionProxyContext(
      * Deletes the referenced file. See [CoreConsts.ConfigFile] annotation class
      * for accepted arguments.
      *
-     * @param [onionProxyConst] String that defines what file is to be delete.
+     * @param [configFileReference] String that defines what file is to be delete.
      * @return True if it was deleted, false if it failed.
      * @throws [SecurityException] Unauthorized access to file/directory.
      * @throws [IllegalArgumentException]
      * */
     @Throws(SecurityException::class, IllegalArgumentException::class)
-    fun deleteFile(@ConfigFile onionProxyConst: String): Boolean {
-        broadcastLogger.debug("Deleting file for $onionProxyConst")
-        return when (onionProxyConst) {
+    fun deleteFile(@ConfigFile configFileReference: String): Boolean {
+        broadcastLogger.debug("Deleting $configFileReference")
+        return when (configFileReference) {
             ConfigFile.CONTROL_PORT_FILE -> {
                 synchronized(controlPortFileLock) {
                     torConfigFiles.controlPortFile.delete()
@@ -155,7 +155,7 @@ internal class OnionProxyContext(
                 }
             }
             else -> {
-                throw IllegalArgumentException("$onionProxyConst is not a valid argument")
+                throw IllegalArgumentException("$configFileReference is not a valid argument")
             }
         }
     }
@@ -164,16 +164,16 @@ internal class OnionProxyContext(
      * Reads the referenced file. See [CoreConsts.ConfigFile] annotation class
      * for accepted arguments.
      *
-     * @param [onionProxyConst] String that defines what file is to be read.
+     * @param [configFileReference] String that defines what file is to be read.
      * @return The contents of the file.
      * @throws [IOException] Errors while reading file.
      * @throws [EOFException] Errors while reading file.
      * @throws [SecurityException] Unauthorized access to file/directory.
      * */
     @Throws(IOException::class, EOFException::class, SecurityException::class)
-    fun readFile(@ConfigFile onionProxyConst: String): ByteArray {
-        broadcastLogger.debug("Reading file for $onionProxyConst")
-        return when (onionProxyConst) {
+    fun readFile(@ConfigFile configFileReference: String): ByteArray {
+        broadcastLogger.debug("Reading $configFileReference")
+        return when (configFileReference) {
             ConfigFile.CONTROL_PORT_FILE -> {
                 synchronized(controlPortFileLock) {
                     FileUtilities.read(torConfigFiles.controlPortFile)
@@ -190,7 +190,7 @@ internal class OnionProxyContext(
                 }
             }
             else -> {
-                throw IllegalArgumentException("$onionProxyConst is not a valid argument")
+                throw IllegalArgumentException("$configFileReference is not a valid argument")
             }
         }
     }

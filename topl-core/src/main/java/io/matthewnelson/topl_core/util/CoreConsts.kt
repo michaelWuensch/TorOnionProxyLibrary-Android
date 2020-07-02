@@ -13,9 +13,9 @@ abstract class CoreConsts: BaseConsts() {
     @Retention(AnnotationRetention.SOURCE)
     internal annotation class ConfigFile {
         companion object {
-            const val CONTROL_PORT_FILE = ConfigFileName.CONTROL_PORT
-            const val COOKIE_AUTH_FILE = ConfigFileName.COOKIE_AUTH
-            const val HOSTNAME_FILE = ConfigFileName.HOST
+            const val CONTROL_PORT_FILE = "ControlPort file"
+            const val COOKIE_AUTH_FILE = "CookieAuth file"
+            const val HOSTNAME_FILE = "Hostname file"
         }
     }
 }
