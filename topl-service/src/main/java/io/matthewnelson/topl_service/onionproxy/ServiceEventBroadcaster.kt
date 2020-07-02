@@ -22,12 +22,8 @@ import java.util.*
  * (selectively curated, ofc).
  *
  * @param [torService] [TorService] for context.
- * @param [serviceTorSettings] [ServiceTorSettings]
  * */
-internal class ServiceEventBroadcaster(
-    private val torService: TorService,
-    private val serviceTorSettings: ServiceTorSettings
-): EventBroadcaster() {
+internal class ServiceEventBroadcaster(private val torService: TorService): EventBroadcaster() {
 
     private val serviceNotification = ServiceNotification.get()
 

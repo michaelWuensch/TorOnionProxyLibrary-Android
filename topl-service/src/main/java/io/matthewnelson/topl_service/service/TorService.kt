@@ -100,7 +100,6 @@ internal class TorService: Service() {
     private lateinit var onionProxyManager: OnionProxyManager
 
     private fun initTOPLCore() {
-        val serviceTorSettings = ServiceTorSettings(torSettings, this)
         val serviceTorInstaller = ServiceTorInstaller(
             this,
             torConfigFiles,
@@ -109,14 +108,13 @@ internal class TorService: Service() {
             geoipAssetPath,
             geoip6AssetPath
         )
-        val serviceEventBroadcaster = ServiceEventBroadcaster(this, serviceTorSettings)
         onionProxyManager = OnionProxyManager(
             this,
             torConfigFiles,
             serviceTorInstaller,
-            serviceTorSettings,
+            ServiceTorSettings(torSettings, this),
             ServiceEventListener(),
-            serviceEventBroadcaster,
+            ServiceEventBroadcaster(this),
             buildConfigDebug
         )
     }
