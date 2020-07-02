@@ -35,6 +35,7 @@ import io.matthewnelson.topl_core.listener.BaseEventListener
 import io.matthewnelson.topl_core.receiver.NetworkStateReceiver
 import io.matthewnelson.topl_core.settings.TorSettingsBuilder
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
+import io.matthewnelson.topl_core.broadcaster.BroadcastLoggerHelper
 import io.matthewnelson.topl_core.broadcaster.TorStateMachine
 import io.matthewnelson.topl_core.util.FileUtilities
 import io.matthewnelson.topl_core.util.CoreConsts
@@ -74,15 +75,14 @@ class OnionProxyManager(
     torConfigFiles: TorConfigFiles,
     torInstaller: TorInstaller,
     torSettings: TorSettings,
-    private val eventListener: BaseEventListener,
-    private val eventBroadcaster: EventBroadcaster,
-    buildConfigDebug: Boolean?
+    val eventListener: BaseEventListener,
+    eventBroadcaster: EventBroadcaster,
+    buildConfigDebug: Boolean? = null
 ): CoreConsts() {
 
-    private val buildConfigDebug = buildConfigDebug ?: BuildConfig.DEBUG
-    private val onionProxyContext = OnionProxyContext(torConfigFiles, torInstaller, torSettings)
+    internal val onionProxyContext = OnionProxyContext(torConfigFiles, torInstaller, torSettings)
 
-    // Ensures that these stay/live only in OnionProxyContext, but are accessible from here.
+    // Ensures that these live only in OnionProxyContext, but are accessible from here.
     val torConfigFiles: TorConfigFiles
         get() = onionProxyContext.torConfigFiles
     val torInstaller: TorInstaller
@@ -90,17 +90,36 @@ class OnionProxyManager(
     val torSettings: TorSettings
         get() = onionProxyContext.torSettings
 
-    private val broadcastLogger = createBroadcastLogger(OnionProxyManager::class.java)
-    val torStateMachine = TorStateMachine(createBroadcastLogger(TorStateMachine::class.java))
+    private val logHelper =
+        BroadcastLoggerHelper(this, eventBroadcaster, buildConfigDebug ?: BuildConfig.DEBUG)
+    private val broadcastLogger =
+        createBroadcastLogger(OnionProxyManager::class.java)
+    val torStateMachine =
+        TorStateMachine(createBroadcastLogger(TorStateMachine::class.java))
+
+    /**
+     * See [BroadcastLoggerHelper.refreshBroadcastLoggersHasDebugLogsVar]
+     * */
+    fun refreshBroadcastLoggersHasDebugLogsVar() =
+        logHelper.refreshBroadcastLoggersHasDebugLogsVar()
+
+    /**
+     * See [BroadcastLoggerHelper.createBroadcastLogger]
+     *
+     * @param [clazz] Class<*> - For initializing [BroadcastLogger.TAG] with your class' name.
+     * */
+    fun createBroadcastLogger(clazz: Class<*>): BroadcastLogger =
+        logHelper.createBroadcastLogger(clazz)
+
+    /**
+     * See [BroadcastLoggerHelper.createBroadcastLogger]
+     *
+     * @param [tagName] String - For initializing [BroadcastLogger.TAG].
+     * */
+    fun createBroadcastLogger(tagName: String): BroadcastLogger =
+        logHelper.createBroadcastLogger(tagName)
 
     init {
-        onionProxyContext.initBroadcastLogger(
-            createBroadcastLogger(OnionProxyContext::class.java)
-        )
-        this.torInstaller.initBroadcastLogger(
-            createBroadcastLogger(TorInstaller::class.java)
-        )
-
         try {
             onionProxyContext.createDataDir()
         } catch (e: SecurityException) {
@@ -115,15 +134,6 @@ class OnionProxyManager(
         const val NEWNYM_NO_NETWORK = "No network, cannot change Tor identities"
         const val NEWNYM_RATE_LIMIT_PARTIAL_MSG = "Rate limiting NEWNYM request: "
     }
-
-    /**
-     * Helper method for instantiating a [BroadcastLogger] for your class with the values
-     * [OnionProxyManager] has been initialized with.
-     *
-     * @param [clazz] To initialize [BroadcastLogger.TAG] with your class' name.
-     * */
-    fun createBroadcastLogger(clazz: Class<*>) =
-        BroadcastLogger(clazz, eventBroadcaster, buildConfigDebug, torSettings)
 
     /**
      * Sets up and installs any files needed to run tor. If the tor files are already on
@@ -456,6 +466,7 @@ class OnionProxyManager(
             torStateMachine.setTorState(TorState.ON)
             return
         }
+        refreshBroadcastLoggersHasDebugLogsVar()
 
         torStateMachine.setTorState(TorState.STARTING)
 
@@ -580,12 +591,12 @@ class OnionProxyManager(
         } catch (eee: KotlinNullPointerException) {
             throw NullPointerException(eee.message)
         }
-        if (torSettings.hasDebugLogs) {
-            // TODO: think about changing this to something other than System.out. Maybe
-            //  try to pipe it to the BroadcastLogger to keep it out of Logcat on release
-            //  builds?
-            controlConnection.setDebugging(System.out)
-        }
+//        if (torSettings.hasDebugLogs) {
+//            // TODO: think about changing this to something other than System.out. Maybe
+//            //  try to pipe it to the BroadcastLogger to keep it out of Logcat on release
+//            //  builds?
+//            controlConnection.setDebugging(System.out)
+//        }
         return controlConnection
     }
 
@@ -827,8 +838,7 @@ class OnionProxyManager(
 
         if (signalSuccess) {
             if (!rateLimited) {
-                broadcastLogger.debug("Successfully acquired a new nym")
-                eventBroadcaster.broadcastNotice(
+                broadcastLogger.notice(
                     "${TorControlCommands.SIGNAL_NEWNYM}: $NEWNYM_SUCCESS_MESSAGE"
                 )
             }

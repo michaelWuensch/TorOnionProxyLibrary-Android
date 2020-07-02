@@ -207,6 +207,8 @@ abstract class TorSettings: BaseConsts() {
 
     /**
      * See [DEFAULT__HAS_DEBUG_LOGS]
+     *
+     * 
      * */
     abstract val hasDebugLogs: Boolean
 

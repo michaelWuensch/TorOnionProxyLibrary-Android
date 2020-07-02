@@ -1,5 +1,7 @@
 package io.matthewnelson.topl_core.listener
 
+import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
+import io.matthewnelson.topl_core.util.TorInstaller
 import kotlinx.coroutines.delay
 import net.freehaven.tor.control.EventListener
 import net.freehaven.tor.control.TorControlCommands
@@ -8,6 +10,17 @@ import net.freehaven.tor.control.TorControlCommands
  * Extend this class to customize implementation of the member overrides.
  * */
 abstract class BaseEventListener: EventListener() {
+
+    /**
+     * This gets set as soon as [io.matthewnelson.topl_core.OnionProxyManager] is instantiated,
+     * and can be used to broadcast messages in your class which extends [TorInstaller].
+     * */
+    var broadcastLogger: BroadcastLogger? = null
+        private set
+    internal fun initBroadcastLogger(torInstallerBroadcastLogger: BroadcastLogger) {
+        if (broadcastLogger == null)
+            broadcastLogger = torInstallerBroadcastLogger
+    }
 
     /**
      * See [TorControlCommands.EVENT_NAMES] values. These are **REQUIRED**

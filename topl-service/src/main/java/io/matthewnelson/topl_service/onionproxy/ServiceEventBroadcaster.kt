@@ -116,8 +116,7 @@ internal class ServiceEventBroadcaster(
     /// Debug ///
     /////////////
     override fun broadcastDebug(msg: String) {
-        if (serviceTorSettings.hasDebugLogs)
-            appEventBroadcaster?.broadcastDebug(msg)
+        appEventBroadcaster?.broadcastDebug(msg)
     }
 
 
@@ -125,15 +124,16 @@ internal class ServiceEventBroadcaster(
     /// Exceptions ///
     //////////////////
     override fun broadcastException(msg: String?, e: Exception) {
-        if (!msg.isNullOrEmpty())
+        if (!msg.isNullOrEmpty()) {
             if (msg.contains(TorService::class.java.simpleName)) {
                 serviceNotification.updateIcon(torService, NotificationImage.ERROR)
                 val splitMsg = msg.split("|")
-                if (splitMsg.size > 2 && splitMsg[2].isNotEmpty())
+                if (splitMsg.size > 2 && splitMsg[2].isNotEmpty()) {
                     serviceNotification.updateContentText(splitMsg[2])
+                }
             }
-        if (serviceTorSettings.hasDebugLogs)
-            appEventBroadcaster?.broadcastException(msg, e)
+        }
+        appEventBroadcaster?.broadcastException(msg, e)
     }
 
 
@@ -158,7 +158,7 @@ internal class ServiceEventBroadcaster(
         // BOOTSTRAPPED
         if (msg.contains("Bootstrapped")) {
             val msgSplit = msg.split(" ")
-            val bootstrapped = "${msgSplit[0]} ${msgSplit[1]}"
+            val bootstrapped = "${msgSplit[0]} ${msgSplit[1]}".split("|")[2]
 
             if (bootstrapped != bootstrapProgress) {
                 serviceNotification.updateContentText(bootstrapped)

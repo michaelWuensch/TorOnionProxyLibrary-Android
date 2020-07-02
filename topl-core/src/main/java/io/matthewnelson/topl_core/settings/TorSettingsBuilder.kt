@@ -217,7 +217,7 @@ class TorSettingsBuilder internal constructor(
     fun debugLogs(): TorSettingsBuilder {
         buffer.append("Log debug syslog\n")
         buffer.append("Log info syslog\n")
-        buffer.append("SafeLogging 0\n")
+        buffer.append("SafeLogging 1\n")
         return this
     }
 

@@ -103,13 +103,12 @@ internal class TorService: Service() {
             geoip6AssetPath
         )
         val serviceEventBroadcaster = ServiceEventBroadcaster(this, serviceTorSettings)
-        val serviceEventListener = ServiceEventListener(this, serviceEventBroadcaster)
         onionProxyManager = OnionProxyManager(
             this,
             torConfigFiles,
             serviceTorInstaller,
             serviceTorSettings,
-            serviceEventListener,
+            ServiceEventListener(),
             serviceEventBroadcaster,
             buildConfigDebug
         )

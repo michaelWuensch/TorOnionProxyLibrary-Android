@@ -1,6 +1,7 @@
 package io.matthewnelson.topl_core_base
 
 import androidx.annotation.StringDef
+import java.lang.Error
 
 abstract class BaseConsts {
 
@@ -16,6 +17,7 @@ abstract class BaseConsts {
     )
     @StringDef(
         BroadcastType.DEBUG,
+        BroadcastType.ERROR,
         BroadcastType.EXCEPTION,
         BroadcastType.NOTICE,
         BroadcastType.WARN
@@ -24,6 +26,7 @@ abstract class BaseConsts {
     annotation class BroadcastType {
         companion object {
             const val DEBUG = "DEBUG"
+            const val ERROR = "ERROR"
             const val EXCEPTION = "EXCEPTION"
             const val NOTICE = "NOTICE"
             const val WARN = "WARN"

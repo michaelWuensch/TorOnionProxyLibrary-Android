@@ -75,9 +75,11 @@ class TorServiceController private constructor(): ServiceConsts() {
          * will still get the same messages sent to your [EventBroadcaster] if you set it
          * via [Builder.setEventBroadcaster].
          *
-         * See [io.matthewnelson.topl_core.broadcaster.BroadcastLogger] for more info.
+         * TODO: Provide a link to gh-pages that discusses logging and how it work, it's pretty
+         *  complex with everything that is going on.
          *
          * @param [buildConfigDebug] Send [BuildConfig.DEBUG]
+         * @see [io.matthewnelson.topl_core.broadcaster.BroadcastLogger]
          * */
         fun setBuildConfigDebug(buildConfigDebug: Boolean): Builder {
             this.buildConfigDebug = buildConfigDebug
