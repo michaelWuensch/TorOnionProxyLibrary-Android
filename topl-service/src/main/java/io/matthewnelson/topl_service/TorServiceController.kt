@@ -89,6 +89,9 @@ class TorServiceController private constructor(): ServiceConsts() {
          * Get broadcasts piped to your Application to do with them what you desire. What
          * you send this will live at [Companion.appEventBroadcaster] for the remainder of
          * your application's lifecycle to refer to elsewhere in your App.
+         *
+         * NOTE: You will, ofc, have to cast [Companion.appEventBroadcaster] as whatever your
+         * class actually is.
          * */
         fun setEventBroadcaster(eventBroadcaster: EventBroadcaster): Builder {
             appEventBroadcaster = eventBroadcaster
