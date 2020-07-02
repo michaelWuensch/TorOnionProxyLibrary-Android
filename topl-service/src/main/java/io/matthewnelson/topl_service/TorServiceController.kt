@@ -61,7 +61,6 @@ class TorServiceController private constructor(): ServiceConsts() {
     ) {
 
         private lateinit var torConfigFiles: TorConfigFiles
-        private lateinit var appEventBroadcaster: EventBroadcaster
 
         // On published releases of this Library, this value will **always** be `false`.
         private var buildConfigDebug = BuildConfig.DEBUG
@@ -87,7 +86,9 @@ class TorServiceController private constructor(): ServiceConsts() {
         }
 
         /**
-         * Get broadcasts piped to your Application to do with them what you desire.
+         * Get broadcasts piped to your Application to do with them what you desire. What
+         * you send this will live at [Companion.appEventBroadcaster] for the remainder of
+         * your application's lifecycle to refer to elsewhere in your App.
          * */
         fun setEventBroadcaster(eventBroadcaster: EventBroadcaster): Builder {
             appEventBroadcaster = eventBroadcaster
@@ -365,14 +366,6 @@ class TorServiceController private constructor(): ServiceConsts() {
                 geoip6AssetPath
             )
 
-            val eventBroadcaster: EventBroadcaster? =
-                if (::appEventBroadcaster.isInitialized)
-                    this.appEventBroadcaster
-                else
-                    null
-
-            ServiceEventBroadcaster.initAppEventBroadcaster(eventBroadcaster)
-
             ServiceNotification.get().setupNotificationChannel(application.applicationContext)
 
             appContext = application.applicationContext
@@ -385,6 +378,8 @@ class TorServiceController private constructor(): ServiceConsts() {
     companion object {
 
         private lateinit var appContext: Context
+        var appEventBroadcaster: EventBroadcaster? = null
+            private set
 
         private fun sendAction(@ServiceAction action: String) {
             if (!::appContext.isInitialized) return

@@ -2,6 +2,7 @@ package io.matthewnelson.topl_service.onionproxy
 
 import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_core_base.EventBroadcaster
+import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
@@ -27,14 +28,6 @@ internal class ServiceEventBroadcaster(
     private val torService: TorService,
     private val serviceTorSettings: ServiceTorSettings
 ): EventBroadcaster() {
-
-    companion object {
-        private var appEventBroadcaster: EventBroadcaster? = null
-        fun initAppEventBroadcaster(eventBroadcaster: EventBroadcaster?) {
-            if (appEventBroadcaster == null)
-                appEventBroadcaster = eventBroadcaster
-        }
-    }
 
     private val serviceNotification = ServiceNotification.get()
 
@@ -77,7 +70,7 @@ internal class ServiceEventBroadcaster(
             }
         }
 
-        appEventBroadcaster?.broadcastBandwidth(bytesRead, bytesWritten)
+        TorServiceController.appEventBroadcaster?.broadcastBandwidth(bytesRead, bytesWritten)
     }
 
     /**
@@ -116,7 +109,7 @@ internal class ServiceEventBroadcaster(
     /// Debug ///
     /////////////
     override fun broadcastDebug(msg: String) {
-        appEventBroadcaster?.broadcastDebug(msg)
+        TorServiceController.appEventBroadcaster?.broadcastDebug(msg)
     }
 
 
@@ -133,7 +126,7 @@ internal class ServiceEventBroadcaster(
                 }
             }
         }
-        appEventBroadcaster?.broadcastException(msg, e)
+        TorServiceController.appEventBroadcaster?.broadcastException(msg, e)
     }
 
 
@@ -141,7 +134,7 @@ internal class ServiceEventBroadcaster(
     /// LogMessages ///
     ///////////////////
     override fun broadcastLogMessage(logMessage: String?) {
-        appEventBroadcaster?.broadcastLogMessage(logMessage)
+        TorServiceController.appEventBroadcaster?.broadcastLogMessage(logMessage)
     }
 
 
@@ -192,7 +185,7 @@ internal class ServiceEventBroadcaster(
             displayMessageToContentText(msgToShow, 3500L)
         }
 
-        appEventBroadcaster?.broadcastNotice(msg)
+        TorServiceController.appEventBroadcaster?.broadcastNotice(msg)
     }
 
     /**
@@ -250,6 +243,6 @@ internal class ServiceEventBroadcaster(
             torNetworkState = networkState
         }
 
-        appEventBroadcaster?.broadcastTorState(state, networkState)
+        TorServiceController.appEventBroadcaster?.broadcastTorState(state, networkState)
     }
 }
