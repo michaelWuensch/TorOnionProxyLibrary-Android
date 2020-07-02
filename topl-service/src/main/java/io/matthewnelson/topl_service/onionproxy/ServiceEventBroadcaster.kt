@@ -6,6 +6,7 @@ import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
+import io.matthewnelson.topl_service.util.ServiceUtilities
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -30,7 +31,6 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
     /////////////////
     /// Bandwidth ///
     /////////////////
-    private val numberFormat = NumberFormat.getInstance(Locale.getDefault())
     private var bytesRead = 0L
     private var bytesWritten = 0L
 
@@ -77,28 +77,9 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
     private fun updateBandwidth(download: Long, upload: Long) {
         if (::noticeMsgToContentTextJob.isInitialized && noticeMsgToContentTextJob.isActive) return
         serviceNotification.updateContentText(
-            getFormattedBandwidthString(download, upload)
+            ServiceUtilities.getFormattedBandwidthString(download, upload)
         )
     }
-
-    private fun getFormattedBandwidthString(download: Long, upload: Long): String =
-        "${formatBandwidth(download)} ↓ / ${formatBandwidth(upload)} ↑"
-
-    /**
-     * Obtained from: https://gitweb.torproject.org/tor-android-service.git/tree/service/
-     *                src/main/java/org/torproject/android/service/TorEventHandler.java
-     *
-     * Original method name: formatCount()
-     * */
-    private fun formatBandwidth(value: Long): String =
-        if (value < 1e6)
-            numberFormat.format(
-                Math.round( ( ( (value * 10 / 1024 ).toInt() ) /10 ).toFloat() )
-            ) + "kbps"
-        else
-            numberFormat.format(
-                Math.round( ( ( (value * 100 / 1024 / 1024).toInt() ) /100 ).toFloat() )
-            ) + "mbps"
 
 
     /////////////
@@ -197,11 +178,13 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
             // Publish the last bandwidth broadcast to overwrite the message.
             if (torNetworkState == TorNetworkState.ENABLED) {
                 serviceNotification.updateContentText(
-                    getFormattedBandwidthString(bytesRead, bytesWritten)
+                    ServiceUtilities.getFormattedBandwidthString(bytesRead, bytesWritten)
                 )
             } else {
                 if (isBootstrappingComplete())
-                    serviceNotification.updateContentText(getFormattedBandwidthString(0L, 0L))
+                    serviceNotification.updateContentText(
+                        ServiceUtilities.getFormattedBandwidthString(0L, 0L)
+                    )
             }
         }
     }
