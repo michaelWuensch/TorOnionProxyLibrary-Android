@@ -86,9 +86,6 @@ class BroadcastLogger internal constructor(
     }
 
     fun torState(@TorState state: String, @TorNetworkState networkState: String) {
-        if (toLogcat()) {
-            Log.i(TAG, "$state|$networkState")
-        }
         eventBroadcaster.broadcastTorState(state, networkState)
     }
 

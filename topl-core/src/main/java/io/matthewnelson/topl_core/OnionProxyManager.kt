@@ -573,13 +573,13 @@ class OnionProxyManager(
             val controlPortTokens = String(onionProxyContext.readFile(ConfigFile.CONTROL_PORT_FILE))
                 .trim { it <= ' ' }.split(":".toRegex()).toTypedArray()
             controlPort = controlPortTokens[1].toInt()
-            broadcastLogger.notice("Connecting to Control Port: $controlPort")
+            broadcastLogger.debug("Connecting to Control Port: $controlPort")
             controlSocket = Socket(
                 controlPortTokens[0].split("=".toRegex()).toTypedArray()[1],
                 controlPort
             )
             controlConnection = TorControlConnection(controlSocket!!)
-            broadcastLogger.notice("Successfully connected to Control Port")
+            broadcastLogger.debug("Successfully connected to Control Port")
         } catch (e: IOException) {
             broadcastLogger.warn("Failed to connect to Control Port.")
             throw IOException(e.message)
@@ -669,7 +669,7 @@ class OnionProxyManager(
         }
 
         val startTime = System.currentTimeMillis()
-        broadcastLogger.notice("Waiting for $configFileReference")
+        broadcastLogger.debug("Waiting for $configFileReference")
 
         val isCreated: Boolean = onionProxyContext.createNewFileIfDoesNotExist(configFileReference)
         val fileObserver: WriteObserver? = onionProxyContext.createFileObserver(configFileReference)

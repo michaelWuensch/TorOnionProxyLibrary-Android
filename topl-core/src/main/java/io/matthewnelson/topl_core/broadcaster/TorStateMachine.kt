@@ -49,6 +49,7 @@ class TorStateMachine(private val broadcastLogger: BroadcastLogger): CoreConsts(
         if (currentTorState != state) {
             currentTorState = state
             broadcastLogger.torState(currentTorState, currentTorNetworkState)
+            broadcastLogger.debug("$currentTorState & $currentTorNetworkState")
         } else {
             broadcastLogger.debug("TorState was already set to $currentState")
         }
@@ -67,6 +68,7 @@ class TorStateMachine(private val broadcastLogger: BroadcastLogger): CoreConsts(
         if (currentTorNetworkState != networkState) {
             currentTorNetworkState = networkState
             broadcastLogger.torState(currentTorState, currentTorNetworkState)
+            broadcastLogger.debug("$currentTorState & $currentTorNetworkState")
         } else {
             broadcastLogger.debug("TorNetworkState was already set to $currentNetworkState")
         }
