@@ -42,27 +42,30 @@ internal class ServiceTorInstaller(
 //    private lateinit var broadcastLogger: BroadcastLogger
 
     companion object {
-        const val TOR_INSTALL_PREFS_NAME = "TOR_INSTALLER"
         private const val APP_VERSION_CODE = "APP_VERSION_CODE"
     }
 
     @Throws(IOException::class, SecurityException::class)
     override fun setup() {
-        if (!torConfigFiles.geoIpFile.exists())
+        if (!torConfigFiles.geoIpFile.exists()) {
             copyAsset(geoIpAssetPath, torConfigFiles.geoIpFile)
             geoIpFileCopied = ""
-        if (!torConfigFiles.geoIpv6File.exists())
+        }
+        if (!torConfigFiles.geoIpv6File.exists()) {
             copyAsset(geoIp6AssetPath, torConfigFiles.geoIpv6File)
             geoIpv6FileCopied = ""
+        }
 
         // If the app version has been increased, or if this is a debug build, copy over
         // geoip assets then update SharedPreferences with the new version code. This
         // mitigates copying to be done only if a version upgrade is had.
-        if (buildConfigVersionCode > localPrefs.getInt(APP_VERSION_CODE, -1) || buildConfigDebug) {
-            if (!::geoIpFileCopied.isInitialized)
+        if (buildConfigDebug || buildConfigVersionCode > localPrefs.getInt(APP_VERSION_CODE, -1)) {
+            if (!::geoIpFileCopied.isInitialized) {
                 copyAsset(geoIpAssetPath, torConfigFiles.geoIpFile)
-            if (!::geoIpv6FileCopied.isInitialized)
+            }
+            if (!::geoIpv6FileCopied.isInitialized) {
                 copyAsset(geoIp6AssetPath, torConfigFiles.geoIpv6File)
+            }
             localPrefs.edit().putInt(APP_VERSION_CODE, buildConfigVersionCode).apply()
         }
     }
@@ -71,7 +74,7 @@ internal class ServiceTorInstaller(
     private fun copyAsset(assetPath: String, file: File) {
         try {
             FileUtilities.copy(torService.assets.open(assetPath), file.outputStream())
-            broadcastLogger?.debug("Asset copied from $assetPath -> ${file.name}")
+            broadcastLogger?.debug("Asset copied from $assetPath -> $file")
         } catch (e: Exception) {
             throw IOException("Failed copying asset from $assetPath", e)
         }
