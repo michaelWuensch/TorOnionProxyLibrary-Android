@@ -4,7 +4,7 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion versions.compileSdk
-    buildToolsVersion "29.0.3"
+    buildToolsVersion versions.buildTools
 
     defaultConfig {
         minSdkVersion versions.minSdk
@@ -42,53 +42,10 @@ dependencies {
     implementation deps.kotlin.coroutinesAndroid
     implementation deps.kotlin.coroutinesCore
     implementation deps.kotlin.stdlib
-    implementation deps.slf4j.api
-    implementation deps.slf4j.android
 
     testImplementation deps.junit
 
     androidTestImplementation deps.androidx.test.core
     androidTestImplementation deps.androidx.test.junit
     androidTestImplementation deps.androidx.test.espresso
-}
-
-task updatePluggableTransportsSubmodule(type: Exec) {
-    workingDir "$rootDir"
-    commandLine "scripts/pull_latest_transports.sh"
-}
-
-task copyPluggableTransports(type: Copy, dependsOn: updatePluggableTransportsSubmodule) {
-    from("$rootDir/external/AndroidPluggableTransports/APTDispatchLibrary-MeekObfs4-Legacy/src/main/libs")
-    into("src/main/jniLibs")
-    rename { filename ->
-        filename.replace "$filename", 'libObfs4proxy.so'
-    }
-}
-
-task buildTorBinaries(type: Exec) {
-    workingDir "$rootDir"
-    commandLine 'scripts/update_tor_binaries.sh', 'build'
-}
-
-task copyTorBinaries(type: Copy, dependsOn: buildTorBinaries) {
-    from("$rootDir/external/tor-android/tor-android-binary/src/main/libs")
-    into("src/main/jniLibs")
-    rename { filename ->
-        filename.replace "$filename", 'libTor.so'
-    }
-}
-
-task updateTorBinaries(type: Exec, dependsOn: copyTorBinaries) {
-    workingDir "$rootDir"
-    commandLine 'scripts/update_tor_binaries.sh', 'update_versions_file'
-}
-
-task checkForTorBinaryUpdate(type: Exec) {
-    workingDir "$rootDir"
-    commandLine 'scripts/update_tor_binaries.sh', 'check_for_update'
-}
-
-gradle.projectsEvaluated {
-    preBuild.dependsOn(checkForTorBinaryUpdate)
-    preBuild.dependsOn(copyPluggableTransports)
 }

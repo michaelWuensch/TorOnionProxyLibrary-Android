@@ -1,9 +1,8 @@
 package io.matthewnelson.topl_core_base
 
 /**
- * This class is for defining default values for your torrc file.
- *
- * Extend this class and define your own settings.
+ * This class is for defining default values for your torrc file. Extend this class and define
+ * your own settings.
  *
  * Keep in mind that Orbot and TorBrowser are the 2 most widely used applications
  * using Tor, and to use settings that won't conflict (those settings are documented
@@ -12,13 +11,12 @@ package io.matthewnelson.topl_core_base
  * [Companion] contains pretty standard default values which'll get you a Socks5 proxy
  * running, nothing more.
  *
- * Would *highly recommend* reading up on what's what in the docs:
- *
- *     https://2019.www.torproject.org/docs/tor-manual.html.en
+ * Would **highly recommend** reading up on what's what:
+ *  - See <a href="https://2019.www.torproject.org/docs/tor-manual.html.en" target="_blank">docs</a>
  *
  * @sample [io.matthewnelson.sampleapp.MyTorSettings]
  * */
-abstract class TorSettings: SettingsConsts() {
+abstract class TorSettings: BaseConsts() {
 
     /**
      * Handy constants for declaring pre-defined values when you extend this class to set
@@ -107,7 +105,7 @@ abstract class TorSettings: SettingsConsts() {
      * Must have the transport binaries for obfs4 and/or snowflake, depending
      * on if you wish to include them in your bridges file to use.
      *
-     * See [SettingsConsts.SupportedBridges] for options.
+     * See [BaseConsts.SupportedBridges] for options.
      */
     abstract val listOfSupportedBridges: List<@SupportedBridges String>
 
@@ -209,6 +207,8 @@ abstract class TorSettings: SettingsConsts() {
 
     /**
      * See [DEFAULT__HAS_DEBUG_LOGS]
+     *
+     * 
      * */
     abstract val hasDebugLogs: Boolean
 

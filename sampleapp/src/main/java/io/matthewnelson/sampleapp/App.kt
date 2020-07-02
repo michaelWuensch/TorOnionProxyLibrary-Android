@@ -5,9 +5,12 @@ import io.matthewnelson.topl_service.TorServiceController
 
 class App: Application() {
 
+    companion object {
+        val myTorSettings = MyTorSettings()
+    }
+
     override fun onCreate() {
         super.onCreate()
-
         setupTorServices()
     }
 
@@ -15,10 +18,11 @@ class App: Application() {
         TorServiceController.Builder(
             application = this,
             buildConfigVersion = BuildConfig.VERSION_CODE,
-            torSettings = MyTorSettings(),
+            torSettings = myTorSettings,
             geoipAssetPath = "common/geoip",
             geoip6AssetPath = "common/geoip6"
         )
+
             .customizeNotification(
                 channelName = "TorService Channel",
                 channelDescription = "Tor Channel",
@@ -31,12 +35,15 @@ class App: Application() {
                 intentRequestCode = null
             )
             .setCustomColor(
-                colorRes = R.color.tor_service_connected,
+                colorRes = R.color.primaryColor,
                 colorizeBackground = true
             )
             .enableTorRestartButton()
             .enableTorStopButton()
             .applyNotificationSettings()
+
+            .setBuildConfigDebug(buildConfigDebug = BuildConfig.DEBUG)
+            .setEventBroadcaster(eventBroadcaster = MyEventBroadcaster())
             .build()
     }
 }

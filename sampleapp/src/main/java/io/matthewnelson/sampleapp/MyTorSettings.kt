@@ -77,7 +77,7 @@ class MyTorSettings: TorSettings() {
         get() = DEFAULT__HAS_COOKIE_AUTHENTICATION
 
     override val hasDebugLogs: Boolean
-        get() = false
+        get() = DEFAULT__HAS_DEBUG_LOGS
 
     override val hasDormantCanceledByStartup: Boolean
         get() = DEFAULT__HAS_DORMANT_CANCELED_BY_STARTUP

@@ -12,11 +12,23 @@ See the Apache 2 License for the specific language governing permissions and lim
 */
 package io.matthewnelson.topl_core.util
 
+import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import java.io.IOException
 import java.io.InputStream
 import java.util.concurrent.TimeoutException
 
-abstract class TorInstaller {
+abstract class TorInstaller: CoreConsts() {
+
+    /**
+     * This gets set as soon as [io.matthewnelson.topl_core.OnionProxyManager] is instantiated,
+     * and can be used to broadcast messages in your class which extends [TorInstaller].
+     * */
+    var broadcastLogger: BroadcastLogger? = null
+        private set
+    internal fun initBroadcastLogger(torInstallerBroadcastLogger: BroadcastLogger) {
+        if (broadcastLogger == null)
+            broadcastLogger = torInstallerBroadcastLogger
+    }
 
     /**
      * Sets up and installs any files needed to run tor. If the tor files are already on

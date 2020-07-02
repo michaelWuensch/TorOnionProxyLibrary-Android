@@ -3,8 +3,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
+    packagingOptions {
+        exclude 'META-INF/*.kotlin_module'
+        exclude 'META-INF/*.version'
+    }
     compileSdkVersion versions.compileSdk
-    buildToolsVersion "29.0.3"
+    buildToolsVersion versions.buildTools
 
     defaultConfig {
         applicationId "io.matthewnelson.sampleapp"
@@ -20,6 +24,14 @@ android {
 
     buildTypes {
         release {
+            resValue "string", "app_name", "SampleApp"
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            applicationIdSuffix ".debug"
+            resValue "string", "app_name", "SampleApp Debug"
+            debuggable true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -39,10 +51,16 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation project(':topl-core-base')
     implementation project(':topl-service')
-    implementation deps.kotlin.stdlib
-    implementation deps.androidx.core
     implementation deps.androidx.appCompat
+    implementation deps.androidx.core
     implementation deps.androidx.constraintLayout
+    implementation deps.androidx.lifecycle.commonJava8
+    implementation deps.androidx.lifecycle.liveData
+    implementation deps.androidx.lifecycle.reactiveStreams
+    implementation deps.androidx.recyclerView
+    implementation deps.kotlin.coroutinesCore
+    implementation deps.kotlin.coroutinesAndroid
+    implementation deps.kotlin.stdlib
 
     testImplementation deps.junit
 
@@ -50,4 +68,45 @@ dependencies {
     androidTestImplementation deps.androidx.test.espresso
     androidTestImplementation deps.androidx.test.junit
 
+}
+
+task updatePluggableTransportsSubmodule(type: Exec) {
+    workingDir "$rootDir"
+    commandLine "scripts/pull_latest_transports.sh"
+}
+
+task copyPluggableTransports(type: Copy, dependsOn: updatePluggableTransportsSubmodule) {
+    from("$rootDir/external/AndroidPluggableTransports/APTDispatchLibrary-MeekObfs4-Legacy/src/main/libs")
+    into("src/main/jniLibs")
+    rename { filename ->
+        filename.replace "$filename", 'libObfs4proxy.so'
+    }
+}
+
+task buildTorBinaries(type: Exec) {
+    workingDir "$rootDir"
+    commandLine 'scripts/update_tor_binaries.sh', 'build'
+}
+
+task copyTorBinaries(type: Copy, dependsOn: buildTorBinaries) {
+    from("$rootDir/external/tor-android/tor-android-binary/src/main/libs")
+    into("src/main/jniLibs")
+    rename { filename ->
+        filename.replace "$filename", 'libTor.so'
+    }
+}
+
+task updateTorBinaries(type: Exec, dependsOn: copyTorBinaries) {
+    workingDir "$rootDir"
+    commandLine 'scripts/update_tor_binaries.sh', 'update_versions_file'
+}
+
+task checkForTorBinaryUpdate(type: Exec) {
+    workingDir "$rootDir"
+    commandLine 'scripts/update_tor_binaries.sh', 'check_for_update'
+}
+
+gradle.projectsEvaluated {
+    preBuild.dependsOn(checkForTorBinaryUpdate)
+    preBuild.dependsOn(copyPluggableTransports)
 }

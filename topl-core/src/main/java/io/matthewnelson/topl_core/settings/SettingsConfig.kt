@@ -25,4 +25,4 @@ package io.matthewnelson.topl_core.settings
     AnnotationTarget.PROPERTY_GETTER,
     AnnotationTarget.PROPERTY_SETTER
 )
-annotation class SettingsConfig
+internal annotation class SettingsConfig

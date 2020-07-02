@@ -1,0 +1,240 @@
+package io.matthewnelson.topl_service.onionproxy
+
+import io.matthewnelson.topl_core.OnionProxyManager
+import io.matthewnelson.topl_core_base.EventBroadcaster
+import io.matthewnelson.topl_service.TorServiceController
+import io.matthewnelson.topl_service.notification.ServiceNotification
+import io.matthewnelson.topl_service.service.TorService
+import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
+import io.matthewnelson.topl_service.util.ServiceUtilities
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import net.freehaven.tor.control.TorControlCommands
+import java.text.NumberFormat
+import java.util.*
+
+/**
+ * [io.matthewnelson.topl_core.OnionProxyManager] utilizes this customized class for
+ * broadcasting things while it is operating (such as Tor's State, operation errors,
+ * debugging, etc).
+ *
+ * [ServiceEventListener] utilizes this class by sending it what Tor is spitting out
+ * (selectively curated, ofc).
+ *
+ * @param [torService] [TorService] for context.
+ * */
+internal class ServiceEventBroadcaster(private val torService: TorService): EventBroadcaster() {
+
+    private val serviceNotification = ServiceNotification.get()
+
+    /////////////////
+    /// Bandwidth ///
+    /////////////////
+    private var bytesRead = 0L
+    private var bytesWritten = 0L
+
+    override fun broadcastBandwidth(bytesRead: String, bytesWritten: String) {
+        val read =
+            try {
+                bytesRead.toLong()
+            } catch (e: NumberFormatException) {
+                this.bytesRead
+            }
+        val written =
+            try {
+                bytesWritten.toLong()
+            } catch (e: NumberFormatException) {
+                this.bytesWritten
+            }
+
+        // Only update the notification if proper State is had & we're bootstrapped.
+        if (torState == TorState.ON &&
+            torNetworkState == TorNetworkState.ENABLED &&
+            isBootstrappingComplete()
+        ) {
+            if (read != this.bytesRead || written != this.bytesWritten) {
+                this.bytesRead = read
+                this.bytesWritten = written
+
+                updateBandwidth(read, written)
+
+                if (read == 0L && written == 0L)
+                    serviceNotification.updateIcon(torService, NotificationImage.ENABLED)
+                else
+                    serviceNotification.updateIcon(torService, NotificationImage.DATA)
+            }
+        }
+
+        torService.scopeMain.launch {
+            TorServiceController.appEventBroadcaster?.broadcastBandwidth(bytesRead, bytesWritten)
+        }
+    }
+
+    /**
+     * Do a check for if a message is being displayed in the contentText of the
+     * notification, allowing it to remain there unabated until the coroutine
+     * finishes.
+     * */
+    private fun updateBandwidth(download: Long, upload: Long) {
+        if (::noticeMsgToContentTextJob.isInitialized && noticeMsgToContentTextJob.isActive) return
+        serviceNotification.updateContentText(
+            ServiceUtilities.getFormattedBandwidthString(download, upload)
+        )
+    }
+
+
+    /////////////
+    /// Debug ///
+    /////////////
+    override fun broadcastDebug(msg: String) {
+        torService.scopeMain.launch {
+            TorServiceController.appEventBroadcaster?.broadcastDebug(msg)
+        }
+    }
+
+
+    //////////////////
+    /// Exceptions ///
+    //////////////////
+    override fun broadcastException(msg: String?, e: Exception) {
+        if (!msg.isNullOrEmpty()) {
+            if (msg.contains(TorService::class.java.simpleName)) {
+                serviceNotification.updateIcon(torService, NotificationImage.ERROR)
+                val splitMsg = msg.split("|")
+                if (splitMsg.size > 2 && splitMsg[2].isNotEmpty()) {
+                    serviceNotification.updateContentText(splitMsg[2])
+                }
+            }
+        }
+
+        torService.scopeMain.launch {
+            TorServiceController.appEventBroadcaster?.broadcastException(msg, e)
+        }
+    }
+
+
+    ///////////////////
+    /// LogMessages ///
+    ///////////////////
+    override fun broadcastLogMessage(logMessage: String?) {
+        torService.scopeMain.launch {
+            TorServiceController.appEventBroadcaster?.broadcastLogMessage(logMessage)
+        }
+    }
+
+
+    ///////////////
+    /// Notices ///
+    ///////////////
+    private lateinit var noticeMsgToContentTextJob: Job
+    private var bootstrapProgress = ""
+    private fun isBootstrappingComplete(): Boolean =
+        bootstrapProgress == "Bootstrapped 100%"
+
+    override fun broadcastNotice(msg: String) {
+
+        // BOOTSTRAPPED
+        if (msg.contains("Bootstrapped")) {
+            val msgSplit = msg.split(" ")
+            val bootstrapped = "${msgSplit[0]} ${msgSplit[1]}".split("|")[2]
+
+            if (bootstrapped != bootstrapProgress) {
+                serviceNotification.updateContentText(bootstrapped)
+
+                if (bootstrapped == "Bootstrapped 100%") {
+                    serviceNotification.updateIcon(torService, NotificationImage.ENABLED)
+                    serviceNotification.addActions(torService)
+                }
+
+                bootstrapProgress = bootstrapped
+            }
+
+        // NEWNYM
+        } else if (msg.contains(TorControlCommands.SIGNAL_NEWNYM)) {
+            val msgToShow =
+                when {
+                    msg.contains(OnionProxyManager.NEWNYM_SUCCESS_MESSAGE) -> {
+                        OnionProxyManager.NEWNYM_SUCCESS_MESSAGE
+                    }
+                    msg.contains(OnionProxyManager.NEWNYM_NO_NETWORK) -> {
+                        OnionProxyManager.NEWNYM_NO_NETWORK
+                    }
+                    else -> {
+                        msg
+                    }
+                }
+
+            if (::noticeMsgToContentTextJob.isInitialized && noticeMsgToContentTextJob.isActive)
+                noticeMsgToContentTextJob.cancel()
+
+            displayMessageToContentText(msgToShow, 3500L)
+        }
+
+        torService.scopeMain.launch {
+            TorServiceController.appEventBroadcaster?.broadcastNotice(msg)
+        }
+    }
+
+    /**
+     * Display a message in the notification's ContentText space for the defined
+     * [delayMilliSeconds], after which (if Tor is connected), publish to the Notification's
+     * ContentText the most recently broadcast bandwidth via [bytesRead] && [bytesWritten].
+     * */
+    private fun displayMessageToContentText(message: String, delayMilliSeconds: Long) {
+        noticeMsgToContentTextJob = torService.scopeMain.launch {
+            serviceNotification.updateContentText(message)
+            delay(delayMilliSeconds)
+
+            // Publish the last bandwidth broadcast to overwrite the message.
+            if (torNetworkState == TorNetworkState.ENABLED) {
+                serviceNotification.updateContentText(
+                    ServiceUtilities.getFormattedBandwidthString(bytesRead, bytesWritten)
+                )
+            } else {
+                if (isBootstrappingComplete())
+                    serviceNotification.updateContentText(
+                        ServiceUtilities.getFormattedBandwidthString(0L, 0L)
+                    )
+            }
+        }
+    }
+
+
+    ////////////////
+    /// TorState ///
+    ////////////////
+    @Volatile
+    private var torState = TorState.OFF
+    @Volatile
+    private var torNetworkState = TorNetworkState.DISABLED
+
+    override fun broadcastTorState(@TorState state: String, @TorNetworkState networkState: String) {
+        if (torState == TorState.ON && state != torState) {
+            bootstrapProgress = ""
+            serviceNotification.removeActions(torService, state)
+        } else {
+            serviceNotification.updateContentTitle(state)
+        }
+
+        torState = state
+
+        if (networkState == TorNetworkState.DISABLED) {
+            // Update torNetworkState _before_ setting the icon to `disabled` so bandwidth won't
+            // overwrite the icon with an update
+            torNetworkState = networkState
+            serviceNotification.updateIcon(torService, NotificationImage.DISABLED)
+        } else {
+            if (isBootstrappingComplete())
+                serviceNotification.updateIcon(torService, NotificationImage.ENABLED)
+
+            // Update torNetworkState _after_ setting the icon to `enabled` so bandwidth changes
+            // occur afterwards and this won't overwrite ImageState.DATA
+            torNetworkState = networkState
+        }
+
+        torService.scopeMain.launch {
+            TorServiceController.appEventBroadcaster?.broadcastTorState(state, networkState)
+        }
+    }
+}

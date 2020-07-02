@@ -62,23 +62,9 @@ class TorConfigFiles private constructor(
      * This method returns how much time to wait in seconds until failing the startup.
      * */
     val fileCreationTimeout: Int
-) {
+): BaseConsts() {
 
     companion object {
-        const val GEO_IP_NAME = "geoip"
-        const val GEO_IPV_6_NAME = "geoip6"
-        const val TORRC_NAME = "torrc"
-        const val HIDDEN_SERVICE_NAME = "hiddenservice"
-        const val HOST_FILE_NAME = "hostname"
-        const val COOKIE_AUTH_FILE_NAME = "control_auth_cookie"
-        const val RESOLVE_CONF_FILE_NAME = "resolv.conf"
-        const val CONTROL_PORT_FILE_NAME = "control.txt"
-
-        /**
-         * If your .so file name is different, call [Builder.torExecutable] to set it
-         * manually rather than using the [createConfig] convenience method.
-         * */
-        private const val torExecutableFileName: String = "libTor.so"
 
         /**
          * Convenience method for if you're including in your App's jniLibs directory
@@ -90,11 +76,7 @@ class TorConfigFiles private constructor(
          * */
         fun createConfig(context: Context, configDir: File, dataDir: File? = null): TorConfigFiles {
             val installDir = File(context.applicationInfo.nativeLibraryDir)
-            val builder =
-                Builder(
-                    installDir,
-                    configDir
-                )
+            val builder = Builder(installDir, configDir)
             if (dataDir != null)
                 builder.dataDir(dataDir)
             return builder.build()
@@ -107,10 +89,7 @@ class TorConfigFiles private constructor(
          * @param context Context
          * */
         fun createConfig(context: Context): TorConfigFiles =
-            createConfig(
-                context,
-                context.getDir("torservice", Context.MODE_PRIVATE)
-            )
+            createConfig(context, context.getDir("torservice", Context.MODE_PRIVATE))
     }
 
     private val configLock = Object()
@@ -133,13 +112,13 @@ class TorConfigFiles private constructor(
                 return torrcFile
             }
 
-            val tmpTorrcFile = File(configDir, TORRC_NAME)
+            val tmpTorrcFile = File(configDir, ConfigFileName.TORRC)
             if (tmpTorrcFile.exists()) {
                 torrcFile = tmpTorrcFile
                 return torrcFile
             }
 
-            torrcFile = File(configDir, TORRC_NAME)
+            torrcFile = File(configDir, ConfigFileName.TORRC)
             if (torrcFile.createNewFile()) {
                 return torrcFile
             }
@@ -312,37 +291,37 @@ class TorConfigFiles private constructor(
          */
         fun build(): TorConfigFiles {
             if (!::mTorExecutableFile.isInitialized)
-                mTorExecutableFile = File(installDir, torExecutableFileName)
+                mTorExecutableFile = File(installDir, ConfigFileName.TOR_EXECUTABLE)
 
             if (!::mGeoIpFile.isInitialized)
-                mGeoIpFile = File(configDir, GEO_IP_NAME)
+                mGeoIpFile = File(configDir, ConfigFileName.GEO_IP)
 
             if (!::mGeoIpv6File.isInitialized)
-                mGeoIpv6File = File(configDir, GEO_IPV_6_NAME)
+                mGeoIpv6File = File(configDir, ConfigFileName.GEO_IPV_6)
 
             if (!::mTorrcFile.isInitialized)
-                mTorrcFile = File(configDir, TORRC_NAME)
+                mTorrcFile = File(configDir, ConfigFileName.TORRC)
 
             if (!::mHiddenServiceDir.isInitialized)
-                mHiddenServiceDir = File(configDir, HIDDEN_SERVICE_NAME)
+                mHiddenServiceDir = File(configDir, ConfigFileName.HIDDEN_SERVICE)
 
             if (!::mDataDir.isInitialized)
-                mDataDir = File(configDir, "lib/tor")
+                mDataDir = File(configDir, ConfigFileName.DATA_DIR)
 
             if (!::mLibraryPath.isInitialized)
                 mLibraryPath = mTorExecutableFile.parentFile
 
             if (!::mHostnameFile.isInitialized)
-                mHostnameFile = File(mDataDir, HOST_FILE_NAME)
+                mHostnameFile = File(mDataDir, ConfigFileName.HOST)
 
             if (!::mCookieAuthFile.isInitialized)
-                mCookieAuthFile = File(mDataDir, COOKIE_AUTH_FILE_NAME)
+                mCookieAuthFile = File(mDataDir, ConfigFileName.COOKIE_AUTH)
 
             if (!::mResolveConf.isInitialized)
-                mResolveConf = File(configDir, RESOLVE_CONF_FILE_NAME)
+                mResolveConf = File(configDir, ConfigFileName.RESOLVE_CONF)
 
             if (!::mControlPortFile.isInitialized)
-                mControlPortFile = File(mDataDir, CONTROL_PORT_FILE_NAME)
+                mControlPortFile = File(mDataDir, ConfigFileName.CONTROL_PORT)
 
             if (mFileCreationTimeout <= 0)
                 mFileCreationTimeout = 15

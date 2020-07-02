@@ -14,7 +14,8 @@ package io.matthewnelson.topl_core.settings
 
 import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.OnionProxyContext
-import io.matthewnelson.topl_core_base.SettingsConsts.ConnectionPadding
+import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
+import io.matthewnelson.topl_core.util.CoreConsts
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
 import java.io.*
@@ -24,8 +25,14 @@ import java.net.Socket
 import java.util.*
 
 /**
+ * Call [io.matthewnelson.topl_core.OnionProxyManager.getNewSettingsBuilder] to obtain
+ * this class.
+ *
  * This class is basically a torrc file builder. Every method you call adds a
  * specific value to the [buffer] which Tor understands.
+ *
+ * You can call [addLine] if something isn't covered here so you can customize your torrc
+ * file however you wish.
  *
  * Calling [finishAndReturnString] will return to you the String that has been
  * built for you to write to the
@@ -33,9 +40,13 @@ import java.util.*
  *
  * Calling [finishAndWriteToTorrcFile] will do just that.
  *
- * See [io.matthewnelson.topl_core.OnionProxyManager.getNewSettingsBuilder]
+ * @param [onionProxyContext] [OnionProxyContext]
+ * @param [broadcastLogger] for broadcasting/logging
  * */
-class TorSettingsBuilder(private val onionProxyContext: OnionProxyContext) {
+class TorSettingsBuilder internal constructor(
+    private val onionProxyContext: OnionProxyContext,
+    private val broadcastLogger: BroadcastLogger
+): CoreConsts() {
 
     private var buffer = StringBuffer()
 
@@ -60,6 +71,15 @@ class TorSettingsBuilder(private val onionProxyContext: OnionProxyContext) {
      * */
     fun finishAndWriteToTorrcFile() =
         onionProxyContext.torConfigFiles.torrcFile.writeText(finishAndReturnString())
+
+    /**
+     * Add a new line to the [buffer] if a setting here is not available.
+     * */
+    fun addLine(value: String?): TorSettingsBuilder {
+        if (!value.isNullOrEmpty())
+            buffer.append("$value\n")
+        return this
+    }
 
     /**
      * Updates the buffer for all methods annotated with [SettingsConfig]. You still need
@@ -197,7 +217,7 @@ class TorSettingsBuilder(private val onionProxyContext: OnionProxyContext) {
     fun debugLogs(): TorSettingsBuilder {
         buffer.append("Log debug syslog\n")
         buffer.append("Log info syslog\n")
-        buffer.append("SafeLogging 0\n")
+        buffer.append("SafeLogging 1\n")
         return this
     }
 
@@ -296,12 +316,6 @@ class TorSettingsBuilder(private val onionProxyContext: OnionProxyContext) {
             else
                 null
         )
-    }
-
-    private fun addLine(value: String?): TorSettingsBuilder {
-        if (!value.isNullOrEmpty())
-            buffer.append("$value\n")
-        return this
     }
 
     fun makeNonExitRelay(dnsFile: String, orPort: Int, nickname: String): TorSettingsBuilder {
@@ -614,6 +628,8 @@ class TorSettingsBuilder(private val onionProxyContext: OnionProxyContext) {
      *
      * See [io.matthewnelson.topl_core.util.TorInstaller] comment for further details
      * on how to implement that.
+     *
+     * TODO: Re-work format type to use annotations...
      * */
     @Throws(IOException::class)
     fun addBridgesFromResources(): TorSettingsBuilder {

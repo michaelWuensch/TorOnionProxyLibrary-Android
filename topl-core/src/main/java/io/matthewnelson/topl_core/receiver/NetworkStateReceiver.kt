@@ -13,6 +13,9 @@ internal class NetworkStateReceiver(
     private val onionProxyManager: OnionProxyManager
 ): BroadcastReceiver() {
 
+    private val broadcastLogger =
+        onionProxyManager.createBroadcastLogger(NetworkStateReceiver::class.java)
+
     private lateinit var connectivityManager: ConnectivityManager
     var networkConnectivity = true
         private set
@@ -20,15 +23,19 @@ internal class NetworkStateReceiver(
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context != null) {
             if (!initializeConnectivityManager(context)) return
-            if (onionProxyManager.eventBroadcaster.torStateMachine.isOff) return
+            if (onionProxyManager.torStateMachine.isOff) return
 
             val info = connectivityManager.activeNetworkInfo
             networkConnectivity = info != null && info.isConnected
 
+            broadcastLogger.debug("Network connectivity: $networkConnectivity")
+
             CoroutineScope(Dispatchers.Main).launch(Dispatchers.IO) {
                 try {
                     onionProxyManager.disableNetwork(!networkConnectivity)
-                } catch (e: Exception) {}
+                } catch (e: Exception) {
+                    broadcastLogger.exception(e)
+                }
             }
         }
     }

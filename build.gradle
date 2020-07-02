@@ -16,6 +16,10 @@ allprojects  {
         google()
         jcenter()
     }
+
+    tasks.withType(Test) {
+        maxHeapSize = "4096m"
+    }
 }
 
 task clean(type: Delete) {

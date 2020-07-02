@@ -13,14 +13,13 @@ See the Apache 2 License for the specific language governing permissions and lim
 package io.matthewnelson.topl_core
 
 import android.os.Process
+import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core_base.TorSettings
-import io.matthewnelson.topl_core.util.OnionProxyConsts.ConfigFile
 import io.matthewnelson.topl_core.util.FileUtilities
+import io.matthewnelson.topl_core.util.CoreConsts
 import io.matthewnelson.topl_core.util.TorInstaller
 import io.matthewnelson.topl_core.util.WriteObserver
 import io.matthewnelson.topl_core_base.TorConfigFiles
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.io.*
 
 /**
@@ -40,14 +39,18 @@ import java.io.*
  * @param [torInstaller] [TorInstaller]
  * @param [torSettings] [TorSettings] Basically your torrc file
  */
-class OnionProxyContext(
+internal class OnionProxyContext(
     val torConfigFiles: TorConfigFiles,
     val torInstaller: TorInstaller,
     val torSettings: TorSettings
-) {
+): CoreConsts() {
 
-    private companion object {
-        val LOG: Logger = LoggerFactory.getLogger(OnionProxyContext::class.java)
+    // Gets initialized in OnionProxyManager _immediately_ after
+    // OnionProxyContext is instantiated.
+    private lateinit var broadcastLogger: BroadcastLogger
+    fun initBroadcastLogger(onionProxyBroadcastLogger: BroadcastLogger) {
+        if (!::broadcastLogger.isInitialized)
+            broadcastLogger = onionProxyBroadcastLogger
     }
 
     private val controlPortFileLock = Object()
@@ -56,28 +59,19 @@ class OnionProxyContext(
     private val resolvConfFileLock = Object()
     private val hostnameFileLock = Object()
 
-    // Try creating the data dir upon instantiation. Everything hinges on it.
-    init {
-        try {
-            createDataDir()
-        } catch (e: SecurityException) {
-            e.printStackTrace()
-            LOG.warn("Could not create directory dataDir upon instantiation")
-        }
-    }
-
     /**
-     * Creates an observer for the file referenced. See [ConfigFile] annotation
-     * class for accepted arguments.
+     * Creates an observer for the file referenced. See [CoreConsts.ConfigFile] annotation class
+     * for accepted arguments.
      *
-     * @param [onionProxyConst] String that defines what file a [WriteObserver] is created for.
+     * @param [configFileReference] String that defines what file a [WriteObserver] is created for.
      * @return A WriteObserver for the appropriate file referenced.
-     * @throws [IllegalArgumentException] If [onionProxyConst] is an invalid argument, or null file.
+     * @throws [IllegalArgumentException] If [configFileReference] is an invalid argument, or null file.
      * @throws [SecurityException] See [WriteObserver.checkExists]
      */
     @Throws(IllegalArgumentException::class, SecurityException::class)
-    internal fun createFileObserver(@ConfigFile onionProxyConst: String): WriteObserver {
-        return when (onionProxyConst) {
+    fun createFileObserver(@ConfigFile configFileReference: String): WriteObserver {
+        broadcastLogger.debug("Creating FileObserver for $configFileReference")
+        return when (configFileReference) {
             ConfigFile.CONTROL_PORT_FILE -> {
                 synchronized(controlPortFileLock) {
                     WriteObserver(torConfigFiles.controlPortFile)
@@ -94,15 +88,23 @@ class OnionProxyContext(
                 }
             }
             else -> {
-                throw IllegalArgumentException(
-                    "$onionProxyConst is not a valid argument for method createFileObserver"
-                )
+                throw IllegalArgumentException("$configFileReference is not a valid argument")
             }
         }
     }
 
-    internal fun createNewFileIfDoesNotExist(@ConfigFile onionProxyConst: String): Boolean {
-        return when (onionProxyConst) {
+    /**
+     * Creates an empty file if the provided one does not exist. See [CoreConsts.ConfigFile]
+     * annotation class for accepted arguments.
+     *
+     * @param [configFileReference] String that defines what file is to be created.
+     * @return True if file exists or is created successfully, otherwise false.
+     * @throws [SecurityException] Unauthorized access to file/directory.
+     * */
+    @Throws(IllegalArgumentException::class, SecurityException::class)
+    fun createNewFileIfDoesNotExist(@ConfigFile configFileReference: String): Boolean {
+        broadcastLogger.debug("Creating $configFileReference if DNE")
+        return when (configFileReference) {
             ConfigFile.CONTROL_PORT_FILE -> {
                 synchronized(controlPortFileLock) {
                     createNewFileIfDoesNotExist(torConfigFiles.controlPortFile)
@@ -119,25 +121,24 @@ class OnionProxyContext(
                 }
             }
             else -> {
-                throw IllegalArgumentException(
-                    "$onionProxyConst is not a valid argument for method createNewFileIfDoesNotExist"
-                )
+                throw IllegalArgumentException("$configFileReference is not a valid argument")
             }
         }
     }
 
     /**
-     * Deletes the referenced file.See [ConfigFile] annotation class for
-     * accepted arguments.
+     * Deletes the referenced file. See [CoreConsts.ConfigFile] annotation class
+     * for accepted arguments.
      *
-     * @param [onionProxyConst] String that defines what file to delete.
+     * @param [configFileReference] String that defines what file is to be delete.
      * @return True if it was deleted, false if it failed.
      * @throws [SecurityException] Unauthorized access to file/directory.
      * @throws [IllegalArgumentException]
      * */
     @Throws(SecurityException::class, IllegalArgumentException::class)
-    internal fun deleteFile(@ConfigFile onionProxyConst: String): Boolean {
-        return when (onionProxyConst) {
+    fun deleteFile(@ConfigFile configFileReference: String): Boolean {
+        broadcastLogger.debug("Deleting $configFileReference")
+        return when (configFileReference) {
             ConfigFile.CONTROL_PORT_FILE -> {
                 synchronized(controlPortFileLock) {
                     torConfigFiles.controlPortFile.delete()
@@ -149,21 +150,30 @@ class OnionProxyContext(
                 }
             }
             ConfigFile.HOSTNAME_FILE -> {
-                synchronized(controlPortFileLock) {
+                synchronized(hostnameFileLock) {
                     torConfigFiles.hostnameFile.delete()
                 }
             }
             else -> {
-                throw IllegalArgumentException(
-                    "$onionProxyConst is not a valid argument for method deleteFile"
-                )
+                throw IllegalArgumentException("$configFileReference is not a valid argument")
             }
         }
     }
 
+    /**
+     * Reads the referenced file. See [CoreConsts.ConfigFile] annotation class
+     * for accepted arguments.
+     *
+     * @param [configFileReference] String that defines what file is to be read.
+     * @return The contents of the file.
+     * @throws [IOException] Errors while reading file.
+     * @throws [EOFException] Errors while reading file.
+     * @throws [SecurityException] Unauthorized access to file/directory.
+     * */
     @Throws(IOException::class, EOFException::class, SecurityException::class)
-    internal fun readFile(@ConfigFile onionProxyConst: String): ByteArray {
-        return when (onionProxyConst) {
+    fun readFile(@ConfigFile configFileReference: String): ByteArray {
+        broadcastLogger.debug("Reading $configFileReference")
+        return when (configFileReference) {
             ConfigFile.CONTROL_PORT_FILE -> {
                 synchronized(controlPortFileLock) {
                     FileUtilities.read(torConfigFiles.controlPortFile)
@@ -180,9 +190,7 @@ class OnionProxyContext(
                 }
             }
             else -> {
-                throw IllegalArgumentException(
-                    "$onionProxyConst is not a valid argument for method readFile"
-                )
+                throw IllegalArgumentException("$configFileReference is not a valid argument")
             }
         }
     }
@@ -197,7 +205,7 @@ class OnionProxyContext(
      * @throws [SecurityException] Unauthorized access to file/directory.
      */
     @Throws(SecurityException::class)
-    internal fun createDataDir(): Boolean =
+    fun createDataDir(): Boolean =
         synchronized(dataDirLock) {
             return torConfigFiles.dataDir.exists() || torConfigFiles.dataDir.mkdirs()
         }
@@ -205,11 +213,11 @@ class OnionProxyContext(
     /**
      * Deletes the configured tor data directory, except for hiddenservices.
      *
-     * @throws [RuntimeException]
+     * @throws [RuntimeException] Was unable to delete a file.
      * @throws [SecurityException] Unauthorized access to file/directory.
      */
     @Throws(RuntimeException::class, SecurityException::class)
-    internal fun deleteDataDirExceptHiddenService() =
+    fun deleteDataDirExceptHiddenService() =
         synchronized(dataDirLock) {
             for (file in torConfigFiles.dataDir.listFiles())
                 if (file.isDirectory)
@@ -223,9 +231,8 @@ class OnionProxyContext(
     ////////////////////
     /// HostnameFile ///
     ////////////////////
-
     @Throws(SecurityException::class)
-    internal fun setHostnameDirPermissionsToReadOnly(): Boolean =
+    fun setHostnameDirPermissionsToReadOnly(): Boolean =
         synchronized(hostnameFileLock) {
             FileUtilities.setToReadOnlyPermissions(torConfigFiles.hostnameFile.parentFile)
         }
@@ -241,7 +248,7 @@ class OnionProxyContext(
      * @throws [IOException] from FileWriter
      */
     @Throws(IOException::class)
-    internal fun createQuad9NameserverFile(): File =
+    fun createQuad9NameserverFile(): File =
         synchronized(resolvConfFileLock) {
             val file = torConfigFiles.resolveConf
             val writer = BufferedWriter(FileWriter(file))
@@ -256,18 +263,13 @@ class OnionProxyContext(
      *
      * @return process id
      */
-    internal val processId: String
+    val processId: String
         get() = Process.myPid().toString()
 
-    /**
-     * Creates an empty file if the provided one does not exist.
-     *
-     * @return True if file exists or is created successfully, otherwise false.
-     * @throws [SecurityException] Unauthorized access to file/directory.
-     * */
+    @Throws(SecurityException::class)
     private fun createNewFileIfDoesNotExist(file: File): Boolean {
         if (!file.parentFile.exists() && !file.parentFile.mkdirs()) {
-            LOG.warn("Could not create ${file.nameWithoutExtension} parent directory")
+            broadcastLogger.warn("Could not create ${file.nameWithoutExtension} parent directory")
             return false
         }
 
@@ -275,7 +277,7 @@ class OnionProxyContext(
             val exists = if (file.exists()) true else file.createNewFile()
             exists
         } catch (e: IOException) {
-            LOG.warn("Could not create ${file.nameWithoutExtension}")
+            broadcastLogger.warn("Could not create ${file.nameWithoutExtension}")
             false
         }
     }

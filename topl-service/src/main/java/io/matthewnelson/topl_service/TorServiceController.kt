@@ -8,13 +8,14 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.TorService
-import io.matthewnelson.topl_service.service.ActionConsts.ServiceAction
 import androidx.core.app.NotificationCompat.NotificationVisibility
+import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
-import net.freehaven.tor.control.EventListener
+import io.matthewnelson.topl_service.onionproxy.ServiceEventBroadcaster
+import io.matthewnelson.topl_service.util.ServiceConsts
 
-class TorServiceController private constructor() {
+class TorServiceController private constructor(): ServiceConsts() {
 
     /**
      * The [TorServiceController.Builder] is where you get to customize how [TorService] works
@@ -22,13 +23,14 @@ class TorServiceController private constructor() {
      *
      * A note about the [TorSettings] you send this. Those are the default settings which
      * [TorService] will fall back on if [io.matthewnelson.topl_service.util.TorServicePrefs]
-     * has nothing in it for that particular [io.matthewnelson.topl_service.util.PrefsKeys].
+     * has nothing in it for that particular [ServiceConsts].PrefKey.
+     *
      * The settings get written to the `torrc` file every time Tor is started (I plan to make
      * this less sledgehammer-ish in the future).
      *
      * To update settings while your application is running you need only to instantiate
      * [io.matthewnelson.topl_service.util.TorServicePrefs] and save the data using the
-     * appropriately annotated method and [io.matthewnelson.topl_service.util.PrefsKeys], then
+     * appropriately annotated method and [ServiceConsts].PrefKey, then
      * restart Tor (for now... ;-D).
      *
      * I plan to implement a
@@ -36,12 +38,13 @@ class TorServiceController private constructor() {
      * immediately for the settings that don't require a restart, but a stable release comes first).
      *
      * You can see how the [TorSettings] sent here are used in [TorService] by looking at
-     * [io.matthewnelson.topl_service.service.TorServiceSettings] and [TorService.onCreate].
+     * [io.matthewnelson.topl_service.onionproxy.ServiceTorSettings] and
+     * [TorService.initTOPLCore].
      *
-     * @param [application] [Application], for obtaining
+     * @param [application] [Application], for obtaining context.
      * @param [buildConfigVersion] send [BuildConfig.VERSION_CODE]. Mitigates copying of geoip
      *   files to app updates only.
-     * @param [torSettings] [TorSettings] used to create your torrc file on startup.
+     * @param [torSettings] [TorSettings] used to create your torrc file on start of Tor.
      * @param [geoipAssetPath] The path to where you have your geoip file located (ex: in
      *   assets/common directory, send this variable "common/geoip").
      * @param [geoip6AssetPath] The path to where you have your geoip6 file located (ex: in
@@ -58,6 +61,42 @@ class TorServiceController private constructor() {
     ) {
 
         private lateinit var torConfigFiles: TorConfigFiles
+
+        // On published releases of this Library, this value will **always** be `false`.
+        private var buildConfigDebug = BuildConfig.DEBUG
+
+        /**
+         * This makes it such that on your Application's **Debug** builds, the `topl-core` and
+         * `topl-service` modules will provide you with Logcat messages (when
+         * [TorSettings.hasDebugLogs] is enabled).
+         *
+         * For your **Release** builds no Logcat messaging will be provided, but you
+         * will still get the same messages sent to your [EventBroadcaster] if you set it
+         * via [Builder.setEventBroadcaster].
+         *
+         * TODO: Provide a link to gh-pages that discusses logging and how it work, it's pretty
+         *  complex with everything that is going on.
+         *
+         * @param [buildConfigDebug] Send [BuildConfig.DEBUG]
+         * @see [io.matthewnelson.topl_core.broadcaster.BroadcastLogger]
+         * */
+        fun setBuildConfigDebug(buildConfigDebug: Boolean): Builder {
+            this.buildConfigDebug = buildConfigDebug
+            return this
+        }
+
+        /**
+         * Get broadcasts piped to your Application to do with them what you desire. What
+         * you send this will live at [Companion.appEventBroadcaster] for the remainder of
+         * your application's lifecycle to refer to elsewhere in your App.
+         *
+         * NOTE: You will, ofc, have to cast [Companion.appEventBroadcaster] as whatever your
+         * class actually is.
+         * */
+        fun setEventBroadcaster(eventBroadcaster: EventBroadcaster): Builder {
+            appEventBroadcaster = eventBroadcaster
+            return this
+        }
 
         /**
          * If you wish to customize the file structure of how Tor is installed in your app,
@@ -168,7 +207,7 @@ class TorServiceController private constructor() {
              * Defaults to Orbot/TorBrowser's icon [R.drawable.tor_stat_network_enabled].
              *
              * The small icon you wish to display when Tor's network state is
-             * [io.matthewnelson.topl_core_base.TorStates.TorNetworkState.ENABLED].
+             * [io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState.ENABLED].
              *
              * See [Builder] for code samples.
              *
@@ -184,7 +223,7 @@ class TorServiceController private constructor() {
              * Defaults to Orbot/TorBrowser's icon [R.drawable.tor_stat_network_disabled].
              *
              * The small icon you wish to display when Tor's network state is
-             * [io.matthewnelson.topl_core_base.TorStates.TorNetworkState.DISABLED].
+             * [io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState.DISABLED].
              *
              * See [Builder] for code samples.
              *
@@ -230,7 +269,7 @@ class TorServiceController private constructor() {
              * Defaults to [R.color.tor_service_white]
              *
              * The color you wish to display when Tor's network state is
-             * [io.matthewnelson.topl_core_base.TorStates.TorNetworkState.ENABLED]. Note that
+             * [io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState.ENABLED]. Note that
              * if [colorizeBackground] is being passed a value of `true`, the notification will
              * always be that color where as if it is passed `false`, the icon & action button
              * colors will change with Tor's network state.
@@ -315,17 +354,17 @@ class TorServiceController private constructor() {
          * See [Builder] for code samples.
          * */
         fun build() {
-            val torConfigFiles =
-                if (::torConfigFiles.isInitialized) {
+            val torConfigFiles: TorConfigFiles =
+                if (::torConfigFiles.isInitialized)
                     this.torConfigFiles
-                } else {
+                else
                     TorConfigFiles.createConfig(application.applicationContext)
-                }
 
             TorService.initialize(
                 torConfigFiles,
                 torSettings,
                 buildConfigVersion,
+                buildConfigDebug,
                 geoipAssetPath,
                 geoip6AssetPath
             )
@@ -342,6 +381,8 @@ class TorServiceController private constructor() {
     companion object {
 
         private lateinit var appContext: Context
+        var appEventBroadcaster: EventBroadcaster? = null
+            private set
 
         private fun sendAction(@ServiceAction action: String) {
             if (!::appContext.isInitialized) return
