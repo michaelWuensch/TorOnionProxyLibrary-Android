@@ -38,7 +38,6 @@ internal class ServiceEventListener: BaseEventListener() {
         if (!data.isNullOrEmpty()) {
             broadcastLogger?.notice(data)
         }
-        debug("${TorControlCommands.EVENT_NOTICE_MSG} $data")
         super.noticeMsg(data)
     }
 
@@ -110,7 +109,6 @@ internal class ServiceEventListener: BaseEventListener() {
     override fun warnMsg(data: String?) {
         if (!data.isNullOrEmpty())
             broadcastLogger?.warn(data)
-        debug("${TorControlCommands.EVENT_WARN_MSG} $data")
     }
 
     override fun statusGeneral(data: String?) {
@@ -124,7 +122,6 @@ internal class ServiceEventListener: BaseEventListener() {
     override fun errMsg(data: String?) {
         if (!data.isNullOrEmpty())
             broadcastLogger?.error(data)
-        debug("${TorControlCommands.EVENT_ERR_MSG} $data")
     }
 
     override fun streamStatus(data: String?) {
