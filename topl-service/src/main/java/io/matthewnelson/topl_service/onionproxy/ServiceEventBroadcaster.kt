@@ -66,7 +66,9 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
             }
         }
 
-        TorServiceController.appEventBroadcaster?.broadcastBandwidth(bytesRead, bytesWritten)
+        torService.scopeMain.launch {
+            TorServiceController.appEventBroadcaster?.broadcastBandwidth(bytesRead, bytesWritten)
+        }
     }
 
     /**
@@ -86,7 +88,9 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
     /// Debug ///
     /////////////
     override fun broadcastDebug(msg: String) {
-        TorServiceController.appEventBroadcaster?.broadcastDebug(msg)
+        torService.scopeMain.launch {
+            TorServiceController.appEventBroadcaster?.broadcastDebug(msg)
+        }
     }
 
 
@@ -103,7 +107,10 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
                 }
             }
         }
-        TorServiceController.appEventBroadcaster?.broadcastException(msg, e)
+
+        torService.scopeMain.launch {
+            TorServiceController.appEventBroadcaster?.broadcastException(msg, e)
+        }
     }
 
 
@@ -111,7 +118,9 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
     /// LogMessages ///
     ///////////////////
     override fun broadcastLogMessage(logMessage: String?) {
-        TorServiceController.appEventBroadcaster?.broadcastLogMessage(logMessage)
+        torService.scopeMain.launch {
+            TorServiceController.appEventBroadcaster?.broadcastLogMessage(logMessage)
+        }
     }
 
 
@@ -162,7 +171,9 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
             displayMessageToContentText(msgToShow, 3500L)
         }
 
-        TorServiceController.appEventBroadcaster?.broadcastNotice(msg)
+        torService.scopeMain.launch {
+            TorServiceController.appEventBroadcaster?.broadcastNotice(msg)
+        }
     }
 
     /**
@@ -222,6 +233,8 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
             torNetworkState = networkState
         }
 
-        TorServiceController.appEventBroadcaster?.broadcastTorState(state, networkState)
+        torService.scopeMain.launch {
+            TorServiceController.appEventBroadcaster?.broadcastTorState(state, networkState)
+        }
     }
 }
