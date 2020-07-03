@@ -398,6 +398,8 @@ class TorServiceController private constructor(): ServiceConsts() {
          * Starts [TorService]. Does nothing if called prior to:
          *
          *  - Initializing [TorServiceController.Builder] by calling [Builder.build]
+         *
+         * You can call this as much as you want. If Tor is already on, it will do nothing.
          * */
         fun startTor() =
             sendAction(ServiceAction.ACTION_START)
