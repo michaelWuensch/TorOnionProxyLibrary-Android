@@ -161,7 +161,12 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
                         OnionProxyManager.NEWNYM_NO_NETWORK
                     }
                     else -> {
-                        msg
+                        val msgSplit = msg.split("|")
+                        if (msgSplit.size > 2) {
+                            msgSplit[2]
+                        } else {
+                            "Rate limited"
+                        }
                     }
                 }
 
