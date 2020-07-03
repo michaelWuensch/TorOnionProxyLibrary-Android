@@ -8,7 +8,6 @@ import io.matthewnelson.topl_core_base.EventBroadcaster
 
 /**
  * Just a helper class for broadcasting/logging.
- *
  * */
 internal class BroadcastLoggerHelper(
     private val onionProxyManager: OnionProxyManager,

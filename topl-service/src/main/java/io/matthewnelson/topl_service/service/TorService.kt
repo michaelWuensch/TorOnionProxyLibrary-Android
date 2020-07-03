@@ -130,18 +130,17 @@ internal class TorService: Service() {
      * */
     @WorkerThread
     private fun startTor() {
-        if (!onionProxyManager.torStateMachine.isOn) {
-            try {
-                onionProxyManager.setup()
-                onionProxyManager.getNewSettingsBuilder()
-                    .updateTorSettings()
-                    .setGeoIpFiles()
-                    .finishAndWriteToTorrcFile()
+        if (onionProxyManager.hasControlConnection) return
+        try {
+            onionProxyManager.setup()
+            onionProxyManager.getNewSettingsBuilder()
+                .updateTorSettings()
+                .setGeoIpFiles()
+                .finishAndWriteToTorrcFile()
 
-                onionProxyManager.start()
-            } catch (e: Exception) {
-                broadcastLogger.exception(e)
-            }
+            onionProxyManager.start()
+        } catch (e: Exception) {
+            broadcastLogger.exception(e)
         }
     }
 

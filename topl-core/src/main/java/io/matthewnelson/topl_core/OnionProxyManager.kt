@@ -210,7 +210,7 @@ class OnionProxyManager(
      * @throws [IllegalStateException] If [controlConnection] is null (service isn't running)
      * @throws [NullPointerException] If [controlConnection] is null even after checking
      * @throws [SecurityException] Unauthorized access to file/directory.
-     * @throws [IllegalArgumentException] See [io.matthewnelson.topl_core.util.WriteObserver.checkExists]
+     * @throws [IllegalArgumentException]
      */
     @Synchronized
     @Throws(
@@ -271,7 +271,7 @@ class OnionProxyManager(
     @Synchronized
     @Throws(NullPointerException::class, IOException::class)
     fun stop() {
-        if (controlConnection == null) {
+        if (!hasControlConnection) {
             broadcastLogger.notice("Stop command called but no TorControlConnection exists.")
 
             // Re-sync state if it's out of whack
@@ -280,7 +280,7 @@ class OnionProxyManager(
         }
 
         torStateMachine.setTorState(TorState.STOPPING)
-        broadcastLogger.debug("Using control port to shutdown Tor")
+        broadcastLogger.debug("Using the Control Port to shutdown Tor")
         try {
             disableNetwork(true)
             controlConnection!!.signal(TorControlCommands.SIGNAL_SHUTDOWN)
@@ -293,12 +293,12 @@ class OnionProxyManager(
             try {
                 controlConnection!!.shutdownTor(TorControlCommands.SIGNAL_HALT)
             } catch (eee: KotlinNullPointerException) {
-                torStateMachine.setTorState(TorState.ON)
                 throw NullPointerException(eee.message)
             } catch (eeee: IOException) {
                 warnControlConnectionNotResponding("shutdownTor")
-                torStateMachine.setTorState(TorState.ON)
                 throw IOException(eeee.message)
+            } finally {
+                torStateMachine.setTorState(TorState.ON)
             }
 
         } finally {
@@ -364,7 +364,7 @@ class OnionProxyManager(
     @Throws(IOException::class, KotlinNullPointerException::class)
     fun disableNetwork(disable: Boolean) {
         synchronized(disableNetworkLock) {
-            if (controlConnection == null) return
+            if (!hasControlConnection) return
 
             val networkIsSetToDisable = try {
                 isNetworkDisabled
@@ -401,7 +401,7 @@ class OnionProxyManager(
     @get:Synchronized
     private val isNetworkDisabled: Boolean
         get() {
-            if (controlConnection == null) return true
+            if (!hasControlConnection) return true
 
             val disableNetworkSettingValues = try {
                 controlConnection!!.getConf("DisableNetwork")
@@ -434,7 +434,7 @@ class OnionProxyManager(
     @get:Synchronized
     private val isBootstrapped: Boolean
         get() {
-            if (controlConnection == null) return false
+            if (!hasControlConnection) return false
 
             try {
                 val phase = controlConnection?.getInfo("status/bootstrap-phase")
@@ -459,7 +459,7 @@ class OnionProxyManager(
     @Synchronized
     @Throws(IOException::class, SecurityException::class, IllegalArgumentException::class)
     fun start() {
-        if (controlConnection != null) {
+        if (hasControlConnection) {
             broadcastLogger.notice("Start command called but TorControlConnection already exists")
 
             // Re-sync state if it's out of whack
@@ -573,13 +573,13 @@ class OnionProxyManager(
             val controlPortTokens = String(onionProxyContext.readFile(ConfigFile.CONTROL_PORT_FILE))
                 .trim { it <= ' ' }.split(":".toRegex()).toTypedArray()
             controlPort = controlPortTokens[1].toInt()
-            broadcastLogger.debug("Connecting to Control Port: $controlPort")
+            broadcastLogger.debug("Connecting to Control Port")
             controlSocket = Socket(
                 controlPortTokens[0].split("=".toRegex()).toTypedArray()[1],
                 controlPort
             )
             controlConnection = TorControlConnection(controlSocket!!)
-            broadcastLogger.debug("Successfully connected to Control Port")
+            broadcastLogger.notice("Successfully connected to Control Port: $controlPort")
         } catch (e: IOException) {
             broadcastLogger.warn("Failed to connect to Control Port.")
             throw IOException(e.message)

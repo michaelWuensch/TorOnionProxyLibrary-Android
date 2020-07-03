@@ -691,7 +691,7 @@ class TorSettingsBuilder internal constructor(
 
             br.close()
         } catch (e: Exception) {
-            e.printStackTrace()
+            broadcastLogger.warn("Failed to read bridges")
         }
         return bridges
     }
