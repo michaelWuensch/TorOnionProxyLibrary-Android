@@ -46,14 +46,11 @@ class MyEventBroadcaster: EventBroadcaster() {
     ////////////////////
     /// Log Messages ///
     ////////////////////
-    private val _liveLogMessage = MutableLiveData<String>("")
-    val liveLogMessage: LiveData<String> = _liveLogMessage
-
     override fun broadcastLogMessage(logMessage: String?) {
         if (!logMessage.isNullOrEmpty()) {
             val splitMsg = logMessage.split("|")
             if (splitMsg.size > 2) {
-                _liveLogMessage.value = "${splitMsg[0]} | ${splitMsg[1]} | ${splitMsg[2]}"
+                LogMessageAdapter.addLogMessage("${splitMsg[0]} | ${splitMsg[1]} | ${splitMsg[2]}")
             }
         }
     }

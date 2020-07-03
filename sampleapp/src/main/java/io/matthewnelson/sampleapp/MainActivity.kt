@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,15 +25,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var buttonStart: Button
     private lateinit var buttonStop: Button
 
+    private lateinit var recyclerView: RecyclerView
+
     private lateinit var textViewBandwidth: TextView
     private lateinit var textViewNetworkState: TextView
     private lateinit var textViewState: TextView
 
     private lateinit var torServicePrefs: TorServicePrefs
-
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var logMessageAdapter: LogMessageAdapter
-    private lateinit var logMessageManager: RecyclerView.LayoutManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         findViews()
         initPrefs(this)
         initButtons()
-        initRecyclerView(this)
+        initRecyclerView(this, this)
         initObservers(this)
     }
 
@@ -94,14 +93,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun initRecyclerView(context: Context) {
-        logMessageAdapter = LogMessageAdapter()
-        logMessageManager = LinearLayoutManager(context)
-        recyclerView.apply {
-            setHasFixedSize(true)
-            layoutManager = logMessageManager
-            adapter = logMessageAdapter
-        }
+    private fun initRecyclerView(context: Context, lifecycleOwner: LifecycleOwner) {
+        LogMessageAdapter(context, lifecycleOwner, recyclerView)
     }
 
     private fun initObservers(activity: MainActivity) {
@@ -109,12 +102,6 @@ class MainActivity : AppCompatActivity() {
             .liveBandwidth.observe(activity, Observer { string ->
                 if (!string.isNullOrEmpty()) {
                     textViewBandwidth.text = string
-                }
-            })
-        (TorServiceController.appEventBroadcaster as MyEventBroadcaster)
-            .liveLogMessage.observe(activity, Observer { msg ->
-                if (!msg.isNullOrEmpty()) {
-                    logMessageAdapter.addLogMessage(msg)
                 }
             })
         (TorServiceController.appEventBroadcaster as MyEventBroadcaster)
