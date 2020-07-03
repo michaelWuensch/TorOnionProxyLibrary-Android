@@ -45,7 +45,7 @@ class LogMessageAdapter(
 
         private fun removeFirstLogMessage() {
             logMessageList.removeAt(0)
-            if (liveNotifyInserted.hasActiveObservers()) {
+            if (liveNotifyRemoved.hasActiveObservers()) {
                 liveNotifyRemoved.value = liveNotifyRemoved.value != true
             }
         }
