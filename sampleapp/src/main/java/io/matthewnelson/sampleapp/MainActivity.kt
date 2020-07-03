@@ -7,11 +7,10 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyBoolean
-import io.matthewnelson.topl_service.util.TorServicePrefs
+import io.matthewnelson.topl_service.prefs.TorServicePrefs
 
 class MainActivity : AppCompatActivity() {
 
@@ -58,7 +57,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initPrefs(context: Context) {
-        torServicePrefs = TorServicePrefs(context)
+        torServicePrefs =
+            TorServicePrefs(context)
         hasDebugLogs = torServicePrefs.getBoolean(
             PrefKeyBoolean.HAS_DEBUG_LOGS, App.myTorSettings.hasDebugLogs
         )

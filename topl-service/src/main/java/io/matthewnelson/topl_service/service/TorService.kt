@@ -47,11 +47,12 @@ internal class TorService: Service() {
         }
 
         // Needed to inhibit all TorServiceController methods except for startTor()
-        // from sending working such that startService isn't called and Tor doesn't
-        // properly start up.
+        // from sending such that startService isn't called and Tor isn't properly
+        // started up.
         var isTorStarted = false
             private set
 
+        // For things that can't be saved to TorServicePrefs, such as BuildConfig.VERSION_CODE
         fun getLocalPrefs(context: Context): SharedPreferences =
             context.getSharedPreferences("TorServiceLocalPrefs", Context.MODE_PRIVATE)
     }

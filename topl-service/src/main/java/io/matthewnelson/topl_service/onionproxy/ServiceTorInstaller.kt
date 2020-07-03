@@ -7,7 +7,7 @@ import io.matthewnelson.topl_service.BuildConfig
 import io.matthewnelson.topl_service.R
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyList
-import io.matthewnelson.topl_service.util.TorServicePrefs
+import io.matthewnelson.topl_service.prefs.TorServicePrefs
 import java.io.*
 import java.util.concurrent.TimeoutException
 

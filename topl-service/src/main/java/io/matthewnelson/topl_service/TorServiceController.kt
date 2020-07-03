@@ -12,7 +12,6 @@ import androidx.core.app.NotificationCompat.NotificationVisibility
 import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
-import io.matthewnelson.topl_service.onionproxy.ServiceEventBroadcaster
 import io.matthewnelson.topl_service.util.ServiceConsts
 
 class TorServiceController private constructor(): ServiceConsts() {
@@ -22,14 +21,14 @@ class TorServiceController private constructor(): ServiceConsts() {
      * for your application. Call it in `Application.onCreate` and follow along.
      *
      * A note about the [TorSettings] you send this. Those are the default settings which
-     * [TorService] will fall back on if [io.matthewnelson.topl_service.util.TorServicePrefs]
+     * [TorService] will fall back on if [io.matthewnelson.topl_service.prefs.TorServicePrefs]
      * has nothing in it for that particular [ServiceConsts].PrefKey.
      *
      * The settings get written to the `torrc` file every time Tor is started (I plan to make
      * this less sledgehammer-ish in the future).
      *
      * To update settings while your application is running you need only to instantiate
-     * [io.matthewnelson.topl_service.util.TorServicePrefs] and save the data using the
+     * [io.matthewnelson.topl_service.prefs.TorServicePrefs] and save the data using the
      * appropriately annotated method and [ServiceConsts].PrefKey, then
      * restart Tor (for now... ;-D).
      *

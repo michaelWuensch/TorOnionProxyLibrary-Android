@@ -1,7 +1,8 @@
-package io.matthewnelson.topl_service.util
+package io.matthewnelson.topl_service.prefs
 
 import android.content.Context
 import android.content.SharedPreferences
+import io.matthewnelson.topl_service.util.ServiceConsts
 
 /**
  * This class provides a standardized way for library users to change settings used

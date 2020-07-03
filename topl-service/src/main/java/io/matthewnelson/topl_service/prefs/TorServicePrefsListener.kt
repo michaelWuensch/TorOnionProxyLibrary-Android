@@ -5,10 +5,6 @@ import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyBoolean
-import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyInt
-import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyList
-import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyString
-import io.matthewnelson.topl_service.util.TorServicePrefs
 
 /**
  * Listens to [TorServicePrefs] for changes such that while Tor is running, it can

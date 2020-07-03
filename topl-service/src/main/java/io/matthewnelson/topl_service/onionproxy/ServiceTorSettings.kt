@@ -6,8 +6,7 @@ import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyString
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyList
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyInt
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyBoolean
-import io.matthewnelson.topl_service.util.TorServicePrefs
-
+import io.matthewnelson.topl_service.prefs.TorServicePrefs
 
 /**
  * This class is for enabling the updating of settings in a standardized manner

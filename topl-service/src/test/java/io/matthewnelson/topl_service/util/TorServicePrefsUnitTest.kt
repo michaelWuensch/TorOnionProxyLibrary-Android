@@ -1,6 +1,7 @@
 package io.matthewnelson.topl_service.util
 
 import androidx.test.core.app.ApplicationProvider
+import io.matthewnelson.topl_service.prefs.TorServicePrefs
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
