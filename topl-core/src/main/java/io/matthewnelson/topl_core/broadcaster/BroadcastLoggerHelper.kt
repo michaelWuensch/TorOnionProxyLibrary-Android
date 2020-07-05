@@ -7,8 +7,9 @@ import io.matthewnelson.topl_core.util.TorInstaller
 import io.matthewnelson.topl_core_base.EventBroadcaster
 
 /**
- * Just a helper class for broadcasting/logging.
- *
+ * This class is for handling the instantiation of new [BroadcastLogger]s such that debugging
+ * can be controlled in a more efficient/effective manner. It also handles initialization of
+ * several other classes [BroadcastLogger]'s upon instantiation.
  * */
 internal class BroadcastLoggerHelper(
     private val onionProxyManager: OnionProxyManager,
@@ -20,13 +21,13 @@ internal class BroadcastLoggerHelper(
 
     init {
         onionProxyManager.onionProxyContext.initBroadcastLogger(
-            createBroadcastLogger(OnionProxyContext::class.java)
+            getBroadcastLogger(OnionProxyContext::class.java)
         )
         onionProxyManager.torInstaller.initBroadcastLogger(
-            createBroadcastLogger(TorInstaller::class.java)
+            getBroadcastLogger(TorInstaller::class.java)
         )
         onionProxyManager.eventListener.initBroadcastLogger(
-            createBroadcastLogger(BaseEventListener::class.java)
+            getBroadcastLogger(BaseEventListener::class.java)
         )
     }
 
@@ -36,32 +37,33 @@ internal class BroadcastLoggerHelper(
      * any time whether Tor's State is ON or OFF.
      * */
     fun refreshBroadcastLoggersHasDebugLogsVar() {
+        if (broadcastLoggerList.size < 1) return
         val hasDebugLogs = onionProxyManager.torSettings.hasDebugLogs
         try {
-            if (broadcastLoggerList.size > 0) {
-                broadcastLoggerList.forEach {
-                    it.updateHasDebugLogs(hasDebugLogs)
-                }
+            broadcastLoggerList.forEach {
+                it.updateHasDebugLogs(hasDebugLogs)
             }
         } catch (e: Exception) {}
     }
 
     /**
      * Helper method for instantiating a [BroadcastLogger] for your class with the values
-     * [OnionProxyManager] has been initialized with.
+     * [OnionProxyManager] has been initialized with. If one with the same [BroadcastLogger.TAG]
+     * exists in [broadcastLoggerList], that will be returned instead of creating a new one.
      *
      * @param [clazz] Class<*> - For initializing [BroadcastLogger.TAG] with your class' name.
      * */
-    fun createBroadcastLogger(clazz: Class<*>): BroadcastLogger =
-        createBroadcastLogger(clazz.simpleName)
+    fun getBroadcastLogger(clazz: Class<*>): BroadcastLogger =
+        getBroadcastLogger(clazz.simpleName)
 
     /**
      * Helper method for instantiating a [BroadcastLogger] for your class with the values
-     * [OnionProxyManager] has been initialized with.
+     * [OnionProxyManager] has been initialized with. If one with the same [BroadcastLogger.TAG]
+     * exists in [broadcastLoggerList], that will be returned instead of creating a new one.
      *
      * @param [tagName] String - For initialize [BroadcastLogger.TAG].
      * */
-    fun createBroadcastLogger(tagName: String): BroadcastLogger {
+    fun getBroadcastLogger(tagName: String): BroadcastLogger {
         var bl: BroadcastLogger? = checkIfBroadcastLoggerExists(tagName)
         if (bl == null) {
             bl = BroadcastLogger(
@@ -76,12 +78,11 @@ internal class BroadcastLoggerHelper(
     }
 
     private fun checkIfBroadcastLoggerExists(tagName: String): BroadcastLogger? {
+        if (broadcastLoggerList.size < 1) return null
         return try {
-            if (broadcastLoggerList.size > 0) {
-                broadcastLoggerList.forEach {
-                    if (it.TAG == tagName) {
-                        return it
-                    }
+            broadcastLoggerList.forEach {
+                if (it.TAG == tagName) {
+                    return it
                 }
             }
             null

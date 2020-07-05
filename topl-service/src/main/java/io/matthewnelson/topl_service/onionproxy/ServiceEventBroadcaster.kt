@@ -66,8 +66,8 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
             }
         }
 
-        torService.scopeMain.launch {
-            TorServiceController.appEventBroadcaster?.broadcastBandwidth(bytesRead, bytesWritten)
+        TorServiceController.appEventBroadcaster?.let {
+            torService.scopeMain.launch { it.broadcastBandwidth(bytesRead, bytesWritten) }
         }
     }
 
@@ -88,8 +88,8 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
     /// Debug ///
     /////////////
     override fun broadcastDebug(msg: String) {
-        torService.scopeMain.launch {
-            TorServiceController.appEventBroadcaster?.broadcastDebug(msg)
+        TorServiceController.appEventBroadcaster?.let {
+            torService.scopeMain.launch { it.broadcastDebug(msg) }
         }
     }
 
@@ -108,8 +108,8 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
             }
         }
 
-        torService.scopeMain.launch {
-            TorServiceController.appEventBroadcaster?.broadcastException(msg, e)
+        TorServiceController.appEventBroadcaster?.let {
+            torService.scopeMain.launch { it.broadcastException(msg, e) }
         }
     }
 
@@ -118,8 +118,8 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
     /// LogMessages ///
     ///////////////////
     override fun broadcastLogMessage(logMessage: String?) {
-        torService.scopeMain.launch {
-            TorServiceController.appEventBroadcaster?.broadcastLogMessage(logMessage)
+        TorServiceController.appEventBroadcaster?.let {
+            torService.scopeMain.launch { it.broadcastLogMessage(logMessage) }
         }
     }
 
@@ -161,7 +161,12 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
                         OnionProxyManager.NEWNYM_NO_NETWORK
                     }
                     else -> {
-                        msg
+                        val msgSplit = msg.split("|")
+                        if (msgSplit.size > 2) {
+                            msgSplit[2]
+                        } else {
+                            "Rate limited"
+                        }
                     }
                 }
 
@@ -171,8 +176,8 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
             displayMessageToContentText(msgToShow, 3500L)
         }
 
-        torService.scopeMain.launch {
-            TorServiceController.appEventBroadcaster?.broadcastNotice(msg)
+        TorServiceController.appEventBroadcaster?.let {
+            torService.scopeMain.launch { it.broadcastNotice(msg) }
         }
     }
 
@@ -191,11 +196,10 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
                 serviceNotification.updateContentText(
                     ServiceUtilities.getFormattedBandwidthString(bytesRead, bytesWritten)
                 )
-            } else {
-                if (isBootstrappingComplete())
-                    serviceNotification.updateContentText(
-                        ServiceUtilities.getFormattedBandwidthString(0L, 0L)
-                    )
+            } else if (isBootstrappingComplete()){
+                serviceNotification.updateContentText(
+                    ServiceUtilities.getFormattedBandwidthString(0L, 0L)
+                )
             }
         }
     }
@@ -233,8 +237,8 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
             torNetworkState = networkState
         }
 
-        torService.scopeMain.launch {
-            TorServiceController.appEventBroadcaster?.broadcastTorState(state, networkState)
+        TorServiceController.appEventBroadcaster?.let {
+            torService.scopeMain.launch { it.broadcastTorState(state, networkState) }
         }
     }
 }

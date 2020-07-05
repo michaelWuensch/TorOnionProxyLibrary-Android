@@ -20,15 +20,15 @@ class MyEventBroadcaster: EventBroadcaster() {
     val liveBandwidth: LiveData<String> = _liveBandwidth
 
     override fun broadcastBandwidth(bytesRead: String, bytesWritten: String) {
-        if (bytesRead != lastDownload || bytesWritten != lastUpload) {
-            lastDownload = bytesRead
-            lastUpload = bytesWritten
-            if (liveBandwidth.hasActiveObservers()) {
-                _liveBandwidth.value = ServiceUtilities.getFormattedBandwidthString(
-                    bytesRead.toLong(), bytesWritten.toLong()
-                )
-            }
-        }
+        if (bytesRead == lastDownload && bytesWritten == lastUpload) return
+
+        lastDownload = bytesRead
+        lastUpload = bytesWritten
+        if (!liveBandwidth.hasActiveObservers()) return
+
+        _liveBandwidth.value = ServiceUtilities.getFormattedBandwidthString(
+            bytesRead.toLong(), bytesWritten.toLong()
+        )
     }
 
     override fun broadcastDebug(msg: String) {
@@ -36,26 +36,26 @@ class MyEventBroadcaster: EventBroadcaster() {
     }
 
     override fun broadcastException(msg: String?, e: Exception) {
-        if (!msg.isNullOrEmpty()) {
-            broadcastLogMessage(msg)
-            e.printStackTrace()
-        }
+        if (msg.isNullOrEmpty()) return
+
+        broadcastLogMessage(msg)
+        e.printStackTrace()
     }
 
 
     ////////////////////
     /// Log Messages ///
     ////////////////////
-    private val _liveLogMessage = MutableLiveData<String>("")
-    val liveLogMessage: LiveData<String> = _liveLogMessage
-
     override fun broadcastLogMessage(logMessage: String?) {
-        if (!logMessage.isNullOrEmpty()) {
-            val splitMsg = logMessage.split("|")
-            if (splitMsg.size > 2) {
-                _liveLogMessage.value = "${splitMsg[0]} | ${splitMsg[1]} | ${splitMsg[2]}"
-            }
-        }
+        if (logMessage.isNullOrEmpty()) return
+
+        val splitMsg = logMessage.split("|")
+        if (splitMsg.size < 3) return
+
+        LogMessageAdapter.addLogMessageNotifyAndCurate(
+            "${splitMsg[0]} | ${splitMsg[1]} | ${splitMsg[2]}"
+        )
+
     }
 
     override fun broadcastNotice(msg: String) {
@@ -77,10 +77,10 @@ class MyEventBroadcaster: EventBroadcaster() {
     val liveTorState: LiveData<TorStateData> = _liveTorState
 
     override fun broadcastTorState(@TorState state: String, @TorNetworkState networkState: String) {
-        if (state != lastState || networkState != lastNetworkState) {
-            lastState = state
-            lastNetworkState = networkState
-            _liveTorState.value = TorStateData(state, networkState)
-        }
+        if (state == lastState && networkState == lastNetworkState) return
+
+        lastState = state
+        lastNetworkState = networkState
+        _liveTorState.value = TorStateData(state, networkState)
     }
 }

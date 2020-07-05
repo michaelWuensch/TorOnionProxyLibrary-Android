@@ -16,7 +16,7 @@ import io.matthewnelson.topl_core_base.TorSettings
  * Library is causing problems in your App you need only set [TorSettings.hasDebugLogs] to
  * `true` for a Debug build of your App.
  *
- * See helper method [io.matthewnelson.topl_core.OnionProxyManager.createBroadcastLogger] to
+ * See helper method [io.matthewnelson.topl_core.OnionProxyManager.getBroadcastLogger] to
  * instantiate.
  *
  * @param [TAG] Typically, the class name, but able to be set to whatever you wish
@@ -49,40 +49,35 @@ class BroadcastLogger internal constructor(
      * Will only broadcast if [hasDebugLogs] is on.
      * */
     fun debug(msg: String) {
-        if (hasDebugLogs) {
-            eventBroadcaster.broadcastDebug("${BroadcastType.DEBUG}|$TAG|$msg")
-            if (buildConfigDebug) {
-                Log.d(TAG, msg)
-            }
-        }
+        if (!hasDebugLogs) return
+        eventBroadcaster.broadcastDebug("${BroadcastType.DEBUG}|$TAG|$msg")
+        if (!buildConfigDebug) return
+        Log.d(TAG, msg)
     }
 
     fun exception(e: Exception) {
-        if (toLogcat()) {
-            Log.e(TAG, e.message, e)
-        }
         eventBroadcaster.broadcastException("${BroadcastType.EXCEPTION}|$TAG|${e.message}", e)
+        if (!toLogcat()) return
+        Log.e(TAG, e.message, e)
+
     }
 
     fun notice(msg: String) {
-        if (toLogcat()) {
-            Log.i(TAG, msg)
-        }
         eventBroadcaster.broadcastNotice("${BroadcastType.NOTICE}|$TAG|$msg")
+        if (!toLogcat()) return
+        Log.i(TAG, msg)
     }
 
     fun warn(msg: String) {
-        if (toLogcat()) {
-            Log.w(TAG, msg)
-        }
         eventBroadcaster.broadcastNotice("${BroadcastType.WARN}|$TAG|$msg")
+        if (!toLogcat()) return
+        Log.w(TAG, msg)
     }
 
     fun error(msg: String) {
-        if (toLogcat()) {
-            Log.e(TAG, msg)
-        }
         eventBroadcaster.broadcastNotice("${BroadcastType.ERROR}|$TAG|$msg")
+        if (!toLogcat()) return
+        Log.e(TAG, msg)
     }
 
     fun torState(@TorState state: String, @TorNetworkState networkState: String) {
