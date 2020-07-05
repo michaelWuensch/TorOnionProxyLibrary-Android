@@ -41,7 +41,7 @@ class TorServiceController private constructor(): ServiceConsts() {
      * [TorService.initTOPLCore].
      *
      * @param [application] [Application], for obtaining context.
-     * @param [buildConfigVersion] send [BuildConfig.VERSION_CODE]. Mitigates copying of geoip
+     * @param [buildConfigVersionCode] send [BuildConfig.VERSION_CODE]. Mitigates copying of geoip
      *   files to app updates only.
      * @param [torSettings] [TorSettings] used to create your torrc file on start of Tor.
      * @param [geoipAssetPath] The path to where you have your geoip file located (ex: in
@@ -53,7 +53,7 @@ class TorServiceController private constructor(): ServiceConsts() {
      * */
     class Builder(
         private val application: Application,
-        private val buildConfigVersion: Int,
+        private val buildConfigVersionCode: Int,
         private val torSettings: TorSettings,
         private val geoipAssetPath: String,
         private val geoip6AssetPath: String
@@ -362,7 +362,7 @@ class TorServiceController private constructor(): ServiceConsts() {
             TorService.initialize(
                 torConfigFiles,
                 torSettings,
-                buildConfigVersion,
+                buildConfigVersionCode,
                 buildConfigDebug,
                 geoipAssetPath,
                 geoip6AssetPath
@@ -410,8 +410,8 @@ class TorServiceController private constructor(): ServiceConsts() {
          *  - Calling [startTor]
          * */
         fun stopTor() {
-            if (TorService.isTorStarted)
-                sendAction(ServiceAction.ACTION_STOP)
+            if (!TorService.isTorStarted) return
+            sendAction(ServiceAction.ACTION_STOP)
         }
 
         /**
@@ -421,8 +421,8 @@ class TorServiceController private constructor(): ServiceConsts() {
          *  - Calling [startTor]
          * */
         fun restartTor() {
-            if (TorService.isTorStarted)
-                sendAction(ServiceAction.ACTION_RESTART)
+            if (!TorService.isTorStarted) return
+            sendAction(ServiceAction.ACTION_RESTART)
         }
 
         /**
@@ -432,8 +432,8 @@ class TorServiceController private constructor(): ServiceConsts() {
          *  - Calling [startTor]
          * */
         fun newIdentity() {
-            if (TorService.isTorStarted)
-                sendAction(ServiceAction.ACTION_NEW_ID)
+            if (!TorService.isTorStarted) return
+            sendAction(ServiceAction.ACTION_NEW_ID)
         }
     }
 }
