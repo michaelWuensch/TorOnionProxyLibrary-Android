@@ -1,13 +1,10 @@
 package io.matthewnelson.sampleapp
 
-import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.RecyclerView
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyBoolean
 import io.matthewnelson.topl_service.prefs.TorServicePrefs
@@ -33,8 +30,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        torServicePrefs = TorServicePrefs(this)
+        hasDebugLogs = torServicePrefs.getBoolean(
+            PrefKeyBoolean.HAS_DEBUG_LOGS, App.myTorSettings.hasDebugLogs
+        )
         findViews()
-        initPrefs(this)
         initButtons()
         LogMessageAdapter(this)
         initObservers(this)
@@ -50,14 +50,6 @@ class MainActivity : AppCompatActivity() {
         textViewBandwidth = findViewById(R.id.text_view_bandwidth)
         textViewNetworkState = findViewById(R.id.text_view_tor_network_state)
         textViewState = findViewById(R.id.text_view_tor_state)
-    }
-
-    private fun initPrefs(context: Context) {
-        torServicePrefs =
-            TorServicePrefs(context)
-        hasDebugLogs = torServicePrefs.getBoolean(
-            PrefKeyBoolean.HAS_DEBUG_LOGS, App.myTorSettings.hasDebugLogs
-        )
     }
 
     private fun initButtons() {
@@ -90,18 +82,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initObservers(activity: MainActivity) {
-        (TorServiceController.appEventBroadcaster as MyEventBroadcaster)
-            .liveBandwidth.observe(activity, Observer { string ->
-                if (!string.isNullOrEmpty()) {
-                    textViewBandwidth.text = string
-                }
+        TorServiceController.appEventBroadcaster?.let {
+            (it as MyEventBroadcaster).liveBandwidth.observe(activity, Observer { string ->
+                if (string.isNullOrEmpty()) return@Observer
+                textViewBandwidth.text = string
             })
-        (TorServiceController.appEventBroadcaster as MyEventBroadcaster)
-            .liveTorState.observe(activity, Observer { data ->
-                if (data != null) {
-                    textViewState.text = data.state
-                    textViewNetworkState.text = data.networkState
-                }
+        }
+        TorServiceController.appEventBroadcaster?.let {
+            (it as MyEventBroadcaster).liveTorState.observe(activity, Observer { data ->
+                if (data == null) return@Observer
+                textViewState.text = data.state
+                textViewNetworkState.text = data.networkState
             })
+        }
     }
 }
