@@ -106,7 +106,7 @@ internal class ServiceNotification(
     //////////////////////////
     /**
      * Called at [TorService.onCreate] and sets the [notificationBuilder] variable such that
-     * it can be re-used/updated throughout the lifecycle of the service.
+     * it can be re-used/updated throughout the life of [TorService].
      * */
     fun startForegroundNotification(torService: TorService) {
         val builder = buildInitialNotification(torService, TorState.OFF)
@@ -159,9 +159,6 @@ internal class ServiceNotification(
     ///////////////
     /// Actions ///
     ///////////////
-    var actionsPresent = false
-        private set
-
     @Synchronized
     fun addActions(torService: TorService) {
         val builder = notificationBuilder
@@ -184,8 +181,6 @@ internal class ServiceNotification(
                 "Stop Tor",
                 getActionPendingIntent(torService, ServiceAction.ACTION_STOP)
             )
-
-        actionsPresent = true
         notify(builder)
     }
 
@@ -207,7 +202,6 @@ internal class ServiceNotification(
     @Synchronized
     fun removeActions(torService: TorService, @TorState state: String) {
         val builder = buildInitialNotification(torService, state)
-        actionsPresent = false
         notify(builder)
     }
 
