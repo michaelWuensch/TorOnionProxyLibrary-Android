@@ -24,8 +24,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var buttonStart: Button
     private lateinit var buttonStop: Button
 
-    private lateinit var recyclerView: RecyclerView
-
     private lateinit var textViewBandwidth: TextView
     private lateinit var textViewNetworkState: TextView
     private lateinit var textViewState: TextView
@@ -38,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         findViews()
         initPrefs(this)
         initButtons()
-        initRecyclerView(this, this)
+        LogMessageAdapter(this)
         initObservers(this)
     }
 
@@ -48,8 +46,6 @@ class MainActivity : AppCompatActivity() {
         buttonRestart = findViewById(R.id.button_restart)
         buttonStart = findViewById(R.id.button_start)
         buttonStop = findViewById(R.id.button_stop)
-
-        recyclerView = findViewById(R.id.recycler_view_log_messages)
 
         textViewBandwidth = findViewById(R.id.text_view_bandwidth)
         textViewNetworkState = findViewById(R.id.text_view_tor_network_state)
@@ -91,10 +87,6 @@ class MainActivity : AppCompatActivity() {
         } else {
             getString(R.string.button_debugging_enable)
         }
-    }
-
-    private fun initRecyclerView(context: Context, lifecycleOwner: LifecycleOwner) {
-        LogMessageAdapter(context, lifecycleOwner, recyclerView)
     }
 
     private fun initObservers(activity: MainActivity) {

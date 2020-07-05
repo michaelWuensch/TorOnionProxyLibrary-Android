@@ -1,10 +1,8 @@
 package io.matthewnelson.sampleapp
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -12,9 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 class LogMessageAdapter(
-    context: Context,
-    lifecycleOwner: LifecycleOwner,
-    recyclerView: RecyclerView
+    activity: MainActivity
 ): RecyclerView.Adapter<LogMessageAdapter.LogMessageHolder>(){
 
     companion object {
@@ -52,19 +48,19 @@ class LogMessageAdapter(
     }
 
     init {
-        recyclerView.apply {
+        activity.findViewById<RecyclerView>(R.id.recycler_view_log_messages).apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
             adapter = this@LogMessageAdapter
         }
 
-        observeLiveNotifyInserted().observe(lifecycleOwner, Observer {
+        observeLiveNotifyInserted().observe(activity, Observer {
             if (it != null) {
                 this.notifyItemInserted(logMessageList.size - 1)
             }
         })
 
-        observeLiveNotifyRemoved().observe(lifecycleOwner, Observer {
+        observeLiveNotifyRemoved().observe(activity, Observer {
             if (it != null) {
                 this.notifyItemRemoved(0)
             }
