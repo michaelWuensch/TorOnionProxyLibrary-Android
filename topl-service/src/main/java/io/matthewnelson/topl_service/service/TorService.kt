@@ -68,7 +68,7 @@ internal class TorService: Service() {
         super.onCreate()
         ServiceNotification.get().startForegroundNotification(this)
         initTOPLCore(this)
-        broadcastLogger = onionProxyManager.createBroadcastLogger(TorService::class.java)
+        broadcastLogger = onionProxyManager.getBroadcastLogger(TorService::class.java)
         broadcastLogger.notice("BuildConfig.DEBUG set to: $buildConfigDebug")
         torServicePrefsListener = TorServicePrefsListener(this, onionProxyManager)
     }

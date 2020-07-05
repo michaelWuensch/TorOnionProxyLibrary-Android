@@ -93,9 +93,9 @@ class OnionProxyManager(
     private val logHelper =
         BroadcastLoggerHelper(this, eventBroadcaster, buildConfigDebug ?: BuildConfig.DEBUG)
     private val broadcastLogger =
-        createBroadcastLogger(OnionProxyManager::class.java)
+        getBroadcastLogger(OnionProxyManager::class.java)
     val torStateMachine =
-        TorStateMachine(createBroadcastLogger(TorStateMachine::class.java))
+        TorStateMachine(getBroadcastLogger(TorStateMachine::class.java))
 
     /**
      * See [BroadcastLoggerHelper.refreshBroadcastLoggersHasDebugLogsVar]
@@ -104,20 +104,20 @@ class OnionProxyManager(
         logHelper.refreshBroadcastLoggersHasDebugLogsVar()
 
     /**
-     * See [BroadcastLoggerHelper.createBroadcastLogger]
+     * See [BroadcastLoggerHelper.getBroadcastLogger]
      *
      * @param [clazz] Class<*> - For initializing [BroadcastLogger.TAG] with your class' name.
      * */
-    fun createBroadcastLogger(clazz: Class<*>): BroadcastLogger =
-        logHelper.createBroadcastLogger(clazz)
+    fun getBroadcastLogger(clazz: Class<*>): BroadcastLogger =
+        logHelper.getBroadcastLogger(clazz)
 
     /**
-     * See [BroadcastLoggerHelper.createBroadcastLogger]
+     * See [BroadcastLoggerHelper.getBroadcastLogger]
      *
      * @param [tagName] String - For initializing [BroadcastLogger.TAG].
      * */
-    fun createBroadcastLogger(tagName: String): BroadcastLogger =
-        logHelper.createBroadcastLogger(tagName)
+    fun getBroadcastLogger(tagName: String): BroadcastLogger =
+        logHelper.getBroadcastLogger(tagName)
 
     init {
         try {
@@ -146,7 +146,7 @@ class OnionProxyManager(
         broadcastLogger.debug("Generating a new SettingsBuilder")
         return TorSettingsBuilder(
             onionProxyContext,
-            createBroadcastLogger(TorSettingsBuilder::class.java)
+            getBroadcastLogger(TorSettingsBuilder::class.java)
         )
     }
 

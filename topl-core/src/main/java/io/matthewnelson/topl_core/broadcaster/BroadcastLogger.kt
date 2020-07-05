@@ -16,7 +16,7 @@ import io.matthewnelson.topl_core_base.TorSettings
  * Library is causing problems in your App you need only set [TorSettings.hasDebugLogs] to
  * `true` for a Debug build of your App.
  *
- * See helper method [io.matthewnelson.topl_core.OnionProxyManager.createBroadcastLogger] to
+ * See helper method [io.matthewnelson.topl_core.OnionProxyManager.getBroadcastLogger] to
  * instantiate.
  *
  * @param [TAG] Typically, the class name, but able to be set to whatever you wish

@@ -21,7 +21,7 @@ internal class TorServicePrefsListener(
 
     private val torServicePrefs = TorServicePrefs(torService)
     private val broadcastLogger: BroadcastLogger =
-        onionProxyManager.createBroadcastLogger(TorServicePrefsListener::class.java)
+        onionProxyManager.getBroadcastLogger(TorServicePrefsListener::class.java)
 
 
     // Register itself immediately upon instantiation.
