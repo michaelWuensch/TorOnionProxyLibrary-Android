@@ -50,7 +50,7 @@ class MyEventBroadcaster: EventBroadcaster() {
         if (!logMessage.isNullOrEmpty()) {
             val splitMsg = logMessage.split("|")
             if (splitMsg.size > 2) {
-                LogMessageAdapter.addLogMessage("${splitMsg[0]} | ${splitMsg[1]} | ${splitMsg[2]}")
+                LogMessageAdapter.addLogMessageNotifyAndCurate("${splitMsg[0]} | ${splitMsg[1]} | ${splitMsg[2]}")
             }
         }
     }

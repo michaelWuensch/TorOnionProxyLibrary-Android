@@ -33,7 +33,7 @@ class LogMessageAdapter(
             return liveNotifyRemoved
         }
 
-        fun addLogMessage(msg: String) {
+        fun addLogMessageNotifyAndCurate(msg: String) {
             logMessageList.add(msg)
             if (liveNotifyInserted.hasActiveObservers()) {
                 liveNotifyInserted.value = liveNotifyInserted.value != true
