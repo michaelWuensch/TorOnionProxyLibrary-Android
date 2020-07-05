@@ -41,9 +41,9 @@ class LogMessageAdapter(
 
         private fun removeFirstLogMessageAndNotify() {
             logMessageList.removeAt(0)
-            if (liveNotifyRemoved.hasActiveObservers()) {
-                liveNotifyRemoved.value = liveNotifyRemoved.value != true
-            }
+
+            if (!liveNotifyRemoved.hasActiveObservers()) return
+            liveNotifyRemoved.value = liveNotifyRemoved.value != true
         }
     }
 
@@ -55,15 +55,13 @@ class LogMessageAdapter(
         }
 
         observeLiveNotifyInserted().observe(activity, Observer {
-            if (it != null) {
-                this.notifyItemInserted(logMessageList.size - 1)
-            }
+            if (it == null) return@Observer
+            this.notifyItemInserted(logMessageList.size - 1)
         })
 
         observeLiveNotifyRemoved().observe(activity, Observer {
-            if (it != null) {
-                this.notifyItemRemoved(0)
-            }
+            if (it == null) return@Observer
+            this.notifyItemRemoved(0)
         })
     }
 
