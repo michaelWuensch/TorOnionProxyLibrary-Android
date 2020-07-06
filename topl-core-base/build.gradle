@@ -37,11 +37,12 @@ android {
 
 dokka {
     configuration {
+        moduleName = 'topl-core-base'
         reportUndocumented = false
         includeNonPublic = false
         skipEmptyPackages = true
         samples = [
-                "$rootDir/sampleapp/samplecode/SampleCode.kt".toString()
+                "$rootDir/sampleapp/src/main/java/io/matthewnelson/sampleapp/samplecode/SampleCode.kt".toString()
         ]
         sourceLink {
             url = "https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/"
