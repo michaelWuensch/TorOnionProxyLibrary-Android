@@ -43,7 +43,13 @@ dokka {
         samples = [
                 "$rootDir/sampleapp/samplecode/SampleCode.kt".toString()
         ]
+        sourceLink {
+            url = "https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/"
+            lineSuffix = "#L"
+        }
     }
+    outputFormat = 'gfm'
+    outputDirectory = "$rootDir/docs/"
 }
 
 dependencies {

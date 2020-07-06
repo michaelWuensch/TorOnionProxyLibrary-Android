@@ -44,7 +44,13 @@ dokka {
                 "$rootDir/topl-service/service/TorService.kt".toString(),
                 "$rootDir/topl-service/service/onionproxy/ServiceTorInstaller.kt".toString()
         ]
+        sourceLink {
+            url = "https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/"
+            lineSuffix = "#L"
+        }
     }
+    outputFormat = 'gfm'
+    outputDirectory = "$rootDir/docs/"
 }
 
 dependencies {
