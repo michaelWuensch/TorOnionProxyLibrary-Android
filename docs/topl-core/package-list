@@ -1,0 +1,8 @@
+$dokka.format:gfm
+$dokka.linkExtension:md
+
+io.matthewnelson.topl_core
+io.matthewnelson.topl_core.broadcaster
+io.matthewnelson.topl_core.listener
+io.matthewnelson.topl_core.settings
+io.matthewnelson.topl_core.util
