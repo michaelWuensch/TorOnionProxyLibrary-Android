@@ -57,8 +57,6 @@ package io.matthewnelson.topl_core_base
  *
  * Would **highly recommend** reading up on what's what:
  *  - See <a href="https://2019.www.torproject.org/docs/tor-manual.html.en" target="_blank">docs</a>
- *
- * @sample [io.matthewnelson.sampleapp.MyTorSettings]
  * */
 abstract class TorSettings: BaseConsts() {
 

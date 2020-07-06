@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'org.jetbrains.dokka'
 
 android {
     compileSdkVersion versions.compileSdk
@@ -31,6 +32,18 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8
+    }
+}
+
+dokka {
+    configuration {
+        reportUndocumented = false
+        includeNonPublic = false
+        skipEmptyPackages = true
+        samples = [
+                "$rootDir/topl-service/service/TorService.kt".toString(),
+                "$rootDir/topl-service/service/onionproxy/ServiceTorInstaller.kt".toString()
+        ]
     }
 }
 
