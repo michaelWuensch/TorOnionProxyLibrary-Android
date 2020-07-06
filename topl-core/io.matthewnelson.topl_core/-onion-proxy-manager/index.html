@@ -470,14 +470,14 @@ implications of this.</p>
 
 <h3 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h3>
 <p><code>context</code> - Context.</p>
-<p><code>torConfigFiles</code> - <a href="file:/home/matthew/AndroidStudioProjects/personal_projects/TorOnionProxyLibrary-Android/docs/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md">TorConfigFiles</a> For setting up <a href="#">OnionProxyContext</a></p>
+<p><code>torConfigFiles</code> - <a href="#">TorConfigFiles</a> For setting up <a href="#">OnionProxyContext</a></p>
 <p><code>torInstaller</code> - <a href="../../io.matthewnelson.topl_core.util/-tor-installer/">TorInstaller</a> For setting up <a href="#">OnionProxyContext</a></p>
-<p><code>torSettings</code> - <a href="file:/home/matthew/AndroidStudioProjects/personal_projects/TorOnionProxyLibrary-Android/docs/topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md">TorSettings</a> For setting up <a href="#">OnionProxyContext</a></p>
+<p><code>torSettings</code> - <a href="#">TorSettings</a> For setting up <a href="#">OnionProxyContext</a></p>
 <p><code>eventListener</code> - <a href="../../io.matthewnelson.topl_core.listener/-base-event-listener/">BaseEventListener</a> For processing Tor OP messages.</p>
-<p><code>eventBroadcaster</code> - Your own broadcaster which extends <a href="file:/home/matthew/AndroidStudioProjects/personal_projects/TorOnionProxyLibrary-Android/docs/topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md">EventBroadcaster</a></p>
+<p><code>eventBroadcaster</code> - Your own broadcaster which extends <a href="#">EventBroadcaster</a></p>
 <p><code>buildConfigDebug</code> - Send <a href="#">BuildConfig.DEBUG</a> which will show Logcat messages for this
 module on Debug builds of your Application. If <code>null</code>, all the messages will still be
-broadcast to the provided <a href="file:/home/matthew/AndroidStudioProjects/personal_projects/TorOnionProxyLibrary-Android/docs/topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md">EventBroadcaster</a> and you can handle them there how you&rsquo;d like.</p>
+broadcast to the provided <a href="#">EventBroadcaster</a> and you can handle them there how you&rsquo;d like.</p>
 <h3 id="constructors">Constructors<a class="headerlink" href="#constructors" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -489,7 +489,7 @@ broadcast to the provided <a href="file:/home/matthew/AndroidStudioProjects/pers
 <tbody>
 <tr>
 <td><a href="-init-/">&lt;init&gt;</a></td>
-<td>This is where all the fun is, this is the class which acts as a gateway into the <code>topl-core</code> module, and ensures synchronicity is had.<code>OnionProxyManager(context:</code><a href="https://developer.android.com/reference/android/content/Context.html"><code>Context</code></a><code>, torConfigFiles:</code><a href="file:/home/matthew/AndroidStudioProjects/personal_projects/TorOnionProxyLibrary-Android/docs/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md"><code>TorConfigFiles</code></a><code>, torInstaller:</code><a href="../../io.matthewnelson.topl_core.util/-tor-installer/"><code>TorInstaller</code></a><code>, torSettings:</code><a href="file:/home/matthew/AndroidStudioProjects/personal_projects/TorOnionProxyLibrary-Android/docs/topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md"><code>TorSettings</code></a><code>, eventListener:</code><a href="../../io.matthewnelson.topl_core.listener/-base-event-listener/"><code>BaseEventListener</code></a><code>, eventBroadcaster:</code><a href="file:/home/matthew/AndroidStudioProjects/personal_projects/TorOnionProxyLibrary-Android/docs/topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md"><code>EventBroadcaster</code></a><code>, buildConfigDebug:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a><code>? = null)</code></td>
+<td>This is where all the fun is, this is the class which acts as a gateway into the <code>topl-core</code> module, and ensures synchronicity is had.<code>OnionProxyManager(context:</code><a href="https://developer.android.com/reference/android/content/Context.html"><code>Context</code></a><code>, torConfigFiles: TorConfigFiles, torInstaller:</code><a href="../../io.matthewnelson.topl_core.util/-tor-installer/"><code>TorInstaller</code></a><code>, torSettings: TorSettings, eventListener:</code><a href="../../io.matthewnelson.topl_core.listener/-base-event-listener/"><code>BaseEventListener</code></a><code>, eventBroadcaster: EventBroadcaster, buildConfigDebug:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a><code>? = null)</code></td>
 </tr>
 </tbody>
 </table>
@@ -528,7 +528,7 @@ broadcast to the provided <a href="file:/home/matthew/AndroidStudioProjects/pers
 </tr>
 <tr>
 <td><a href="tor-config-files/">torConfigFiles</a></td>
-<td><code>val torConfigFiles:</code><a href="file:/home/matthew/AndroidStudioProjects/personal_projects/TorOnionProxyLibrary-Android/docs/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md"><code>TorConfigFiles</code></a></td>
+<td><code>val torConfigFiles: TorConfigFiles</code></td>
 </tr>
 <tr>
 <td><a href="tor-installer/">torInstaller</a></td>
@@ -540,7 +540,7 @@ broadcast to the provided <a href="file:/home/matthew/AndroidStudioProjects/pers
 </tr>
 <tr>
 <td><a href="tor-settings/">torSettings</a></td>
-<td><code>val torSettings:</code><a href="file:/home/matthew/AndroidStudioProjects/personal_projects/TorOnionProxyLibrary-Android/docs/topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md"><code>TorSettings</code></a></td>
+<td><code>val torSettings: TorSettings</code></td>
 </tr>
 <tr>
 <td><a href="tor-state-machine/">torStateMachine</a></td>
