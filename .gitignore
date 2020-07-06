@@ -24,3 +24,7 @@ proguard/
 
 # intellij
 .idea/
+
+# Mkdocs
+site/
+Pipfile

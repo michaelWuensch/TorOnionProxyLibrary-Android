@@ -44,9 +44,16 @@ class TorServicePrefs(context: Context): ServiceConsts() {
     /////////////////
     /// Listeners ///
     /////////////////
+    /**
+     * Registers a [SharedPreferences.OnSharedPreferenceChangeListener] for the
+     * associated SharedPreference
+     * */
     fun registerListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) =
         prefs.registerOnSharedPreferenceChangeListener(listener)
-
+    /**
+     * Unregisters a [SharedPreferences.OnSharedPreferenceChangeListener] for the
+     * associated SharedPreference
+     * */
     fun unregisterListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) =
         prefs.unregisterOnSharedPreferenceChangeListener(listener)
 
@@ -54,13 +61,43 @@ class TorServicePrefs(context: Context): ServiceConsts() {
     /////////////
     /// Query ///
     /////////////
+    /**
+     * Checks if the SharedPreference contains a value for the supplied [prefsKey].
+     * Accepts the following annotation type String values:
+     *  - [ServiceConsts.PrefKeyBoolean]
+     *  - [ServiceConsts.PrefKeyInt]
+     *  - [ServiceConsts.PrefKeyList]
+     *  - [ServiceConsts.PrefKeyString]
+     *
+     *  @param [prefsKey] String of type ServiceConsts.PrefKey*
+     *  @return True if the SharedPreference contains a value for the associated
+     *   [prefsKey], false if not
+     *  * */
     fun contains(@PrefKeyBoolean @PrefKeyInt @PrefKeyList @PrefKeyString prefsKey: String): Boolean =
         prefs.contains(prefsKey)
 
+    /**
+     * Returns a Boolean value for the provided [ServiceConsts.PrefKeyBoolean]. If no
+     * value is stored in the SharedPreference, [defValue] will be returned.
+     *
+     * @param [booleanKey] String of type [ServiceConsts.PrefKeyBoolean]
+     * @param [defValue] Use the [io.matthewnelson.topl_core_base.TorSettings] value
+     *  associated with the [booleanKey].
+     * @return The Boolean value associated with the [booleanKey], otherwise [defValue]
+     * */
     fun getBoolean(@PrefKeyBoolean booleanKey: String, defValue: Boolean): Boolean {
         return prefs.getBoolean(booleanKey, defValue)
     }
 
+    /**
+     * Returns an Int value for the provided [ServiceConsts.PrefKeyInt]. If no
+     * value is stored in the SharedPreference, [defValue] will be returned.
+     *
+     * @param [intKey] String of type [ServiceConsts.PrefKeyInt]
+     * @param [defValue] Use the [io.matthewnelson.topl_core_base.TorSettings] value
+     *  associated with the [intKey].
+     * @return The Int value associated with [intKey], otherwise [defValue]
+     * */
     fun getInt(@PrefKeyInt intKey: String, defValue: Int?): Int? {
         val value = prefs.getInt(intKey, defValue ?: NULL_INT_VALUE)
         return if (value == NULL_INT_VALUE) {
@@ -70,6 +107,15 @@ class TorServicePrefs(context: Context): ServiceConsts() {
         }
     }
 
+    /**
+     * Returns a List of Strings for the provided [ServiceConsts.PrefKeyList]. If no
+     * value is stored in the SharedPreference, [defValue] will be returned.
+     *
+     * @param [listKey] String of type [ServiceConsts.PrefKeyList]
+     * @param [defValue] Use the [io.matthewnelson.topl_core_base.TorSettings] value
+     *  associated with the [listKey].
+     * @return The List of Strings associated with the [listKey], otherwise [defValue]
+     * */
     fun getList(@PrefKeyList listKey: String, defValue: List<String>): List<String> {
         val csv: String = prefs.getString(listKey, defValue.joinToString()) ?: defValue.joinToString()
         return if (csv.trim().isEmpty()) {
@@ -79,6 +125,15 @@ class TorServicePrefs(context: Context): ServiceConsts() {
         }
     }
 
+    /**
+     * Returns a String value for the provided [ServiceConsts.PrefKeyString]. If no
+     * value is stored in the SharedPreference, [defValue] will be returned.
+     *
+     * @param [stringKey] String of type [ServiceConsts.PrefKeyString]
+     * @param [defValue] Use the [io.matthewnelson.topl_core_base.TorSettings] value
+     *  associated with the [stringKey].
+     * @return The String value associated with [stringKey], otherwise [defValue]
+     * */
     fun getString(@PrefKeyString stringKey: String, defValue: String?): String? {
         val value = prefs.getString(stringKey, defValue ?: NULL_STRING_VALUE)
         return if (value == NULL_STRING_VALUE) {
@@ -92,30 +147,65 @@ class TorServicePrefs(context: Context): ServiceConsts() {
     //////////////
     /// Modify ///
     //////////////
+    /**
+     * Removes from the SharedPreference the value associated with [prefsKey] if there is one.
+     * Accepts the following annotation type String values:
+     *  - [ServiceConsts.PrefKeyBoolean]
+     *  - [ServiceConsts.PrefKeyInt]
+     *  - [ServiceConsts.PrefKeyList]
+     *  - [ServiceConsts.PrefKeyString]
+     *
+     *  @param [prefsKey] String of type ServiceConsts.PrefKey*
+     *  * */
     fun remove(@PrefKeyBoolean @PrefKeyInt @PrefKeyList @PrefKeyString prefsKey: String) {
         val editor = prefs.edit().remove(prefsKey)
         if (!editor.commit())
             editor.apply()
     }
 
+    /**
+     * Inserts a Boolean value into the SharedPreference for the supplied [booleanKey].
+     *
+     * @param [booleanKey] String of type [ServiceConsts.PrefKeyBoolean]
+     * @param [value] Your Boolean value
+     * */
     fun putBoolean(@PrefKeyBoolean booleanKey: String, value: Boolean) {
         val editor = prefs.edit().putBoolean(booleanKey, value)
         if (!editor.commit())
             editor.apply()
     }
 
+    /**
+     * Inserts an Int value into the SharedPreference for the supplied [intKey].
+     *
+     * @param [intKey] String of type [ServiceConsts.PrefKeyInt]
+     * @param [value] Your Int? value
+     * */
     fun putInt(@PrefKeyInt intKey: String, value: Int?) {
         val editor = prefs.edit().putInt(intKey, value ?: NULL_INT_VALUE)
         if (!editor.commit())
             editor.apply()
     }
 
+    /**
+     * Inserts a List of Strings as a comma separated String into the SharedPreference
+     * for the supplied [listKey].
+     *
+     * @param [listKey] String of type [ServiceConsts.PrefKeyList]
+     * @param [value] Your List<String> value
+     * */
     fun putList(@PrefKeyList listKey: String, value: List<String>) {
         val editor = prefs.edit().putString(listKey, value.joinToString())
         if (!editor.commit())
             editor.apply()
     }
 
+    /**
+     * Inserts a String value into the SharedPreference for the supplied [stringKey].
+     *
+     * @param [stringKey] String of type [ServiceConsts.PrefKeyString]
+     * @param [value] Your String value
+     * */
     fun putString(@PrefKeyString stringKey: String, value: String?) {
         val editor = prefs.edit().putString(stringKey, value ?: NULL_STRING_VALUE)
         if (!editor.commit())

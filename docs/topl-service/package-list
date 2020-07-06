@@ -1,0 +1,6 @@
+$dokka.format:gfm
+$dokka.linkExtension:md
+
+io.matthewnelson.topl_service
+io.matthewnelson.topl_service.prefs
+io.matthewnelson.topl_service.util
