@@ -11,14 +11,14 @@ Get Started
    
  - TODO: geoip files and binaries
  
- - Create a new class which extends [TorSettings](topl-core-base/io.matthewnelson.topl_core_base/-tor-settings)
+ - Create a new class which extends [TorSettings](./topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md)
    and apply your own default settings.
    
  - In your Application class' `onCreate` implement, and customize as desired, the
-   [TorServiceController.Builder](topl-service/io.matthewnelson.topl_service/-tor-service-controller/-builder/index.md)
+   [TorServiceController.Builder](./topl-service/io.matthewnelson.topl_service/-tor-service-controller/-builder/index.md)
    
  - Call APIs provided from
-   [TorServiceController.Companion](topl-service/io.matthewnelson.topl_service/-tor-service-controller/index.md)
+   [TorServiceController.Companion](./topl-service/io.matthewnelson.topl_service/-tor-service-controller/index.md)
  
 ## Using the SNAPSHOT version
 
