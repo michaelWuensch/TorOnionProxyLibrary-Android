@@ -854,7 +854,7 @@ class OnionProxyManager(
         eventListener.beginWatchingNoticeMsgs()
 
         val signalSuccess = signalControlConnection(TorControlCommands.SIGNAL_NEWNYM)
-        val rateLimited = eventListener.doesNoticeMsgBufferContain(NEWNYM_RATE_LIMIT_PARTIAL_MSG)
+        val rateLimited = eventListener.doesNoticeMsgBufferContain(NEWNYM_RATE_LIMIT_PARTIAL_MSG, 50L)
 
         if (signalSuccess) {
             if (!rateLimited) {

@@ -70,10 +70,11 @@ abstract class BaseEventListener: EventListener() {
      * Checks [noticeMsgBuffer] for the declared [string] and resets [noticeMsgBuffer] to null.
      *
      * @param [string] The string you wish to check for in [noticeMsgBuffer]
+     * @param [delayMilliseconds] Length of time you wish to delay the coroutine for before executing
      * @return True if it contains the string, false if not.
      * */
-    internal suspend fun doesNoticeMsgBufferContain(string: String): Boolean {
-        delay(50)
+    internal suspend fun doesNoticeMsgBufferContain(string: String, delayMilliseconds: Long): Boolean {
+        delay(delayMilliseconds)
         val boolean = noticeMsgBuffer.toString().contains(string)
         noticeMsgBuffer = null
         return boolean
