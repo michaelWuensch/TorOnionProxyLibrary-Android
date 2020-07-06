@@ -49,6 +49,14 @@ import java.io.IOException
 import java.io.InputStream
 import java.util.concurrent.TimeoutException
 
+/**
+ * Extend this class and implement the need methods.
+ *
+ * [setup] is called from [io.matthewnelson.topl_core.OnionProxyManager.setup] after
+ * instantiation, and [openBridgesStream] is called from
+ * [io.matthewnelson.topl_core.settings.TorSettingsBuilder.addBridgesFromResources]
+ * when configuring bridge support.
+ * */
 abstract class TorInstaller: CoreConsts() {
 
     /**
@@ -67,6 +75,7 @@ abstract class TorInstaller: CoreConsts() {
      * the system this does not need to be invoked.
      *
      * @return true if tor installation is successful, otherwise false.
+     * @sample [io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller.setup]
      */
     @Throws(IOException::class)
     abstract fun setup()
@@ -88,6 +97,8 @@ abstract class TorInstaller: CoreConsts() {
      * `($bridge_info \r\n)*`
      *
      * The second form is used for custom bridges from the user.
+     *
+     * @sample [io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller.openBridgesStream]
      */
     @Throws(IOException::class)
     abstract fun openBridgesStream(): InputStream?

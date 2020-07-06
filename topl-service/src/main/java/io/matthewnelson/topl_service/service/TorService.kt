@@ -35,6 +35,8 @@ import io.matthewnelson.topl_service.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import kotlinx.coroutines.*
+import java.io.IOException
+import java.lang.reflect.InvocationTargetException
 
 internal class TorService: Service() {
 
@@ -149,10 +151,7 @@ internal class TorService: Service() {
         if (onionProxyManager.hasControlConnection) return
         try {
             onionProxyManager.setup()
-            onionProxyManager.getNewSettingsBuilder()
-                .updateTorSettings()
-                .setGeoIpFiles()
-                .finishAndWriteToTorrcFile()
+            generateTorrcFile()
 
             onionProxyManager.start()
         } catch (e: Exception) {
@@ -172,6 +171,25 @@ internal class TorService: Service() {
         }
     }
 
+    /**
+     * Called from [startTor].
+     * */
+    @WorkerThread
+    @Throws(
+        SecurityException::class,
+        IllegalAccessException::class,
+        IllegalArgumentException::class,
+        InvocationTargetException::class,
+        NullPointerException::class,
+        ExceptionInInitializerError::class,
+        IOException::class
+    )
+    private fun generateTorrcFile() {
+        onionProxyManager.getNewSettingsBuilder()
+            .updateTorSettings()
+            .setGeoIpFiles()
+            .finishAndWriteToTorrcFile()
+    }
 
     ///////////////
     /// Actions ///

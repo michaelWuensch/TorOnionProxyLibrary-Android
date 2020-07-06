@@ -86,6 +86,7 @@ import java.util.concurrent.TimeUnit
  * @param [buildConfigDebug] Send [BuildConfig.DEBUG] which will show Logcat messages for this
  *   module on Debug builds of your Application. If `null`, all the messages will still be
  *   broadcast to the provided [EventBroadcaster] and you can handle them there how you'd like.
+ * @sample [io.matthewnelson.topl_service.service.TorService.initTOPLCore]
  * */
 class OnionProxyManager(
     private val context: Context,
