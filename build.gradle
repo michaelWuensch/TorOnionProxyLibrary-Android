@@ -1,3 +1,5 @@
+apply plugin: 'org.jetbrains.dokka'
+
 buildscript {
     apply from: "$rootDir/gradle/dependencies.gradle"
 
@@ -7,7 +9,7 @@ buildscript {
     }
     dependencies {
         classpath deps.androidGradlePlugin
-        classpath deps.dokka
+        classpath deps.kotlin.dokka
         classpath deps.kotlin.gradlePlugin
     }
 }
