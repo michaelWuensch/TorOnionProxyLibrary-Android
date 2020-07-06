@@ -21,6 +21,12 @@ import java.util.*
 
 object ServiceUtilities {
 
+    /**
+     * Formats the supplied values to look like: `20kbps ↓ / 85kbps ↑`
+     *
+     * @param [download] Long value associated with download (bytesRead)
+     * @param [upload] Long value associated with upload (bytesWritten)
+     * */
     fun getFormattedBandwidthString(download: Long, upload: Long): String =
         "${formatBandwidth(download)} ↓ / ${formatBandwidth(upload)} ↑"
 

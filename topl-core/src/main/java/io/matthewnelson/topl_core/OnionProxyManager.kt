@@ -899,9 +899,8 @@ class OnionProxyManager(
         }
 
     /**
-     * See the
-     * <a href="https://torproject.gitlab.io/torspec/control-spec/#getinfo" target="_blank">tor_spec</a>
-     * for accepted queries.
+     * See the torspec for accepted queries:
+     *  - https://torproject.gitlab.io/torspec/control-spec/#getinfo
      *
      * @param [queryCommand] What data you are querying the [TorControlConnection] for
      * */
