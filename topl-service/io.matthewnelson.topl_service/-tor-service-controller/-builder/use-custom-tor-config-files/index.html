@@ -397,11 +397,11 @@
                 
                 <p><a href="../../../../">topl-service</a> / <a href="../../../">io.matthewnelson.topl_service</a> / <a href="../../">TorServiceController</a> / <a href="../">Builder</a> / <a href="./">useCustomTorConfigFiles</a></p>
 <h1 id="usecustomtorconfigfiles">useCustomTorConfigFiles<a class="headerlink" href="#usecustomtorconfigfiles" title="Permanent link">&para;</a></h1>
-<p><code>fun useCustomTorConfigFiles(torConfigFiles: TorConfigFiles): Builder</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L129">(source)</a></p>
+<p><code>fun useCustomTorConfigFiles(torConfigFiles:</code><a href="https://topl-android.matthewnelson.io/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md"><code>TorConfigFiles</code></a><code>): Builder</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L129">(source)</a></p>
 <p>If you wish to customize the file structure of how Tor is installed in your app,
-you can do so by instantiating your own <a href="#">TorConfigFiles</a> and customizing it via
-the <a href="#">TorConfigFiles.Builder</a>, or overridden method <a href="#">TorConfigFiles.createConfig</a>.</p>
-<p>By default, <a href="#">TorService</a> will call <a href="#">TorConfigFiles.createConfig</a> using your
+you can do so by instantiating your own <a href="https://topl-android.matthewnelson.io/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md">TorConfigFiles</a> and customizing it via
+the <a href="https://topl-android.matthewnelson.io/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/-builder/index.md">TorConfigFiles.Builder</a>, or overridden method <a href="https://topl-android.matthewnelson.io/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/-companion/create-config.md">TorConfigFiles.createConfig</a>.</p>
+<p>By default, <a href="#">TorService</a> will call <a href="https://topl-android.matthewnelson.io/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/-companion/create-config.md">TorConfigFiles.createConfig</a> using your
 <a href="https://developer.android.com/reference/android/content/Context.html#getApplicationContext()">Context.getApplicationContext</a> to set up a standard directory hierarchy for Tor
 to operate with.</p>
 <div class="highlight"><pre><span></span><code><span class="c1">//        fun customTorConfigFilesSetup(context: Context): TorConfigFiles {</span>
