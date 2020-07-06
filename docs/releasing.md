@@ -24,32 +24,35 @@ extra:
 ```
 
 - Generate the Dokka docs
-```bash
+```
 rm -rf docs/topl-core docs/topl-core-base docs/topl-service
-./gradlew topl-core:dokka topl-core-base:dokka topl-service:dokka
+./gradlew topl-core-base:dokka topl-core:dokka topl-service:dokka
 ```
 
 - Update `docs/changelog.md` after checking out all changes:
     - <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/compare/{{ topl_android.release }}...master" target="_blank">compare changes</a>
 
+- Update `docs/roadmap.md` with with new milestones:
+    - <a href="https://topl-android.matthewnelson.io/roadmap" target="_blank">Project Roadmap</a>
+
 - Take one last look
-```bash
+```
 git diff
 ```
 
 - Commit all local changes and PGP sign
-```bash
+```
 git commit -S -am "Prepare {{ topl_android.next_release }} release"
 ```
 
 - Perform a clean build
-```bash
+```
 ./gradlew clean
 ./gradlew build
 ```
 
 - Create a PGP signed tag, and push it
-```bash
+```
 git tag -s {{ topl_android.next_release }} -m "Release v{{ topl_android.next_release }}"
 git push origin {{ topl_android.next_release }}
 ```
@@ -65,7 +68,7 @@ signing.gnupg.keyName=0x61471B8AB3890961
 ```
 
 - Upload the artifacts to Sonatype OSS Nexus
-```bash
+```
 ./gradlew uploadArchives --no-daemon --no-parallel
 ```
 
@@ -78,7 +81,7 @@ signing.gnupg.keyName=0x61471B8AB3890961
     - Check the box next to the `iomatthewnelson-XXXX` entry, click **Release** then **Confirm**
 
 - Merge the release branch to master
-```bash
+```
 git checkout master
 git pull
 git merge --no-ff -S release_{{ topl_android.next_release }}
@@ -91,12 +94,12 @@ VERSION_CODE=INCREMENT
 ```
 
 - Commit your changes and sign with PGP keys
-```bash
+```
 git commit -S -am "Prepare for next development iteration"
 ```
 
 - Push your changes
-```bash
+```
 git push
 ```
 
