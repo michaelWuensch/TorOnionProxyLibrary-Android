@@ -25,6 +25,9 @@ import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyBoolean
 import io.matthewnelson.topl_service.prefs.TorServicePrefs
 
+/**
+ * @suppress
+ * */
 class MainActivity : AppCompatActivity() {
 
     private companion object {

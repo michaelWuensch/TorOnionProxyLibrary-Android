@@ -65,7 +65,7 @@ class TorServiceController private constructor(): ServiceConsts() {
      * @param [geoip6AssetPath] The path to where you have your geoip6 file located (ex: in
      *   assets/common directory, send this variable "common/geoip6").
      *
-     * @sample [io.matthewnelson.sampleapp.App.setupTorServices]
+     * @sample [io.matthewnelson.sampleapp.samplecode.SampleCode.setupTorServices]
      * */
     class Builder(
         private val application: Application,
@@ -122,9 +122,8 @@ class TorServiceController private constructor(): ServiceConsts() {
          * [Context.getApplicationContext] to set up a standard directory hierarchy for Tor
          * to operate with.
          *
-         * See [Builder] for code samples.
-         *
          * @return [Builder]
+         * @sample [io.matthewnelson.sampleapp.samplecode.SampleCode.customTorConfigFilesSetup]
          * @see [Builder.build]
          * */
         fun useCustomTorConfigFiles(torConfigFiles: TorConfigFiles): Builder {
@@ -141,7 +140,8 @@ class TorServiceController private constructor(): ServiceConsts() {
          * @param [channelID] Your notification channel's ID (cannot be empty).
          * @param [channelDescription] Your notification channel's description (cannot be empty).
          * @param [notificationID] Your foreground notification's ID.
-         * @return [NotificationBuilder] to obtain methods specific to notification customization.
+         * @return [NotificationBuilder] To obtain methods specific to notification customization.
+         * @throws [IllegalArgumentException] If String fields are empty.
          * */
         @Throws(IllegalArgumentException::class)
         fun customizeNotification(
