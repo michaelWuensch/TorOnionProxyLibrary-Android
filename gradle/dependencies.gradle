@@ -29,6 +29,7 @@ ext.deps = [
             liveDataCore: "androidx.arch.core:core-testing:2.1.0",
         ],
     ],
+    dokka: "org.jetbrains.dokka:dokka-gradle-plugin:0.10.1",
     gradleVersions: "com.github.ben-manes:gradle-versions-plugin:0.20.0",
     jtorctl: "info.guardianproject:jtorctl:0.4",
     junit: "junit:junit:4.12",

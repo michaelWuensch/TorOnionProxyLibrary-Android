@@ -21,6 +21,9 @@ import androidx.lifecycle.MutableLiveData
 import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_service.util.ServiceUtilities
 
+/**
+ * @suppress
+ * */
 class MyEventBroadcaster: EventBroadcaster() {
 
 

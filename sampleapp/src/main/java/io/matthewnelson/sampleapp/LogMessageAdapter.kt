@@ -25,6 +25,9 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
+/**
+ * @suppress
+ * */
 class LogMessageAdapter(
     activity: MainActivity
 ): RecyclerView.Adapter<LogMessageAdapter.LogMessageHolder>(){

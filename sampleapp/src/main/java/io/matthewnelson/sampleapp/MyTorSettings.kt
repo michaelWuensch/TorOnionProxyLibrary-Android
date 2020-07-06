@@ -20,6 +20,7 @@ import io.matthewnelson.topl_core_base.TorSettings
 
 /**
  * See [TorSettings] for comments on what is what.
+ * @suppress
  * */
 class MyTorSettings: TorSettings() {
 

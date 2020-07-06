@@ -74,6 +74,7 @@ import java.util.*
  *
  * @param [onionProxyContext] [OnionProxyContext]
  * @param [broadcastLogger] for broadcasting/logging
+ * @sample [io.matthewnelson.topl_service.service.TorService.generateTorrcFile]
  * */
 class TorSettingsBuilder internal constructor(
     private val onionProxyContext: OnionProxyContext,

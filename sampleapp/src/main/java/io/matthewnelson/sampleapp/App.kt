@@ -19,6 +19,9 @@ package io.matthewnelson.sampleapp
 import android.app.Application
 import io.matthewnelson.topl_service.TorServiceController
 
+/**
+ * @suppress
+ * */
 class App: Application() {
 
     companion object {

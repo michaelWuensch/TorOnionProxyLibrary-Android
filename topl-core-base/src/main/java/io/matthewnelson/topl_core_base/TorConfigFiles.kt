@@ -181,6 +181,7 @@ class TorConfigFiles private constructor(
      *
      * @param [installDir] directory where the tor binaries are installed.
      * @param [configDir] directory where the filesystem will be setup for tor.
+     * @sample [io.matthewnelson.sampleapp.samplecode.SampleCode.customTorConfigFilesSetup]
      */
     class Builder(private val installDir: File, private val configDir: File) {
 

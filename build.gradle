@@ -7,6 +7,7 @@ buildscript {
     }
     dependencies {
         classpath deps.androidGradlePlugin
+        classpath deps.dokka
         classpath deps.kotlin.gradlePlugin
     }
 }

@@ -47,12 +47,6 @@ abstract class BaseEventListener: EventListener() {
      * See [TorControlCommands.EVENT_NAMES] values. These are **REQUIRED**
      * for registering them in [io.matthewnelson.topl_core.OnionProxyManager.start]
      * which allows you full control over what you wish to listen for.
-     *
-     * WARNING: Be careful as to what events your are attempting to listen for. If
-     * jtorctl has not implemented that event yet it will crash.
-     *
-     * See <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/issues/14" target="_blank">this issue</a>
-     * for more details.
      * */
     abstract val CONTROL_COMMAND_EVENTS: Array<String>
 
@@ -72,8 +66,15 @@ abstract class BaseEventListener: EventListener() {
         delay(50)
     }
 
-    internal suspend fun doesNoticeMsgBufferContain(string: String): Boolean {
-        delay(50)
+    /**
+     * Checks [noticeMsgBuffer] for the declared [string] and resets [noticeMsgBuffer] to null.
+     *
+     * @param [string] The string you wish to check for in [noticeMsgBuffer]
+     * @param [delayMilliseconds] Length of time you wish to delay the coroutine for before executing
+     * @return True if it contains the string, false if not.
+     * */
+    internal suspend fun doesNoticeMsgBufferContain(string: String, delayMilliseconds: Long): Boolean {
+        delay(delayMilliseconds)
         val boolean = noticeMsgBuffer.toString().contains(string)
         noticeMsgBuffer = null
         return boolean
@@ -81,8 +82,8 @@ abstract class BaseEventListener: EventListener() {
 
     /**
      * Requires that when you extend this class and override [noticeMsg], you **must**
-     * use `super.noticeMsg(data)` within your override; otherwise, it will never get
-     * messages to watch for the string value.
+     * use `super.noticeMsg(data)` within your overridden method; otherwise, [noticeMsgBuffer]
+     * [beginWatchingNoticeMsgs] and [doesNoticeMsgBufferContain] will not work correctly.
      * */
     override fun noticeMsg(data: String?) {
         noticeMsgBuffer?.append("${data}\n")
