@@ -11,7 +11,7 @@ value is stored in the SharedPreference, [defValue](get-int.md#io.matthewnelson.
 
 `intKey` - String of type [ServiceConsts.PrefKeyInt](../../io.matthewnelson.topl_service.util/-service-consts/-pref-key-int/index.md)
 
-`defValue` - Use the [io.matthewnelson.topl_core_base.TorSettings](file:/home/matthew/AndroidStudioProjects/personal_projects/TorOnionProxyLibrary-Android/docs/topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) value
+`defValue` - Use the [io.matthewnelson.topl_core_base.TorSettings](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) value
 associated with the [intKey](get-int.md#io.matthewnelson.topl_service.prefs.TorServicePrefs$getInt(kotlin.String, kotlin.Int)/intKey).
 
 **Return**

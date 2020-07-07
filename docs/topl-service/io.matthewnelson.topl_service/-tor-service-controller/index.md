@@ -14,7 +14,7 @@
 
 | Name | Summary |
 |---|---|
-| [appEventBroadcaster](app-event-broadcaster.md) | `var appEventBroadcaster: `[`EventBroadcaster`](file:/home/matthew/AndroidStudioProjects/personal_projects/TorOnionProxyLibrary-Android/docs/topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md)`?` |
+| [appEventBroadcaster](app-event-broadcaster.md) | `var appEventBroadcaster: `[`EventBroadcaster`](../../../topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md)`?` |
 
 ### Companion Object Functions
 

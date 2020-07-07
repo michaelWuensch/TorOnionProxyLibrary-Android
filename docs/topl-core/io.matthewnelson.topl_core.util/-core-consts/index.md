@@ -2,7 +2,7 @@
 
 # CoreConsts
 
-`abstract class CoreConsts : `[`BaseConsts`](file:/home/matthew/AndroidStudioProjects/personal_projects/TorOnionProxyLibrary-Android/docs/topl-core-base/io.matthewnelson.topl_core_base/-base-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/util/CoreConsts.kt#L27)
+`abstract class CoreConsts : `[`BaseConsts`](../../../topl-core-base/io.matthewnelson.topl_core_base/-base-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/util/CoreConsts.kt#L27)
 
 ### Constructors
 

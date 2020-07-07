@@ -15,6 +15,6 @@ See [BaseEventListener](../../io.matthewnelson.topl_core.listener/-base-event-li
 methods.
 
 If the [eventListener](event-listener.md) you're instantiating [OnionProxyManager](index.md) with has it's
-[BaseEventListener.noticeMsg](../../io.matthewnelson.topl_core.listener/-base-event-listener/notice-msg.md) being piped to the [EventBroadcaster.broadcastNotice](file:/home/matthew/AndroidStudioProjects/personal_projects/TorOnionProxyLibrary-Android/docs/topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/broadcast-notice.md),
+[BaseEventListener.noticeMsg](../../io.matthewnelson.topl_core.listener/-base-event-listener/notice-msg.md) being piped to the [EventBroadcaster.broadcastNotice](../../../topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/broadcast-notice.md),
 you will receive the message of being rate limited.
 
