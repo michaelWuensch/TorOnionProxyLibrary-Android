@@ -51,7 +51,10 @@ dokka {
             lineSuffix = "#L"
         }
         externalDocumentationLink {
-            url = new URL("file://$rootDir/docs/topl-core-base/")
+            // Dokka plugin requires a protocol (http/https/etc.) here, so we have to repair the
+            // links after building the docs by running `./gradlew fixDokkaDocLinks`.
+            url = new URL("http://FIX_DOKKA_LINKS/topl-core-base/")
+            packageListUrl = new URL("file://$rootDir/docs/topl-core-base/package-list")
         }
     }
     outputFormat = 'gfm'
