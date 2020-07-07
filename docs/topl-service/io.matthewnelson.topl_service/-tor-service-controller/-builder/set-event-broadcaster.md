@@ -2,7 +2,7 @@
 
 # setEventBroadcaster
 
-`fun setEventBroadcaster(eventBroadcaster: `[`EventBroadcaster`](file:/home/matthew/AndroidStudioProjects/personal_projects/TorOnionProxyLibrary-Android/docs/topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md)`): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L111)
+`fun setEventBroadcaster(eventBroadcaster: `[`EventBroadcaster`](../../../topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md)`): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L111)
 
 Get broadcasts piped to your Application to do with them what you desire. What
 you send this will live at [Companion.appEventBroadcaster](../app-event-broadcaster.md) for the remainder of

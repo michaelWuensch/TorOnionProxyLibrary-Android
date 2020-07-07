@@ -25,6 +25,17 @@ allprojects  {
     }
 }
 
+// Dokka's configuration.externalDocumentationLink.url setting for connecting methods/variables
+// in each module is quarky, especially when relying on Mkdocs to generate a website using the
+// Markdown files that are created. the `externalDocumentationLink.url` setting requires a
+// protocol (http, https, etc.) such that we cannot just input what we want (../../../module-name)
+// and are required to go back over all files within the `docs` directory, search for our string
+// constant, and replace it with what we want after Dokka Docs are all generated.
+task fixDokkaDocLinks(type: Exec) {
+    workingDir "$rootDir"
+    commandLine "scripts/fix_dokka_doc_external_links.sh"
+}
+
 task clean(type: Delete) {
   delete rootProject.buildDir
 }

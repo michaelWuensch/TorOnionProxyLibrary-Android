@@ -1,8 +1,8 @@
 #API Documentation
 
-## [topl-service](./topl-service/io.matthewnelson.topl_service/index.md)
+## [topl-service](./topl-service/index.md)
 
-## [topl-core-base](./topl-core-base/io.matthewnelson.topl_core_base/index.md)
+## [topl-core-base](./topl-core-base/index.md)
 
 <!-- Hold off linking to docs until release -->
 <!-- ## [topl-core](./topl-core/io.matthewnelson.topl_core/index.md) -->

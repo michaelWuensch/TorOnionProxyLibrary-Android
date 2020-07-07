@@ -6,10 +6,10 @@
 
 This makes it such that on your Application's **Debug** builds, the `topl-core` and
 `topl-service` modules will provide you with Logcat messages (when
-[TorSettings.hasDebugLogs](file:/home/matthew/AndroidStudioProjects/personal_projects/TorOnionProxyLibrary-Android/docs/topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/has-debug-logs.md) is enabled).
+[TorSettings.hasDebugLogs](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/has-debug-logs.md) is enabled).
 
 For your **Release** builds no Logcat messaging will be provided, but you
-will still get the same messages sent to your [EventBroadcaster](file:/home/matthew/AndroidStudioProjects/personal_projects/TorOnionProxyLibrary-Android/docs/topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md) if you set it
+will still get the same messages sent to your [EventBroadcaster](../../../topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md) if you set it
 via [Builder.setEventBroadcaster](set-event-broadcaster.md).
 
 TODO: Provide a link to gh-pages that discusses logging and how it work, it's pretty
@@ -21,5 +21,5 @@ complex with everything that is going on.
 
 **See Also**
 
-[io.matthewnelson.topl_core.broadcaster.BroadcastLogger](file:/home/matthew/AndroidStudioProjects/personal_projects/TorOnionProxyLibrary-Android/docs/topl-core/io.matthewnelson.topl_core.broadcaster/-broadcast-logger/index.md)
+[io.matthewnelson.topl_core.broadcaster.BroadcastLogger](../../../topl-core/io.matthewnelson.topl_core.broadcaster/-broadcast-logger/index.md)
 

@@ -27,6 +27,7 @@ extra:
 ```
 rm -rf docs/topl-core docs/topl-core-base docs/topl-service
 ./gradlew topl-core-base:dokka topl-core:dokka topl-service:dokka
+./gradlew fixDokkaDocLinks
 ```
 
 - Update `docs/changelog.md` after checking out all changes:
@@ -108,6 +109,7 @@ git push
         - `pipenv shell`
         - `mkdocs serve` to check locally
         - `mkdocs gh-deploy` to deploy
+        - Ensure docs are served <a href="https://topl-android.matthewnelson.io" target="_blank">Here</a>
         - `exit`
     - Go to the <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/releases/new" target="_blank">Draft a new release</a> page,
       enter the release name ({{ topl_android.next_release }}) as tag and title, and have the description

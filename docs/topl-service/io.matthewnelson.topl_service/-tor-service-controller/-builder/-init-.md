@@ -2,12 +2,12 @@
 
 # &lt;init&gt;
 
-`Builder(application: `[`Application`](https://developer.android.com/reference/android/app/Application.html)`, buildConfigVersionCode: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`, torSettings: `[`TorSettings`](file:/home/matthew/AndroidStudioProjects/personal_projects/TorOnionProxyLibrary-Android/docs/topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md)`, geoipAssetPath: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`, geoip6AssetPath: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`)`
+`Builder(application: `[`Application`](https://developer.android.com/reference/android/app/Application.html)`, buildConfigVersionCode: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`, torSettings: `[`TorSettings`](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md)`, geoipAssetPath: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`, geoip6AssetPath: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`)`
 
 The [TorServiceController.Builder](index.md) is where you get to customize how [TorService](#) works
 for your application. Call it in `Application.onCreate` and follow along.
 
-A note about the [TorSettings](file:/home/matthew/AndroidStudioProjects/personal_projects/TorOnionProxyLibrary-Android/docs/topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) you send this. Those are the default settings which
+A note about the [TorSettings](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) you send this. Those are the default settings which
 [TorService](#) will fall back on if [io.matthewnelson.topl_service.prefs.TorServicePrefs](../../../io.matthewnelson.topl_service.prefs/-tor-service-prefs/index.md)
 has nothing in it for that particular [ServiceConsts](../../../io.matthewnelson.topl_service.util/-service-consts/index.md).PrefKey.
 
@@ -23,7 +23,7 @@ I plan to implement a
 [android.content.SharedPreferences.OnSharedPreferenceChangeListener](https://developer.android.com/reference/android/content/SharedPreferences/OnSharedPreferenceChangeListener.html) that will do this
 immediately for the settings that don't require a restart, but a stable release comes first).
 
-You can see how the [TorSettings](file:/home/matthew/AndroidStudioProjects/personal_projects/TorOnionProxyLibrary-Android/docs/topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) sent here are used in [TorService](#) by looking at
+You can see how the [TorSettings](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) sent here are used in [TorService](#) by looking at
 [io.matthewnelson.topl_service.onionproxy.ServiceTorSettings](#) and
 [TorService.initTOPLCore](#).
 
@@ -84,7 +84,7 @@ You can see how the [TorSettings](file:/home/matthew/AndroidStudioProjects/perso
 `buildConfigVersionCode` - send [BuildConfig.VERSION_CODE](#). Mitigates copying of geoip
 files to app updates only.
 
-`torSettings` - [TorSettings](file:/home/matthew/AndroidStudioProjects/personal_projects/TorOnionProxyLibrary-Android/docs/topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) used to create your torrc file on start of Tor.
+`torSettings` - [TorSettings](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) used to create your torrc file on start of Tor.
 
 `geoipAssetPath` - The path to where you have your geoip file located (ex: in
 assets/common directory, send this variable "common/geoip").

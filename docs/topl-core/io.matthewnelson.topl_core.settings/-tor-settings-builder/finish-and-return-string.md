@@ -6,5 +6,5 @@
 
 This returns what's in the [buffer](#) as a String and then clears it.
 You still need to write the String to the
-[io.matthewnelson.topl_core_base.TorConfigFiles.torrcFile](file:/home/matthew/AndroidStudioProjects/personal_projects/TorOnionProxyLibrary-Android/docs/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/torrc-file.md).
+[io.matthewnelson.topl_core_base.TorConfigFiles.torrcFile](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/torrc-file.md).
 

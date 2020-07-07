@@ -11,7 +11,7 @@ value is stored in the SharedPreference, [defValue](get-boolean.md#io.matthewnel
 
 `booleanKey` - String of type [ServiceConsts.PrefKeyBoolean](../../io.matthewnelson.topl_service.util/-service-consts/-pref-key-boolean/index.md)
 
-`defValue` - Use the [io.matthewnelson.topl_core_base.TorSettings](file:/home/matthew/AndroidStudioProjects/personal_projects/TorOnionProxyLibrary-Android/docs/topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) value
+`defValue` - Use the [io.matthewnelson.topl_core_base.TorSettings](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) value
 associated with the [booleanKey](get-boolean.md#io.matthewnelson.topl_service.prefs.TorServicePrefs$getBoolean(kotlin.String, kotlin.Boolean)/booleanKey).
 
 **Return**
