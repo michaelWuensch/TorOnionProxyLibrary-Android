@@ -47,6 +47,12 @@ android {
     }
 }
 
+//repositories {
+//    maven {
+//        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+//    }
+//}
+
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation project(':topl-core-base')
@@ -62,7 +68,7 @@ dependencies {
     implementation deps.kotlin.coroutinesAndroid
     implementation deps.kotlin.stdlib
 
-    implementation "io.matthewnelson.topl-android:tor-binary:0.4.3.5"
+    implementation "io.matthewnelson.topl-android:tor-binary:0.4.3.5a"
 
     testImplementation deps.junit
 
