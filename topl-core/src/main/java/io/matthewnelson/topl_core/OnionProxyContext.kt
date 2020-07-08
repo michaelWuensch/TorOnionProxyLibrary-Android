@@ -251,7 +251,8 @@ internal class OnionProxyContext(
     @Throws(RuntimeException::class, SecurityException::class)
     fun deleteDataDirExceptHiddenService() =
         synchronized(dataDirLock) {
-            for (file in torConfigFiles.dataDir.listFiles())
+            val listFiles = torConfigFiles.dataDir.listFiles() ?: return
+            for (file in listFiles)
                 if (file.isDirectory)
                     if (file.absolutePath != torConfigFiles.hiddenServiceDir.absolutePath)
                         FileUtilities.recursiveFileDelete(file)
@@ -266,7 +267,8 @@ internal class OnionProxyContext(
     @Throws(SecurityException::class)
     fun setHostnameDirPermissionsToReadOnly(): Boolean =
         synchronized(hostnameFileLock) {
-            FileUtilities.setToReadOnlyPermissions(torConfigFiles.hostnameFile.parentFile)
+            val parentFile = torConfigFiles.hostnameFile.parentFile ?: return false
+            FileUtilities.setToReadOnlyPermissions(parentFile)
         }
 
     ///////////
@@ -300,7 +302,7 @@ internal class OnionProxyContext(
 
     @Throws(SecurityException::class)
     private fun createNewFileIfDoesNotExist(file: File): Boolean {
-        if (!file.parentFile.exists() && !file.parentFile.mkdirs()) {
+        if (file.parentFile?.exists() != true && file.parentFile?.mkdirs() != true) {
             broadcastLogger.warn("Could not create ${file.nameWithoutExtension} parent directory")
             return false
         }

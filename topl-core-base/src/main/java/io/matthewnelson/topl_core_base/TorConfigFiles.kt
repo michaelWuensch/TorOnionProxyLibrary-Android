@@ -81,7 +81,7 @@ class TorConfigFiles private constructor(
      * @return [cookieAuthFile]
      * */
     val cookieAuthFile: File,
-    val libraryPath: File,
+    val libraryPath: File?,
     val resolveConf: File,
     val controlPortFile: File,
     val installDir: File,
@@ -191,7 +191,7 @@ class TorConfigFiles private constructor(
         private lateinit var mTorrcFile: File
         private lateinit var mHiddenServiceDir: File
         private lateinit var mDataDir: File
-        private lateinit var mLibraryPath: File
+        private var mLibraryPath: File? = null
         private lateinit var mCookieAuthFile: File
         private lateinit var mHostnameFile: File
         private lateinit var mResolveConf: File
@@ -341,7 +341,7 @@ class TorConfigFiles private constructor(
             if (!::mDataDir.isInitialized)
                 mDataDir = File(configDir, ConfigFileName.DATA_DIR)
 
-            if (!::mLibraryPath.isInitialized)
+            if (mLibraryPath != null)
                 mLibraryPath = mTorExecutableFile.parentFile
 
             if (!::mHostnameFile.isInitialized)
