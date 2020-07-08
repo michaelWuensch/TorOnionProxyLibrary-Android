@@ -1,14 +1,25 @@
 # TorOnionProxyLibrary-Android
-An Android Library for embedding Tor as a service into your Application
+An Android Library for embedding Tor as a service into your Application  
 
 **NOTE: This project exists independently of the Tor Project, & Guardian Project.**  
 
-This is a Fork of the <a href="https://github.com/thaliproject/Tor_Onion_Proxy_Library" target="_blank">Tor_Onion_Proxy_Library</a>  
+This is a Fork of the 
+<a href="https://github.com/thaliproject/Tor_Onion_Proxy_Library" target="_blank">Tor_Onion_Proxy_Library</a> 
+project. 
 
-This fork has been re-built from the ground up and engineered specifically for Android, where
-it was once multi-platform. It's been re-written in Kotlin, heavily refactored, and a separate
-`Service` created for abstracting away the complexities into simple APIs to make embedding Tor
-directly into your Application, easy.
+<center>
+    <img src="assets/Screenshot_SampleApp_Debug_full.png" width="250"/>
+    <img src="assets/Screenshot_SampleApp_Debug_notification1.png" width="250"/>
+    <img src="assets/Screenshot_SampleApp_Debug_notification2.png" width="250"/>
+</center>
+
+It's been re-built from the ground up and engineered specifically for :material-heart-multiple: 
+Android :material-heart-multiple:, where it was once multi-platform. It's been re-written in 
+Kotlin, heavily refactored to improve reliability/ease of use, and an `android.app.Service` 
+built on top as an additional module/Library for abstracting away complexities.  
+
+The `topl-service` module/Library has simple to use APIs for integrating Tor into your 
+application, and customizing the notification to meet your liking.  
 
 ## [Project Roadmap](roadmap.md)
 

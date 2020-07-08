@@ -205,6 +205,8 @@ internal class TorService: Service() {
      * */
     private fun executeAction(@ServiceAction action: String) {
         scopeMain.launch {
+            // TODO: Need to think about solution for if start() or stop() hangs due to
+            //  jtorctl's lack of interruption timeout
             if (::executeActionJob.isInitialized && executeActionJob.isActive) {
                 executeActionJob.join()
                 delay(100L)
@@ -213,8 +215,8 @@ internal class TorService: Service() {
             executeActionJob = launch(Dispatchers.IO) {
                 when (action) {
                     ServiceAction.ACTION_START -> {
-                        startTor()
                         isTorStarted = true
+                        startTor()
                     }
                     ServiceAction.ACTION_STOP -> {
                         isTorStarted = false
