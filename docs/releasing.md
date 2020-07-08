@@ -111,8 +111,12 @@ git push
         - `mkdocs gh-deploy` to deploy
         - Ensure docs are served <a href="https://topl-android.matthewnelson.io" target="_blank">Here</a>
         - `exit`
-    - Go to the <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/releases/new" target="_blank">Draft a new release</a> page,
-      enter the release name ({{ topl_android.next_release }}) as tag and title, and have the description
-      point to the changelog. You can find the direct anchor URL from the
-      <a href="https://topl-android.matthewnelson.io/changelog/" target="_blank">Change Log</a>
-      page on the doc site.
+    - Sign SampleApp release apks:
+        - `scripts/sign_sampleapp_release_build.sh`
+    - Go to the <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/releases/new" target="_blank">Draft a new release</a> 
+    page
+        - Enter the release name ({{ topl_android.next_release }}) as tag and title.
+        - Have the description point to the changelog. You can find the direct anchor URL from the 
+        <a href="https://topl-android.matthewnelson.io/changelog/" target="_blank">Change Log</a> 
+        page on the doc site.
+        - Upload the signed release apks.
