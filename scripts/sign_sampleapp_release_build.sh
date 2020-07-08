@@ -62,7 +62,10 @@ for FILE in $UNSIGNED_APK_DIR_FILE_LIST; do
     echo "zipaligning the apk"
     echo ""
     "$ANDROID_SDK"/build-tools/"$BUILD_TOOLS_VERSION"/zipalign 4 \
-    "$UNSIGNED_APK_DIR"/"$FILE" "$FILE".tmp && mv -vf "$FILE".tmp "$FILE"
+    "$UNSIGNED_APK_DIR"/"$FILE" \
+    "$UNSIGNED_APK_DIR"/"$FILE".tmp &&
+    mv -vf "$UNSIGNED_APK_DIR"/"$FILE".tmp \
+    "$UNSIGNED_APK_DIR"/"$FILE"
 
     echo ""
     echo "Signing"
