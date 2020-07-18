@@ -437,6 +437,12 @@ git checkout -b release_1.0.0-alpha02
 </code></pre></div></p>
 </li>
 <li>
+<p>Perform a clean build
+<div class="highlight"><pre><span></span><code>./gradlew clean
+./gradlew build
+</code></pre></div></p>
+</li>
+<li>
 <p>Generate the Dokka docs
 <div class="highlight"><pre><span></span><code>rm -rf docs/topl-core docs/topl-core-base docs/topl-service
 ./gradlew topl-core-base:dokka topl-core:dokka topl-service:dokka
@@ -467,12 +473,6 @@ git checkout -b release_1.0.0-alpha02
 <li>
 <p>Commit all local changes and PGP sign
 <div class="highlight"><pre><span></span><code>git commit -S -am &quot;Prepare 1.0.0-alpha02 release&quot;
-</code></pre></div></p>
-</li>
-<li>
-<p>Perform a clean build
-<div class="highlight"><pre><span></span><code>./gradlew clean
-./gradlew build
 </code></pre></div></p>
 </li>
 <li>
