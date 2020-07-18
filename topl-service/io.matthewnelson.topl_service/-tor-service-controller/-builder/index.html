@@ -438,7 +438,7 @@
 <p><code>class Builder</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L70">(source)</a></p>
 <p>The <a href="./">TorServiceController.Builder</a> is where you get to customize how <a href="#">TorService</a> works
 for your application. Call it in <code>Application.onCreate</code> and follow along.</p>
-<p>A note about the <a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md">TorSettings</a> you send this. Those are the default settings which
+<p>A note about the <a href="http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md">TorSettings</a> you send this. Those are the default settings which
 <a href="#">TorService</a> will fall back on if <a href="../../../io.matthewnelson.topl_service.prefs/-tor-service-prefs/">io.matthewnelson.topl_service.prefs.TorServicePrefs</a>
 has nothing in it for that particular <a href="../../../io.matthewnelson.topl_service.util/-service-consts/">ServiceConsts</a>.PrefKey.</p>
 <p>The settings get written to the <code>torrc</code> file every time Tor is started (I plan to make
@@ -450,7 +450,7 @@ restart Tor (for now&hellip; ;-D).</p>
 <p>I plan to implement a
 <a href="https://developer.android.com/reference/android/content/SharedPreferences/OnSharedPreferenceChangeListener.html">android.content.SharedPreferences.OnSharedPreferenceChangeListener</a> that will do this
 immediately for the settings that don&rsquo;t require a restart, but a stable release comes first).</p>
-<p>You can see how the <a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md">TorSettings</a> sent here are used in <a href="#">TorService</a> by looking at
+<p>You can see how the <a href="http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md">TorSettings</a> sent here are used in <a href="#">TorService</a> by looking at
 <a href="#">io.matthewnelson.topl_service.onionproxy.ServiceTorSettings</a> and
 <a href="#">TorService.initTOPLCore</a>.</p>
 <div class="highlight"><pre><span></span><code><span class="c1">//        fun setupTorServices(</span>
@@ -506,7 +506,7 @@ immediately for the settings that don&rsquo;t require a restart, but a stable re
 <p><code>application</code> - <a href="https://developer.android.com/reference/android/app/Application.html">Application</a>, for obtaining context.</p>
 <p><code>buildConfigVersionCode</code> - send <a href="#">BuildConfig.VERSION_CODE</a>. Mitigates copying of geoip
 files to app updates only.</p>
-<p><code>torSettings</code> - <a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md">TorSettings</a> used to create your torrc file on start of Tor.</p>
+<p><code>torSettings</code> - <a href="http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md">TorSettings</a> used to create your torrc file on start of Tor.</p>
 <p><code>geoipAssetPath</code> - The path to where you have your geoip file located (ex: in
 assets/common directory, send this variable &ldquo;common/geoip&rdquo;).</p>
 <p><code>geoip6AssetPath</code> - The path to where you have your geoip6 file located (ex: in
@@ -537,7 +537,7 @@ assets/common directory, send this variable &ldquo;common/geoip6&rdquo;).</p>
 <tbody>
 <tr>
 <td><a href="-init-/">&lt;init&gt;</a></td>
-<td>The <a href="./">TorServiceController.Builder</a> is where you get to customize how <a href="#">TorService</a> works for your application. Call it in <code>Application.onCreate</code> and follow along.<code>Builder(application:</code><a href="https://developer.android.com/reference/android/app/Application.html"><code>Application</code></a><code>, buildConfigVersionCode:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>, torSettings:</code><a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md"><code>TorSettings</code></a><code>, geoipAssetPath:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>, geoip6AssetPath:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>)</code></td>
+<td>The <a href="./">TorServiceController.Builder</a> is where you get to customize how <a href="#">TorService</a> works for your application. Call it in <code>Application.onCreate</code> and follow along.<code>Builder(application:</code><a href="https://developer.android.com/reference/android/app/Application.html"><code>Application</code></a><code>, buildConfigVersionCode:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>, torSettings:</code><a href="http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md"><code>TorSettings</code></a><code>, geoipAssetPath:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>, geoip6AssetPath:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>)</code></td>
 </tr>
 </tbody>
 </table>
@@ -560,15 +560,15 @@ assets/common directory, send this variable &ldquo;common/geoip6&rdquo;).</p>
 </tr>
 <tr>
 <td><a href="set-build-config-debug/">setBuildConfigDebug</a></td>
-<td>This makes it such that on your Application&rsquo;s <strong>Debug</strong> builds, the <code>topl-core</code> and <code>topl-service</code> modules will provide you with Logcat messages (when <a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/has-debug-logs.md">TorSettings.hasDebugLogs</a> is enabled).<code>fun setBuildConfigDebug(buildConfigDebug:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a><code>): Builder</code></td>
+<td>This makes it such that on your Application&rsquo;s <strong>Debug</strong> builds, the <code>topl-core</code> and <code>topl-service</code> modules will provide you with Logcat messages (when <a href="http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/has-debug-logs.md">TorSettings.hasDebugLogs</a> is enabled).<code>fun setBuildConfigDebug(buildConfigDebug:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a><code>): Builder</code></td>
 </tr>
 <tr>
 <td><a href="set-event-broadcaster/">setEventBroadcaster</a></td>
-<td>Get broadcasts piped to your Application to do with them what you desire. What you send this will live at <a href="../app-event-broadcaster/">Companion.appEventBroadcaster</a> for the remainder of your application&rsquo;s lifecycle to refer to elsewhere in your App.<code>fun setEventBroadcaster(eventBroadcaster:</code><a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md"><code>EventBroadcaster</code></a><code>): Builder</code></td>
+<td>Get broadcasts piped to your Application to do with them what you desire. What you send this will live at <a href="../app-event-broadcaster/">Companion.appEventBroadcaster</a> for the remainder of your application&rsquo;s lifecycle to refer to elsewhere in your App.<code>fun setEventBroadcaster(eventBroadcaster:</code><a href="http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md"><code>EventBroadcaster</code></a><code>): Builder</code></td>
 </tr>
 <tr>
 <td><a href="use-custom-tor-config-files/">useCustomTorConfigFiles</a></td>
-<td>If you wish to customize the file structure of how Tor is installed in your app, you can do so by instantiating your own <a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md">TorConfigFiles</a> and customizing it via the <a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/-builder/index.md">TorConfigFiles.Builder</a>, or overridden method <a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/-companion/create-config.md">TorConfigFiles.createConfig</a>.<code>fun useCustomTorConfigFiles(torConfigFiles:</code><a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md"><code>TorConfigFiles</code></a><code>): Builder</code></td>
+<td>If you wish to customize the file structure of how Tor is installed in your app, you can do so by instantiating your own <a href="http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md">TorConfigFiles</a> and customizing it via the <a href="http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/-builder/index.md">TorConfigFiles.Builder</a>, or overridden method <a href="http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/-companion/create-config.md">TorConfigFiles.createConfig</a>.<code>fun useCustomTorConfigFiles(torConfigFiles:</code><a href="http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md"><code>TorConfigFiles</code></a><code>): Builder</code></td>
 </tr>
 </tbody>
 </table>
