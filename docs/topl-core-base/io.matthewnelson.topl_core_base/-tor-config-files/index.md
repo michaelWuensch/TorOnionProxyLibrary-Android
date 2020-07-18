@@ -28,7 +28,7 @@ See [Companion.createConfig](create-config.md) or [Builder](-builder/index.md) t
 | [hiddenServiceDir](hidden-service-dir.md) | `val hiddenServiceDir: `[`File`](https://docs.oracle.com/javase/6/docs/api/java/io/File.html) |
 | [hostnameFile](hostname-file.md) | The &lt;base32-encoded-fingerprint&gt;.onion domain name for this hidden service. If the hidden service is restricted to authorized clients only, this file also contains authorization data for all clients.`val hostnameFile: `[`File`](https://docs.oracle.com/javase/6/docs/api/java/io/File.html) |
 | [installDir](install-dir.md) | `val installDir: `[`File`](https://docs.oracle.com/javase/6/docs/api/java/io/File.html) |
-| [libraryPath](library-path.md) | `val libraryPath: `[`File`](https://docs.oracle.com/javase/6/docs/api/java/io/File.html) |
+| [libraryPath](library-path.md) | `val libraryPath: `[`File`](https://docs.oracle.com/javase/6/docs/api/java/io/File.html)`?` |
 | [resolveConf](resolve-conf.md) | `val resolveConf: `[`File`](https://docs.oracle.com/javase/6/docs/api/java/io/File.html) |
 | [torExecutableFile](tor-executable-file.md) | `val torExecutableFile: `[`File`](https://docs.oracle.com/javase/6/docs/api/java/io/File.html) |
 | [torrcFile](torrc-file.md) | `var torrcFile: `[`File`](https://docs.oracle.com/javase/6/docs/api/java/io/File.html) |
