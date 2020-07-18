@@ -23,6 +23,12 @@ extra:
     next_release: 'REPLACE_WITH_NEXT_VERSION_NUMBER'
 ```
 
+- Perform a clean build
+```
+./gradlew clean
+./gradlew build
+```
+
 - Generate the Dokka docs
 ```
 rm -rf docs/topl-core docs/topl-core-base docs/topl-service
@@ -48,12 +54,6 @@ git diff
 - Commit all local changes and PGP sign
 ```
 git commit -S -am "Prepare {{ topl_android.next_release }} release"
-```
-
-- Perform a clean build
-```
-./gradlew clean
-./gradlew build
 ```
 
 - Create a PGP signed tag, and push it

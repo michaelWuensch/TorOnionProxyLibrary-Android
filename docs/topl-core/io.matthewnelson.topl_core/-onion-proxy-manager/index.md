@@ -37,25 +37,25 @@ onionProxyManager = OnionProxyManager(
 
 `context` - Context.
 
-`torConfigFiles` - [TorConfigFiles](http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md) For setting up [OnionProxyContext](#)
+`torConfigFiles` - [TorConfigFiles](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md) For setting up [OnionProxyContext](#)
 
 `torInstaller` - [TorInstaller](../../io.matthewnelson.topl_core.util/-tor-installer/index.md) For setting up [OnionProxyContext](#)
 
-`torSettings` - [TorSettings](http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) For setting up [OnionProxyContext](#)
+`torSettings` - [TorSettings](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) For setting up [OnionProxyContext](#)
 
 `eventListener` - [BaseEventListener](../../io.matthewnelson.topl_core.listener/-base-event-listener/index.md) For processing Tor OP messages.
 
-`eventBroadcaster` - Your own broadcaster which extends [EventBroadcaster](http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md)
+`eventBroadcaster` - Your own broadcaster which extends [EventBroadcaster](../../../topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md)
 
 `buildConfigDebug` - Send [BuildConfig.DEBUG](#) which will show Logcat messages for this
 module on Debug builds of your Application. If `null`, all the messages will still be
-broadcast to the provided [EventBroadcaster](http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md) and you can handle them there how you'd like.
+broadcast to the provided [EventBroadcaster](../../../topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md) and you can handle them there how you'd like.
 
 ### Constructors
 
 | Name | Summary |
 |---|---|
-| [&lt;init&gt;](-init-.md) | This is where all the fun is, this is the class which acts as a gateway into the `topl-core` module, and ensures synchronicity is had.`OnionProxyManager(context: `[`Context`](https://developer.android.com/reference/android/content/Context.html)`, torConfigFiles: `[`TorConfigFiles`](http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md)`, torInstaller: `[`TorInstaller`](../../io.matthewnelson.topl_core.util/-tor-installer/index.md)`, torSettings: `[`TorSettings`](http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md)`, eventListener: `[`BaseEventListener`](../../io.matthewnelson.topl_core.listener/-base-event-listener/index.md)`, eventBroadcaster: `[`EventBroadcaster`](http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md)`, buildConfigDebug: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)`? = null)` |
+| [&lt;init&gt;](-init-.md) | This is where all the fun is, this is the class which acts as a gateway into the `topl-core` module, and ensures synchronicity is had.`OnionProxyManager(context: `[`Context`](https://developer.android.com/reference/android/content/Context.html)`, torConfigFiles: `[`TorConfigFiles`](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md)`, torInstaller: `[`TorInstaller`](../../io.matthewnelson.topl_core.util/-tor-installer/index.md)`, torSettings: `[`TorSettings`](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md)`, eventListener: `[`BaseEventListener`](../../io.matthewnelson.topl_core.listener/-base-event-listener/index.md)`, eventBroadcaster: `[`EventBroadcaster`](../../../topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md)`, buildConfigDebug: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)`? = null)` |
 
 ### Properties
 
@@ -67,10 +67,10 @@ broadcast to the provided [EventBroadcaster](http://FIX_DOKKA_LINKS/topl-core-ba
 | [isIPv4LocalHostSocksPortOpen](is-i-pv4-local-host-socks-port-open.md) | `val isIPv4LocalHostSocksPortOpen: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) |
 | [isRunning](is-running.md) | Checks to see if the Tor OP is running (e.g. fully bootstrapped) and open to network connections.`val isRunning: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) |
 | [processId](process-id.md) | `val processId: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
-| [torConfigFiles](tor-config-files.md) | `val torConfigFiles: `[`TorConfigFiles`](http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md) |
+| [torConfigFiles](tor-config-files.md) | `val torConfigFiles: `[`TorConfigFiles`](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md) |
 | [torInstaller](tor-installer.md) | `val torInstaller: `[`TorInstaller`](../../io.matthewnelson.topl_core.util/-tor-installer/index.md) |
 | [torPid](tor-pid.md) | `val torPid: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html) |
-| [torSettings](tor-settings.md) | `val torSettings: `[`TorSettings`](http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) |
+| [torSettings](tor-settings.md) | `val torSettings: `[`TorSettings`](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) |
 | [torStateMachine](tor-state-machine.md) | `val torStateMachine: `[`TorStateMachine`](../../io.matthewnelson.topl_core.broadcaster/-tor-state-machine/index.md) |
 
 ### Functions

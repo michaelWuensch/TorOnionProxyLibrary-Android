@@ -6,5 +6,5 @@
 
 This returns what's in the [buffer](#) as a String and then clears it.
 You still need to write the String to the
-[io.matthewnelson.topl_core_base.TorConfigFiles.torrcFile](http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/torrc-file.md).
+[io.matthewnelson.topl_core_base.TorConfigFiles.torrcFile](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/torrc-file.md).
 

@@ -8,7 +8,7 @@ Tells the Tor OP if it should accept network connections.
 
 Whenever setting Tor's Conf to `DisableNetwork X`, ONLY use this method to do it
 such that [torStateMachine](tor-state-machine.md) will reflect the proper
-[io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState](http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-base-consts/-tor-network-state/index.md).
+[io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState](../../../topl-core-base/io.matthewnelson.topl_core_base/-base-consts/-tor-network-state/index.md).
 
 ### Parameters
 

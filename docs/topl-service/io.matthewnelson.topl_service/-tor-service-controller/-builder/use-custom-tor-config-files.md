@@ -2,13 +2,13 @@
 
 # useCustomTorConfigFiles
 
-`fun useCustomTorConfigFiles(torConfigFiles: `[`TorConfigFiles`](http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md)`): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L129)
+`fun useCustomTorConfigFiles(torConfigFiles: `[`TorConfigFiles`](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md)`): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L129)
 
 If you wish to customize the file structure of how Tor is installed in your app,
-you can do so by instantiating your own [TorConfigFiles](http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md) and customizing it via
-the [TorConfigFiles.Builder](http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/-builder/index.md), or overridden method [TorConfigFiles.createConfig](http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/-companion/create-config.md).
+you can do so by instantiating your own [TorConfigFiles](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md) and customizing it via
+the [TorConfigFiles.Builder](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/-builder/index.md), or overridden method [TorConfigFiles.createConfig](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/-companion/create-config.md).
 
-By default, [TorService](#) will call [TorConfigFiles.createConfig](http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/-companion/create-config.md) using your
+By default, [TorService](#) will call [TorConfigFiles.createConfig](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/-companion/create-config.md) using your
 [Context.getApplicationContext](https://developer.android.com/reference/android/content/Context.html#getApplicationContext()) to set up a standard directory hierarchy for Tor
 to operate with.
 
