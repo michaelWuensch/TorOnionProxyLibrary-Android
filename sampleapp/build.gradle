@@ -93,6 +93,8 @@ dependencies {
     implementation deps.kotlin.coroutinesAndroid
     implementation deps.kotlin.stdlib
 
+    implementation 'io.matthewnelson.topl-android:tor-binary:0.4.3.5a'
+
     testImplementation deps.junit
 
     androidTestImplementation deps.androidx.test.core
