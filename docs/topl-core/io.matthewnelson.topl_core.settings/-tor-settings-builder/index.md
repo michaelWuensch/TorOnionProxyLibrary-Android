@@ -15,7 +15,7 @@ file however you wish.
 
 Calling [finishAndReturnString](finish-and-return-string.md) will return to you the String that has been
 built for you to write to the
-[io.matthewnelson.topl_core_base.TorConfigFiles.torrcFile](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/torrc-file.md).
+[io.matthewnelson.topl_core_base.TorConfigFiles.torrcFile](http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/torrc-file.md).
 
 Calling [finishAndWriteToTorrcFile](finish-and-write-to-torrc-file.md) will do just that.
 
@@ -46,7 +46,7 @@ onionProxyManager.getNewSettingsBuilder()
 | [configurePluggableTransportsFromSettings](configure-pluggable-transports-from-settings.md) | `fun configurePluggableTransportsFromSettings(pluggableTransportClient: `[`File`](https://docs.oracle.com/javase/6/docs/api/java/io/File.html)`?): `[`TorSettingsBuilder`](./index.md) |
 | [connectionPadding](connection-padding.md) | `fun connectionPadding(setting: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`): `[`TorSettingsBuilder`](./index.md) |
 | [connectionPaddingFromSettings](connection-padding-from-settings.md) | `fun connectionPaddingFromSettings(): `[`TorSettingsBuilder`](./index.md) |
-| [controlPortWriteToFile](control-port-write-to-file.md) | `fun controlPortWriteToFile(torConfigFiles: `[`TorConfigFiles`](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md)`): `[`TorSettingsBuilder`](./index.md) |
+| [controlPortWriteToFile](control-port-write-to-file.md) | `fun controlPortWriteToFile(torConfigFiles: `[`TorConfigFiles`](http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md)`): `[`TorSettingsBuilder`](./index.md) |
 | [controlPortWriteToFileFromConfig](control-port-write-to-file-from-config.md) | `fun controlPortWriteToFileFromConfig(): `[`TorSettingsBuilder`](./index.md) |
 | [cookieAuthentication](cookie-authentication.md) | `fun cookieAuthentication(): `[`TorSettingsBuilder`](./index.md) |
 | [cookieAuthenticationFromSettings](cookie-authentication-from-settings.md) | `fun cookieAuthenticationFromSettings(): `[`TorSettingsBuilder`](./index.md) |
@@ -61,7 +61,7 @@ onionProxyManager.getNewSettingsBuilder()
 | [entryNodes](entry-nodes.md) | `fun entryNodes(entryNodes: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?): `[`TorSettingsBuilder`](./index.md) |
 | [excludeNodes](exclude-nodes.md) | `fun excludeNodes(excludeNodes: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?): `[`TorSettingsBuilder`](./index.md) |
 | [exitNodes](exit-nodes.md) | `fun exitNodes(exitNodes: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?): `[`TorSettingsBuilder`](./index.md) |
-| [finishAndReturnString](finish-and-return-string.md) | This returns what's in the [buffer](#) as a String and then clears it. You still need to write the String to the [io.matthewnelson.topl_core_base.TorConfigFiles.torrcFile](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/torrc-file.md).`fun finishAndReturnString(): `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
+| [finishAndReturnString](finish-and-return-string.md) | This returns what's in the [buffer](#) as a String and then clears it. You still need to write the String to the [io.matthewnelson.topl_core_base.TorConfigFiles.torrcFile](http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/torrc-file.md).`fun finishAndReturnString(): `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
 | [finishAndWriteToTorrcFile](finish-and-write-to-torrc-file.md) | A convenience method for after populating the [buffer](#) by calling [updateTorSettings](update-tor-settings.md). It will overwrite your current torrc file (or create a new one if it doesn't exist) with the new settings.`fun finishAndWriteToTorrcFile(): `[`Unit`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html) |
 | [geoIpFile](geo-ip-file.md) | `fun geoIpFile(path: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?): `[`TorSettingsBuilder`](./index.md) |
 | [geoIpV6File](geo-ip-v6-file.md) | `fun geoIpV6File(path: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?): `[`TorSettingsBuilder`](./index.md) |
@@ -96,7 +96,7 @@ onionProxyManager.getNewSettingsBuilder()
 | [transPort](trans-port.md) | `fun transPort(transPort: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`): `[`TorSettingsBuilder`](./index.md) |
 | [transPortFromSettings](trans-port-from-settings.md) | `fun transPortFromSettings(): `[`TorSettingsBuilder`](./index.md) |
 | [transportPlugin](transport-plugin.md) | `fun transportPlugin(clientPath: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`): `[`TorSettingsBuilder`](./index.md) |
-| [updateTorSettings](update-tor-settings.md) | Updates the buffer for all methods annotated with [SettingsConfig](#). You still need to call [finishAndReturnString](finish-and-return-string.md) and then write the returned String to your [io.matthewnelson.topl_core_base.TorConfigFiles.torrcFile](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/torrc-file.md).`fun updateTorSettings(): `[`TorSettingsBuilder`](./index.md) |
+| [updateTorSettings](update-tor-settings.md) | Updates the buffer for all methods annotated with [SettingsConfig](#). You still need to call [finishAndReturnString](finish-and-return-string.md) and then write the returned String to your [io.matthewnelson.topl_core_base.TorConfigFiles.torrcFile](http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/torrc-file.md).`fun updateTorSettings(): `[`TorSettingsBuilder`](./index.md) |
 | [useBridges](use-bridges.md) | `fun useBridges(useThem: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)`): `[`TorSettingsBuilder`](./index.md) |
 | [useBridgesFromSettings](use-bridges-from-settings.md) | `fun useBridgesFromSettings(): `[`TorSettingsBuilder`](./index.md) |
 | [virtualAddressNetwork](virtual-address-network.md) | `fun virtualAddressNetwork(address: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?): `[`TorSettingsBuilder`](./index.md) |

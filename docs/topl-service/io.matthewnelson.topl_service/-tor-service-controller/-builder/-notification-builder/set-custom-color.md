@@ -7,7 +7,7 @@
 Defaults to [R.color.tor_service_white](#)
 
 The color you wish to display when Tor's network state is
-[io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState.ENABLED](../../../topl-core-base/io.matthewnelson.topl_core_base/-base-consts/-tor-network-state/-companion/-e-n-a-b-l-e-d.md). Note that
+[io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState.ENABLED](http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-base-consts/-tor-network-state/-companion/-e-n-a-b-l-e-d.md). Note that
 if [colorizeBackground](set-custom-color.md#io.matthewnelson.topl_service.TorServiceController.Builder.NotificationBuilder$setCustomColor(kotlin.Int, kotlin.Boolean)/colorizeBackground) is being passed a value of `true`, the notification will
 always be that color where as if it is passed `false`, the icon &amp; action button
 colors will change with Tor's network state.

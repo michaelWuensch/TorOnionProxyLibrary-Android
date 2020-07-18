@@ -14,7 +14,7 @@
 
 | Name | Summary |
 |---|---|
-| [appEventBroadcaster](app-event-broadcaster.md) | `var appEventBroadcaster: `[`EventBroadcaster`](../../../topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md)`?` |
+| [appEventBroadcaster](app-event-broadcaster.md) | `var appEventBroadcaster: `[`EventBroadcaster`](http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md)`?` |
 
 ### Companion Object Functions
 

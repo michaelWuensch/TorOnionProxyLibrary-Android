@@ -6,7 +6,7 @@
 
 Updates the buffer for all methods annotated with [SettingsConfig](#). You still need
 to call [finishAndReturnString](finish-and-return-string.md) and then write the returned String to your
-[io.matthewnelson.topl_core_base.TorConfigFiles.torrcFile](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/torrc-file.md).
+[io.matthewnelson.topl_core_base.TorConfigFiles.torrcFile](http://FIX_DOKKA_LINKS/topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/torrc-file.md).
 
 Alternatively, call [finishAndWriteToTorrcFile](finish-and-write-to-torrc-file.md), it's up to you.
 
