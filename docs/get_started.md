@@ -22,28 +22,19 @@ Get Started
     your static/default [TorSettings](./topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) 
     that you supply upon initialization of `TorServiceController.Builder`.  
  - **Tor Binaries**:        
-    - For now, you'll have to copy the binaries into your application's `src/main/jniLibs/<abi>/` 
-    directory so that they are packaged in your APK **uncompressed** (which Android will automatically 
-    extract to your application's native directory on the device (`/data/app/<your app>/<abi>/libTor.so`))
-        - Tor v0.4.3.5 binaries can be found in the `sampleapp` which you can copy over (for the 
-        time being).
-    - I am currently building a gradle plugin to streamline binary distribution, so stay tuned!
-        - The issue: Providing Tor Binaries packaged via an `aar` presents problems, as the 
-        binaries are compressed which results in the Android OS not extracting them automatically. 
-        This requires extraction of the Shared Native Library from the APK to be executed via 
-        inclusion of `extractNativeLibs="true"` in the app's Manifest (min API 23), or code to 
-        unzip the APK and extract the tor binaries to the application's native directory at runtime. 
-        There are many bugs/limitations across the various Android APIs (16-29) that makes this 
-        incredibly inefficient, not UX friendly for library users, error prone, and makes 
-        versioning somewhat complicated as devs have no control over the Android OS' symlink
-        creation process. API 29 also presents problems with extracting the binaries 
-        to the application's `/data/data/` directory as it 
-        <a href="https://developer.android.com/about/versions/10/behavior-changes-10" target="_blank">
-        no longer supports running of executables from that location</a>. Because of the plethora 
-        of issues across APIs, distribution of *.so files would be best done as a gradle plugin 
-        such that upon building of your application, the *.so files included in the plugin can be 
-        extracted to your application module's `src/main/jniLibs/<abi>/` directory. This ensures 
-        that when your application is built and zipaligned, everything will simply work.
+    - I use The GuardianProject's <a href="https://github.com/guardianproject/tor-android" target="_blank">tor-android</a>
+        project to build binaries, and provided them 
+        <a href="https://github.com/05nelsonm/TOPL-Android-TorBinary" target="_blank">here</a>. The 
+        difference is in how they are packaged as a dependency, and the contents of what you are
+        importing as a dependency. I package them in the `jniLibs` directory so that the Android OS
+        will automatically install them into your application's `/data/app/...` directory, and include
+        no unnecessary classes or resources; just the binaries. Android API 29+ no longer supports 
+        execution of executable files from your application's `/data/data/` directory, and must now be
+        installed in the `context.applicationInfo.nativeLibraryDir` directory (aka, `/data/app/...`) 
+        to execute.
+            - Nothing more is needed in terms of configuring initialization via the 
+            `TorServiceController.Builder`, as files will be installed in the correct directory, and 
+            named to match what `topl-service` looks for.
     - If you wish to use GuardianProject's binaries, see 
     <a href="https://github.com/guardianproject/tor-android" target="_blank">tor-android</a>.
         - You'll need to use their `NativeResouceInstaller` to install the binaries.
