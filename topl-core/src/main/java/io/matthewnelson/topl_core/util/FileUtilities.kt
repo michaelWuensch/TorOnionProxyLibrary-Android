@@ -152,9 +152,11 @@ object FileUtilities {
 
     @Throws(SecurityException::class)
     fun listFilesToLog(f: File) {
-        if (f.isDirectory)
-            for (child in f.listFiles())
+        if (f.isDirectory) {
+            val listFiles = f.listFiles() ?: return
+            for (child in listFiles)
                 listFilesToLog(child)
+        }
     }
 
     @Throws(IOException::class, EOFException::class, SecurityException::class)
@@ -193,9 +195,11 @@ object FileUtilities {
 
     @Throws(SecurityException::class)
     fun recursiveFileDelete(fileOrDirectory: File) {
-        if (fileOrDirectory.isDirectory)
-            for (child in fileOrDirectory.listFiles())
+        if (fileOrDirectory.isDirectory) {
+            val listFiles = fileOrDirectory.listFiles() ?: return
+            for (child in listFiles)
                 recursiveFileDelete(child)
+        }
 
         if (fileOrDirectory.exists() && !fileOrDirectory.delete())
             throw RuntimeException("Could not delete directory ${fileOrDirectory.absolutePath}")

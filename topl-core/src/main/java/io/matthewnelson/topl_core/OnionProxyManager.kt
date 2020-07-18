@@ -253,7 +253,7 @@ class OnionProxyManager(
 
         // Use the control connection to update the Tor config
         val config = listOf(
-            "HiddenServiceDir ${hostnameFile.parentFile.absolutePath}",
+            "HiddenServiceDir ${hostnameFile.parentFile?.absolutePath}",
             "HiddenServicePort $hiddenServicePort 127.0.0.1:$localPort"
         )
 
@@ -267,7 +267,7 @@ class OnionProxyManager(
 
         // Wait for the hostname file to be created/updated
         if (!hostNameFileObserver.poll(HOSTNAME_TIMEOUT.toLong(), TimeUnit.SECONDS)) {
-            FileUtilities.listFilesToLog(hostnameFile.parentFile)
+            hostnameFile.parentFile?.let { FileUtilities.listFilesToLog(it) }
             throw RuntimeException("Wait for hidden service hostname file to be created expired.")
         }
 
