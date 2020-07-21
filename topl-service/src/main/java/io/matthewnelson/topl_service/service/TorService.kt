@@ -21,7 +21,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.IBinder
-import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_service.notification.ServiceNotification
@@ -37,8 +36,6 @@ import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationAction
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import kotlinx.coroutines.*
-import java.io.IOException
-import java.lang.reflect.InvocationTargetException
 
 internal class TorService: Service() {
 
@@ -107,7 +104,7 @@ internal class TorService: Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.action?.let { actionString ->
-
+            broadcastLogger.debug("Received: $actionString")
             when (actionString) {
 
                 // Send all NotificationActions back through the TorServiceController to be
@@ -133,7 +130,6 @@ internal class TorService: Service() {
                     else if (actionString == ServiceAction.STOP_SERVICE)
                         isTorServiceAcceptingActions = false
 
-                    broadcastLogger.debug("Received ServiceAction: $actionString")
                     submitServiceActionForExecution(intent)
                 }
             }
@@ -172,54 +168,6 @@ internal class TorService: Service() {
             ServiceEventBroadcaster(torService),
             buildConfigDebug
         )
-    }
-
-    /**
-     * Do not call directly, use [submitServiceActionForExecution].
-     * */
-    @WorkerThread
-    private fun startTor() {
-        if (onionProxyManager.hasControlConnection) return
-        try {
-            onionProxyManager.setup()
-            generateTorrcFile()
-
-            onionProxyManager.start()
-        } catch (e: Exception) {
-            broadcastLogger.exception(e)
-        }
-    }
-
-    /**
-     * Do not call directly, use [submitServiceActionForExecution].
-     * */
-    @WorkerThread
-    private fun stopTor() {
-        try {
-            onionProxyManager.stop()
-        } catch (e: Exception) {
-            broadcastLogger.exception(e)
-        }
-    }
-
-    /**
-     * Called from [startTor].
-     * */
-    @WorkerThread
-    @Throws(
-        SecurityException::class,
-        IllegalAccessException::class,
-        IllegalArgumentException::class,
-        InvocationTargetException::class,
-        NullPointerException::class,
-        ExceptionInInitializerError::class,
-        IOException::class
-    )
-    private fun generateTorrcFile() {
-        onionProxyManager.getNewSettingsBuilder()
-            .updateTorSettings()
-            .setGeoIpFiles()
-            .finishAndWriteToTorrcFile()
     }
 
     ///////////////////////
@@ -262,10 +210,26 @@ internal class TorService: Service() {
                         onionProxyManager.signalNewNym()
                     }
                     ServiceAction.START_TOR -> {
-                        startTor()
+                        if (!onionProxyManager.hasControlConnection) {
+                            try {
+                                onionProxyManager.setup()
+                                onionProxyManager.getNewSettingsBuilder()
+                                    .updateTorSettings()
+                                    .setGeoIpFiles()
+                                    .finishAndWriteToTorrcFile()
+
+                                onionProxyManager.start()
+                            } catch (e: Exception) {
+                                broadcastLogger.exception(e)
+                            }
+                        }
                     }
                     ServiceAction.STOP_TOR -> {
-                        stopTor()
+                        try {
+                            onionProxyManager.stop()
+                        } catch (e: Exception) {
+                            broadcastLogger.exception(e)
+                        }
                     }
                     ServiceAction.STOP_SERVICE -> {
                         // if START_TOR was called after STOP_SERVICE had been added to the
