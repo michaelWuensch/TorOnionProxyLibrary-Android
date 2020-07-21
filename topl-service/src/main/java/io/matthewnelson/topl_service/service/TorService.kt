@@ -107,10 +107,10 @@ internal class TorService: Service() {
         intent?.action?.let {
             broadcastLogger.debug("Received ServiceAction: $it")
 
-            // Set isTorStarted immediately before sending action off to be executed on
+            // Set isTorStarted immediately before sending the action off to be executed on
             // a different thread. This inhibits issuance of actions after stop is called,
             // unless that action is ACTION_START which will "save" the service instance
-            // and start Tor and allow for queuing of other ServiceActions.
+            // and start Tor, allowing for queuing of other ServiceActions.
             when (it) {
                 ServiceAction.ACTION_START -> {
                     isTorStarted = true
@@ -120,7 +120,7 @@ internal class TorService: Service() {
                 }
             }
 
-            executeAction(it)
+            submitServiceActionForExecution(it)
         }
         return START_STICKY
     }
@@ -130,7 +130,7 @@ internal class TorService: Service() {
         // TODO: add to debug message if Controller option for disabling stop on task removed
         //  when the feature gets implemented.
         broadcastLogger.debug("Task has been removed")
-        executeAction(ServiceAction.ACTION_STOP)
+        submitServiceActionForExecution(ServiceAction.ACTION_STOP)
     }
 
     /////////////////
@@ -159,7 +159,7 @@ internal class TorService: Service() {
     }
 
     /**
-     * Do not call directly, use [executeAction].
+     * Do not call directly, use [submitServiceActionForExecution].
      * */
     @WorkerThread
     private fun startTor() {
@@ -175,7 +175,7 @@ internal class TorService: Service() {
     }
 
     /**
-     * Do not call directly, use [executeAction].
+     * Do not call directly, use [submitServiceActionForExecution].
      * */
     @WorkerThread
     private fun stopTor() {
@@ -206,29 +206,41 @@ internal class TorService: Service() {
             .finishAndWriteToTorrcFile()
     }
 
-    ///////////////
-    /// Actions ///
-    ///////////////
+    ///////////////////////
+    /// Service Actions ///
+    ///////////////////////
     private val supervisorJob = SupervisorJob()
     val scopeMain = CoroutineScope(Dispatchers.Main + supervisorJob)
-    private lateinit var executeActionJob: Job
+
+    private lateinit var processServiceActionsJob: Job
+    private val serviceActionQueue = mutableListOf<@ServiceAction String>()
 
     /**
      * Route all [ServiceAction]s here for execution.
      *
-     * @param [action] A [ServiceAction]
+     * Submits the [ServiceAction] to a queue, and starts [processServiceActionsJob] to work
+     * through it. This allows for receiving of multiple actions that will be executed in order
+     * that they are received, and only after the previous action has been completed.
+     *
+     * @param [serviceAction] A [ServiceAction] to be executed.
      * */
-    private fun executeAction(@ServiceAction action: String) {
-        scopeMain.launch {
-            // TODO: Need to think about solution for if start() or stop() hangs due to
-            //  jtorctl's lack of interruption timeout
-            if (::executeActionJob.isInitialized && executeActionJob.isActive) {
-                executeActionJob.join()
-                delay(100L)
-            }
+    private fun submitServiceActionForExecution(@ServiceAction serviceAction: String) {
+        serviceActionQueue.add(serviceAction)
 
-            executeActionJob = launch(Dispatchers.IO) {
-                when (action) {
+        if (!::processServiceActionsJob.isInitialized || !processServiceActionsJob.isActive) {
+            processServiceActionQueue()
+        }
+    }
+
+    /**
+     * Works through the [serviceActionQueue].
+     * */
+    private fun processServiceActionQueue() {
+        processServiceActionsJob = scopeMain.launch(Dispatchers.IO) {
+
+            while (serviceActionQueue.size > 0 && isActive) {
+
+                when (serviceActionQueue[0]) {
                     ServiceAction.ACTION_START -> {
                         startTor()
                     }
@@ -254,6 +266,7 @@ internal class TorService: Service() {
                         onionProxyManager.signalNewNym()
                     }
                 }
+                serviceActionQueue.removeAt(0)
             }
         }
     }
