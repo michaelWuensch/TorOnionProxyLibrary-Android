@@ -161,18 +161,40 @@ abstract class ServiceConsts: BaseConsts() {
     /// ServiceActions ///
     //////////////////////
     @StringDef(
-        ServiceAction.ACTION_START,
-        ServiceAction.ACTION_STOP,
-        ServiceAction.ACTION_RESTART,
-        ServiceAction.ACTION_NEW_ID
+        ServiceAction.DELAY,
+        ServiceAction.NEW_ID,
+        ServiceAction.START_TOR,
+        ServiceAction.STOP_TOR,
+        ServiceAction.STOP_SERVICE
     )
     @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
     internal annotation class ServiceAction {
         companion object {
-            const val ACTION_START = "ACTION_START"
-            const val ACTION_STOP = "ACTION_STOP"
-            const val ACTION_RESTART = "ACTION_RESTART"
-            const val ACTION_NEW_ID = "ACTION_NEW_ID"
+            private const val SERVICE_ACTION = "ServiceAction_"
+            const val DELAY = "${SERVICE_ACTION}DELAY"
+            const val NEW_ID = "${SERVICE_ACTION}NEW_ID"
+            const val START_TOR = "${SERVICE_ACTION}START_TOR"
+            const val STOP_TOR = "${SERVICE_ACTION}STOP_TOR"
+            const val STOP_SERVICE = "${SERVICE_ACTION}STOP_SERVICE"
+        }
+    }
+
+
+    ///////////////////////////
+    /// NotificationActions ///
+    ///////////////////////////
+    @StringDef(
+        NotificationAction.NEW_ID,
+        NotificationAction.RESTART_TOR,
+        NotificationAction.STOP_SERVICE
+    )
+    @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
+    internal annotation class NotificationAction {
+        companion object {
+            private const val NOTIFICATION_ACTION = "NotificationAction_"
+            const val NEW_ID = "${NOTIFICATION_ACTION}NEW_ID"
+            const val RESTART_TOR = "${NOTIFICATION_ACTION}RESTART_TOR"
+            const val STOP_SERVICE = "${NOTIFICATION_ACTION}STOP_SERVICE"
         }
     }
 }

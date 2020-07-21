@@ -399,10 +399,19 @@ class TorServiceController private constructor(): ServiceConsts() {
         var appEventBroadcaster: EventBroadcaster? = null
             private set
 
-        private fun sendAction(@ServiceAction action: String) {
+        private fun sendAction(
+            @ServiceAction action: String,
+            extrasKey: String? = null,
+            extrasString: String? = null
+        ) {
             if (!::appContext.isInitialized) return
             val torServiceIntent = Intent(appContext.applicationContext, TorService::class.java)
             torServiceIntent.action = action
+
+            if (extrasKey != null && extrasString != null) {
+                torServiceIntent.putExtra(extrasKey, extrasString)
+            }
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 appContext.startForegroundService(torServiceIntent)
             else
@@ -416,8 +425,10 @@ class TorServiceController private constructor(): ServiceConsts() {
          *
          * You can call this as much as you want. If Tor is already on, it will do nothing.
          * */
-        fun startTor() =
-            sendAction(ServiceAction.ACTION_START)
+        fun startTor() {
+            sendAction(ServiceAction.START_TOR)
+            sendAction(ServiceAction.DELAY, ServiceAction.DELAY, "100")
+        }
 
         /**
          * Stops [TorService]. Does nothing if called prior to:
@@ -426,8 +437,10 @@ class TorServiceController private constructor(): ServiceConsts() {
          *  - Calling [startTor]
          * */
         fun stopTor() {
-            if (!TorService.isTorStarted) return
-            sendAction(ServiceAction.ACTION_STOP)
+            if (!TorService.isTorServiceAcceptingActions) return
+            sendAction(ServiceAction.STOP_TOR)
+            sendAction(ServiceAction.DELAY, ServiceAction.DELAY, "200")
+            sendAction(ServiceAction.STOP_SERVICE)
         }
 
         /**
@@ -437,8 +450,10 @@ class TorServiceController private constructor(): ServiceConsts() {
          *  - Calling [startTor]
          * */
         fun restartTor() {
-            if (!TorService.isTorStarted) return
-            sendAction(ServiceAction.ACTION_RESTART)
+            if (!TorService.isTorServiceAcceptingActions) return
+            sendAction(ServiceAction.STOP_TOR)
+            sendAction(ServiceAction.DELAY, ServiceAction.DELAY, "1000")
+            startTor()
         }
 
         /**
@@ -448,8 +463,8 @@ class TorServiceController private constructor(): ServiceConsts() {
          *  - Calling [startTor]
          * */
         fun newIdentity() {
-            if (!TorService.isTorStarted) return
-            sendAction(ServiceAction.ACTION_NEW_ID)
+            if (!TorService.isTorServiceAcceptingActions) return
+            sendAction(ServiceAction.NEW_ID)
         }
     }
 }

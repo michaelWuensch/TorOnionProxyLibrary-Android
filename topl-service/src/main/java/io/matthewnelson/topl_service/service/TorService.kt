@@ -28,11 +28,13 @@ import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.BuildConfig
+import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.onionproxy.ServiceEventBroadcaster
 import io.matthewnelson.topl_service.onionproxy.ServiceEventListener
 import io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller
 import io.matthewnelson.topl_service.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
+import io.matthewnelson.topl_service.util.ServiceConsts.NotificationAction
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import kotlinx.coroutines.*
 import java.io.IOException
@@ -68,7 +70,7 @@ internal class TorService: Service() {
         // from sending such that startService isn't called and Tor isn't properly
         // started up.
         @Volatile
-        var isTorStarted = false
+        var isTorServiceAcceptingActions = false
             private set
 
         // For things that can't be saved to TorServicePrefs, such as BuildConfig.VERSION_CODE
@@ -104,23 +106,37 @@ internal class TorService: Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        intent?.action?.let {
-            broadcastLogger.debug("Received ServiceAction: $it")
+        intent?.action?.let { actionString ->
 
-            // Set isTorStarted immediately before sending the action off to be executed on
-            // a different thread. This inhibits issuance of actions after stop is called,
-            // unless that action is ACTION_START which will "save" the service instance
-            // and start Tor, allowing for queuing of other ServiceActions.
-            when (it) {
-                ServiceAction.ACTION_START -> {
-                    isTorStarted = true
+            when (actionString) {
+
+                // Send all NotificationActions back through the TorServiceController to be
+                // properly executed.
+                NotificationAction.NEW_ID -> {
+                    TorServiceController.newIdentity()
                 }
-                ServiceAction.ACTION_STOP -> {
-                    isTorStarted = false
+                NotificationAction.RESTART_TOR -> {
+                    TorServiceController.restartTor()
+                }
+                NotificationAction.STOP_SERVICE -> {
+                    TorServiceController.stopTor()
+                }
+                else -> {
+
+                    // Set isTorServiceAcceptingActions immediately before sending the action off to
+                    // be executed on a different thread. This inhibits issuance of actions after
+                    // ACTION_STOP_SERVICE is called, unless that action is ACTION_START which will
+                    // "save" the service instance and start Tor, allowing for queuing of other
+                    // ServiceActions.
+                    if (actionString == ServiceAction.START_TOR)
+                        isTorServiceAcceptingActions = true
+                    else if (actionString == ServiceAction.STOP_SERVICE)
+                        isTorServiceAcceptingActions = false
+
+                    broadcastLogger.debug("Received ServiceAction: $actionString")
+                    submitServiceActionForExecution(intent)
                 }
             }
-
-            submitServiceActionForExecution(it)
         }
         return START_STICKY
     }
@@ -130,7 +146,7 @@ internal class TorService: Service() {
         // TODO: add to debug message if Controller option for disabling stop on task removed
         //  when the feature gets implemented.
         broadcastLogger.debug("Task has been removed")
-        submitServiceActionForExecution(ServiceAction.ACTION_STOP)
+        TorServiceController.stopTor()
     }
 
     /////////////////
@@ -213,23 +229,23 @@ internal class TorService: Service() {
     val scopeMain = CoroutineScope(Dispatchers.Main + supervisorJob)
 
     private lateinit var processServiceActionsJob: Job
-    private val serviceActionQueue = mutableListOf<@ServiceAction String>()
+    private val serviceActionQueue = mutableListOf<Intent>()
 
     /**
      * Route all [ServiceAction]s here for execution.
      *
-     * Submits the [ServiceAction] to a queue, and starts [processServiceActionsJob] to work
-     * through it. This allows for receiving of multiple actions that will be executed in order
-     * that they are received, and only after the previous action has been completed.
+     * Submits the Intent containing a [ServiceAction] to the queue, and starts
+     * [processServiceActionsJob] to work through it (if not already active). This allows for
+     * receiving of multiple actions that will be executed in order that they are received, and
+     * only after the previous action has been completed.
      *
-     * @param [serviceAction] A [ServiceAction] to be executed.
+     * @param [serviceActionIntent] An Intent containing a [ServiceAction] to be executed.
      * */
-    private fun submitServiceActionForExecution(@ServiceAction serviceAction: String) {
-        serviceActionQueue.add(serviceAction)
+    private fun submitServiceActionForExecution(serviceActionIntent: Intent) {
+        serviceActionQueue.add(serviceActionIntent)
 
-        if (!::processServiceActionsJob.isInitialized || !processServiceActionsJob.isActive) {
+        if (!::processServiceActionsJob.isInitialized || !processServiceActionsJob.isActive)
             processServiceActionQueue()
-        }
     }
 
     /**
@@ -239,31 +255,32 @@ internal class TorService: Service() {
         processServiceActionsJob = scopeMain.launch(Dispatchers.IO) {
 
             while (serviceActionQueue.size > 0 && isActive) {
+                val serviceActionIntent = serviceActionQueue[0]
 
-                when (serviceActionQueue[0]) {
-                    ServiceAction.ACTION_START -> {
+                when (serviceActionIntent.action) {
+                    ServiceAction.NEW_ID -> {
+                        onionProxyManager.signalNewNym()
+                    }
+                    ServiceAction.START_TOR -> {
                         startTor()
                     }
-                    ServiceAction.ACTION_STOP -> {
+                    ServiceAction.STOP_TOR -> {
                         stopTor()
-
-                        // Need a delay before calling stopSelf so that the coroutine which
-                        // removes notification actions isn't cancelled via the supervisorJob
-                        // being cancelled in onDestroy.
-                        delay(200L)
-
-                        // if ACTION_START was called while stopTor was executing, do not stop
-                        // the service and allow startTor to be executed.
-                        if (!isTorStarted)
+                    }
+                    ServiceAction.STOP_SERVICE -> {
+                        // if START_TOR was called after STOP_SERVICE had been added to the
+                        // queue, do not stop the service and allow startTor to be executed
+                        // instead.
+                        if (!isTorServiceAcceptingActions)
                             stopSelf()
                     }
-                    ServiceAction.ACTION_RESTART -> {
-                        stopTor()
-                        delay(1000L)
-                        startTor()
-                    }
-                    ServiceAction.ACTION_NEW_ID -> {
-                        onionProxyManager.signalNewNym()
+                    ServiceAction.DELAY -> {
+                        val delayLength: Long = try {
+                            serviceActionIntent.getStringExtra(ServiceAction.DELAY)?.toLong() ?: 1000L
+                        } catch (e: NumberFormatException) {
+                            1000L
+                        }
+                        delay(delayLength)
                     }
                 }
                 serviceActionQueue.removeAt(0)
