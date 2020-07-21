@@ -67,6 +67,7 @@ internal class TorService: Service() {
         // Needed to inhibit all TorServiceController methods except for startTor()
         // from sending such that startService isn't called and Tor isn't properly
         // started up.
+        @Volatile
         var isTorStarted = false
             private set
 
@@ -105,6 +106,20 @@ internal class TorService: Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.action?.let {
             broadcastLogger.debug("Received ServiceAction: $it")
+
+            // Set isTorStarted immediately before sending action off to be executed on
+            // a different thread. This inhibits issuance of actions after stop is called,
+            // unless that action is ACTION_START which will "save" the service instance
+            // and start Tor and allow for queuing of other ServiceActions.
+            when (it) {
+                ServiceAction.ACTION_START -> {
+                    isTorStarted = true
+                }
+                ServiceAction.ACTION_STOP -> {
+                    isTorStarted = false
+                }
+            }
+
             executeAction(it)
         }
         return START_STICKY
@@ -215,18 +230,20 @@ internal class TorService: Service() {
             executeActionJob = launch(Dispatchers.IO) {
                 when (action) {
                     ServiceAction.ACTION_START -> {
-                        isTorStarted = true
                         startTor()
                     }
                     ServiceAction.ACTION_STOP -> {
-                        isTorStarted = false
                         stopTor()
 
                         // Need a delay before calling stopSelf so that the coroutine which
                         // removes notification actions isn't cancelled via the supervisorJob
                         // being cancelled in onDestroy.
                         delay(200L)
-                        stopSelf()
+
+                        // if ACTION_START was called while stopTor was executing, do not stop
+                        // the service and allow startTor to be executed.
+                        if (!isTorStarted)
+                            stopSelf()
                     }
                     ServiceAction.ACTION_RESTART -> {
                         stopTor()
