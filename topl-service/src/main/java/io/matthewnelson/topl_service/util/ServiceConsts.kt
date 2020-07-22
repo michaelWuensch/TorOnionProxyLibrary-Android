@@ -161,18 +161,45 @@ abstract class ServiceConsts: BaseConsts() {
     /// ServiceActions ///
     //////////////////////
     @StringDef(
-        ServiceAction.ACTION_START,
-        ServiceAction.ACTION_STOP,
-        ServiceAction.ACTION_RESTART,
-        ServiceAction.ACTION_NEW_ID
+        ServiceAction.NEW_ID,
+        ServiceAction.RESTART_TOR,
+        ServiceAction.START,
+        ServiceAction.STOP
     )
     @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
     internal annotation class ServiceAction {
         companion object {
-            const val ACTION_START = "ACTION_START"
-            const val ACTION_STOP = "ACTION_STOP"
-            const val ACTION_RESTART = "ACTION_RESTART"
-            const val ACTION_NEW_ID = "ACTION_NEW_ID"
+            private const val SERVICE_ACTION = "ServiceAction_"
+            const val NEW_ID = "${SERVICE_ACTION}NEW_ID"
+            const val RESTART_TOR = "${SERVICE_ACTION}RESTART_TOR"
+            const val START = "${SERVICE_ACTION}START"
+            const val STOP = "${SERVICE_ACTION}STOP"
         }
     }
+
+
+    //////////////////////
+    /// ActionCommands ///
+    //////////////////////
+    @Target(AnnotationTarget.TYPE, AnnotationTarget.CLASS, AnnotationTarget.VALUE_PARAMETER)
+    @StringDef(
+        ActionCommand.DELAY,
+        ActionCommand.NEW_ID,
+        ActionCommand.START_TOR,
+        ActionCommand.STOP_SERVICE,
+        ActionCommand.STOP_TOR
+    )
+    @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
+    internal annotation class ActionCommand {
+        companion object {
+            private const val ACTION_COMMAND = "ActionCommand_"
+            const val DELAY = "${ACTION_COMMAND}DELAY"
+            const val NEW_ID = "${ACTION_COMMAND}NEW_ID"
+            const val START_TOR = "${ACTION_COMMAND}START_TOR"
+            const val STOP_SERVICE = "${ACTION_COMMAND}STOP_SERVICE"
+            const val STOP_TOR = "${ACTION_COMMAND}STOP_TOR"
+        }
+    }
+
+
 }

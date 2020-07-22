@@ -28,6 +28,7 @@ import androidx.core.app.NotificationCompat.NotificationVisibility
 import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
+import io.matthewnelson.topl_service.service.ServiceActionProcessor
 import io.matthewnelson.topl_service.util.ServiceConsts
 
 class TorServiceController private constructor(): ServiceConsts() {
@@ -399,10 +400,30 @@ class TorServiceController private constructor(): ServiceConsts() {
         var appEventBroadcaster: EventBroadcaster? = null
             private set
 
-        private fun sendAction(@ServiceAction action: String) {
+        // Needed to inhibit all TorServiceController methods except for startTor()
+        // from sending such that startService isn't called and Tor isn't properly
+        // started up. Also inhibits executing certain actions within the
+        // TorService.serviceActionQueue as this variable is checked.
+        @Volatile
+        internal var isTorServiceAcceptingActions = false
+            private set
+
+        /**
+         * Adding a StringExtra to the Intent by passing a value for [extrasString] will
+         * always use the [action] as the key for retrieving it.
+         * */
+        private fun sendAction(
+            @ServiceAction action: String,
+            extrasString: String? = null
+        ) {
             if (!::appContext.isInitialized) return
             val torServiceIntent = Intent(appContext.applicationContext, TorService::class.java)
             torServiceIntent.action = action
+
+            if (extrasString != null) {
+                torServiceIntent.putExtra(action, extrasString)
+            }
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 appContext.startForegroundService(torServiceIntent)
             else
@@ -417,7 +438,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * You can call this as much as you want. If Tor is already on, it will do nothing.
          * */
         fun startTor() =
-            sendAction(ServiceAction.ACTION_START)
+            sendAction(ServiceAction.START)
 
         /**
          * Stops [TorService]. Does nothing if called prior to:
@@ -426,8 +447,8 @@ class TorServiceController private constructor(): ServiceConsts() {
          *  - Calling [startTor]
          * */
         fun stopTor() {
-            if (!TorService.isTorStarted) return
-            sendAction(ServiceAction.ACTION_STOP)
+            if (!ServiceActionProcessor.isAcceptingActions) return
+            sendAction(ServiceAction.STOP)
         }
 
         /**
@@ -437,8 +458,8 @@ class TorServiceController private constructor(): ServiceConsts() {
          *  - Calling [startTor]
          * */
         fun restartTor() {
-            if (!TorService.isTorStarted) return
-            sendAction(ServiceAction.ACTION_RESTART)
+            if (!ServiceActionProcessor.isAcceptingActions) return
+            sendAction(ServiceAction.RESTART_TOR)
         }
 
         /**
@@ -448,8 +469,8 @@ class TorServiceController private constructor(): ServiceConsts() {
          *  - Calling [startTor]
          * */
         fun newIdentity() {
-            if (!TorService.isTorStarted) return
-            sendAction(ServiceAction.ACTION_NEW_ID)
+            if (!ServiceActionProcessor.isAcceptingActions) return
+            sendAction(ServiceAction.NEW_ID)
         }
     }
 }

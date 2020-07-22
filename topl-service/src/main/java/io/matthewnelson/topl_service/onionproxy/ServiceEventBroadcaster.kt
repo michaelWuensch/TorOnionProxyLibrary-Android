@@ -23,6 +23,7 @@ import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import io.matthewnelson.topl_service.util.ServiceUtilities
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -43,6 +44,8 @@ import java.util.*
 internal class ServiceEventBroadcaster(private val torService: TorService): EventBroadcaster() {
 
     private val serviceNotification = ServiceNotification.get()
+    private val scopeMain: CoroutineScope
+        get() = torService.scopeMain
 
     /////////////////
     /// Bandwidth ///
@@ -83,7 +86,7 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
         }
 
         TorServiceController.appEventBroadcaster?.let {
-            torService.scopeMain.launch { it.broadcastBandwidth(bytesRead, bytesWritten) }
+            scopeMain.launch { it.broadcastBandwidth(bytesRead, bytesWritten) }
         }
     }
 
@@ -105,7 +108,7 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
     /////////////
     override fun broadcastDebug(msg: String) {
         TorServiceController.appEventBroadcaster?.let {
-            torService.scopeMain.launch { it.broadcastDebug(msg) }
+            scopeMain.launch { it.broadcastDebug(msg) }
         }
     }
 
@@ -125,7 +128,7 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
         }
 
         TorServiceController.appEventBroadcaster?.let {
-            torService.scopeMain.launch { it.broadcastException(msg, e) }
+            scopeMain.launch { it.broadcastException(msg, e) }
         }
     }
 
@@ -135,7 +138,7 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
     ///////////////////
     override fun broadcastLogMessage(logMessage: String?) {
         TorServiceController.appEventBroadcaster?.let {
-            torService.scopeMain.launch { it.broadcastLogMessage(logMessage) }
+            scopeMain.launch { it.broadcastLogMessage(logMessage) }
         }
     }
 
@@ -193,7 +196,7 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
         }
 
         TorServiceController.appEventBroadcaster?.let {
-            torService.scopeMain.launch { it.broadcastNotice(msg) }
+            scopeMain.launch { it.broadcastNotice(msg) }
         }
     }
 
@@ -203,7 +206,7 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
      * ContentText the most recently broadcast bandwidth via [bytesRead] && [bytesWritten].
      * */
     private fun displayMessageToContentText(message: String, delayMilliSeconds: Long) {
-        noticeMsgToContentTextJob = torService.scopeMain.launch {
+        noticeMsgToContentTextJob = scopeMain.launch {
             serviceNotification.updateContentText(message)
             delay(delayMilliSeconds)
 
@@ -254,7 +257,7 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
         }
 
         TorServiceController.appEventBroadcaster?.let {
-            torService.scopeMain.launch { it.broadcastTorState(state, networkState) }
+            scopeMain.launch { it.broadcastTorState(state, networkState) }
         }
     }
 }

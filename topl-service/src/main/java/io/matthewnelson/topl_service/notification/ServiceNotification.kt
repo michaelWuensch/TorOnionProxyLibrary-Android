@@ -181,21 +181,21 @@ internal class ServiceNotification(
         builder.addAction(
             imageNetworkEnabled,
             "New Identity",
-            getActionPendingIntent(torService, ServiceAction.ACTION_NEW_ID)
+            getActionPendingIntent(torService, ServiceAction.NEW_ID)
         )
 
         if (enableRestartButton)
             builder.addAction(
                 imageNetworkEnabled,
                 "Restart Tor",
-                getActionPendingIntent(torService, ServiceAction.ACTION_RESTART)
+                getActionPendingIntent(torService, ServiceAction.RESTART_TOR)
             )
 
         if (enableStopButton)
             builder.addAction(
                 imageNetworkEnabled,
                 "Stop Tor",
-                getActionPendingIntent(torService, ServiceAction.ACTION_STOP)
+                getActionPendingIntent(torService, ServiceAction.STOP)
             )
         notify(builder)
     }
