@@ -86,11 +86,16 @@ internal class OnionProxyContext(
             broadcastLogger = onionProxyBroadcastLogger
     }
 
-    private val controlPortFileLock = Object()
-    private val cookieAuthFileLock = Object()
-    private val dataDirLock = Object()
-    private val resolvConfFileLock = Object()
-    private val hostnameFileLock = Object()
+    private val controlPortFileLock: Any
+        get() = torConfigFiles.controlPortFileLock
+    private val cookieAuthFileLock: Any
+        get() = torConfigFiles.cookieAuthFileLock
+    private val dataDirLock: Any
+        get() = torConfigFiles.dataDirLock
+    private val resolvConfFileLock: Any
+        get() = torConfigFiles.resolvConfFileLock
+    private val hostnameFileLock: Any
+        get() = torConfigFiles.hostnameFileLock
 
     /**
      * Creates an observer for the file referenced. See [CoreConsts.ConfigFile] annotation class
