@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         torServicePrefs = TorServicePrefs(this)
         hasDebugLogs = torServicePrefs.getBoolean(
-            PrefKeyBoolean.HAS_DEBUG_LOGS, App.myTorSettings.hasDebugLogs
+            PrefKeyBoolean.HAS_DEBUG_LOGS, TorServiceController.getTorSettings().hasDebugLogs
         )
         findViews()
         initButtons()
