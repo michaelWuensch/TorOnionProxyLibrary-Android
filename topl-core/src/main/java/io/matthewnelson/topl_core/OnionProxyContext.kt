@@ -52,6 +52,7 @@ import io.matthewnelson.topl_core.util.CoreConsts
 import io.matthewnelson.topl_core.util.TorInstaller
 import io.matthewnelson.topl_core.util.WriteObserver
 import io.matthewnelson.topl_core_base.TorConfigFiles
+import io.matthewnelson.topl_core_base.readTorConfigFile
 import java.io.*
 
 /**
@@ -208,17 +209,17 @@ internal class OnionProxyContext(
         return when (configFileReference) {
             ConfigFile.CONTROL_PORT_FILE -> {
                 synchronized(controlPortFileLock) {
-                    FileUtilities.read(torConfigFiles.controlPortFile)
+                    torConfigFiles.controlPortFile.readTorConfigFile()
                 }
             }
             ConfigFile.COOKIE_AUTH_FILE -> {
                 synchronized(cookieAuthFileLock) {
-                    FileUtilities.read(torConfigFiles.cookieAuthFile)
+                    torConfigFiles.cookieAuthFile.readTorConfigFile()
                 }
             }
             ConfigFile.HOSTNAME_FILE -> {
                 synchronized(hostnameFileLock) {
-                    FileUtilities.read(torConfigFiles.hostnameFile)
+                    torConfigFiles.hostnameFile.readTorConfigFile()
                 }
             }
             else -> {

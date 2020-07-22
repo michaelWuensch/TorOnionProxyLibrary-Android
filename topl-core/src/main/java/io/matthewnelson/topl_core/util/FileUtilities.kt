@@ -159,24 +159,6 @@ object FileUtilities {
         }
     }
 
-    @Throws(IOException::class, EOFException::class, SecurityException::class)
-    fun read(f: File): ByteArray {
-        val b = ByteArray(f.length().toInt())
-        val `in` = FileInputStream(f)
-
-        return `in`.use { inputStream ->
-            var offset = 0
-
-            while (offset < b.size) {
-                val read = inputStream.read(b, offset, b.size - offset)
-                if (read == -1) throw EOFException()
-                offset += read
-            }
-
-            b
-        }
-    }
-
     /**
      * Reads the input stream, deletes fileToWriteTo if it exists and over writes it with the stream.
      * @param readFrom Stream to read from
