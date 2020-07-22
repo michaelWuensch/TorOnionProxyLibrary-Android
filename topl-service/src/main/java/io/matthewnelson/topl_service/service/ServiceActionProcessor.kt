@@ -172,12 +172,14 @@ internal class ServiceActionProcessor(private val torService: TorService): Servi
                             }
                             ActionCommand.START_TOR -> {
                                 startTor()
+                                delay(300L)
                             }
                             ActionCommand.STOP_SERVICE -> {
                                 stopService()
                             }
                             ActionCommand.STOP_TOR -> {
                                 stopTor()
+                                delay(300L)
                             }
                         }
                         if (index == actionObject.commands.lastIndex) {

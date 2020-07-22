@@ -76,32 +76,25 @@ internal sealed class ActionCommands {
             get() = arrayOf(
                 ActionCommand.STOP_TOR,
                 ActionCommand.DELAY,
-                ActionCommand.START_TOR,
-                ActionCommand.DELAY
+                ActionCommand.START_TOR
             )
         override val delayLengthQueue =
-            mutableListOf(200L, 100L)
+            mutableListOf(700L)
     }
 
     class Start: ServiceActionObject() {
         override val commands: Array<String>
             get() = arrayOf(
-                ActionCommand.START_TOR,
-                ActionCommand.DELAY
+                ActionCommand.START_TOR
             )
-        override val delayLengthQueue=
-            mutableListOf(100L)
     }
 
     class Stop: ServiceActionObject() {
         override val commands: Array<String>
             get() = arrayOf(
                 ActionCommand.STOP_TOR,
-                ActionCommand.DELAY,
                 ActionCommand.STOP_SERVICE
             )
-        override val delayLengthQueue =
-            mutableListOf(200L)
     }
 
     /**
