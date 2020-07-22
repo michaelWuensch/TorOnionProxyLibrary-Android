@@ -27,14 +27,11 @@ import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.BuildConfig
-import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.onionproxy.ServiceEventBroadcaster
 import io.matthewnelson.topl_service.onionproxy.ServiceEventListener
 import io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller
 import io.matthewnelson.topl_service.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
-import io.matthewnelson.topl_service.util.ServiceConsts.NotificationAction
-import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import kotlinx.coroutines.*
 
 internal class TorService: Service() {
@@ -63,19 +60,15 @@ internal class TorService: Service() {
             this.geoip6AssetPath = geoip6AssetPath
         }
 
-        // Needed to inhibit all TorServiceController methods except for startTor()
-        // from sending such that startService isn't called and Tor isn't properly
-        // started up.
-        @Volatile
-        var isTorServiceAcceptingActions = false
-            private set
-
         // For things that can't be saved to TorServicePrefs, such as BuildConfig.VERSION_CODE
         fun getLocalPrefs(context: Context): SharedPreferences =
             context.getSharedPreferences("TorServiceLocalPrefs", Context.MODE_PRIVATE)
     }
 
-    private lateinit var broadcastLogger: BroadcastLogger
+    private val supervisorJob = SupervisorJob()
+    val scopeMain = CoroutineScope(Dispatchers.Main + supervisorJob)
+    lateinit var serviceActionProcessor: ServiceActionProcessor
+        private set
     private lateinit var torServicePrefsListener: TorServicePrefsListener
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -86,9 +79,8 @@ internal class TorService: Service() {
         super.onCreate()
         ServiceNotification.get().startForegroundNotification(this)
         initTOPLCore(this)
-        broadcastLogger = onionProxyManager.getBroadcastLogger(TorService::class.java)
-        broadcastLogger.notice("BuildConfig.DEBUG set to: $buildConfigDebug")
-        torServicePrefsListener = TorServicePrefsListener(this, onionProxyManager)
+        serviceActionProcessor = ServiceActionProcessor(this)
+        torServicePrefsListener = TorServicePrefsListener(this)
     }
 
     override fun onDestroy() {
@@ -103,36 +95,8 @@ internal class TorService: Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        intent?.action?.let { actionString ->
-            broadcastLogger.debug("Received: $actionString")
-            when (actionString) {
-
-                // Send all NotificationActions back through the TorServiceController to be
-                // properly executed.
-                NotificationAction.NEW_ID -> {
-                    TorServiceController.newIdentity()
-                }
-                NotificationAction.RESTART_TOR -> {
-                    TorServiceController.restartTor()
-                }
-                NotificationAction.STOP_SERVICE -> {
-                    TorServiceController.stopTor()
-                }
-                else -> {
-
-                    // Set isTorServiceAcceptingActions immediately before sending the action off to
-                    // be executed on a different thread. This inhibits issuance of actions after
-                    // ACTION_STOP_SERVICE is called, unless that action is ACTION_START which will
-                    // "save" the service instance and start Tor, allowing for queuing of other
-                    // ServiceActions.
-                    if (actionString == ServiceAction.START_TOR)
-                        isTorServiceAcceptingActions = true
-                    else if (actionString == ServiceAction.STOP_SERVICE)
-                        isTorServiceAcceptingActions = false
-
-                    submitServiceActionForExecution(intent)
-                }
-            }
+        intent?.action?.let {
+            serviceActionProcessor.processIntent(intent)
         }
         return START_STICKY
     }
@@ -142,13 +106,15 @@ internal class TorService: Service() {
         // TODO: add to debug message if Controller option for disabling stop on task removed
         //  when the feature gets implemented.
         broadcastLogger.debug("Task has been removed")
-        TorServiceController.stopTor()
+        serviceActionProcessor.processActionObject(ActionCommands.Stop())
     }
 
     /////////////////
     /// TOPL-Core ///
     /////////////////
-    private lateinit var onionProxyManager: OnionProxyManager
+    private lateinit var broadcastLogger: BroadcastLogger
+    lateinit var onionProxyManager: OnionProxyManager
+        private set
 
     private fun initTOPLCore(torService: TorService) {
         val serviceTorInstaller = ServiceTorInstaller(
@@ -168,87 +134,7 @@ internal class TorService: Service() {
             ServiceEventBroadcaster(torService),
             buildConfigDebug
         )
-    }
-
-    ///////////////////////
-    /// Service Actions ///
-    ///////////////////////
-    private val supervisorJob = SupervisorJob()
-    val scopeMain = CoroutineScope(Dispatchers.Main + supervisorJob)
-
-    private lateinit var processServiceActionsJob: Job
-    private val serviceActionQueue = mutableListOf<Intent>()
-
-    /**
-     * Route all [ServiceAction]s here for execution.
-     *
-     * Submits the Intent containing a [ServiceAction] to the queue, and starts
-     * [processServiceActionsJob] to work through it (if not already active). This allows for
-     * receiving of multiple actions that will be executed in order that they are received, and
-     * only after the previous action has been completed.
-     *
-     * @param [serviceActionIntent] An Intent containing a [ServiceAction] to be executed.
-     * */
-    private fun submitServiceActionForExecution(serviceActionIntent: Intent) {
-        serviceActionQueue.add(serviceActionIntent)
-
-        if (!::processServiceActionsJob.isInitialized || !processServiceActionsJob.isActive)
-            processServiceActionQueue()
-    }
-
-    /**
-     * Works through the [serviceActionQueue].
-     * */
-    private fun processServiceActionQueue() {
-        processServiceActionsJob = scopeMain.launch(Dispatchers.IO) {
-
-            while (serviceActionQueue.size > 0 && isActive) {
-                val serviceActionIntent = serviceActionQueue[0]
-
-                when (serviceActionIntent.action) {
-                    ServiceAction.NEW_ID -> {
-                        onionProxyManager.signalNewNym()
-                    }
-                    ServiceAction.START_TOR -> {
-                        if (!onionProxyManager.hasControlConnection) {
-                            try {
-                                onionProxyManager.setup()
-                                onionProxyManager.getNewSettingsBuilder()
-                                    .updateTorSettings()
-                                    .setGeoIpFiles()
-                                    .finishAndWriteToTorrcFile()
-
-                                onionProxyManager.start()
-                            } catch (e: Exception) {
-                                broadcastLogger.exception(e)
-                            }
-                        }
-                    }
-                    ServiceAction.STOP_TOR -> {
-                        try {
-                            onionProxyManager.stop()
-                        } catch (e: Exception) {
-                            broadcastLogger.exception(e)
-                        }
-                    }
-                    ServiceAction.STOP_SERVICE -> {
-                        // if START_TOR was called after STOP_SERVICE had been added to the
-                        // queue, do not stop the service and allow startTor to be executed
-                        // instead.
-                        if (!isTorServiceAcceptingActions)
-                            stopSelf()
-                    }
-                    ServiceAction.DELAY -> {
-                        val delayLength: Long = try {
-                            serviceActionIntent.getStringExtra(ServiceAction.DELAY)?.toLong() ?: 1000L
-                        } catch (e: NumberFormatException) {
-                            1000L
-                        }
-                        delay(delayLength)
-                    }
-                }
-                serviceActionQueue.removeAt(0)
-            }
-        }
+        broadcastLogger = onionProxyManager.getBroadcastLogger(TorService::class.java)
+        broadcastLogger.notice("BuildConfig.DEBUG set to: $buildConfigDebug")
     }
 }

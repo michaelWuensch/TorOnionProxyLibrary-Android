@@ -19,21 +19,26 @@ package io.matthewnelson.topl_service.prefs
 import android.content.SharedPreferences
 import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
+import io.matthewnelson.topl_service.service.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyBoolean
 
 /**
  * Listens to [TorServicePrefs] for changes such that while Tor is running, it can
  * query [onionProxyManager] to have it updated immediately (if the setting doesn't
- * require a restart).
+ * require a restart), as well as submit Actions to [ServiceActionProcessor] to be queued
+ * for execution.
  *
  * @param [torService] To instantiate [TorServicePrefs]
- * @param [onionProxyManager]
  * */
 internal class TorServicePrefsListener(
-    private val torService: TorService,
-    private val onionProxyManager: OnionProxyManager
+    private val torService: TorService
 ): SharedPreferences.OnSharedPreferenceChangeListener {
+
+    private val onionProxyManager: OnionProxyManager
+        get() = torService.onionProxyManager
+    private val serviceActionProcessor: ServiceActionProcessor
+        get() = torService.serviceActionProcessor
 
     private val torServicePrefs = TorServicePrefs(torService)
     private val broadcastLogger: BroadcastLogger =
