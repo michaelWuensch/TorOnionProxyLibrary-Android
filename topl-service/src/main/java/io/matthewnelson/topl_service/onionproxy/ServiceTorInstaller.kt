@@ -64,11 +64,11 @@ internal class ServiceTorInstaller(
     @Throws(IOException::class, SecurityException::class)
     override fun setup() {
         if (!torConfigFiles.geoIpFile.exists()) {
-            copyAsset(geoIpAssetPath, torConfigFiles.geoIpFile)
+            copyGeoIpAsset()
             geoIpFileCopied = ""
         }
         if (!torConfigFiles.geoIpv6File.exists()) {
-            copyAsset(geoIp6AssetPath, torConfigFiles.geoIpv6File)
+            copyGeoIpv6Asset()
             geoIpv6FileCopied = ""
         }
 
@@ -77,14 +77,24 @@ internal class ServiceTorInstaller(
         // mitigates copying to be done only if a version upgrade is had.
         if (buildConfigDebug || buildConfigVersionCode > localPrefs.getInt(APP_VERSION_CODE, -1)) {
             if (!::geoIpFileCopied.isInitialized) {
-                copyAsset(geoIpAssetPath, torConfigFiles.geoIpFile)
+                copyGeoIpAsset()
             }
             if (!::geoIpv6FileCopied.isInitialized) {
-                copyAsset(geoIp6AssetPath, torConfigFiles.geoIpv6File)
+                copyGeoIpv6Asset()
             }
             localPrefs.edit().putInt(APP_VERSION_CODE, buildConfigVersionCode).apply()
         }
     }
+
+    private fun copyGeoIpAsset() =
+        synchronized(torConfigFiles.geoIpFileLock) {
+            copyAsset(geoIpAssetPath, torConfigFiles.geoIpFile)
+        }
+
+    private fun copyGeoIpv6Asset() =
+        synchronized(torConfigFiles.geoIpv6FileLock) {
+            copyAsset(geoIp6AssetPath, torConfigFiles.geoIpv6File)
+        }
 
     @Throws(IOException::class)
     private fun copyAsset(assetPath: String, file: File) {
