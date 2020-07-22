@@ -140,24 +140,32 @@ internal class ServiceActionProcessor(private val torService: TorService): Servi
         if (!::processQueueJob.isInitialized || !processQueueJob.isActive) {
             processQueueJob = scopeMain.launch(Dispatchers.IO) {
 
-                // Hold processing the queue until after clearQueueJob is done.
-                if (::clearQueueJob.isInitialized && clearQueueJob.isActive) {
-                    clearQueueJob.join()
-                    delay(25L)
-                }
-
                 while (actionQueue.size > 0 && isActive) {
+
+                    // Hold processing the queue until after clearQueueJob is done.
+                    // Happens more frequently if the queue is big enough and the timing
+                    // is just right.
+                    if (::clearQueueJob.isInitialized && clearQueueJob.isActive) {
+                        clearQueueJob.join()
+                        delay(25L)
+                    }
 
                     val actionObject = actionQueue[0]
                     actionObject.commands.forEachIndexed { index, command ->
 
-                        // If clearQueueJob is active, stop the for loop and wait for it to finish
-                        // before processing the next action.
-                        if (::clearQueueJob.isInitialized && clearQueueJob.isActive) return@launch
+                        // Check if the current actionObject being executed has been
+                        // removed from the queue by clearQueueJob before executing the
+                        // next command.
+                        if (actionQueue[0] != actionObject) {
+                            broadcastDebugObjectDetailsMsg(
+                                "Interrupting execution of: ServiceActionObject.", actionObject
+                            )
+                            return@forEachIndexed
+                        }
+
                         when (command) {
                             ActionCommand.DELAY -> {
-                                val delayLength = actionObject.consumeDelayLength()
-                                delay(delayLength)
+                                delay(actionObject.consumeDelayLength())
                             }
                             ActionCommand.NEW_ID -> {
                                 onionProxyManager.signalNewNym()
@@ -230,7 +238,4 @@ internal class ServiceActionProcessor(private val torService: TorService): Servi
             .setGeoIpFiles()
             .finishAndWriteToTorrcFile()
     }
-
-
-
 }
