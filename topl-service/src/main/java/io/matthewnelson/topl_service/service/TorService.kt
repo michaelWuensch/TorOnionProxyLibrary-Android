@@ -24,7 +24,6 @@ import android.os.IBinder
 import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_service.notification.ServiceNotification
-import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.onionproxy.ServiceEventBroadcaster
 import io.matthewnelson.topl_service.onionproxy.ServiceEventListener
