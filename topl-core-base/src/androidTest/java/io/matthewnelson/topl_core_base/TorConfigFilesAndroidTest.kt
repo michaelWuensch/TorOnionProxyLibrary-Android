@@ -105,7 +105,7 @@ class TorConfigFilesAndroidTest {
         val config = torConfigFilesBuilder.torExecutable(File(sampleFile, "exedir/tor.real")).build()
         assertEquals(
             File(sampleFile, "exedir").path,
-            config.libraryPath.path
+            config.libraryPath?.path
         )
     }
 
@@ -114,7 +114,7 @@ class TorConfigFilesAndroidTest {
         val config = torConfigFilesBuilder.build()
         assertEquals(
             appContext.applicationInfo.nativeLibraryDir,
-            config.libraryPath.path
+            config.libraryPath?.path
         )
     }
 

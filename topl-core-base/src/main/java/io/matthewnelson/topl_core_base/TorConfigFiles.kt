@@ -359,7 +359,7 @@ class TorConfigFiles private constructor(
             if (!::mDataDir.isInitialized)
                 mDataDir = File(configDir, ConfigFileName.DATA_DIR)
 
-            if (mLibraryPath != null)
+            if (mLibraryPath == null)
                 mLibraryPath = mTorExecutableFile.parentFile
 
             if (!::mHostnameFile.isInitialized)
