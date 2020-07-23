@@ -71,10 +71,14 @@ class TorServiceController private constructor(): ServiceConsts() {
     class Builder(
         private val application: Application,
         private val buildConfigVersionCode: Int,
-        private val torSettings: TorSettings,
+        torSettings: TorSettings,
         private val geoipAssetPath: String,
         private val geoip6AssetPath: String
     ) {
+
+        init {
+            Companion.torSettings = torSettings
+        }
 
         private lateinit var torConfigFiles: TorConfigFiles
 
@@ -370,15 +374,14 @@ class TorServiceController private constructor(): ServiceConsts() {
          * See [Builder] for code samples.
          * */
         fun build() {
-            val torConfigFiles: TorConfigFiles =
+
+            Companion.torConfigFiles =
                 if (::torConfigFiles.isInitialized)
-                    this.torConfigFiles
+                    torConfigFiles
                 else
                     TorConfigFiles.createConfig(application.applicationContext)
 
             TorService.initialize(
-                torConfigFiles,
-                torSettings,
                 buildConfigVersionCode,
                 buildConfigDebug,
                 geoipAssetPath,
@@ -399,6 +402,35 @@ class TorServiceController private constructor(): ServiceConsts() {
         private lateinit var appContext: Context
         var appEventBroadcaster: EventBroadcaster? = null
             private set
+        private lateinit var torConfigFiles: TorConfigFiles
+        private lateinit var torSettings: TorSettings
+
+        /**
+         * Get the [TorConfigFiles] that have been set after calling [Builder.build]
+         *
+         * @return Instance of [TorConfigFiles] that are being used throughout TOPL-Android
+         * @throws [UninitializedPropertyAccessException] if called before [Builder.build]
+         * */
+        @Throws(UninitializedPropertyAccessException::class)
+        fun getTorConfigFiles(): TorConfigFiles =
+            if (::torConfigFiles.isInitialized)
+                torConfigFiles
+            else
+                throw UninitializedPropertyAccessException("TorConfigFiles hasn't been initialized")
+
+        /**
+         * Get the [TorSettings] that have been set after calling [Builder.build]. These are
+         * the [TorSettings] you initialized [TorServiceController.Builder] with.
+         *
+         * @return Instance of [TorSettings] that are being used throughout TOPL-Android
+         * @throws [UninitializedPropertyAccessException] if called before [Builder.build]
+         * */
+        @Throws(UninitializedPropertyAccessException::class)
+        fun getTorSettings(): TorSettings =
+            if (::torSettings.isInitialized)
+                torSettings
+            else
+                throw UninitializedPropertyAccessException("TorSettings hasn't been initialized")
 
         // Needed to inhibit all TorServiceController methods except for startTor()
         // from sending such that startService isn't called and Tor isn't properly

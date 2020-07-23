@@ -24,9 +24,7 @@ import android.os.IBinder
 import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_service.notification.ServiceNotification
-import io.matthewnelson.topl_core_base.TorConfigFiles
-import io.matthewnelson.topl_core_base.TorSettings
-import io.matthewnelson.topl_service.BuildConfig
+import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.onionproxy.ServiceEventBroadcaster
 import io.matthewnelson.topl_service.onionproxy.ServiceEventListener
 import io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller
@@ -37,27 +35,30 @@ import kotlinx.coroutines.*
 internal class TorService: Service() {
 
     companion object {
-        private lateinit var torConfigFiles: TorConfigFiles
-        private lateinit var torSettings: TorSettings
-        private var buildConfigVersionCode: Int = -1
-        private var buildConfigDebug: Boolean? = null
-        private lateinit var geoipAssetPath: String
-        private lateinit var geoip6AssetPath: String
+        var buildConfigVersionCode: Int = -1
+            private set
+        var buildConfigDebug: Boolean? = null
+            private set
+        lateinit var geoipAssetPath: String
+            private set
+        lateinit var geoip6AssetPath: String
+            private set
+
+        private fun isInitialized(): Boolean =
+            ::geoipAssetPath.isInitialized
 
         fun initialize(
-            torConfigFiles: TorConfigFiles,
-            torSettings: TorSettings,
             buildConfigVersionCode: Int,
             buildConfigDebug: Boolean,
             geoipAssetPath: String,
             geoip6AssetPath: String
         ) {
-            this.torConfigFiles = torConfigFiles
-            this.torSettings = torSettings
-            this.buildConfigVersionCode = buildConfigVersionCode
-            this.buildConfigDebug = buildConfigDebug
-            this.geoipAssetPath = geoipAssetPath
-            this.geoip6AssetPath = geoip6AssetPath
+            if (!isInitialized()) {
+                this.buildConfigVersionCode = buildConfigVersionCode
+                this.buildConfigDebug = buildConfigDebug
+                this.geoipAssetPath = geoipAssetPath
+                this.geoip6AssetPath = geoip6AssetPath
+            }
         }
 
         // For things that can't be saved to TorServicePrefs, such as BuildConfig.VERSION_CODE
@@ -78,7 +79,7 @@ internal class TorService: Service() {
     override fun onCreate() {
         super.onCreate()
         ServiceNotification.get().startForegroundNotification(this)
-        initTOPLCore(this)
+        initTOPLCore()
         serviceActionProcessor = ServiceActionProcessor(this)
         torServicePrefsListener = TorServicePrefsListener(this)
     }
@@ -116,22 +117,14 @@ internal class TorService: Service() {
     lateinit var onionProxyManager: OnionProxyManager
         private set
 
-    private fun initTOPLCore(torService: TorService) {
-        val serviceTorInstaller = ServiceTorInstaller(
-            torService,
-            torConfigFiles,
-            buildConfigVersionCode,
-            buildConfigDebug ?: BuildConfig.DEBUG,
-            geoipAssetPath,
-            geoip6AssetPath
-        )
+    private fun initTOPLCore() {
         onionProxyManager = OnionProxyManager(
-            torService,
-            torConfigFiles,
-            serviceTorInstaller,
-            ServiceTorSettings(torSettings, torService),
+            this,
+            TorServiceController.getTorConfigFiles(),
+            ServiceTorInstaller(this),
+            ServiceTorSettings(TorServiceController.getTorSettings(), this),
             ServiceEventListener(),
-            ServiceEventBroadcaster(torService),
+            ServiceEventBroadcaster(this),
             buildConfigDebug
         )
         broadcastLogger = onionProxyManager.getBroadcastLogger(TorService::class.java)

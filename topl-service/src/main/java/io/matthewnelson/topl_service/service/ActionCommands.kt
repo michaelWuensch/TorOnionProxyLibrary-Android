@@ -45,7 +45,7 @@ internal sealed class ActionCommands {
          *
          * Override this to define the values for each DELAY call.
          * */
-        open val delayLengthQueue: MutableList<Long> = mutableListOf()
+        protected open val delayLengthQueue: MutableList<Long> = mutableListOf()
 
         /**
          * Consumes the 0th element within [delayLengthQueue], removes, then returns it.
@@ -54,7 +54,7 @@ internal sealed class ActionCommands {
          * @return The 0th element within [delayLengthQueue], or 0L if empty
          * */
         fun consumeDelayLength(): Long {
-            return if (!delayLengthQueue.isNullOrEmpty()) {
+            return if (delayLengthQueue.isNotEmpty()) {
                 val delayLength = delayLengthQueue[0]
                 delayLengthQueue.removeAt(0)
                 delayLength
@@ -97,9 +97,6 @@ internal sealed class ActionCommands {
             )
     }
 
-    /**
-     *
-     * */
     class ServiceActionObjectGetter {
 
         /**

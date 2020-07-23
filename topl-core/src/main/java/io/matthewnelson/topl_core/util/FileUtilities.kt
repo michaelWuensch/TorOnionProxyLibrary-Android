@@ -92,7 +92,6 @@
 package io.matthewnelson.topl_core.util
 
 import java.io.*
-import java.util.logging.Logger
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
@@ -156,24 +155,6 @@ object FileUtilities {
             val listFiles = f.listFiles() ?: return
             for (child in listFiles)
                 listFilesToLog(child)
-        }
-    }
-
-    @Throws(IOException::class, EOFException::class, SecurityException::class)
-    fun read(f: File): ByteArray {
-        val b = ByteArray(f.length().toInt())
-        val `in` = FileInputStream(f)
-
-        return `in`.use { inputStream ->
-            var offset = 0
-
-            while (offset < b.size) {
-                val read = inputStream.read(b, offset, b.size - offset)
-                if (read == -1) throw EOFException()
-                offset += read
-            }
-
-            b
         }
     }
 

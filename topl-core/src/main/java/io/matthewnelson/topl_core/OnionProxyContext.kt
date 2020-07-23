@@ -52,6 +52,7 @@ import io.matthewnelson.topl_core.util.CoreConsts
 import io.matthewnelson.topl_core.util.TorInstaller
 import io.matthewnelson.topl_core.util.WriteObserver
 import io.matthewnelson.topl_core_base.TorConfigFiles
+import io.matthewnelson.topl_core_base.readTorConfigFile
 import java.io.*
 
 /**
@@ -85,11 +86,16 @@ internal class OnionProxyContext(
             broadcastLogger = onionProxyBroadcastLogger
     }
 
-    private val controlPortFileLock = Object()
-    private val cookieAuthFileLock = Object()
-    private val dataDirLock = Object()
-    private val resolvConfFileLock = Object()
-    private val hostnameFileLock = Object()
+    private val controlPortFileLock: Any
+        get() = torConfigFiles.controlPortFileLock
+    private val cookieAuthFileLock: Any
+        get() = torConfigFiles.cookieAuthFileLock
+    private val dataDirLock: Any
+        get() = torConfigFiles.dataDirLock
+    private val resolvConfFileLock: Any
+        get() = torConfigFiles.resolvConfFileLock
+    private val hostnameFileLock: Any
+        get() = torConfigFiles.hostnameFileLock
 
     /**
      * Creates an observer for the file referenced. See [CoreConsts.ConfigFile] annotation class
@@ -208,17 +214,17 @@ internal class OnionProxyContext(
         return when (configFileReference) {
             ConfigFile.CONTROL_PORT_FILE -> {
                 synchronized(controlPortFileLock) {
-                    FileUtilities.read(torConfigFiles.controlPortFile)
+                    torConfigFiles.controlPortFile.readTorConfigFile()
                 }
             }
             ConfigFile.COOKIE_AUTH_FILE -> {
                 synchronized(cookieAuthFileLock) {
-                    FileUtilities.read(torConfigFiles.cookieAuthFile)
+                    torConfigFiles.cookieAuthFile.readTorConfigFile()
                 }
             }
             ConfigFile.HOSTNAME_FILE -> {
                 synchronized(hostnameFileLock) {
-                    FileUtilities.read(torConfigFiles.hostnameFile)
+                    torConfigFiles.hostnameFile.readTorConfigFile()
                 }
             }
             else -> {

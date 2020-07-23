@@ -24,6 +24,16 @@ import kotlinx.coroutines.*
 import java.io.IOException
 import java.lang.reflect.InvocationTargetException
 
+/**
+ * [ServiceConsts.ServiceAction]'s are translated to [ActionCommands.ServiceActionObject]'s,
+ * submitted to a queue, and then processed. This allows for sequential execution of
+ * individual [ServiceConsts.ActionCommand]'s for each [ActionCommands.ServiceActionObject]
+ * and the ability to quickly interrupt execution for reacting to User actions (such as
+ * stopping, or clearing the task).
+ *
+ * @param [torService] For accessing internally public values
+ * @see [ActionCommands]
+ * */
 internal class ServiceActionProcessor(private val torService: TorService): ServiceConsts() {
 
     companion object {
@@ -53,20 +63,15 @@ internal class ServiceActionProcessor(private val torService: TorService): Servi
     }
 
     fun processActionObject(serviceActionObject: ActionCommands.ServiceActionObject) {
-        addActionToQueue(serviceActionObject)
-
         if (serviceActionObject is ActionCommands.Stop) {
             isAcceptingActions = false
-
-            // If there are actions queued previous to Stop, clear them.
-            if (actionQueue.size > 1)
-                launchClearQueueJob()
-
+            clearActionQueue()
         } else if (serviceActionObject is ActionCommands.Start) {
             isAcceptingActions = true
         }
 
-        launchProcessQueueJob()
+        if (addActionToQueue(serviceActionObject))
+            launchProcessQueueJob()
     }
 
     private fun broadcastDebugObjectDetailsMsg(prefix: String, something: Any) {
@@ -82,81 +87,63 @@ internal class ServiceActionProcessor(private val torService: TorService): Servi
     private val actionQueueLock = Object()
     private val actionQueue = mutableListOf<ActionCommands.ServiceActionObject>()
 
-    private fun addActionToQueue(serviceActionObject: ActionCommands.ServiceActionObject) =
+    private fun addActionToQueue(serviceActionObject: ActionCommands.ServiceActionObject): Boolean =
         synchronized(actionQueueLock) {
-            if (actionQueue.add(serviceActionObject))
+            return if (actionQueue.add(serviceActionObject)) {
                 broadcastDebugObjectDetailsMsg(
                     "Added to queue: ServiceActionObject.", serviceActionObject
                 )
+                true
+            } else {
+                false
+            }
         }
 
-    private fun removeActionFromQueue(serviceActionObject: ActionCommands.ServiceActionObject) {
+    private fun removeActionFromQueue(serviceActionObject: ActionCommands.ServiceActionObject) =
         synchronized(actionQueueLock) {
             if (actionQueue.remove(serviceActionObject))
                 broadcastDebugObjectDetailsMsg(
                     "Removed from queue: ServiceActionObject.", serviceActionObject
                 )
         }
-    }
+
+    /**
+     * Clears the [actionQueue]
+     * */
+    private fun clearActionQueue() =
+        synchronized(actionQueueLock) {
+            if (!actionQueue.isNullOrEmpty()) {
+                actionQueue.clear()
+                broadcastLogger.debug("Queue cleared")
+            }
+        }
 
 
-    //////////////////
-    /// Coroutines ///
-    //////////////////
+    ////////////////////////
+    /// Queue Processing ///
+    ////////////////////////
     private val scopeMain: CoroutineScope
         get() = torService.scopeMain
-    private lateinit var clearQueueJob: Job
     private lateinit var processQueueJob: Job
 
     /**
-     * Will clear [actionQueue] up to the [ActionCommands.Stop] insertion
-     * */
-    private fun launchClearQueueJob() {
-        synchronized(actionQueueLock) {
-            if (!::clearQueueJob.isInitialized || !clearQueueJob.isActive) {
-                clearQueueJob = scopeMain.launch(Dispatchers.Default) {
-                    val iterator = actionQueue.listIterator()
-                    while (iterator.hasNext() && isActive) {
-                        val serviceActionObject = iterator.next()
-                        if (serviceActionObject is ActionCommands.Stop) {
-                            return@launch
-                        }
-                        iterator.remove()
-                        broadcastDebugObjectDetailsMsg(
-                            "Removed from queue: ServiceActionObject.", serviceActionObject
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Processes the [actionQueue]. Checks to see if [clearQueueJob] is active before executing
-     * every [ServiceConsts.ActionCommand], will finish processing the current command and then
-     * wait for completion of [clearQueueJob] before continuing to process [actionQueue].
+     * Processes the [actionQueue].
      * */
     private fun launchProcessQueueJob() {
-        if (!::processQueueJob.isInitialized || !processQueueJob.isActive) {
-            processQueueJob = scopeMain.launch(Dispatchers.IO) {
+        if (::processQueueJob.isInitialized && processQueueJob.isActive) return
+        processQueueJob = scopeMain.launch(Dispatchers.IO) {
+            broadcastDebugObjectDetailsMsg("Processing Queue: ", this)
 
-                while (actionQueue.size > 0 && isActive) {
-
-                    // Hold processing the queue until after clearQueueJob is done.
-                    // Happens more frequently if the queue is big enough and the timing
-                    // is just right.
-                    if (::clearQueueJob.isInitialized && clearQueueJob.isActive) {
-                        clearQueueJob.join()
-                        delay(25L)
-                    }
-
-                    val actionObject = actionQueue[0]
+            while (actionQueue.size > 0 && isActive) {
+                val actionObject = actionQueue.elementAtOrNull(0)
+                if (actionObject == null) {
+                    return@launch
+                } else {
                     actionObject.commands.forEachIndexed { index, command ->
 
                         // Check if the current actionObject being executed has been
-                        // removed from the queue by clearQueueJob before executing the
-                        // next command.
-                        if (actionQueue[0] != actionObject) {
+                        // removed from the queue before executing it's next command.
+                        if (actionQueue.elementAtOrNull(0) != actionObject) {
                             broadcastDebugObjectDetailsMsg(
                                 "Interrupting execution of: ServiceActionObject.", actionObject
                             )

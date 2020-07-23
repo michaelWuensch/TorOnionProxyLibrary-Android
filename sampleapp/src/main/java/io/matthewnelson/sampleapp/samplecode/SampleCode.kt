@@ -3,10 +3,7 @@ package io.matthewnelson.sampleapp.samplecode
 import android.app.Application
 import android.content.Context
 import androidx.core.app.NotificationCompat
-import io.matthewnelson.sampleapp.App
-import io.matthewnelson.sampleapp.BuildConfig
-import io.matthewnelson.sampleapp.MainActivity
-import io.matthewnelson.sampleapp.R
+import io.matthewnelson.sampleapp.*
 import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_service.TorServiceController
@@ -35,7 +32,7 @@ object SampleCode {
             TorServiceController.Builder(
                 application = application,
                 buildConfigVersionCode = BuildConfig.VERSION_CODE,
-                torSettings = App.myTorSettings,
+                torSettings = MyTorSettings(),
 
                 // These should live somewhere in your project application's assets directory
                 geoipAssetPath = "common/geoip",

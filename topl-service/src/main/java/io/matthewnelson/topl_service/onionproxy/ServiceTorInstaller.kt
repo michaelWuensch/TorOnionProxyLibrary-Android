@@ -19,8 +19,8 @@ package io.matthewnelson.topl_service.onionproxy
 import io.matthewnelson.topl_core.util.FileUtilities
 import io.matthewnelson.topl_core.util.TorInstaller
 import io.matthewnelson.topl_core_base.TorConfigFiles
-import io.matthewnelson.topl_service.BuildConfig
 import io.matthewnelson.topl_service.R
+import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyList
 import io.matthewnelson.topl_service.prefs.TorServicePrefs
@@ -28,27 +28,27 @@ import java.io.*
 import java.util.concurrent.TimeoutException
 
 /**
- * Installs assets needed for Tor.
- *
- * @param [torService] for context.
- * @param [torConfigFiles] [TorConfigFiles] to know where files/directories are.
- * @param [buildConfigVersionCode] Use [BuildConfig.VERSION_CODE]
- * @param [buildConfigDebug] Use [BuildConfig.DEBUG]
- * @param [geoIpAssetPath] The path to geoip file within the application, ex: "common/geoip"
- * @param [geoIp6AssetPath] The path to geoip6 file within the application, ex: "common/geoip6"
+ * Installs things needed for Tor.
  *
  * See [io.matthewnelson.topl_service.TorServiceController.Builder]
+ *
+ * @param [torService] for context
  * */
-internal class ServiceTorInstaller(
-    private val torService: TorService,
-    private val torConfigFiles: TorConfigFiles,
-    private val buildConfigVersionCode: Int,
-    private val buildConfigDebug: Boolean,
-    private val geoIpAssetPath: String,
+internal class ServiceTorInstaller(private val torService: TorService): TorInstaller() {
+
+    private val torConfigFiles: TorConfigFiles
+        get() = TorServiceController.getTorConfigFiles()
+    private val buildConfigVersionCode: Int
+        get() = TorService.buildConfigVersionCode
+    private val buildConfigDebug: Boolean
+        get() = TorService.buildConfigDebug ?: false
+    private val geoIpAssetPath: String
+        get() = TorService.geoipAssetPath
     private val geoIp6AssetPath: String
-): TorInstaller() {
+        get() = TorService.geoip6AssetPath
 
     private val torServicePrefs = TorServicePrefs(torService)
+
     private val localPrefs = TorService.getLocalPrefs(torService.applicationContext)
     private lateinit var geoIpFileCopied: String
     private lateinit var geoIpv6FileCopied: String
@@ -64,11 +64,11 @@ internal class ServiceTorInstaller(
     @Throws(IOException::class, SecurityException::class)
     override fun setup() {
         if (!torConfigFiles.geoIpFile.exists()) {
-            copyAsset(geoIpAssetPath, torConfigFiles.geoIpFile)
+            copyGeoIpAsset()
             geoIpFileCopied = ""
         }
         if (!torConfigFiles.geoIpv6File.exists()) {
-            copyAsset(geoIp6AssetPath, torConfigFiles.geoIpv6File)
+            copyGeoIpv6Asset()
             geoIpv6FileCopied = ""
         }
 
@@ -77,14 +77,24 @@ internal class ServiceTorInstaller(
         // mitigates copying to be done only if a version upgrade is had.
         if (buildConfigDebug || buildConfigVersionCode > localPrefs.getInt(APP_VERSION_CODE, -1)) {
             if (!::geoIpFileCopied.isInitialized) {
-                copyAsset(geoIpAssetPath, torConfigFiles.geoIpFile)
+                copyGeoIpAsset()
             }
             if (!::geoIpv6FileCopied.isInitialized) {
-                copyAsset(geoIp6AssetPath, torConfigFiles.geoIpv6File)
+                copyGeoIpv6Asset()
             }
             localPrefs.edit().putInt(APP_VERSION_CODE, buildConfigVersionCode).apply()
         }
     }
+
+    private fun copyGeoIpAsset() =
+        synchronized(torConfigFiles.geoIpFileLock) {
+            copyAsset(geoIpAssetPath, torConfigFiles.geoIpFile)
+        }
+
+    private fun copyGeoIpv6Asset() =
+        synchronized(torConfigFiles.geoIpv6FileLock) {
+            copyAsset(geoIp6AssetPath, torConfigFiles.geoIpv6File)
+        }
 
     @Throws(IOException::class)
     private fun copyAsset(assetPath: String, file: File) {

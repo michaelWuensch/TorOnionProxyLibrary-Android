@@ -52,6 +52,12 @@ import java.io.IOException
  * Holds Tor configuration information for files and directories that Tor will use.
  *
  * See [Companion.createConfig] or [Builder] to instantiate.
+ *
+ * When modifying/querying Files, ensure you are using `synchronized` and acquiring
+ * the appropriate `FileLock` object pertaining to that File. This inhibits errors
+ * across the library.
+ *
+ * See extension function [readTorConfigFile].
  * */
 class TorConfigFiles private constructor(
     val geoIpFile: File,
@@ -124,9 +130,21 @@ class TorConfigFiles private constructor(
             createConfig(context, context.getDir("torservice", Context.MODE_PRIVATE))
     }
 
-    private val configLock = Object()
     var torrcFile = torrcFile
         private set
+
+
+    //////////////////
+    /// File Locks ///
+    //////////////////
+    val torrcFileLock = Object()
+    val controlPortFileLock = Object()
+    val cookieAuthFileLock = Object()
+    val dataDirLock = Object()
+    val geoIpFileLock = Object()
+    val geoIpv6FileLock = Object()
+    val resolvConfFileLock = Object()
+    val hostnameFileLock = Object()
 
     /**
      * Resolves the tor configuration file. If the torrc file hasn't been set, then
@@ -139,7 +157,7 @@ class TorConfigFiles private constructor(
      * */
     @Throws(IOException::class, SecurityException::class)
     fun resolveTorrcFile(): File {
-        synchronized(configLock) {
+        synchronized(torrcFileLock) {
             if (torrcFile.exists()) {
                 return torrcFile
             }
@@ -341,7 +359,7 @@ class TorConfigFiles private constructor(
             if (!::mDataDir.isInitialized)
                 mDataDir = File(configDir, ConfigFileName.DATA_DIR)
 
-            if (mLibraryPath != null)
+            if (mLibraryPath == null)
                 mLibraryPath = mTorExecutableFile.parentFile
 
             if (!::mHostnameFile.isInitialized)

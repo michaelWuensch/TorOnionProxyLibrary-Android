@@ -24,10 +24,6 @@ import io.matthewnelson.topl_service.TorServiceController
  * */
 class App: Application() {
 
-    companion object {
-        val myTorSettings = MyTorSettings()
-    }
-
     override fun onCreate() {
         super.onCreate()
         setupTorServices()
@@ -37,7 +33,7 @@ class App: Application() {
         TorServiceController.Builder(
             application = this,
             buildConfigVersionCode = BuildConfig.VERSION_CODE,
-            torSettings = myTorSettings,
+            torSettings = MyTorSettings(),
             geoipAssetPath = "common/geoip",
             geoip6AssetPath = "common/geoip6"
         )
