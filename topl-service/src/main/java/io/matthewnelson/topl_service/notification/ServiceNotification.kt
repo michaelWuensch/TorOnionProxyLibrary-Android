@@ -83,12 +83,13 @@ internal class ServiceNotification(
     }
 
     private lateinit var notificationBuilder: NotificationCompat.Builder
-    private lateinit var notificationManager: NotificationManager
 
-    private fun notify(builder: NotificationCompat.Builder) {
+    private fun getNotificationManager(context: Context): NotificationManager? =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
+
+    private fun notify(torService: TorService, builder: NotificationCompat.Builder) {
         notificationBuilder = builder
-        if (::notificationManager.isInitialized)
-            notificationManager.notify(notificationID, builder.build())
+        getNotificationManager(torService)?.notify(notificationID, builder.build())
     }
 
 
@@ -100,10 +101,6 @@ internal class ServiceNotification(
      * [io.matthewnelson.topl_service.TorServiceController.Builder.build]
      * */
     fun setupNotificationChannel(context: Context) {
-        val nm: NotificationManager? = context.applicationContext
-            .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        nm?.let { notificationManager = it }
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelID,
@@ -112,7 +109,7 @@ internal class ServiceNotification(
             )
             channel.description = channelDescription
             channel.setSound(null, null)
-            nm?.createNotificationChannel(channel)
+            getNotificationManager(context)?.createNotificationChannel(channel)
         }
     }
 
@@ -133,7 +130,7 @@ internal class ServiceNotification(
         torService: TorService,
         title: String
     ): NotificationCompat.Builder {
-        val builder = NotificationCompat.Builder(torService.applicationContext, channelID)
+        val builder = NotificationCompat.Builder(torService, channelID)
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
             .setColorized(colorizeBackground)
             .setContentText("Waiting...")
@@ -158,13 +155,13 @@ internal class ServiceNotification(
     }
 
     private fun getContentPendingIntent(torService: TorService): PendingIntent {
-        val contentIntent = Intent(torService.applicationContext, activityWhenTapped)
+        val contentIntent = Intent(torService, activityWhenTapped)
 
         if (!activityIntentKey.isNullOrEmpty() && !activityIntentExtras.isNullOrEmpty())
             contentIntent.putExtra(activityIntentKey, activityIntentExtras)
 
         return PendingIntent.getActivity(
-            torService.applicationContext,
+            torService,
             activityIntentRequestCode,
             contentIntent,
             PendingIntent.FLAG_UPDATE_CURRENT
@@ -197,28 +194,36 @@ internal class ServiceNotification(
                 "Stop Tor",
                 getActionPendingIntent(torService, ServiceAction.STOP)
             )
-        notify(builder)
+        notify(torService, builder)
     }
 
     private fun getActionPendingIntent(
         torService: TorService,
         @ServiceAction action: String
     ): PendingIntent {
-        val intent = Intent(torService.applicationContext, TorService::class.java)
+        val intent = Intent(torService, TorService::class.java)
         intent.action = action
 
-        return PendingIntent.getService(
-            torService.applicationContext,
-            0,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT
-        )
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            PendingIntent.getForegroundService(
+                torService,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+            )
+        else
+            PendingIntent.getService(
+                torService,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+            )
     }
 
     @Synchronized
     fun removeActions(torService: TorService, @TorState state: String) {
         val builder = buildInitialNotification(torService, state)
-        notify(builder)
+        notify(torService, builder)
     }
 
 
@@ -226,10 +231,10 @@ internal class ServiceNotification(
     /// Content Text ///
     /////////////////////
     @Synchronized
-    fun updateContentText(string: String) {
+    fun updateContentText(torService: TorService, string: String) {
         val builder = notificationBuilder
         builder.setContentText(string)
-        notify(builder)
+        notify(torService, builder)
     }
 
 
@@ -237,10 +242,10 @@ internal class ServiceNotification(
     /// Content Title ///
     /////////////////////
     @Synchronized
-    fun updateContentTitle(title: String) {
+    fun updateContentTitle(torService: TorService, title: String) {
         val builder = notificationBuilder
         builder.setContentTitle(title)
-        notify(builder)
+        notify(torService, builder)
     }
 
 
@@ -269,6 +274,6 @@ internal class ServiceNotification(
             }
             else -> {}
         }
-        notify(builder)
+        notify(torService, builder)
     }
 }

@@ -49,7 +49,7 @@ internal class ServiceTorInstaller(private val torService: TorService): TorInsta
 
     private val torServicePrefs = TorServicePrefs(torService)
 
-    private val localPrefs = TorService.getLocalPrefs(torService.applicationContext)
+    private val localPrefs = TorService.getLocalPrefs(torService)
     private lateinit var geoIpFileCopied: String
     private lateinit var geoIpv6FileCopied: String
 

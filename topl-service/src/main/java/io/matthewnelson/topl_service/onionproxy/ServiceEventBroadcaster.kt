@@ -98,6 +98,7 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
     private fun updateBandwidth(download: Long, upload: Long) {
         if (::noticeMsgToContentTextJob.isInitialized && noticeMsgToContentTextJob.isActive) return
         serviceNotification.updateContentText(
+            torService,
             ServiceUtilities.getFormattedBandwidthString(download, upload)
         )
     }
@@ -122,7 +123,7 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
                 serviceNotification.updateIcon(torService, NotificationImage.ERROR)
                 val splitMsg = msg.split("|")
                 if (splitMsg.size > 2 && splitMsg[2].isNotEmpty()) {
-                    serviceNotification.updateContentText(splitMsg[2])
+                    serviceNotification.updateContentText(torService, splitMsg[2])
                 }
             }
         }
@@ -159,7 +160,7 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
             val bootstrapped = "${msgSplit[0]} ${msgSplit[1]}".split("|")[2]
 
             if (bootstrapped != bootstrapProgress) {
-                serviceNotification.updateContentText(bootstrapped)
+                serviceNotification.updateContentText(torService, bootstrapped)
 
                 if (bootstrapped == "Bootstrapped 100%") {
                     serviceNotification.updateIcon(torService, NotificationImage.ENABLED)
@@ -207,16 +208,18 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
      * */
     private fun displayMessageToContentText(message: String, delayMilliSeconds: Long) {
         noticeMsgToContentTextJob = scopeMain.launch {
-            serviceNotification.updateContentText(message)
+            serviceNotification.updateContentText(torService, message)
             delay(delayMilliSeconds)
 
             // Publish the last bandwidth broadcast to overwrite the message.
             if (torNetworkState == TorNetworkState.ENABLED) {
                 serviceNotification.updateContentText(
+                    torService,
                     ServiceUtilities.getFormattedBandwidthString(bytesRead, bytesWritten)
                 )
             } else if (isBootstrappingComplete()){
                 serviceNotification.updateContentText(
+                    torService,
                     ServiceUtilities.getFormattedBandwidthString(0L, 0L)
                 )
             }
@@ -237,7 +240,7 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
             bootstrapProgress = ""
             serviceNotification.removeActions(torService, state)
         } else {
-            serviceNotification.updateContentTitle(state)
+            serviceNotification.updateContentTitle(torService, state)
         }
 
         torState = state
