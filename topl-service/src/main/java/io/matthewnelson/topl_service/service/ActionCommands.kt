@@ -33,6 +33,8 @@ internal sealed class ActionCommands {
 
     abstract class ServiceActionObject: ActionCommands() {
 
+        abstract val serviceAction: @ServiceAction String
+
         /**
          * Individual [ActionCommand]'s to executed sequentially by
          * [io.matthewnelson.topl_service.service.ServiceActionProcessor].
@@ -64,14 +66,14 @@ internal sealed class ActionCommands {
         }
     }
 
-    class NewId: ServiceActionObject() {
+    class NewId(override val serviceAction: String) : ServiceActionObject() {
         override val commands: Array<String>
             get() = arrayOf(
                 ActionCommand.NEW_ID
             )
     }
 
-    class RestartTor: ServiceActionObject() {
+    class RestartTor(override val serviceAction: String) : ServiceActionObject() {
         override val commands: Array<String>
             get() = arrayOf(
                 ActionCommand.STOP_TOR,
@@ -82,14 +84,14 @@ internal sealed class ActionCommands {
             mutableListOf(700L)
     }
 
-    class Start: ServiceActionObject() {
+    class Start(override val serviceAction: String) : ServiceActionObject() {
         override val commands: Array<String>
             get() = arrayOf(
                 ActionCommand.START_TOR
             )
     }
 
-    class Stop: ServiceActionObject() {
+    class Stop(override val serviceAction: String) : ServiceActionObject() {
         override val commands: Array<String>
             get() = arrayOf(
                 ActionCommand.STOP_TOR,
@@ -109,18 +111,18 @@ internal sealed class ActionCommands {
          * */
         @Throws(IllegalArgumentException::class)
         fun get(intent: Intent): ServiceActionObject {
-            return when (intent.action) {
+            return when (val action = intent.action) {
                 ServiceAction.NEW_ID -> {
-                    NewId()
+                    NewId(action)
                 }
                 ServiceAction.RESTART_TOR -> {
-                    RestartTor()
+                    RestartTor(action)
                 }
                 ServiceAction.START -> {
-                    Start()
+                    Start(action)
                 }
                 ServiceAction.STOP -> {
-                    Stop()
+                    Stop(action)
                 }
                 else -> {
                     throw (IllegalArgumentException())

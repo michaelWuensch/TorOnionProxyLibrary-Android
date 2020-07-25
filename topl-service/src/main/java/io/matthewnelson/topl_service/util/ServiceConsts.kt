@@ -160,6 +160,7 @@ abstract class ServiceConsts: BaseConsts() {
     //////////////////////
     /// ServiceActions ///
     //////////////////////
+    @Target(AnnotationTarget.CLASS, AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.TYPE)
     @StringDef(
         ServiceAction.NEW_ID,
         ServiceAction.RESTART_TOR,
