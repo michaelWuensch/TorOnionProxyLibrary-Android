@@ -46,6 +46,10 @@ internal class ServiceActionProcessor(private val torService: TorService): Servi
             private set
     }
 
+    fun setIsAcceptingActions(value: Boolean) {
+        isAcceptingActions = value
+    }
+
     private val onionProxyManager: OnionProxyManager
         get() = torService.onionProxyManager
 
