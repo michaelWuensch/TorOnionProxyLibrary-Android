@@ -19,7 +19,6 @@ package io.matthewnelson.topl_service
 import android.app.Application
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import io.matthewnelson.topl_service.notification.ServiceNotification
@@ -209,6 +208,13 @@ class TorServiceController private constructor(): ServiceConsts() {
              * @param [intentExtrasKey]? The key for if you with to add extras in the PendingIntent.
              * @param [intentExtras]? The extras that will be sent in the PendingIntent.
              * @param [intentRequestCode]? The request code - Defaults to 0 if not set.
+             *
+             * TODO: Check if this conflicts with multi-activity apps such that if the user is
+             *  on a certain activity, and clicks the notification it will bring them to the
+             *  declared activity instead of back to the activity they were on.
+             *  + Include an optional Bundle? to be set for creating the pending intent.
+             *  + Think about overriding and providing another option to rotate the ContentIntent
+             *  to open up/resume current activity?
              * */
             fun setActivityToBeOpenedOnTap(
                 clazz: Class<*>,
@@ -289,20 +295,15 @@ class TorServiceController private constructor(): ServiceConsts() {
              * Defaults to [R.color.tor_service_white]
              *
              * The color you wish to display when Tor's network state is
-             * [io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState.ENABLED]. Note that
-             * if [colorizeBackground] is being passed a value of `true`, the notification will
-             * always be that color where as if it is passed `false`, the icon & action button
-             * colors will change with Tor's network state.
+             * [io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState.ENABLED].
              *
              * See [Builder] for code samples.
              *
              * @param [colorRes] Color resource id.
-             * @param [colorizeBackground] true = background is colorized, false = icon is colorized
              * @return [NotificationBuilder]
              * */
-            fun setCustomColor(@ColorRes colorRes: Int, colorizeBackground: Boolean): NotificationBuilder {
+            fun setCustomColor(@ColorRes colorRes: Int): NotificationBuilder {
                 serviceNotification.colorWhenConnected = colorRes
-                serviceNotification.colorizeBackground = colorizeBackground
                 return this
             }
 
@@ -350,6 +351,18 @@ class TorServiceController private constructor(): ServiceConsts() {
              * */
             fun enableTorStopButton(enable: Boolean = true): NotificationBuilder {
                 serviceNotification.enableStopButton = enable
+                return this
+            }
+
+            /**
+             * Enabled by Default.
+             *
+             * Setting it to false will only show a notification when toggling
+             * `Service.startForeground` to keep the Service alive, where a notification is
+             * required to be had.
+             * */
+            fun showNotification(show: Boolean = false): NotificationBuilder {
+                serviceNotification.showNotification = show
                 return this
             }
 
@@ -435,6 +448,9 @@ class TorServiceController private constructor(): ServiceConsts() {
         /**
          * Adding a StringExtra to the Intent by passing a value for [extrasString] will
          * always use the [action] as the key for retrieving it.
+         *
+         * @param [action] A [ServiceConsts.ServiceAction] to be processed by [TorService]
+         * @param [extrasString] To be included in the intent.
          * */
         private fun sendAction(@ServiceAction action: String, extrasString: String? = null) {
             if (!::appContext.isInitialized) return
@@ -444,11 +460,7 @@ class TorServiceController private constructor(): ServiceConsts() {
             if (extrasString != null) {
                 torServiceIntent.putExtra(action, extrasString)
             }
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                appContext.startForegroundService(torServiceIntent)
-            else
-                appContext.startService(torServiceIntent)
+            appContext.startService(torServiceIntent)
         }
 
         /**

@@ -60,10 +60,11 @@ object SampleCode {
                 .setImageTorNetworkingDisabled(R.drawable.tor_stat_network_disabled)
                 .setImageTorDataTransfer(R.drawable.tor_stat_network_dataxfer)
                 .setImageTorErrors(R.drawable.tor_stat_notifyerr)
-                .setCustomColor(R.color.tor_service_white, colorizeBackground = true)
+                .setCustomColor(R.color.tor_service_white)
                 .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                 .enableTorRestartButton(enable = true)
                 .enableTorStopButton(enable = true)
+                .showNotification(show = true)
 
                 // Will return a Builder object to continue with non-notification related options
                 .applyNotificationSettings()

@@ -49,12 +49,10 @@ class App: Application() {
                 intentExtras = null,
                 intentRequestCode = null
             )
-            .setCustomColor(
-                colorRes = R.color.primaryColor,
-                colorizeBackground = true
-            )
+            .setCustomColor(colorRes = R.color.primaryColor)
             .enableTorRestartButton()
             .enableTorStopButton()
+            .showNotification(false)
             .applyNotificationSettings()
 
             .setBuildConfigDebug(buildConfigDebug = BuildConfig.DEBUG)
