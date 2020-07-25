@@ -62,11 +62,13 @@ internal class ServiceActionProcessor(private val torService: TorService): Servi
         processActionObject(actionObject)
     }
 
-    fun processActionObject(serviceActionObject: ActionCommands.ServiceActionObject) {
+    private fun processActionObject(serviceActionObject: ActionCommands.ServiceActionObject) {
         if (serviceActionObject is ActionCommands.Stop) {
             isAcceptingActions = false
             clearActionQueue()
+            broadcastLogger.notice(ServiceAction.STOP)
         } else if (serviceActionObject is ActionCommands.Start) {
+            clearActionQueue()
             isAcceptingActions = true
         }
 
@@ -139,6 +141,7 @@ internal class ServiceActionProcessor(private val torService: TorService): Servi
                 if (actionObject == null) {
                     return@launch
                 } else {
+                    broadcastLogger.notice(actionObject.serviceAction)
                     actionObject.commands.forEachIndexed { index, command ->
 
                         // Check if the current actionObject being executed has been
