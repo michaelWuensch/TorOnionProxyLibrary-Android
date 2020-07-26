@@ -30,6 +30,7 @@ import io.matthewnelson.topl_service.onionproxy.ServiceEventListener
 import io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller
 import io.matthewnelson.topl_service.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
+import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import kotlinx.coroutines.*
 
 internal class TorService: Service() {
@@ -66,32 +67,30 @@ internal class TorService: Service() {
             context.getSharedPreferences("TorServiceLocalPrefs", Context.MODE_PRIVATE)
     }
 
-    private val supervisorJob = SupervisorJob()
+    val supervisorJob = SupervisorJob()
     val scopeMain = CoroutineScope(Dispatchers.Main + supervisorJob)
     lateinit var serviceActionProcessor: ServiceActionProcessor
         private set
-    private lateinit var torServicePrefsListener: TorServicePrefsListener
+    lateinit var torServicePrefsListener: TorServicePrefsListener
+        private set
+    val serviceNotification = ServiceNotification.get()
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
 
     override fun onCreate() {
-        super.onCreate()
-        ServiceNotification.get().startForegroundNotification(this)
-        initTOPLCore()
+        serviceNotification.buildNotification(this)
+        initTOPLCore(this)
         serviceActionProcessor = ServiceActionProcessor(this)
         torServicePrefsListener = TorServicePrefsListener(this)
     }
 
     override fun onDestroy() {
-        torServicePrefsListener.unregister()
-        supervisorJob.cancel()
-        super.onDestroy()
+        serviceActionProcessor.processIntent(Intent(ServiceAction.DESTROY))
     }
 
     override fun onLowMemory() {
-        super.onLowMemory()
         broadcastLogger.warn("Low memory!!!")
     }
 
@@ -99,15 +98,13 @@ internal class TorService: Service() {
         intent?.action?.let {
             serviceActionProcessor.processIntent(intent)
         }
-        return START_STICKY
+        return START_NOT_STICKY
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
-        super.onTaskRemoved(rootIntent)
-        // TODO: add to debug message if Controller option for disabling stop on task removed
-        //  when the feature gets implemented.
+        serviceNotification.startForeground(this)
         broadcastLogger.debug("Task has been removed")
-        serviceActionProcessor.processActionObject(ActionCommands.Stop())
+        serviceActionProcessor.processIntent(Intent(ServiceAction.STOP))
     }
 
     /////////////////
@@ -117,14 +114,14 @@ internal class TorService: Service() {
     lateinit var onionProxyManager: OnionProxyManager
         private set
 
-    private fun initTOPLCore() {
+    private fun initTOPLCore(torService: TorService) {
         onionProxyManager = OnionProxyManager(
-            this,
+            torService,
             TorServiceController.getTorConfigFiles(),
-            ServiceTorInstaller(this),
-            ServiceTorSettings(TorServiceController.getTorSettings(), this),
+            ServiceTorInstaller(torService),
+            ServiceTorSettings(TorServiceController.getTorSettings(), torService),
             ServiceEventListener(),
-            ServiceEventBroadcaster(this),
+            ServiceEventBroadcaster(torService),
             buildConfigDebug
         )
         broadcastLogger = onionProxyManager.getBroadcastLogger(TorService::class.java)
