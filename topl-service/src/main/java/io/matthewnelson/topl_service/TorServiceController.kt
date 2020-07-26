@@ -357,9 +357,8 @@ class TorServiceController private constructor(): ServiceConsts() {
             /**
              * Enabled by Default.
              *
-             * Setting it to false will only show a notification when toggling
-             * `Service.startForeground` to keep the Service alive, where a notification is
-             * required to be had.
+             * Setting it to false will only show a notification when your task is removed
+             * in order to properly shutdown the Service.
              * */
             fun showNotification(show: Boolean = false): NotificationBuilder {
                 serviceNotification.showNotification = show
