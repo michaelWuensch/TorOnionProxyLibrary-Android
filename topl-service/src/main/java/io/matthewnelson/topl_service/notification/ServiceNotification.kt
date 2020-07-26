@@ -71,16 +71,13 @@ internal class ServiceNotification(
         }
 
         fun get(): ServiceNotification {
-            if (!::serviceNotification.isInitialized) {
-                serviceNotification = ServiceNotification(
-                    "CHANGE ME",
-                    "TorService Channel",
-                    "BSG is a national treasure",
-                    615615
-                )
-            }
-
-            return serviceNotification
+            return if (::serviceNotification.isInitialized)
+                serviceNotification
+            else
+                throw UninitializedPropertyAccessException("A Notification must be setup " +
+                        "to properly shutdown Tor when your task is removed. If you wish to " +
+                        "not show a notification while your Application is running, elect the " +
+                        "showNotification(false) method when initializing the Builder")
         }
     }
 
@@ -131,6 +128,12 @@ internal class ServiceNotification(
         notificationBuilder = builder
         if (showNotification || inForeground)
             notificationManager?.notify(notificationID, builder.build())
+    }
+
+    @Synchronized
+    fun remove() {
+        if (!inForeground && showNotification)
+            notificationManager?.cancel(notificationID)
     }
 
     /**
