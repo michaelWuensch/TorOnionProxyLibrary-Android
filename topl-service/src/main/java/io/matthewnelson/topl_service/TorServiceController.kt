@@ -27,7 +27,7 @@ import androidx.core.app.NotificationCompat.NotificationVisibility
 import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
-import io.matthewnelson.topl_service.service.ServiceActionProcessor
+import io.matthewnelson.topl_service.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.util.ServiceConsts
 
 class TorServiceController private constructor(): ServiceConsts() {
@@ -451,15 +451,17 @@ class TorServiceController private constructor(): ServiceConsts() {
          * @param [action] A [ServiceConsts.ServiceAction] to be processed by [TorService]
          * @param [extrasString] To be included in the intent.
          * */
-        private fun sendAction(@ServiceAction action: String, extrasString: String? = null) {
+        private fun sendBroadcast(@ServiceAction action: String, extrasString: String? = null) {
             if (!::appContext.isInitialized) return
-            val torServiceIntent = Intent(appContext, TorService::class.java)
-            torServiceIntent.action = action
+            val broadcastIntent = Intent(TorServiceReceiver.SERVICE_INTENT_FILTER)
+            broadcastIntent.putExtra(TorServiceReceiver.SERVICE_INTENT_FILTER, action)
+            broadcastIntent.setPackage(appContext.packageName)
 
             if (extrasString != null) {
-                torServiceIntent.putExtra(action, extrasString)
+                broadcastIntent.putExtra(action, extrasString)
             }
-            appContext.startService(torServiceIntent)
+
+            appContext.sendBroadcast(broadcastIntent)
         }
 
         /**
@@ -470,8 +472,9 @@ class TorServiceController private constructor(): ServiceConsts() {
          * You can call this as much as you want. If Tor is already on, it will do nothing.
          * */
         fun startTor() {
-            if (!ServiceActionProcessor.isAcceptingActions)
-                sendAction(ServiceAction.START)
+            val startServiceIntent = Intent(appContext, TorService::class.java)
+            startServiceIntent.action = ServiceAction.START
+            appContext.startService(startServiceIntent)
         }
 
         /**
@@ -481,8 +484,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          *  - Calling [startTor]
          * */
         fun stopTor() {
-            if (ServiceActionProcessor.isAcceptingActions)
-                sendAction(ServiceAction.STOP)
+            sendBroadcast(ServiceAction.STOP)
         }
 
         /**
@@ -492,8 +494,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          *  - Calling [startTor]
          * */
         fun restartTor() {
-            if (ServiceActionProcessor.isAcceptingActions)
-                sendAction(ServiceAction.RESTART_TOR)
+            sendBroadcast(ServiceAction.RESTART_TOR)
         }
 
         /**
@@ -503,8 +504,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          *  - Calling [startTor]
          * */
         fun newIdentity() {
-            if (ServiceActionProcessor.isAcceptingActions)
-                sendAction(ServiceAction.NEW_ID)
+            sendBroadcast(ServiceAction.NEW_ID)
         }
     }
 }

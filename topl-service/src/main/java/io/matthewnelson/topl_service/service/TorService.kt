@@ -30,6 +30,7 @@ import io.matthewnelson.topl_service.onionproxy.ServiceEventListener
 import io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller
 import io.matthewnelson.topl_service.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
+import io.matthewnelson.topl_service.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import kotlinx.coroutines.*
 
@@ -73,6 +74,8 @@ internal class TorService: Service() {
         private set
     lateinit var torServicePrefsListener: TorServicePrefsListener
         private set
+    lateinit var torServiceReceiver: TorServiceReceiver
+        private set
     val serviceNotification = ServiceNotification.get()
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -84,6 +87,8 @@ internal class TorService: Service() {
         initTOPLCore(this)
         serviceActionProcessor = ServiceActionProcessor(this)
         torServicePrefsListener = TorServicePrefsListener(this)
+        torServiceReceiver =
+            TorServiceReceiver(this)
     }
 
     override fun onDestroy() {

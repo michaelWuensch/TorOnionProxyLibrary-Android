@@ -21,6 +21,7 @@ import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
+import io.matthewnelson.topl_service.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.util.ServiceConsts
 import kotlinx.coroutines.*
 import java.io.IOException
@@ -38,22 +39,14 @@ import java.lang.reflect.InvocationTargetException
  * */
 internal class ServiceActionProcessor(private val torService: TorService): ServiceConsts() {
 
-    companion object {
-
-        // Needed to inhibit all TorServiceController methods except for startTor()
-        // from sending such that startService isn't called without properly
-        // starting Tor first.
-        @Volatile
-        var isAcceptingActions = false
-            private set
-    }
-
     private val onionProxyManager: OnionProxyManager
         get() = torService.onionProxyManager
     private val torServicePrefsListener: TorServicePrefsListener
         get() = torService.torServicePrefsListener
     private val serviceNotification: ServiceNotification
         get() = torService.serviceNotification
+    private val torServiceReceiver: TorServiceReceiver
+        get() = torService.torServiceReceiver
 
     private val broadcastLogger = onionProxyManager.getBroadcastLogger(ServiceActionProcessor::class.java)
     private val serviceActionObjectGetter = ActionCommands.ServiceActionObjectGetter()
@@ -71,18 +64,18 @@ internal class ServiceActionProcessor(private val torService: TorService): Servi
     private fun processActionObject(serviceActionObject: ActionCommands.ServiceActionObject) {
         when (serviceActionObject) {
             is ActionCommands.Destroy -> {
-                isAcceptingActions = false
+                torServiceReceiver.unregister()
                 clearActionQueue()
             }
             is ActionCommands.Stop -> {
-                isAcceptingActions = false
+                torServiceReceiver.unregister()
                 clearActionQueue()
                 broadcastLogger.notice(ServiceAction.STOP)
             }
             is ActionCommands.Start -> {
                 clearActionQueue()
+                torServiceReceiver.register()
                 serviceNotification.stopForeground(torService)
-                isAcceptingActions = true
             }
         }
 
@@ -212,10 +205,8 @@ internal class ServiceActionProcessor(private val torService: TorService): Servi
     /// Execution Methods ///
     /////////////////////////
     private fun stopService() {
-        if (!isAcceptingActions) {
-            broadcastDebugObjectDetailsMsg("Stopping: ", torService)
-            torService.stopSelf()
-        }
+        broadcastDebugObjectDetailsMsg("Stopping: ", torService)
+        torService.stopSelf()
     }
 
     @WorkerThread

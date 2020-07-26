@@ -29,6 +29,7 @@ import androidx.core.app.NotificationCompat.NotificationVisibility
 import androidx.core.content.ContextCompat
 import io.matthewnelson.topl_service.R
 import io.matthewnelson.topl_service.service.TorService
+import io.matthewnelson.topl_service.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.util.ServiceConsts
 
 /**
@@ -194,35 +195,37 @@ internal class ServiceNotification(
         builder.addAction(
             imageNetworkEnabled,
             "New Identity",
-            getActionPendingIntent(torService, ServiceAction.NEW_ID)
+            getActionPendingIntent(torService, ServiceAction.NEW_ID, 1)
         )
 
         if (enableRestartButton)
             builder.addAction(
                 imageNetworkEnabled,
                 "Restart Tor",
-                getActionPendingIntent(torService, ServiceAction.RESTART_TOR)
+                getActionPendingIntent(torService, ServiceAction.RESTART_TOR, 2)
             )
 
         if (enableStopButton)
             builder.addAction(
                 imageNetworkEnabled,
                 "Stop Tor",
-                getActionPendingIntent(torService, ServiceAction.STOP)
+                getActionPendingIntent(torService, ServiceAction.STOP, 3)
             )
         notify(builder)
     }
 
     private fun getActionPendingIntent(
         torService: TorService,
-        @ServiceAction action: String
+        @ServiceAction action: String,
+        requestCode: Int
     ): PendingIntent {
-        val intent = Intent(torService, TorService::class.java)
-        intent.action = action
+        val intent = Intent(TorServiceReceiver.SERVICE_INTENT_FILTER)
+        intent.putExtra(TorServiceReceiver.SERVICE_INTENT_FILTER, action)
+        intent.setPackage(torService.packageName)
 
-        return PendingIntent.getService(
+        return PendingIntent.getBroadcast(
             torService,
-            0,
+            requestCode,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT
         )
