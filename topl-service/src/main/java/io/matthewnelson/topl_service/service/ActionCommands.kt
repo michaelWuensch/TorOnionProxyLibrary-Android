@@ -66,6 +66,14 @@ internal sealed class ActionCommands {
         }
     }
 
+    class Destroy(override val serviceAction: String) : ServiceActionObject() {
+        override val commands: Array<String>
+            get() = arrayOf(
+                ActionCommand.STOP_TOR,
+                ActionCommand.DESTROY
+            )
+    }
+
     class NewId(override val serviceAction: String) : ServiceActionObject() {
         override val commands: Array<String>
             get() = arrayOf(
@@ -112,6 +120,9 @@ internal sealed class ActionCommands {
         @Throws(IllegalArgumentException::class)
         fun get(intent: Intent): ServiceActionObject {
             return when (val action = intent.action) {
+                ServiceAction.DESTROY -> {
+                    Destroy(action)
+                }
                 ServiceAction.NEW_ID -> {
                     NewId(action)
                 }

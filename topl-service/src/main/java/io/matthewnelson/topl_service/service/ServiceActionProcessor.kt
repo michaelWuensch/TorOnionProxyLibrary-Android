@@ -19,6 +19,8 @@ package io.matthewnelson.topl_service.service
 import android.content.Intent
 import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.OnionProxyManager
+import io.matthewnelson.topl_service.notification.ServiceNotification
+import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.util.ServiceConsts
 import kotlinx.coroutines.*
 import java.io.IOException
@@ -46,12 +48,12 @@ internal class ServiceActionProcessor(private val torService: TorService): Servi
             private set
     }
 
-    fun setIsAcceptingActions(value: Boolean) {
-        isAcceptingActions = value
-    }
-
     private val onionProxyManager: OnionProxyManager
         get() = torService.onionProxyManager
+    private val torServicePrefsListener: TorServicePrefsListener
+        get() = torService.torServicePrefsListener
+    private val serviceNotification: ServiceNotification
+        get() = torService.serviceNotification
 
     private val broadcastLogger = onionProxyManager.getBroadcastLogger(ServiceActionProcessor::class.java)
     private val serviceActionObjectGetter = ActionCommands.ServiceActionObjectGetter()
@@ -67,13 +69,21 @@ internal class ServiceActionProcessor(private val torService: TorService): Servi
     }
 
     private fun processActionObject(serviceActionObject: ActionCommands.ServiceActionObject) {
-        if (serviceActionObject is ActionCommands.Stop) {
-            isAcceptingActions = false
-            clearActionQueue()
-            broadcastLogger.notice(ServiceAction.STOP)
-        } else if (serviceActionObject is ActionCommands.Start) {
-            clearActionQueue()
-            isAcceptingActions = true
+        when (serviceActionObject) {
+            is ActionCommands.Destroy -> {
+                isAcceptingActions = false
+                clearActionQueue()
+            }
+            is ActionCommands.Stop -> {
+                isAcceptingActions = false
+                clearActionQueue()
+                broadcastLogger.notice(ServiceAction.STOP)
+            }
+            is ActionCommands.Start -> {
+                clearActionQueue()
+                serviceNotification.stopForeground(torService)
+                isAcceptingActions = true
+            }
         }
 
         if (addActionToQueue(serviceActionObject))
@@ -128,6 +138,8 @@ internal class ServiceActionProcessor(private val torService: TorService): Servi
     ////////////////////////
     /// Queue Processing ///
     ////////////////////////
+    private val supervisorJob: Job
+        get() = torService.supervisorJob
     private val scopeMain: CoroutineScope
         get() = torService.scopeMain
     private lateinit var processQueueJob: Job
@@ -161,19 +173,29 @@ internal class ServiceActionProcessor(private val torService: TorService): Servi
                             ActionCommand.DELAY -> {
                                 delay(actionObject.consumeDelayLength())
                             }
+                            ActionCommand.DESTROY -> {
+                                torServicePrefsListener.unregister()
+                                serviceNotification.remove()
+                                delay(300L)
+                                supervisorJob.cancel()
+                            }
                             ActionCommand.NEW_ID -> {
                                 onionProxyManager.signalNewNym()
                             }
                             ActionCommand.START_TOR -> {
-                                startTor()
-                                delay(300L)
+                                if (!onionProxyManager.hasControlConnection) {
+                                    startTor()
+                                    delay(300L)
+                                }
                             }
                             ActionCommand.STOP_SERVICE -> {
                                 stopService()
                             }
                             ActionCommand.STOP_TOR -> {
-                                stopTor()
-                                delay(300L)
+                                if (onionProxyManager.hasControlConnection) {
+                                    stopTor()
+                                    delay(300L)
+                                }
                             }
                         }
                         if (index == actionObject.commands.lastIndex) {
@@ -198,7 +220,6 @@ internal class ServiceActionProcessor(private val torService: TorService): Servi
 
     @WorkerThread
     private fun startTor() {
-        if (onionProxyManager.hasControlConnection) return
         try {
             onionProxyManager.setup()
             generateTorrcFile()
