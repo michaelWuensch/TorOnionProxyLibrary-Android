@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import io.matthewnelson.topl_service.service.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.TorService
+import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import java.math.BigInteger
 import java.security.SecureRandom
 
@@ -56,16 +57,28 @@ internal class TorServiceReceiver(private val torService: TorService): Broadcast
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context != null && intent != null) {
-            if (intent.`package` != torService.packageName) return
-            val serviceAction = intent.getStringExtra(SERVICE_INTENT_FILTER)
-            val newIntent = Intent(serviceAction)
+            // Only accept Intents from this package.
+            if (context.applicationInfo.dataDir != torService.applicationInfo.dataDir) return
 
-            // If the broadcast intent has any string extras, their key will be the
-            // ServiceAction that was included.
-            intent.getStringExtra(serviceAction)?.let {
-                newIntent.putExtra(serviceAction, it)
+            when (val serviceAction = intent.getStringExtra(SERVICE_INTENT_FILTER)) {
+
+                // Only accept these 3 ServiceActions.
+                ServiceAction.NEW_ID, ServiceAction.RESTART_TOR, ServiceAction.STOP -> {
+                    val newIntent = Intent(serviceAction)
+
+                    // If the broadcast intent has any string extras, their key will be the
+                    // ServiceAction that was included.
+                    intent.getStringExtra(serviceAction)?.let {
+                        newIntent.putExtra(serviceAction, it)
+                    }
+                    serviceActionProcessor.processIntent(newIntent)
+                }
+                else -> {
+                    broadcastLogger.warn(
+                        "This class does not accept $serviceAction as an argument."
+                    )
+                }
             }
-            serviceActionProcessor.processIntent(newIntent)
         }
     }
 }
