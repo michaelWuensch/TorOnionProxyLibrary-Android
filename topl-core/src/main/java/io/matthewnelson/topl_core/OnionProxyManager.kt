@@ -89,15 +89,16 @@ import java.util.concurrent.TimeUnit
  * @sample [io.matthewnelson.topl_service.service.TorService.initTOPLCore]
  * */
 class OnionProxyManager(
-    private val context: Context,
+    context: Context,
     torConfigFiles: TorConfigFiles,
     torInstaller: TorInstaller,
     torSettings: TorSettings,
-    val eventListener: BaseEventListener,
+    internal val eventListener: BaseEventListener,
     eventBroadcaster: EventBroadcaster,
     buildConfigDebug: Boolean? = null
 ): CoreConsts() {
 
+    private val appContext = context.applicationContext
     internal val onionProxyContext = OnionProxyContext(torConfigFiles, torInstaller, torSettings)
 
     // Ensures that these live only in OnionProxyContext, but are accessible from here.
@@ -339,7 +340,7 @@ class OnionProxyManager(
             if (networkStateReceiver == null) return
 
             try {
-                context.unregisterReceiver(networkStateReceiver)
+                appContext.unregisterReceiver(networkStateReceiver)
             } catch (e: IllegalArgumentException) {
                 // There is a race condition where if someone calls stop before
                 // installAndStartTorOp is done then we could get an exception because
@@ -555,7 +556,7 @@ class OnionProxyManager(
 
         @Suppress("DEPRECATION")
         val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
-        context.registerReceiver(networkStateReceiver, filter)
+        appContext.registerReceiver(networkStateReceiver, filter)
         broadcastLogger.notice("Completed starting of Tor")
     }
 
