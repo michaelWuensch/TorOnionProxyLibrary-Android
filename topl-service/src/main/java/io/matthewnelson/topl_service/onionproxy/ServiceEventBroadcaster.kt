@@ -223,9 +223,6 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
                     ServiceAction.RESTART_TOR -> {
                         "Restarting Tor..."
                     }
-                    ServiceAction.START -> {
-                        "Waiting..."
-                    }
                     ServiceAction.STOP -> {
                         "Stopping Service..."
                     }
