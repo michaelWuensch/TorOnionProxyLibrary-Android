@@ -17,9 +17,11 @@
 package io.matthewnelson.topl_service.service
 
 import android.app.Service
+import android.content.ComponentCallbacks2
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Binder
 import android.os.IBinder
 import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
@@ -46,16 +48,13 @@ internal class TorService: Service() {
         lateinit var geoip6AssetPath: String
             private set
 
-        private fun isInitialized(): Boolean =
-            ::geoipAssetPath.isInitialized
-
         fun initialize(
             buildConfigVersionCode: Int,
             buildConfigDebug: Boolean,
             geoipAssetPath: String,
             geoip6AssetPath: String
         ) {
-            if (!isInitialized()) {
+            if (Companion::geoipAssetPath.isInitialized) {
                 this.buildConfigVersionCode = buildConfigVersionCode
                 this.buildConfigDebug = buildConfigDebug
                 this.geoipAssetPath = geoipAssetPath
@@ -78,10 +77,6 @@ internal class TorService: Service() {
         private set
     val serviceNotification = ServiceNotification.get()
 
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
-    }
-
     override fun onCreate() {
         serviceNotification.buildNotification(this)
         initTOPLCore(this)
@@ -96,26 +91,74 @@ internal class TorService: Service() {
     }
 
     override fun onLowMemory() {
-        broadcastLogger.warn("Low memory!!!")
+        broadcastLogger?.warn("Low memory!!!")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.action?.let {
-            serviceActionProcessor.processIntent(intent)
+            if (it == ServiceAction.START)
+                serviceActionProcessor.processIntent(intent)
+            else
+                throw IllegalArgumentException(
+                    "$it is not an accepted argument for use with startService()"
+                )
         }
         return START_NOT_STICKY
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         serviceNotification.startForeground(this)
-        broadcastLogger.debug("Task has been removed")
+        broadcastLogger?.debug("Task has been removed")
         serviceActionProcessor.processIntent(Intent(ServiceAction.STOP))
     }
+
+
+    ///////////////
+    /// Binding ///
+    ///////////////
+    private val torServiceBinder = TorServiceBinder()
+    inner class TorServiceBinder: Binder() {
+
+        private fun throwIllegalArgument(action: String) {
+            throw IllegalArgumentException(
+                "$action is not an accepted argument for ${this.javaClass.simpleName}"
+            )
+        }
+
+        fun submitServiceActionIntent(serviceActionIntent: Intent) {
+            val action = serviceActionIntent.action
+            if (action != null && action.contains(ServiceAction.SERVICE_ACTION))
+                throwIllegalArgument(action)
+
+            when (action) {
+                ServiceAction.DESTROY,
+                ServiceAction.NEW_ID,
+                ServiceAction.RESTART_TOR,
+                ServiceAction.START,
+                ServiceAction.STOP -> {
+                    // Do not accept the above ServiceActions through use of this method.
+                    // DESTROY = internal Service use only (for onDestroy)
+                    // NEW_ID, RESTART_TOR, STOP = via BroadcastReceiver
+                    // START = to start TorService
+                    throwIllegalArgument(action)
+                }
+                else -> {
+                    serviceActionProcessor.processIntent(serviceActionIntent)
+                }
+            }
+        }
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        broadcastLogger?.debug("Service has been bound")
+        return torServiceBinder
+    }
+
 
     /////////////////
     /// TOPL-Core ///
     /////////////////
-    private lateinit var broadcastLogger: BroadcastLogger
+    private var broadcastLogger: BroadcastLogger? = null
     lateinit var onionProxyManager: OnionProxyManager
         private set
 
@@ -130,6 +173,6 @@ internal class TorService: Service() {
             buildConfigDebug
         )
         broadcastLogger = onionProxyManager.getBroadcastLogger(TorService::class.java)
-        broadcastLogger.notice("BuildConfig.DEBUG set to: $buildConfigDebug")
+        broadcastLogger?.notice("BuildConfig.DEBUG set to: $buildConfigDebug")
     }
 }

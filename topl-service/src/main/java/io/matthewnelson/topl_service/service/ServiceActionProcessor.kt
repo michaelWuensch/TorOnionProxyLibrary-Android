@@ -19,6 +19,7 @@ package io.matthewnelson.topl_service.service
 import android.content.Intent
 import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.OnionProxyManager
+import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.receiver.TorServiceReceiver
@@ -206,6 +207,7 @@ internal class ServiceActionProcessor(private val torService: TorService): Servi
     /////////////////////////
     private fun stopService() {
         broadcastDebugObjectDetailsMsg("Stopping: ", torService)
+        TorServiceController.unbindTorService(torService.applicationContext)
         torService.stopSelf()
     }
 

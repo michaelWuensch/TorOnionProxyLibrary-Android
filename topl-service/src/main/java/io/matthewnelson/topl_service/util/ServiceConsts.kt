@@ -171,7 +171,7 @@ abstract class ServiceConsts: BaseConsts() {
     @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
     internal annotation class ServiceAction {
         companion object {
-            private const val SERVICE_ACTION = "ServiceAction_"
+            const val SERVICE_ACTION = "ServiceAction_"
             const val DESTROY = "${SERVICE_ACTION}DESTROY"
             const val NEW_ID = "${SERVICE_ACTION}NEW_ID"
             const val RESTART_TOR = "${SERVICE_ACTION}RESTART_TOR"

@@ -17,8 +17,11 @@
 package io.matthewnelson.topl_service
 
 import android.app.Application
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
+import android.os.IBinder
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import io.matthewnelson.topl_service.notification.ServiceNotification
@@ -428,7 +431,9 @@ class TorServiceController private constructor(): ServiceConsts() {
             if (::torConfigFiles.isInitialized)
                 torConfigFiles
             else
-                throw UninitializedPropertyAccessException("TorConfigFiles hasn't been initialized")
+                throw UninitializedPropertyAccessException(
+                    "${TorConfigFiles::class.java.simpleName} hasn't been initialized yet"
+                )
 
         /**
          * Get the [TorSettings] that have been set after calling [Builder.build]. These are
@@ -442,7 +447,9 @@ class TorServiceController private constructor(): ServiceConsts() {
             if (::torSettings.isInitialized)
                 torSettings
             else
-                throw UninitializedPropertyAccessException("TorSettings hasn't been initialized")
+                throw UninitializedPropertyAccessException(
+                    "${TorSettings::class.java.simpleName} hasn't been initialized yet"
+                )
 
         /**
          * Starts [TorService]. Does nothing if called prior to:
@@ -452,9 +459,11 @@ class TorServiceController private constructor(): ServiceConsts() {
          * You can call this as much as you want. If Tor is already on, it will do nothing.
          * */
         fun startTor() {
+            if (!::appContext.isInitialized) return
             val startServiceIntent = Intent(appContext, TorService::class.java)
             startServiceIntent.action = ServiceAction.START
             appContext.startService(startServiceIntent)
+            bindTorService(appContext)
         }
 
         /**
@@ -463,9 +472,8 @@ class TorServiceController private constructor(): ServiceConsts() {
          *  - Initializing [TorServiceController.Builder] by calling [Builder.build]
          *  - Calling [startTor]
          * */
-        fun stopTor() {
+        fun stopTor() =
             sendBroadcast(ServiceAction.STOP)
-        }
 
         /**
          * Restarts Tor. Does nothing if called prior to:
@@ -473,9 +481,8 @@ class TorServiceController private constructor(): ServiceConsts() {
          *  - Initializing [TorServiceController.Builder] by calling [Builder.build]
          *  - Calling [startTor]
          * */
-        fun restartTor() {
+        fun restartTor() =
             sendBroadcast(ServiceAction.RESTART_TOR)
-        }
 
         /**
          * Changes identities. Does nothing if called prior to:
@@ -483,9 +490,8 @@ class TorServiceController private constructor(): ServiceConsts() {
          *  - Initializing [TorServiceController.Builder] by calling [Builder.build]
          *  - Calling [startTor]
          * */
-        fun newIdentity() {
+        fun newIdentity() =
             sendBroadcast(ServiceAction.NEW_ID)
-        }
 
         /**
          * Adding a StringExtra to the Intent by passing a value for [extrasString] will
@@ -500,11 +506,58 @@ class TorServiceController private constructor(): ServiceConsts() {
             broadcastIntent.putExtra(TorServiceReceiver.SERVICE_INTENT_FILTER, action)
             broadcastIntent.setPackage(appContext.packageName)
 
-            if (extrasString != null) {
+            if (extrasString != null)
                 broadcastIntent.putExtra(action, extrasString)
-            }
 
             appContext.sendBroadcast(broadcastIntent)
         }
+
+
+        /////////////////////
+        /// ServiceBinder ///
+        /////////////////////
+        private val torServiceConnection = TorServiceConnection()
+
+        private fun bindTorService(context: Context) {
+            val bindingIntent = Intent(context.applicationContext, TorService::class.java)
+            bindingIntent.action = ServiceAction.START
+
+            context.applicationContext.bindService(
+                bindingIntent,
+                torServiceConnection,
+                Context.BIND_AUTO_CREATE
+            )
+        }
+
+        internal fun unbindTorService(context: Context) {
+            torServiceConnection.clearServiceBinderReference()
+            context.applicationContext.unbindService(torServiceConnection)
+        }
+    }
+
+    internal class TorServiceConnection: ServiceConnection {
+
+        @Volatile
+        var serviceBinder: TorService.TorServiceBinder? = null
+            private set
+
+        /**
+         * Sets the reference to [TorService.TorServiceBinder] to `null` because
+         * [onServiceDisconnected] is not always called when [Context.unbindService]
+         * is made.
+         * */
+        fun clearServiceBinderReference() {
+            serviceBinder = null
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            // TODO: Implement logic for detecting crashes (which is when this gets called)
+            serviceBinder = null
+        }
+
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            serviceBinder = service as TorService.TorServiceBinder
+        }
+
     }
 }
