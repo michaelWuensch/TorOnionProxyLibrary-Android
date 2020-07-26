@@ -445,26 +445,6 @@ class TorServiceController private constructor(): ServiceConsts() {
                 throw UninitializedPropertyAccessException("TorSettings hasn't been initialized")
 
         /**
-         * Adding a StringExtra to the Intent by passing a value for [extrasString] will
-         * always use the [action] as the key for retrieving it.
-         *
-         * @param [action] A [ServiceConsts.ServiceAction] to be processed by [TorService]
-         * @param [extrasString] To be included in the intent.
-         * */
-        private fun sendBroadcast(@ServiceAction action: String, extrasString: String? = null) {
-            if (!::appContext.isInitialized) return
-            val broadcastIntent = Intent(TorServiceReceiver.SERVICE_INTENT_FILTER)
-            broadcastIntent.putExtra(TorServiceReceiver.SERVICE_INTENT_FILTER, action)
-            broadcastIntent.setPackage(appContext.packageName)
-
-            if (extrasString != null) {
-                broadcastIntent.putExtra(action, extrasString)
-            }
-
-            appContext.sendBroadcast(broadcastIntent)
-        }
-
-        /**
          * Starts [TorService]. Does nothing if called prior to:
          *
          *  - Initializing [TorServiceController.Builder] by calling [Builder.build]
@@ -505,6 +485,26 @@ class TorServiceController private constructor(): ServiceConsts() {
          * */
         fun newIdentity() {
             sendBroadcast(ServiceAction.NEW_ID)
+        }
+
+        /**
+         * Adding a StringExtra to the Intent by passing a value for [extrasString] will
+         * always use the [action] as the key for retrieving it.
+         *
+         * @param [action] A [ServiceConsts.ServiceAction] to be processed by [TorService]
+         * @param [extrasString] To be included in the intent.
+         * */
+        private fun sendBroadcast(@ServiceAction action: String, extrasString: String? = null) {
+            if (!::appContext.isInitialized) return
+            val broadcastIntent = Intent(TorServiceReceiver.SERVICE_INTENT_FILTER)
+            broadcastIntent.putExtra(TorServiceReceiver.SERVICE_INTENT_FILTER, action)
+            broadcastIntent.setPackage(appContext.packageName)
+
+            if (extrasString != null) {
+                broadcastIntent.putExtra(action, extrasString)
+            }
+
+            appContext.sendBroadcast(broadcastIntent)
         }
     }
 }
