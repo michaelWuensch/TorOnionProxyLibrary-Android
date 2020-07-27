@@ -22,6 +22,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.RemoteException
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
@@ -35,7 +36,7 @@ import io.matthewnelson.topl_service.util.ServiceConsts
 /**
  * Everything to do with [TorService]'s notification.
  *
- * See [io.matthewnelson.topl_service.TorServiceController.Builder.NotificationBuilder]
+ * @see [Builder]
  * */
 class ServiceNotification internal constructor(
     private val channelName: String,
@@ -63,15 +64,238 @@ class ServiceNotification internal constructor(
     var showNotification: Boolean = true
 ): ServiceConsts() {
 
-    companion object {
+
+    ///////////////
+    /// Builder ///
+    ///////////////
+    /**
+     * Where you get to customize how your notification will look and function.
+     *
+     * A notification is required to be displayed while [TorService] is running in the
+     * Foreground. Even if you set [Builder.showNotification] to false, [TorService]
+     * is brought to the Foreground when the user removes your task from the recent apps tray
+     * in order to properly shut down Tor and clean up w/o being killed by the OS.
+     *
+     * @param [channelName] Your notification channel's name (Cannot be Empty).
+     * @param [channelID] Your notification channel's ID (Cannot be Empty).
+     * @param [channelDescription] Your notification channel's description (Cannot be Empty).
+     * @param [notificationID] Your foreground notification's ID.
+     * @throws [IllegalArgumentException] If String fields are empty.
+     * */
+    class Builder(
+        channelName: String,
+        channelID: String,
+        channelDescription: String,
+        notificationID: Int
+    ) {
+
+        init {
+            require(
+                channelName.isNotEmpty() && channelID.isNotEmpty() && channelDescription.isNotEmpty()
+            ) { "channelName, channelID, & channelDescription must not be empty." }
+        }
+
+        private val serviceNotification =
+            ServiceNotification(
+                channelName,
+                channelID,
+                channelDescription,
+                notificationID
+            )
+
+        /**
+         * Define the Activity to be opened when your user taps TorService's notification.
+         *
+         * See [Builder] for code samples.
+         *
+         * @param [clazz] The Activity to be opened when tapped.
+         * @param [intentExtrasKey]? The key for if you with to add extras in the PendingIntent.
+         * @param [intentExtras]? The extras that will be sent in the PendingIntent.
+         * @param [intentRequestCode]? The request code - Defaults to 0 if not set.
+         * @sample [io.matthewnelson.sampleapp.App.generateTorServiceNotificationBuilder]
+         *
+         * TODO:
+         *  + Include an optional Bundle? to be set for creating the pending intent.
+         *  + Think about overriding and providing another option to rotate the ContentIntent
+         *  to open up/resume current activity?
+         * */
+        fun setActivityToBeOpenedOnTap(
+            clazz: Class<*>,
+            intentExtrasKey: String?,
+            intentExtras: String?,
+            intentRequestCode: Int?
+        ): Builder {
+            serviceNotification.activityWhenTapped = clazz
+            serviceNotification.activityIntentKey = intentExtrasKey
+            serviceNotification.activityIntentExtras = intentExtras
+            intentRequestCode?.let { serviceNotification.activityIntentRequestCode = it }
+            return this
+        }
+
+        /**
+         * Defaults to Orbot/TorBrowser's icon [R.drawable.tor_stat_network_enabled].
+         *
+         * The small icon you wish to display when Tor's network state is
+         * [io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState.ENABLED].
+         *
+         * See [Builder] for code samples.
+         *
+         * @param [drawableRes] Drawable resource id
+         * @return [Builder] To continue customizing
+         * */
+        fun setImageTorNetworkingEnabled(@DrawableRes drawableRes: Int): Builder {
+            serviceNotification.imageNetworkEnabled = drawableRes
+            return this
+        }
+
+        /**
+         * Defaults to Orbot/TorBrowser's icon [R.drawable.tor_stat_network_disabled].
+         *
+         * The small icon you wish to display when Tor's network state is
+         * [io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState.DISABLED].
+         *
+         * See [Builder] for code samples.
+         *
+         * @param [drawableRes] Drawable resource id
+         * @return [Builder] To continue customizing
+         * */
+        fun setImageTorNetworkingDisabled(@DrawableRes drawableRes: Int): Builder {
+            serviceNotification.imageNetworkDisabled = drawableRes
+            return this
+        }
+
+        /**
+         * Defaults to Orbot/TorBrowser's icon [R.drawable.tor_stat_network_dataxfer].
+         *
+         * The small icon you wish to display when bandwidth is being used.
+         *
+         * See [Builder] for code samples.
+         *
+         * @param [drawableRes] Drawable resource id
+         * @return [Builder] To continue customizing
+         * */
+        fun setImageTorDataTransfer(@DrawableRes drawableRes: Int): Builder {
+            serviceNotification.imageDataTransfer = drawableRes
+            return this
+        }
+
+        /**
+         * Defaults to Orbot/TorBrowser's icon [R.drawable.tor_stat_notifyerr].
+         *
+         * The small icon you wish to display when Tor is having problems.
+         *
+         * See [Builder] for code samples.
+         *
+         * @param [drawableRes] Drawable resource id
+         * @return [Builder] To continue customizing
+         * */
+        fun setImageTorErrors(@DrawableRes drawableRes: Int): Builder {
+            serviceNotification.imageError = drawableRes
+            return this
+        }
+
+        /**
+         * Defaults to [R.color.tor_service_white]
+         *
+         * The color you wish to display when Tor's network state is
+         * [io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState.ENABLED].
+         *
+         * See [Builder] for code samples.
+         *
+         * @param [colorRes] Color resource id
+         * @return [Builder] To continue customizing
+         * */
+        fun setCustomColor(@ColorRes colorRes: Int): Builder {
+            serviceNotification.colorWhenConnected = colorRes
+            return this
+        }
+
+        /**
+         * Defaults to NotificationVisibility.VISIBILITY_SECRET
+         *
+         * The visibility of your notification on the user's lock screen.
+         *
+         * See [Builder] for code samples.
+         *
+         * @param [visibility] The [NotificationVisibility] you desire your notification to have
+         * @return [Builder] To continue customizing
+         * */
+        fun setVisibility(@NotificationVisibility visibility: Int): Builder {
+            if (visibility in -1..1)
+                serviceNotification.visibility = visibility
+            return this
+        }
+
+        /**
+         * Disabled by Default
+         *
+         * Enable on the notification the ability to **restart** Tor.
+         *
+         * See [Builder] for code samples.
+         *
+         * @param [enable] Boolean, automatically set to true but provides cleaner option
+         *   for implementor to query SharedPreferences for user's settings (if desired)
+         * @return [Builder] To continue customizing
+         * */
+        fun enableTorRestartButton(enable: Boolean = true): Builder {
+            serviceNotification.enableRestartButton = enable
+            return this
+        }
+
+        /**
+         * Disabled by Default
+         *
+         * Enable on the notification the ability to **stop** Tor.
+         *
+         * See [Builder] for code samples.
+         *
+         * @param [enable] Boolean, automatically set to true but provides cleaner option
+         *   for implementor to query SharedPreferences for user's settings (if desired)
+         * @return [Builder] To continue customizing
+         * */
+        fun enableTorStopButton(enable: Boolean = true): Builder {
+            serviceNotification.enableStopButton = enable
+            return this
+        }
+
+        /**
+         * Enabled by Default.
+         *
+         * Setting it to false will only show a notification when the end user removes your
+         * Application from the Recent App's tray. In that event, [TorService.onTaskRemoved]
+         * moves the Service to the Foreground in order to properly shutdown Tor w/o the OS
+         * killing it beforehand.
+         *
+         * See [Builder] for code samples.
+         *
+         * @param [show] Boolean, automatically set to false but provides cleaner option for
+         *   implementor to query SharedPreferences for user's settings (if desired)
+         * @return [Builder] To continue customizing
+         * */
+        fun showNotification(show: Boolean = false): Builder {
+            serviceNotification.showNotification = show
+            return this
+        }
+
+        /**
+         * Initializes your notification customizations. This is called by
+         * [io.matthewnelson.topl_service.TorServiceController.Builder.build]
+         * */
+        internal fun build() {
+            initialize(serviceNotification)
+        }
+
+    }
+
+    internal companion object {
         private lateinit var serviceNotification: ServiceNotification
 
-        internal fun initialize(serviceNotificay: ServiceNotification) {
+        fun initialize(serviceNotificay: ServiceNotification) {
             if (!::serviceNotification.isInitialized)
                 serviceNotification = serviceNotificay
         }
 
-        internal fun get(): ServiceNotification {
+        fun get(): ServiceNotification {
             return if (::serviceNotification.isInitialized)
                 serviceNotification
             else
@@ -142,8 +366,8 @@ class ServiceNotification internal constructor(
      * [io.matthewnelson.topl_service.TorServiceController.Builder.build]
      * */
     internal fun setupNotificationChannel(context: Context): ServiceNotification {
-        val nm: NotificationManager? =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
+        val nm: NotificationManager? = context.applicationContext
+            .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelID,
