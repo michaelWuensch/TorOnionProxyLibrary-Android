@@ -259,7 +259,7 @@ class ServiceNotification internal constructor(
         }
 
         /**
-         * Enabled by Default.
+         * Shown by Default.
          *
          * Setting it to false will only show a notification when the end user removes your
          * Application from the Recent App's tray. In that event, [TorService.onTaskRemoved]

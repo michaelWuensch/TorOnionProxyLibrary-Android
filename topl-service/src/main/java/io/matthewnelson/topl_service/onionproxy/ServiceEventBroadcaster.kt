@@ -232,7 +232,6 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
                 }
                 msgToShow?.let {
                     serviceNotification.updateContentText(it)
-                    serviceNotification.updateIcon(torService, NotificationImage.DISABLED)
                 }
             }
         }
