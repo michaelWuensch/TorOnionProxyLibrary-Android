@@ -17,20 +17,15 @@
 package io.matthewnelson.topl_service
 
 import android.app.Application
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
-import android.os.IBinder
-import androidx.annotation.ColorRes
-import androidx.annotation.DrawableRes
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.TorService
-import androidx.core.app.NotificationCompat.NotificationVisibility
 import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.receiver.TorServiceReceiver
+import io.matthewnelson.topl_service.service.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts
 
 class TorServiceController private constructor(): ServiceConsts() {
@@ -297,32 +292,5 @@ class TorServiceController private constructor(): ServiceConsts() {
             torServiceConnection.clearServiceBinderReference()
             context.applicationContext.unbindService(torServiceConnection)
         }
-    }
-
-    internal class TorServiceConnection: ServiceConnection {
-
-        @Volatile
-        var serviceBinder: TorService.TorServiceBinder? = null
-            private set
-
-        /**
-         * Sets the reference to [TorService.TorServiceBinder] to `null` because
-         * [onServiceDisconnected] is not always called when [Context.unbindService]
-         * is made.
-         * */
-        fun clearServiceBinderReference() {
-            serviceBinder = null
-        }
-
-        override fun onServiceDisconnected(name: ComponentName?) {
-            // TODO: Implement logic for detecting undesired calls to this method (which
-            //  is primarily when this gets fired off).
-            serviceBinder = null
-        }
-
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            serviceBinder = service as TorService.TorServiceBinder
-        }
-
     }
 }
