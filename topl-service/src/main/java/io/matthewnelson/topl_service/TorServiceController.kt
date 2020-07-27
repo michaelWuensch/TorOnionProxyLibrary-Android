@@ -420,46 +420,47 @@ class TorServiceController private constructor(): ServiceConsts() {
         private lateinit var torConfigFiles: TorConfigFiles
         private lateinit var torSettings: TorSettings
 
+        private fun builderDotBuildNotCalledException(): RuntimeException =
+            RuntimeException("${Builder::class.java.simpleName}.build has yet been called")
+
         /**
          * Get the [TorConfigFiles] that have been set after calling [Builder.build]
          *
          * @return Instance of [TorConfigFiles] that are being used throughout TOPL-Android
-         * @throws [UninitializedPropertyAccessException] if called before [Builder.build]
+         * @throws [RuntimeException] if called before [Builder.build]
          * */
-        @Throws(UninitializedPropertyAccessException::class)
+        @Throws(RuntimeException::class)
         fun getTorConfigFiles(): TorConfigFiles =
             if (::torConfigFiles.isInitialized)
                 torConfigFiles
             else
-                throw UninitializedPropertyAccessException(
-                    "${TorConfigFiles::class.java.simpleName} hasn't been initialized yet"
-                )
+                throw builderDotBuildNotCalledException()
 
         /**
          * Get the [TorSettings] that have been set after calling [Builder.build]. These are
          * the [TorSettings] you initialized [TorServiceController.Builder] with.
          *
          * @return Instance of [TorSettings] that are being used throughout TOPL-Android
-         * @throws [UninitializedPropertyAccessException] if called before [Builder.build]
+         * @throws [RuntimeException] if called before [Builder.build]
          * */
-        @Throws(UninitializedPropertyAccessException::class)
+        @Throws(RuntimeException::class)
         fun getTorSettings(): TorSettings =
             if (::torSettings.isInitialized)
                 torSettings
             else
-                throw UninitializedPropertyAccessException(
-                    "${TorSettings::class.java.simpleName} hasn't been initialized yet"
-                )
+                throw builderDotBuildNotCalledException()
 
         /**
-         * Starts [TorService]. Does nothing if called prior to:
+         * Starts [TorService] and then Tor. You can call this as much as you want. If the Tor
+         * Process is already running, it will do nothing.
          *
-         *  - Initializing [TorServiceController.Builder] by calling [Builder.build]
-         *
-         * You can call this as much as you want. If Tor is already on, it will do nothing.
+         * @throws [RuntimeException] if called before [Builder.build]
          * */
+        @Throws(RuntimeException::class)
         fun startTor() {
-            if (!::appContext.isInitialized) return
+            if (!::appContext.isInitialized)
+                throw builderDotBuildNotCalledException()
+
             val startServiceIntent = Intent(appContext, TorService::class.java)
             startServiceIntent.action = ServiceAction.START
             appContext.startService(startServiceIntent)
@@ -467,29 +468,29 @@ class TorServiceController private constructor(): ServiceConsts() {
         }
 
         /**
-         * Stops [TorService]. Does nothing if called prior to:
+         * Stops [TorService]. Does nothing if called prior to calling [startTor]
          *
-         *  - Initializing [TorServiceController.Builder] by calling [Builder.build]
-         *  - Calling [startTor]
+         * @throws [RuntimeException] if called before [Builder.build]
          * */
+        @Throws(RuntimeException::class)
         fun stopTor() =
             sendBroadcast(ServiceAction.STOP)
 
         /**
-         * Restarts Tor. Does nothing if called prior to:
+         * Restarts Tor. Does nothing if called prior to calling [startTor]
          *
-         *  - Initializing [TorServiceController.Builder] by calling [Builder.build]
-         *  - Calling [startTor]
+         * @throws [RuntimeException] if called before [Builder.build]
          * */
+        @Throws(RuntimeException::class)
         fun restartTor() =
             sendBroadcast(ServiceAction.RESTART_TOR)
 
         /**
-         * Changes identities. Does nothing if called prior to:
+         * Changes identities. Does nothing if called prior to calling [startTor]
          *
-         *  - Initializing [TorServiceController.Builder] by calling [Builder.build]
-         *  - Calling [startTor]
+         * @throws [RuntimeException] if called before [Builder.build]
          * */
+        @Throws(RuntimeException::class)
         fun newIdentity() =
             sendBroadcast(ServiceAction.NEW_ID)
 
@@ -499,9 +500,13 @@ class TorServiceController private constructor(): ServiceConsts() {
          *
          * @param [action] A [ServiceConsts.ServiceAction] to be processed by [TorService]
          * @param [extrasString] To be included in the intent.
+         * @throws [RuntimeException] if called before [Builder.build]
          * */
+        @Throws(RuntimeException::class)
         private fun sendBroadcast(@ServiceAction action: String, extrasString: String? = null) {
-            if (!::appContext.isInitialized) return
+            if (!::appContext.isInitialized)
+                throw builderDotBuildNotCalledException()
+
             val broadcastIntent = Intent(TorServiceReceiver.SERVICE_INTENT_FILTER)
             broadcastIntent.putExtra(TorServiceReceiver.SERVICE_INTENT_FILTER, action)
             broadcastIntent.setPackage(appContext.packageName)
@@ -551,7 +556,8 @@ class TorServiceController private constructor(): ServiceConsts() {
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
-            // TODO: Implement logic for detecting crashes (which is when this gets called)
+            // TODO: Implement logic for detecting undesired calls to this method (which
+            //  is primarily when this gets fired off).
             serviceBinder = null
         }
 
