@@ -18,6 +18,7 @@ package io.matthewnelson.sampleapp
 
 import android.app.Application
 import android.content.Context
+import androidx.core.app.NotificationCompat
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.notification.ServiceNotification
@@ -47,6 +48,12 @@ class App: Application() {
                 intentExtras = null,
                 intentRequestCode = null
             )
+            .setImageTorNetworkingEnabled(drawableRes = R.drawable.tor_stat_network_enabled)
+            .setImageTorNetworkingDisabled(drawableRes = R.drawable.tor_stat_network_disabled)
+            .setImageTorDataTransfer(drawableRes = R.drawable.tor_stat_network_dataxfer)
+            .setImageTorErrors(drawableRes = R.drawable.tor_stat_notifyerr)
+            .setCustomColor(colorRes = R.color.tor_service_white)
+            .setVisibility(visibility = NotificationCompat.VISIBILITY_PRIVATE)
             .setCustomColor(colorRes = R.color.primaryColor)
             .enableTorRestartButton(enable = true)
             .enableTorStopButton(enable = true)
