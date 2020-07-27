@@ -19,16 +19,13 @@ package io.matthewnelson.topl_service
 import android.app.Application
 import android.content.Context
 import android.content.Intent
-import android.os.Build
-import androidx.annotation.ColorRes
-import androidx.annotation.DrawableRes
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.TorService
-import androidx.core.app.NotificationCompat.NotificationVisibility
 import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
-import io.matthewnelson.topl_service.service.ServiceActionProcessor
+import io.matthewnelson.topl_service.receiver.TorServiceReceiver
+import io.matthewnelson.topl_service.service.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts
 
 class TorServiceController private constructor(): ServiceConsts() {
@@ -57,28 +54,28 @@ class TorServiceController private constructor(): ServiceConsts() {
      * [io.matthewnelson.topl_service.onionproxy.ServiceTorSettings] and
      * [TorService.initTOPLCore].
      *
-     * @param [application] [Application], for obtaining context.
+     * @param [application] [Application], for obtaining context
+     * @param [torServiceNotificationBuilder] The [ServiceNotification.Builder] for
+     *   customizing [TorService]'s notification
      * @param [buildConfigVersionCode] send [BuildConfig.VERSION_CODE]. Mitigates copying of geoip
-     *   files to app updates only.
-     * @param [torSettings] [TorSettings] used to create your torrc file on start of Tor.
+     *   files to app updates only
+     * @param [torSettings] [TorSettings] used to create your torrc file on start of Tor
      * @param [geoipAssetPath] The path to where you have your geoip file located (ex: in
-     *   assets/common directory, send this variable "common/geoip").
+     *   assets/common directory, send this variable "common/geoip")
      * @param [geoip6AssetPath] The path to where you have your geoip6 file located (ex: in
-     *   assets/common directory, send this variable "common/geoip6").
+     *   assets/common directory, send this variable "common/geoip6")
      *
-     * @sample [io.matthewnelson.sampleapp.samplecode.SampleCode.setupTorServices]
+     * @sample [io.matthewnelson.sampleapp.App.generateTorServiceNotificationBuilder]
+     * @sample [io.matthewnelson.sampleapp.App.setupTorServices]
      * */
     class Builder(
         private val application: Application,
+        private val torServiceNotificationBuilder: ServiceNotification.Builder,
         private val buildConfigVersionCode: Int,
-        torSettings: TorSettings,
+        private val torSettings: TorSettings,
         private val geoipAssetPath: String,
         private val geoip6AssetPath: String
     ) {
-
-        init {
-            Companion.torSettings = torSettings
-        }
 
         private lateinit var torConfigFiles: TorConfigFiles
 
@@ -94,11 +91,11 @@ class TorServiceController private constructor(): ServiceConsts() {
          * will still get the same messages sent to your [EventBroadcaster] if you set it
          * via [Builder.setEventBroadcaster].
          *
-         * TODO: Provide a link to gh-pages that discusses logging and how it work, it's pretty
-         *  complex with everything that is going on.
-         *
          * @param [buildConfigDebug] Send [BuildConfig.DEBUG]
          * @see [io.matthewnelson.topl_core.broadcaster.BroadcastLogger]
+         *
+         * TODO: Provide a link to gh-pages that discusses logging and how it work, it's pretty
+         *  complex with everything that is going on.
          * */
         fun setBuildConfigDebug(buildConfigDebug: Boolean): Builder {
             this.buildConfigDebug = buildConfigDebug
@@ -128,7 +125,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * to operate with.
          *
          * @return [Builder]
-         * @sample [io.matthewnelson.sampleapp.samplecode.SampleCode.customTorConfigFilesSetup]
+         * @sample [io.matthewnelson.sampleapp.App.customTorConfigFilesSetup]
          * @see [Builder.build]
          * */
         fun useCustomTorConfigFiles(torConfigFiles: TorConfigFiles): Builder {
@@ -137,244 +134,16 @@ class TorServiceController private constructor(): ServiceConsts() {
         }
 
         /**
-         * Customize the service notification to your application.
-         *
-         * See [Builder] for code samples.
-         *
-         * @param [channelName] Your notification channel's name (cannot be empty).
-         * @param [channelID] Your notification channel's ID (cannot be empty).
-         * @param [channelDescription] Your notification channel's description (cannot be empty).
-         * @param [notificationID] Your foreground notification's ID.
-         * @return [NotificationBuilder] To obtain methods specific to notification customization.
-         * @throws [IllegalArgumentException] If String fields are empty.
-         * */
-        @Throws(IllegalArgumentException::class)
-        fun customizeNotification(
-            channelName: String,
-            channelID: String,
-            channelDescription: String,
-            notificationID: Short
-        ): NotificationBuilder {
-            require(
-                channelName.isNotEmpty() &&
-                channelID.isNotEmpty() &&
-                channelDescription.isNotEmpty()
-            ) { "channelName, channelID, & channelDescription must not be empty." }
-
-            return NotificationBuilder(
-                this,
-                channelName,
-                channelID,
-                channelDescription,
-                notificationID.toInt()
-            )
-        }
-
-        /**
-         * Where you get to customize how your foreground notification will look/function.
-         * Calling [customizeNotification] will return this class to you which provides methods
-         * specific to customization of notifications. Call [applyNotificationSettings] when done
-         * to return to [Builder] to continue with it's methods for customization.
-         *
-         * See [Builder] for code samples.
-         *
-         * @param [builder] [Builder] To return to it when calling [applyNotificationSettings]
-         * @param [channelName] Your notification channel's name.
-         * @param [channelID] Your notification channel's ID.
-         * @param [channelDescription] Your notification channel's description.
-         * @param [notificationID] Your foreground notification's ID.
-         * */
-        class NotificationBuilder(
-            private val builder: Builder,
-            channelName: String,
-            channelID: String,
-            channelDescription: String,
-            notificationID: Int
-        ) {
-
-            private val serviceNotification =
-                ServiceNotification(
-                    channelName,
-                    channelID,
-                    channelDescription,
-                    notificationID
-                )
-
-            /**
-             * For when your user taps the TorService notification.
-             *
-             * See [Builder] for code samples.
-             *
-             * @param [clazz] The Activity to be opened when tapped.
-             * @param [intentExtrasKey]? The key for if you with to add extras in the PendingIntent.
-             * @param [intentExtras]? The extras that will be sent in the PendingIntent.
-             * @param [intentRequestCode]? The request code - Defaults to 0 if not set.
-             * */
-            fun setActivityToBeOpenedOnTap(
-                clazz: Class<*>,
-                intentExtrasKey: String?,
-                intentExtras: String?,
-                intentRequestCode: Int?
-            ): NotificationBuilder {
-                serviceNotification.activityWhenTapped = clazz
-                serviceNotification.activityIntentKey = intentExtrasKey
-                serviceNotification.activityIntentExtras = intentExtras
-                intentRequestCode?.let { serviceNotification.activityIntentRequestCode = it }
-                return this
-            }
-
-            /**
-             * Defaults to Orbot/TorBrowser's icon [R.drawable.tor_stat_network_enabled].
-             *
-             * The small icon you wish to display when Tor's network state is
-             * [io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState.ENABLED].
-             *
-             * See [Builder] for code samples.
-             *
-             * @param [drawableRes] Drawable resource id.
-             * @return [NotificationBuilder]
-             * */
-            fun setImageTorNetworkingEnabled(@DrawableRes drawableRes: Int): NotificationBuilder {
-                serviceNotification.imageNetworkEnabled = drawableRes
-                return this
-            }
-
-            /**
-             * Defaults to Orbot/TorBrowser's icon [R.drawable.tor_stat_network_disabled].
-             *
-             * The small icon you wish to display when Tor's network state is
-             * [io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState.DISABLED].
-             *
-             * See [Builder] for code samples.
-             *
-             * @param [drawableRes] Drawable resource id.
-             * @return [NotificationBuilder]
-             * */
-            fun setImageTorNetworkingDisabled(@DrawableRes drawableRes: Int): NotificationBuilder {
-                serviceNotification.imageNetworkDisabled = drawableRes
-                return this
-            }
-
-            /**
-             * Defaults to Orbot/TorBrowser's icon [R.drawable.tor_stat_network_dataxfer].
-             *
-             * The small icon you wish to display when bandwidth is being used.
-             *
-             * See [Builder] for code samples.
-             *
-             * @param [drawableRes] Drawable resource id.
-             * @return [NotificationBuilder]
-             * */
-            fun setImageTorDataTransfer(@DrawableRes drawableRes: Int): NotificationBuilder {
-                serviceNotification.imageDataTransfer = drawableRes
-                return this
-            }
-
-            /**
-             * Defaults to Orbot/TorBrowser's icon [R.drawable.tor_stat_notifyerr].
-             *
-             * The small icon you wish to display when Tor is having problems.
-             *
-             * See [Builder] for code samples.
-             *
-             * @param [drawableRes] Drawable resource id.
-             * @return [NotificationBuilder]
-             * */
-            fun setImageTorErrors(@DrawableRes drawableRes: Int): NotificationBuilder {
-                serviceNotification.imageError = drawableRes
-                return this
-            }
-
-            /**
-             * Defaults to [R.color.tor_service_white]
-             *
-             * The color you wish to display when Tor's network state is
-             * [io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState.ENABLED]. Note that
-             * if [colorizeBackground] is being passed a value of `true`, the notification will
-             * always be that color where as if it is passed `false`, the icon & action button
-             * colors will change with Tor's network state.
-             *
-             * See [Builder] for code samples.
-             *
-             * @param [colorRes] Color resource id.
-             * @param [colorizeBackground] true = background is colorized, false = icon is colorized
-             * @return [NotificationBuilder]
-             * */
-            fun setCustomColor(@ColorRes colorRes: Int, colorizeBackground: Boolean): NotificationBuilder {
-                serviceNotification.colorWhenConnected = colorRes
-                serviceNotification.colorizeBackground = colorizeBackground
-                return this
-            }
-
-            /**
-             * Defaults to NotificationVisibility.VISIBILITY_SECRET
-             *
-             * The visibility of your notification on the user's lock screen.
-             *
-             * See [Builder] for code samples.
-             *
-             * @return [NotificationBuilder]
-             * */
-            fun setVisibility(@NotificationVisibility visibility: Int): NotificationBuilder {
-                if (visibility in -1..1)
-                    serviceNotification.visibility = visibility
-                return this
-            }
-
-            /**
-             * Disabled by Default
-             *
-             * Enable on the notification the ability to *restart* Tor.
-             *
-             * See [Builder] for code samples.
-             *
-             * @param [enable] Boolean, automatically set to true but provides cleaner option
-             *   for implementor to query SharedPreferences for user's settings (if desired).
-             * @return [NotificationBuilder]
-             * */
-            fun enableTorRestartButton(enable: Boolean = true): NotificationBuilder {
-                serviceNotification.enableRestartButton = enable
-                return this
-            }
-
-            /**
-             * Disabled by Default
-             *
-             * Enable on the notification the ability to *stop* Tor.
-             *
-             * See [Builder] for code samples.
-             *
-             * @param [enable] Boolean, automatically set to true but provides cleaner option
-             *   for implementor to query SharedPreferences for user's settings (if desired).
-             * @return [NotificationBuilder]
-             * */
-            fun enableTorStopButton(enable: Boolean = true): NotificationBuilder {
-                serviceNotification.enableStopButton = enable
-                return this
-            }
-
-            /**
-             * Initialize settings.
-             *
-             * See [Builder] for code samples.
-             *
-             * @return [Builder]
-             * */
-            fun applyNotificationSettings(): Builder {
-                ServiceNotification.initialize(serviceNotification)
-                return builder
-            }
-
-        }
-
-        /**
-         * Initializes [TorService] setup and enables the ability to call methods in the
-         * [Companion] object.
+         * Initializes [TorService] setup and enables the ability to call methods from the
+         * [Companion] object w/o throwing exceptions.
          *
          * See [Builder] for code samples.
          * */
         fun build() {
 
+            torServiceNotificationBuilder.build()
+
+            Companion.torSettings = torSettings
             Companion.torConfigFiles =
                 if (::torConfigFiles.isInitialized)
                     torConfigFiles
@@ -405,104 +174,123 @@ class TorServiceController private constructor(): ServiceConsts() {
         private lateinit var torConfigFiles: TorConfigFiles
         private lateinit var torSettings: TorSettings
 
+        private fun builderDotBuildNotCalledException(): RuntimeException =
+            RuntimeException("${Builder::class.java.simpleName}.build has yet been called")
+
         /**
          * Get the [TorConfigFiles] that have been set after calling [Builder.build]
          *
          * @return Instance of [TorConfigFiles] that are being used throughout TOPL-Android
-         * @throws [UninitializedPropertyAccessException] if called before [Builder.build]
+         * @throws [RuntimeException] if called before [Builder.build]
          * */
-        @Throws(UninitializedPropertyAccessException::class)
+        @Throws(RuntimeException::class)
         fun getTorConfigFiles(): TorConfigFiles =
             if (::torConfigFiles.isInitialized)
                 torConfigFiles
             else
-                throw UninitializedPropertyAccessException("TorConfigFiles hasn't been initialized")
+                throw builderDotBuildNotCalledException()
 
         /**
          * Get the [TorSettings] that have been set after calling [Builder.build]. These are
          * the [TorSettings] you initialized [TorServiceController.Builder] with.
          *
          * @return Instance of [TorSettings] that are being used throughout TOPL-Android
-         * @throws [UninitializedPropertyAccessException] if called before [Builder.build]
+         * @throws [RuntimeException] if called before [Builder.build]
          * */
-        @Throws(UninitializedPropertyAccessException::class)
+        @Throws(RuntimeException::class)
         fun getTorSettings(): TorSettings =
             if (::torSettings.isInitialized)
                 torSettings
             else
-                throw UninitializedPropertyAccessException("TorSettings hasn't been initialized")
+                throw builderDotBuildNotCalledException()
 
-        // Needed to inhibit all TorServiceController methods except for startTor()
-        // from sending such that startService isn't called and Tor isn't properly
-        // started up. Also inhibits executing certain actions within the
-        // TorService.serviceActionQueue as this variable is checked.
-        @Volatile
-        internal var isTorServiceAcceptingActions = false
-            private set
+        /**
+         * Starts [TorService] and then Tor. You can call this as much as you want. If the Tor
+         * Process is already running, it will do nothing.
+         *
+         * @throws [RuntimeException] if called before [Builder.build]
+         * */
+        @Throws(RuntimeException::class)
+        fun startTor() {
+            if (!::appContext.isInitialized)
+                throw builderDotBuildNotCalledException()
+
+            val startServiceIntent = Intent(appContext, TorService::class.java)
+            startServiceIntent.action = ServiceAction.START
+            appContext.startService(startServiceIntent)
+            bindTorService(appContext)
+        }
+
+        /**
+         * Stops [TorService]. Does nothing if called prior to calling [startTor]
+         *
+         * @throws [RuntimeException] if called before [Builder.build]
+         * */
+        @Throws(RuntimeException::class)
+        fun stopTor() =
+            sendBroadcast(ServiceAction.STOP)
+
+        /**
+         * Restarts Tor. Does nothing if called prior to calling [startTor]
+         *
+         * @throws [RuntimeException] if called before [Builder.build]
+         * */
+        @Throws(RuntimeException::class)
+        fun restartTor() =
+            sendBroadcast(ServiceAction.RESTART_TOR)
+
+        /**
+         * Changes identities. Does nothing if called prior to calling [startTor]
+         *
+         * @throws [RuntimeException] if called before [Builder.build]
+         * */
+        @Throws(RuntimeException::class)
+        fun newIdentity() =
+            sendBroadcast(ServiceAction.NEW_ID)
 
         /**
          * Adding a StringExtra to the Intent by passing a value for [extrasString] will
          * always use the [action] as the key for retrieving it.
+         *
+         * @param [action] A [ServiceConsts.ServiceAction] to be processed by [TorService]
+         * @param [extrasString] To be included in the intent.
+         * @throws [RuntimeException] if called before [Builder.build]
          * */
-        private fun sendAction(
-            @ServiceAction action: String,
-            extrasString: String? = null
-        ) {
-            if (!::appContext.isInitialized) return
-            val torServiceIntent = Intent(appContext.applicationContext, TorService::class.java)
-            torServiceIntent.action = action
+        @Throws(RuntimeException::class)
+        private fun sendBroadcast(@ServiceAction action: String, extrasString: String? = null) {
+            if (!::appContext.isInitialized)
+                throw builderDotBuildNotCalledException()
 
-            if (extrasString != null) {
-                torServiceIntent.putExtra(action, extrasString)
-            }
+            val broadcastIntent = Intent(TorServiceReceiver.SERVICE_INTENT_FILTER)
+            broadcastIntent.putExtra(TorServiceReceiver.SERVICE_INTENT_FILTER, action)
+            broadcastIntent.setPackage(appContext.packageName)
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                appContext.startForegroundService(torServiceIntent)
-            else
-                appContext.startService(torServiceIntent)
+            if (extrasString != null)
+                broadcastIntent.putExtra(action, extrasString)
+
+            appContext.sendBroadcast(broadcastIntent)
         }
 
-        /**
-         * Starts [TorService]. Does nothing if called prior to:
-         *
-         *  - Initializing [TorServiceController.Builder] by calling [Builder.build]
-         *
-         * You can call this as much as you want. If Tor is already on, it will do nothing.
-         * */
-        fun startTor() =
-            sendAction(ServiceAction.START)
 
-        /**
-         * Stops [TorService]. Does nothing if called prior to:
-         *
-         *  - Initializing [TorServiceController.Builder] by calling [Builder.build]
-         *  - Calling [startTor]
-         * */
-        fun stopTor() {
-            if (!ServiceActionProcessor.isAcceptingActions) return
-            sendAction(ServiceAction.STOP)
+        /////////////////////
+        /// ServiceBinder ///
+        /////////////////////
+        private val torServiceConnection = TorServiceConnection()
+
+        private fun bindTorService(context: Context) {
+            val bindingIntent = Intent(context.applicationContext, TorService::class.java)
+            bindingIntent.action = ServiceAction.START
+
+            context.applicationContext.bindService(
+                bindingIntent,
+                torServiceConnection,
+                Context.BIND_AUTO_CREATE
+            )
         }
 
-        /**
-         * Restarts Tor. Does nothing if called prior to:
-         *
-         *  - Initializing [TorServiceController.Builder] by calling [Builder.build]
-         *  - Calling [startTor]
-         * */
-        fun restartTor() {
-            if (!ServiceActionProcessor.isAcceptingActions) return
-            sendAction(ServiceAction.RESTART_TOR)
-        }
-
-        /**
-         * Changes identities. Does nothing if called prior to:
-         *
-         *  - Initializing [TorServiceController.Builder] by calling [Builder.build]
-         *  - Calling [startTor]
-         * */
-        fun newIdentity() {
-            if (!ServiceActionProcessor.isAcceptingActions) return
-            sendAction(ServiceAction.NEW_ID)
+        internal fun unbindTorService(context: Context) {
+            torServiceConnection.clearServiceBinderReference()
+            context.applicationContext.unbindService(torServiceConnection)
         }
     }
 }

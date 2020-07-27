@@ -17,9 +17,11 @@
 package io.matthewnelson.topl_service.service
 
 import android.app.Service
+import android.content.ComponentCallbacks2
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Binder
 import android.os.IBinder
 import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
@@ -30,6 +32,8 @@ import io.matthewnelson.topl_service.onionproxy.ServiceEventListener
 import io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller
 import io.matthewnelson.topl_service.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
+import io.matthewnelson.topl_service.receiver.TorServiceReceiver
+import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import kotlinx.coroutines.*
 
 internal class TorService: Service() {
@@ -44,21 +48,18 @@ internal class TorService: Service() {
         lateinit var geoip6AssetPath: String
             private set
 
-        private fun isInitialized(): Boolean =
-            ::geoipAssetPath.isInitialized
-
         fun initialize(
             buildConfigVersionCode: Int,
             buildConfigDebug: Boolean,
             geoipAssetPath: String,
             geoip6AssetPath: String
         ) {
-            if (!isInitialized()) {
-                this.buildConfigVersionCode = buildConfigVersionCode
-                this.buildConfigDebug = buildConfigDebug
-                this.geoipAssetPath = geoipAssetPath
-                this.geoip6AssetPath = geoip6AssetPath
-            }
+            if (Companion::geoipAssetPath.isInitialized) return
+            this.buildConfigVersionCode = buildConfigVersionCode
+            this.buildConfigDebug = buildConfigDebug
+            this.geoipAssetPath = geoipAssetPath
+            this.geoip6AssetPath = geoip6AssetPath
+
         }
 
         // For things that can't be saved to TorServicePrefs, such as BuildConfig.VERSION_CODE
@@ -66,68 +67,112 @@ internal class TorService: Service() {
             context.getSharedPreferences("TorServiceLocalPrefs", Context.MODE_PRIVATE)
     }
 
-    private val supervisorJob = SupervisorJob()
+    val supervisorJob = SupervisorJob()
     val scopeMain = CoroutineScope(Dispatchers.Main + supervisorJob)
     lateinit var serviceActionProcessor: ServiceActionProcessor
         private set
-    private lateinit var torServicePrefsListener: TorServicePrefsListener
-
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
-    }
+    lateinit var torServicePrefsListener: TorServicePrefsListener
+        private set
+    lateinit var torServiceReceiver: TorServiceReceiver
+        private set
+    val serviceNotification = ServiceNotification.get()
 
     override fun onCreate() {
-        super.onCreate()
-        ServiceNotification.get().startForegroundNotification(this)
-        initTOPLCore()
+        serviceNotification.buildNotification(this)
+        initTOPLCore(this)
         serviceActionProcessor = ServiceActionProcessor(this)
         torServicePrefsListener = TorServicePrefsListener(this)
+        torServiceReceiver =
+            TorServiceReceiver(this)
     }
 
     override fun onDestroy() {
-        torServicePrefsListener.unregister()
-        supervisorJob.cancel()
-        super.onDestroy()
+        serviceActionProcessor.processIntent(Intent(ServiceAction.DESTROY))
     }
 
     override fun onLowMemory() {
-        super.onLowMemory()
-        broadcastLogger.warn("Low memory!!!")
+        broadcastLogger?.warn("Low memory!!!")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.action?.let {
-            serviceActionProcessor.processIntent(intent)
+            if (it == ServiceAction.START)
+                serviceActionProcessor.processIntent(intent)
+            else
+                throw IllegalArgumentException(
+                    "$it is not an accepted argument for use with startService()"
+                )
         }
-        return START_STICKY
+        return START_NOT_STICKY
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
-        super.onTaskRemoved(rootIntent)
-        // TODO: add to debug message if Controller option for disabling stop on task removed
-        //  when the feature gets implemented.
-        broadcastLogger.debug("Task has been removed")
-        serviceActionProcessor.processActionObject(ActionCommands.Stop())
+        serviceNotification.startForeground(this)
+        broadcastLogger?.debug("Task has been removed")
+        serviceActionProcessor.processIntent(Intent(ServiceAction.STOP))
     }
+
+
+    ///////////////
+    /// Binding ///
+    ///////////////
+    private val torServiceBinder = TorServiceBinder()
+    inner class TorServiceBinder: Binder() {
+
+        private fun throwIllegalArgument(action: String) {
+            throw IllegalArgumentException(
+                "$action is not an accepted argument for ${this.javaClass.simpleName}"
+            )
+        }
+
+        fun submitServiceActionIntent(serviceActionIntent: Intent) {
+            val action = serviceActionIntent.action
+            if (action != null && action.contains(ServiceAction.SERVICE_ACTION))
+                throwIllegalArgument(action)
+
+            when (action) {
+                ServiceAction.DESTROY,
+                ServiceAction.NEW_ID,
+                ServiceAction.RESTART_TOR,
+                ServiceAction.START,
+                ServiceAction.STOP -> {
+                    // Do not accept the above ServiceActions through use of this method.
+                    // DESTROY = internal Service use only (for onDestroy)
+                    // NEW_ID, RESTART_TOR, STOP = via BroadcastReceiver
+                    // START = to start TorService
+                    throwIllegalArgument(action)
+                }
+                else -> {
+                    serviceActionProcessor.processIntent(serviceActionIntent)
+                }
+            }
+        }
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        broadcastLogger?.debug("Service has been bound")
+        return torServiceBinder
+    }
+
 
     /////////////////
     /// TOPL-Core ///
     /////////////////
-    private lateinit var broadcastLogger: BroadcastLogger
+    private var broadcastLogger: BroadcastLogger? = null
     lateinit var onionProxyManager: OnionProxyManager
         private set
 
-    private fun initTOPLCore() {
+    private fun initTOPLCore(torService: TorService) {
         onionProxyManager = OnionProxyManager(
-            this,
+            torService,
             TorServiceController.getTorConfigFiles(),
-            ServiceTorInstaller(this),
-            ServiceTorSettings(TorServiceController.getTorSettings(), this),
+            ServiceTorInstaller(torService),
+            ServiceTorSettings(TorServiceController.getTorSettings(), torService),
             ServiceEventListener(),
-            ServiceEventBroadcaster(this),
+            ServiceEventBroadcaster(torService),
             buildConfigDebug
         )
         broadcastLogger = onionProxyManager.getBroadcastLogger(TorService::class.java)
-        broadcastLogger.notice("BuildConfig.DEBUG set to: $buildConfigDebug")
+        broadcastLogger?.notice("BuildConfig.DEBUG set to: $buildConfigDebug")
     }
 }
