@@ -121,11 +121,11 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
     //////////////////
     override fun broadcastException(msg: String?, e: Exception) {
         if (!msg.isNullOrEmpty()) {
-            if (msg.contains(TorService::class.java.simpleName)) {
+            if (msg.contains(ServiceActionProcessor::class.java.simpleName)) {
                 serviceNotification.updateIcon(torService, NotificationImage.ERROR)
-                val splitMsg = msg.split("|")
-                if (splitMsg.size > 2 && splitMsg[2].isNotEmpty()) {
-                    serviceNotification.updateContentText(splitMsg[2])
+                val msgSplit = msg.split("|")
+                msgSplit.elementAtOrNull(2)?.let {
+                    serviceNotification.updateContentText(it)
                     serviceNotification.updateProgress(show = false)
                 }
             }
@@ -162,7 +162,7 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
         // BOOTSTRAPPED
         if (msg.contains("Bootstrapped")) {
             val msgSplit = msg.split(" ")
-            if (msgSplit.size > 2) {
+            msgSplit.elementAtOrNull(2)?.let {
                 val bootstrapped = "${msgSplit[0]} ${msgSplit[1]}".split("|")[2]
 
                 if (bootstrapped != bootstrapProgress) {
@@ -200,11 +200,7 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
                     }
                     else -> {
                         val msgSplit = msg.split("|")
-                        if (msgSplit.size > 2) {
-                            msgSplit[2]
-                        } else {
-                            null
-                        }
+                        msgSplit.elementAtOrNull(2)
                     }
                 }
 
@@ -218,8 +214,8 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
 
         } else if (msg.contains(ServiceActionProcessor::class.java.simpleName)) {
             val msgSplit = msg.split("|")
-            if (msgSplit.size > 2) {
-                val msgToShow: String? = when (msgSplit[2]) {
+            val msgToShow: String? = msgSplit.elementAtOrNull(2)?.let {
+                when (it) {
                     ServiceAction.RESTART_TOR -> {
                         "Restarting Tor..."
                     }
@@ -230,9 +226,9 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
                         null
                     }
                 }
-                msgToShow?.let {
-                    serviceNotification.updateContentText(it)
-                }
+            }
+            msgToShow?.let {
+                serviceNotification.updateContentText(it)
             }
         }
 
