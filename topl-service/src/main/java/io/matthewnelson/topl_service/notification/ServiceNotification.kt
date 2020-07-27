@@ -37,7 +37,7 @@ import io.matthewnelson.topl_service.util.ServiceConsts
  *
  * See [io.matthewnelson.topl_service.TorServiceController.Builder.NotificationBuilder]
  * */
-internal class ServiceNotification(
+class ServiceNotification internal constructor(
     private val channelName: String,
     private val channelID: String,
     private val channelDescription: String,
@@ -66,12 +66,12 @@ internal class ServiceNotification(
     companion object {
         private lateinit var serviceNotification: ServiceNotification
 
-        fun initialize(serviceNotificay: ServiceNotification) {
+        internal fun initialize(serviceNotificay: ServiceNotification) {
             if (!::serviceNotification.isInitialized)
                 serviceNotification = serviceNotificay
         }
 
-        fun get(): ServiceNotification {
+        internal fun get(): ServiceNotification {
             return if (::serviceNotification.isInitialized)
                 serviceNotification
             else
@@ -89,7 +89,7 @@ internal class ServiceNotification(
     private lateinit var notificationBuilder: NotificationCompat.Builder
     private var notificationManager: NotificationManager? = null
 
-    fun buildNotification(torService: TorService): NotificationCompat.Builder {
+    internal fun buildNotification(torService: TorService): NotificationCompat.Builder {
         val builder = NotificationCompat.Builder(torService, channelID)
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
             .setContentText(currentContent)
@@ -132,7 +132,7 @@ internal class ServiceNotification(
     }
 
     @Synchronized
-    fun remove() {
+    internal fun remove() {
         if (!inForeground && showNotification)
             notificationManager?.cancel(notificationID)
     }
@@ -141,7 +141,7 @@ internal class ServiceNotification(
      * Called once per application start in
      * [io.matthewnelson.topl_service.TorServiceController.Builder.build]
      * */
-    fun setupNotificationChannel(context: Context): ServiceNotification {
+    internal fun setupNotificationChannel(context: Context): ServiceNotification {
         val nm: NotificationManager? =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -168,7 +168,7 @@ internal class ServiceNotification(
     private var inForeground = false
 
     @Synchronized
-    fun startForeground(torService: TorService): ServiceNotification {
+    internal fun startForeground(torService: TorService): ServiceNotification {
         if (!inForeground) {
             torService.startForeground(notificationID, notificationBuilder.build())
             inForeground = true
@@ -177,7 +177,7 @@ internal class ServiceNotification(
     }
 
     @Synchronized
-    fun stopForeground(torService: TorService, removeNotification: Boolean = false): ServiceNotification {
+    internal fun stopForeground(torService: TorService, removeNotification: Boolean = false): ServiceNotification {
         if (inForeground) {
             torService.stopForeground(if (removeNotification) true else !showNotification)
             inForeground = false
@@ -190,7 +190,7 @@ internal class ServiceNotification(
     /// Actions ///
     ///////////////
     @Synchronized
-    fun addActions(torService: TorService) {
+    internal fun addActions(torService: TorService) {
         val builder = notificationBuilder
         builder.addAction(
             imageNetworkEnabled,
@@ -232,7 +232,7 @@ internal class ServiceNotification(
     }
 
     @Synchronized
-    fun removeActions(torService: TorService) {
+    internal fun removeActions(torService: TorService) {
         notify(buildNotification(torService))
     }
 
@@ -244,7 +244,7 @@ internal class ServiceNotification(
     private var currentContent = "Waiting..."
 
     @Synchronized
-    fun updateContentText(string: String) {
+    internal fun updateContentText(string: String) {
         if (currentContent == string) return
         currentContent = string
         val builder = notificationBuilder
@@ -260,7 +260,7 @@ internal class ServiceNotification(
     private var currentTitle = TorState.OFF
 
     @Synchronized
-    fun updateContentTitle(title: String) {
+    internal fun updateContentTitle(title: String) {
         if (currentTitle == title) return
         currentTitle = title
         val builder = notificationBuilder
@@ -276,7 +276,7 @@ internal class ServiceNotification(
     private var currentIcon = imageNetworkDisabled
 
     @Synchronized
-    fun updateIcon(torService: TorService, @NotificationImage notificationImage: Int) {
+    internal fun updateIcon(torService: TorService, @NotificationImage notificationImage: Int) {
         val builder = notificationBuilder
         when (notificationImage) {
             NotificationImage.ENABLED -> {
@@ -311,7 +311,7 @@ internal class ServiceNotification(
     /// Progress Bar ///
     ////////////////////
     @Synchronized
-    fun updateProgress(show: Boolean, progress: Int? = null) {
+    internal fun updateProgress(show: Boolean, progress: Int? = null) {
         val builder = notificationBuilder
         when {
             progress != null -> {
