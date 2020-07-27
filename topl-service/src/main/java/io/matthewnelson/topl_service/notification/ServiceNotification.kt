@@ -80,6 +80,7 @@ class ServiceNotification internal constructor(
      * @param [channelID] Your notification channel's ID (Cannot be Empty).
      * @param [channelDescription] Your notification channel's description (Cannot be Empty).
      * @param [notificationID] Your foreground notification's ID.
+     * @sample [io.matthewnelson.sampleapp.App.generateTorServiceNotificationBuilder]
      * @throws [IllegalArgumentException] If String fields are empty.
      * */
     class Builder(
@@ -112,7 +113,6 @@ class ServiceNotification internal constructor(
          * @param [intentExtrasKey]? The key for if you with to add extras in the PendingIntent.
          * @param [intentExtras]? The extras that will be sent in the PendingIntent.
          * @param [intentRequestCode]? The request code - Defaults to 0 if not set.
-         * @sample [io.matthewnelson.sampleapp.App.generateTorServiceNotificationBuilder]
          *
          * TODO:
          *  + Include an optional Bundle? to be set for creating the pending intent.
