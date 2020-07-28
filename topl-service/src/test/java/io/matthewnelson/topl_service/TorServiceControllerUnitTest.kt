@@ -111,4 +111,14 @@ internal class TorServiceControllerUnitTest {
 
         assertEquals(initialHashCode, hashCodeAfterSecondBuildCall)
     }
+
+    @Test
+    fun `ensure setEventBroadcaster is properly initialized`() {
+        // Hasn't been initialized yet
+        assertNull(TorServiceController.appEventBroadcaster)
+
+        builder.setEventBroadcaster(TestEventBroadcaster()).build()
+
+        assertNotNull(TorServiceController.appEventBroadcaster)
+    }
 }
