@@ -66,6 +66,8 @@
  */
 package io.matthewnelson.topl_service
 
+import android.app.Application
+import androidx.test.core.app.ApplicationProvider
 import io.matthewnelson.test_helpers.TestBase
 import io.matthewnelson.test_helpers.TestEventBroadcaster
 import io.matthewnelson.test_helpers.TestTorSettings
@@ -84,6 +86,10 @@ import org.robolectric.annotation.Config
 @Config(minSdk = 16, maxSdk = 28)
 @RunWith(RobolectricTestRunner::class)
 internal class TorServiceControllerBuilderUnitTest: TestBase() {
+
+    private val app: Application by lazy {
+        ApplicationProvider.getApplicationContext() as Application
+    }
 
     @Before
     fun setup() {
@@ -127,7 +133,7 @@ internal class TorServiceControllerBuilderUnitTest: TestBase() {
 
         val timeToAdd = 300L
 
-        getNewBuilder(torSettings)
+        getNewBuilder(app, torSettings)
             .addTimeToRestartTorDelay(timeToAdd)
             .addTimeToStopServiceDelay(timeToAdd)
             .setBuildConfigDebug(BuildConfig.DEBUG)
@@ -148,7 +154,7 @@ internal class TorServiceControllerBuilderUnitTest: TestBase() {
             // build has been called in a previous test
         } catch (e: RuntimeException) {
             assertNull(TorService.buildConfigDebug)
-            getNewBuilder(torSettings).build()
+            getNewBuilder(app, torSettings).build()
             assertNotNull(TorService.buildConfigDebug)
         }
 
@@ -156,7 +162,7 @@ internal class TorServiceControllerBuilderUnitTest: TestBase() {
 
         // Instantiate new TorSettings and try to overwrite things via the builder
         val newTorSettings = TestTorSettings()
-        getNewBuilder(newTorSettings)
+        getNewBuilder(app, newTorSettings)
             .useCustomTorConfigFiles(torConfigFiles)
             .build()
 

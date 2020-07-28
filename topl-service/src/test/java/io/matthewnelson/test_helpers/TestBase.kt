@@ -20,9 +20,6 @@ internal abstract class TestBase: ServiceConsts() {
     private val installDir = File("/usr/bin")
     lateinit var configDir: File
 
-    private val app: Application by lazy {
-        ApplicationProvider.getApplicationContext() as Application
-    }
     private val notificationBuilder: ServiceNotification.Builder by lazy {
         ServiceNotification.Builder(
             "Test Channel Name",
@@ -44,7 +41,7 @@ internal abstract class TestBase: ServiceConsts() {
             .build()
     }
 
-    fun getNewBuilder(torSettings: TorSettings): TorServiceController.Builder {
+    fun getNewBuilder(app: Application, torSettings: TorSettings): TorServiceController.Builder {
         return TorServiceController.Builder(
             app,
             notificationBuilder,
