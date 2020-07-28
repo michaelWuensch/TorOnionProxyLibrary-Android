@@ -144,9 +144,6 @@ internal class TorService: BaseService() {
     override fun removeNotification() {
         serviceNotification.remove()
     }
-    override fun startForegroundService(): ServiceNotification {
-        return serviceNotification.startForeground(this)
-    }
     override fun stopForegroundService(): ServiceNotification {
         return serviceNotification.stopForeground(this)
     }
@@ -213,7 +210,7 @@ internal class TorService: BaseService() {
     }
 
     override fun onDestroy() {
-        serviceActionProcessor.processIntent(Intent(ServiceAction.DESTROY))
+        processIntent(Intent(ServiceAction.DESTROY))
     }
 
     override fun onLowMemory() {
@@ -223,7 +220,7 @@ internal class TorService: BaseService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.action?.let {
             if (it == ServiceAction.START)
-                serviceActionProcessor.processIntent(intent)
+                processIntent(intent)
             else
                 throw IllegalArgumentException(
                     "$it is not an accepted argument for use with startService()"
@@ -233,8 +230,8 @@ internal class TorService: BaseService() {
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
-        startForegroundService()
+        serviceNotification.startForeground(this)
         broadcastLogger.debug("Task has been removed")
-        serviceActionProcessor.processIntent(Intent(ServiceAction.STOP))
+        processIntent(Intent(ServiceAction.STOP))
     }
 }

@@ -71,6 +71,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import io.matthewnelson.topl_core.OnionProxyManager
+import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import kotlinx.coroutines.CoroutineScope
@@ -146,7 +147,6 @@ internal abstract class BaseService: Service() {
     /// ServiceNotification ///
     ///////////////////////////
     abstract fun removeNotification()
-    abstract fun startForegroundService(): ServiceNotification
     abstract fun stopForegroundService(): ServiceNotification
     abstract fun addNotificationActions()
     abstract fun removeNotificationActions()
