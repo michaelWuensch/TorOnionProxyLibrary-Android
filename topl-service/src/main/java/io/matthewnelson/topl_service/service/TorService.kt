@@ -104,12 +104,10 @@ internal class TorService: Service() {
             geoipAssetPath: String,
             geoip6AssetPath: String
         ) {
-            if (Companion::geoipAssetPath.isInitialized) return
             this.buildConfigVersionCode = buildConfigVersionCode
             this.buildConfigDebug = buildConfigDebug
             this.geoipAssetPath = geoipAssetPath
             this.geoip6AssetPath = geoip6AssetPath
-
         }
 
         // For things that can't be saved to TorServicePrefs, such as BuildConfig.VERSION_CODE

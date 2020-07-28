@@ -64,10 +64,10 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
  */
-package io.matthewnelson.topl_service.util
+package io.matthewnelson.topl_service.prefs
 
 import androidx.test.core.app.ApplicationProvider
-import io.matthewnelson.topl_service.prefs.TorServicePrefs
+import io.matthewnelson.topl_service.util.ServiceConsts
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
