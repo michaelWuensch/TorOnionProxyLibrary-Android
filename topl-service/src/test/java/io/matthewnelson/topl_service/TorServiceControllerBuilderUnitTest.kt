@@ -142,7 +142,16 @@ internal class TorServiceControllerBuilderUnitTest: TestBase() {
 
     @Test
     fun `_zz_ensure one-time initialization if build called more than once`() {
-        // build has already been called in previous test
+        try {
+            TorServiceController.getTorSettings()
+            assertNotNull(TorService.buildConfigDebug)
+            // build has been called in a previous test
+        } catch (e: RuntimeException) {
+            assertNull(TorService.buildConfigDebug)
+            getNewBuilder(torSettings).build()
+            assertNotNull(TorService.buildConfigDebug)
+        }
+
         val initialHashCode = TorServiceController.getTorSettings().hashCode()
 
         // Instantiate new TorSettings and try to overwrite things via the builder
