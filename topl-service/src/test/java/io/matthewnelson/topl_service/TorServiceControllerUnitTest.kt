@@ -9,6 +9,7 @@ import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.TorService
 import org.junit.Before
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertNotNull
 import org.junit.FixMethodOrder
@@ -40,11 +41,12 @@ internal class TorServiceControllerUnitTest {
         TorConfigFiles.Builder(File("installDir"), File("configDir")).build()
     }
     private lateinit var builder: TorServiceController.Builder
-    private lateinit var torSettings: TestTorSettings
+    private val torSettings: TestTorSettings by lazy {
+        TestTorSettings()
+    }
 
     @Before
     fun setup() {
-        torSettings = TestTorSettings()
         builder = TorServiceController.Builder(
             app,
             notificationBuilder,
@@ -79,46 +81,42 @@ internal class TorServiceControllerUnitTest {
     }
 
     @Test
-    fun `_z_ensure setBuildConfigDebug is properly initialized`() {
+    fun `_z_ensure builder methods properly initialize variables when build called`() {
         // Hasn't been initialized yet
         assertNull(TorService.buildConfigDebug)
+        assertNull(TorServiceController.appEventBroadcaster)
 
-        builder.setBuildConfigDebug(BuildConfig.DEBUG).build()
+        builder
+            .setBuildConfigDebug(BuildConfig.DEBUG)
+            .setEventBroadcaster(TestEventBroadcaster())
+            .build()
 
         assertEquals(TorService.buildConfigDebug, BuildConfig.DEBUG)
+        assertNotNull(TorServiceController.appEventBroadcaster)
     }
 
     @Test
-    fun `ensure one-time initialization if build called more than once`() {
-        builder.build()
+    fun `_zz_ensure one-time initialization if build called more than once`() {
+        // build has already been called in previous test
         val initialHashCode = TorServiceController.getTorSettings().hashCode()
 
         // Instantiate new TorSettings and try to overwrite things via the builder
-        torSettings = TestTorSettings()
-        builder = TorServiceController.Builder(
+        val newTorSettings = TestTorSettings()
+        val newBuilder = TorServiceController.Builder(
             app,
             notificationBuilder,
             BuildConfig.VERSION_CODE,
-            torSettings,
+            newTorSettings,
             "common/geoip",
             "common/geoip6"
         )
             .useCustomTorConfigFiles(torConfigFiles)
 
-        builder.build()
+        newBuilder.build()
 
         val hashCodeAfterSecondBuildCall = TorServiceController.getTorSettings().hashCode()
 
+        assertNotEquals(newTorSettings.hashCode(), hashCodeAfterSecondBuildCall)
         assertEquals(initialHashCode, hashCodeAfterSecondBuildCall)
-    }
-
-    @Test
-    fun `ensure setEventBroadcaster is properly initialized`() {
-        // Hasn't been initialized yet
-        assertNull(TorServiceController.appEventBroadcaster)
-
-        builder.setEventBroadcaster(TestEventBroadcaster()).build()
-
-        assertNotNull(TorServiceController.appEventBroadcaster)
     }
 }
