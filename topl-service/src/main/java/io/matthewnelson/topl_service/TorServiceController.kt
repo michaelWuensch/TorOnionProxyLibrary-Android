@@ -128,6 +128,7 @@ class TorServiceController private constructor(): ServiceConsts() {
     ) {
 
         private lateinit var torConfigFiles: TorConfigFiles
+        private lateinit var appEventBroadcaster: EventBroadcaster
 
         // On published releases of this Library, this value will **always** be `false`.
         private var buildConfigDebug = BuildConfig.DEBUG
@@ -161,7 +162,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * class actually is.
          * */
         fun setEventBroadcaster(eventBroadcaster: EventBroadcaster): Builder {
-            appEventBroadcaster = eventBroadcaster
+            this.appEventBroadcaster = eventBroadcaster
             return this
         }
 
@@ -191,6 +192,8 @@ class TorServiceController private constructor(): ServiceConsts() {
          * */
         fun build() {
 
+            appContext = application.applicationContext
+
             // If TorSettings has been initialized already, return as to not
             // overwrite things.
             try {
@@ -199,6 +202,9 @@ class TorServiceController private constructor(): ServiceConsts() {
             } catch (e: RuntimeException) {}
 
             torServiceNotificationBuilder.build()
+
+            if (::appEventBroadcaster.isInitialized)
+                Companion.appEventBroadcaster = this.appEventBroadcaster
 
             Companion.torSettings = torSettings
             Companion.torConfigFiles =
@@ -215,8 +221,6 @@ class TorServiceController private constructor(): ServiceConsts() {
             )
 
             ServiceNotification.get().setupNotificationChannel(application.applicationContext)
-
-            appContext = application.applicationContext
         }
     }
 
