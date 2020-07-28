@@ -66,48 +66,33 @@
  */
 package io.matthewnelson.topl_service
 
-import android.app.Application
-import androidx.test.core.app.ApplicationProvider
+import io.matthewnelson.test_helpers.TestBase
 import io.matthewnelson.test_helpers.TestEventBroadcaster
 import io.matthewnelson.test_helpers.TestTorSettings
-import io.matthewnelson.topl_core_base.TorConfigFiles
-import io.matthewnelson.topl_core_base.TorSettings
-import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.TorService
+import org.junit.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertNotNull
-import org.junit.FixMethodOrder
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import java.io.File
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @Config(minSdk = 16, maxSdk = 28)
 @RunWith(RobolectricTestRunner::class)
-internal class TorServiceControllerUnitTest {
+internal class TorServiceControllerBuilderUnitTest: TestBase() {
 
-    private val app: Application by lazy {
-        ApplicationProvider.getApplicationContext() as Application
+    @Before
+    fun setup() {
+        setupTorConfigFiles()
     }
-    private val notificationBuilder: ServiceNotification.Builder by lazy {
-        ServiceNotification.Builder(
-            "Test Channel Name",
-            "Test Channel ID",
-            "Test Channel Description",
-            615615
-        )
-    }
-    private val torConfigFiles: TorConfigFiles by lazy {
-        // Cannot use factory methods used by default b/c not running on a device.
-        TorConfigFiles.Builder(File("installDir"), File("configDir")).build()
-    }
-    private val torSettings: TestTorSettings by lazy {
-        TestTorSettings()
+
+    @After
+    fun tearDown() {
+        testDirectory.delete()
     }
 
     @Test(expected = RuntimeException::class)
@@ -170,17 +155,5 @@ internal class TorServiceControllerUnitTest {
 
         assertNotEquals(newTorSettings.hashCode(), hashCodeAfterSecondBuildCall)
         assertEquals(initialHashCode, hashCodeAfterSecondBuildCall)
-    }
-
-    private fun getNewBuilder(torSettings: TorSettings): TorServiceController.Builder {
-        return TorServiceController.Builder(
-            app,
-            notificationBuilder,
-            BuildConfig.VERSION_CODE,
-            torSettings,
-            "common/geoip",
-            "common/geoip6"
-        )
-            .useCustomTorConfigFiles(torConfigFiles)
     }
 }
