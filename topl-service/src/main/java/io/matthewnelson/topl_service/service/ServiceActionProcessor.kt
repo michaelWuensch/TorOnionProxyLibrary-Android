@@ -213,7 +213,10 @@ internal class ServiceActionProcessor(private val torService: TorService): Servi
                             return@forEachIndexed
                         }
 
-                        processActionCommand(actionObject, command)
+                        var delayLength = 0L
+                        if (command == ActionCommand.DELAY)
+                            delayLength = actionObject.consumeDelayLength()
+                        processActionCommand(command, delayLength)
 
                         if (index == actionObject.commands.lastIndex) {
                             removeActionFromQueue(actionObject)
@@ -224,13 +227,9 @@ internal class ServiceActionProcessor(private val torService: TorService): Servi
         }
     }
 
-    private suspend fun processActionCommand(
-        actionObject: ActionCommands.ServiceActionObject,
-        @ActionCommand command: String
-    ) {
+    private suspend fun processActionCommand(@ActionCommand command: String, delayLength: Long) {
         when (command) {
             ActionCommand.DELAY -> {
-                val delayLength = actionObject.consumeDelayLength()
                 if (delayLength > 0L)
                     delay(delayLength)
             }
