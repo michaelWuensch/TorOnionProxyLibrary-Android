@@ -67,6 +67,7 @@
 package io.matthewnelson.topl_service.service
 
 import android.content.Intent
+import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.util.ServiceConsts.ActionCommand
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 
@@ -139,7 +140,7 @@ internal sealed class ActionCommands {
                 ActionCommand.START_TOR
             )
         override val delayLengthQueue =
-            mutableListOf(700L)
+            mutableListOf(TorServiceController.restartTorDelayTime)
     }
 
     class Start(override val serviceAction: String) : ServiceActionObject() {
@@ -153,8 +154,11 @@ internal sealed class ActionCommands {
         override val commands: Array<String>
             get() = arrayOf(
                 ActionCommand.STOP_TOR,
+                ActionCommand.DELAY,
                 ActionCommand.STOP_SERVICE
             )
+        override val delayLengthQueue =
+            mutableListOf(TorServiceController.stopServiceDelayTime)
     }
 
     class ServiceActionObjectGetter {

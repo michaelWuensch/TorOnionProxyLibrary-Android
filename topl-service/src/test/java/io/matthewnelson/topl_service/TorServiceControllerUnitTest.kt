@@ -85,12 +85,20 @@ internal class TorServiceControllerUnitTest {
         // Hasn't been initialized yet
         assertNull(TorService.buildConfigDebug)
         assertNull(TorServiceController.appEventBroadcaster)
+        val initialRestartTorDelay = TorServiceController.restartTorDelayTime
+        val initialStopServiceDelay = TorServiceController.stopServiceDelayTime
+
+        val timeToAdd = 300L
 
         builder
+            .addTimeToRestartTorDelay(timeToAdd)
+            .addTimeToStopServiceDelay(timeToAdd)
             .setBuildConfigDebug(BuildConfig.DEBUG)
             .setEventBroadcaster(TestEventBroadcaster())
             .build()
 
+        assertEquals(TorServiceController.restartTorDelayTime, initialRestartTorDelay + timeToAdd)
+        assertEquals(TorServiceController.stopServiceDelayTime, initialStopServiceDelay + timeToAdd)
         assertEquals(TorService.buildConfigDebug, BuildConfig.DEBUG)
         assertNotNull(TorServiceController.appEventBroadcaster)
     }
