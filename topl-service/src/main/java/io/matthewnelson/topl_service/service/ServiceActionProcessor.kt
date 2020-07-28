@@ -253,8 +253,8 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
     /// Execution Methods ///
     /////////////////////////
     private fun stopService() {
-        broadcastDebugObjectDetailsMsg("Stopping: ", torService)
         torService.unbindService()
+        broadcastDebugObjectDetailsMsg("Stopping: ", torService)
         torService.stopSelf()
     }
 

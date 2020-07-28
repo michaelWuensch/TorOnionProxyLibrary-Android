@@ -123,9 +123,9 @@ internal class TorService: BaseService() {
     }
 
 
-    ////////////////
-    /// Receiver ///
-    ////////////////
+    /////////////////////////
+    /// BroadcastReceiver ///
+    /////////////////////////
     private val torServiceReceiver by lazy { TorServiceReceiver(this) }
 
     override fun registerReceiver() {
@@ -176,10 +176,10 @@ internal class TorService: BaseService() {
     }
     override val onionProxyManager: OnionProxyManager by lazy {
         OnionProxyManager(
-            this,
+            context,
             TorServiceController.getTorConfigFiles(),
             ServiceTorInstaller(this),
-            ServiceTorSettings(TorServiceController.getTorSettings(), this),
+            ServiceTorSettings(this, TorServiceController.getTorSettings()),
             ServiceEventListener(),
             ServiceEventBroadcaster(this),
             buildConfigDebug

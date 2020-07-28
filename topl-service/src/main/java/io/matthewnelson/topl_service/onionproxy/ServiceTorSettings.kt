@@ -80,12 +80,12 @@ import io.matthewnelson.topl_service.service.BaseService
  * and then call [io.matthewnelson.topl_service.TorServiceController.restartTor] to have
  * them applied to the Tor Process.
  *
- * @param [defaults] Default values to fall back on if nothing is returned from [TorServicePrefs]
  * @param [torService] To instantiate [TorServicePrefs]
+ * @param [defaults] Default values to fall back on if nothing is returned from [TorServicePrefs]
  * */
 internal class ServiceTorSettings(
-    private val defaults: TorSettings,
-    torService: BaseService
+    torService: BaseService,
+    private val defaults: TorSettings
 ): TorSettings() {
 
     private val prefs = TorServicePrefs(torService.context)
