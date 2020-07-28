@@ -5,9 +5,9 @@ import androidx.test.core.app.ApplicationProvider
 import io.matthewnelson.test_helpers.TestEventBroadcaster
 import io.matthewnelson.test_helpers.TestTorSettings
 import io.matthewnelson.topl_core_base.TorConfigFiles
+import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.TorService
-import org.junit.Before
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
@@ -40,22 +40,8 @@ internal class TorServiceControllerUnitTest {
         // Cannot use factory methods used by default b/c not running on a device.
         TorConfigFiles.Builder(File("installDir"), File("configDir")).build()
     }
-    private lateinit var builder: TorServiceController.Builder
     private val torSettings: TestTorSettings by lazy {
         TestTorSettings()
-    }
-
-    @Before
-    fun setup() {
-        builder = TorServiceController.Builder(
-            app,
-            notificationBuilder,
-            BuildConfig.VERSION_CODE,
-            torSettings,
-            "common/geoip",
-            "common/geoip6"
-        )
-            .useCustomTorConfigFiles(torConfigFiles)
     }
 
     @Test(expected = RuntimeException::class)
@@ -90,7 +76,7 @@ internal class TorServiceControllerUnitTest {
 
         val timeToAdd = 300L
 
-        builder
+        getNewBuilder(torSettings)
             .addTimeToRestartTorDelay(timeToAdd)
             .addTimeToStopServiceDelay(timeToAdd)
             .setBuildConfigDebug(BuildConfig.DEBUG)
@@ -110,21 +96,25 @@ internal class TorServiceControllerUnitTest {
 
         // Instantiate new TorSettings and try to overwrite things via the builder
         val newTorSettings = TestTorSettings()
-        val newBuilder = TorServiceController.Builder(
-            app,
-            notificationBuilder,
-            BuildConfig.VERSION_CODE,
-            newTorSettings,
-            "common/geoip",
-            "common/geoip6"
-        )
+        getNewBuilder(newTorSettings)
             .useCustomTorConfigFiles(torConfigFiles)
-
-        newBuilder.build()
+            .build()
 
         val hashCodeAfterSecondBuildCall = TorServiceController.getTorSettings().hashCode()
 
         assertNotEquals(newTorSettings.hashCode(), hashCodeAfterSecondBuildCall)
         assertEquals(initialHashCode, hashCodeAfterSecondBuildCall)
+    }
+
+    private fun getNewBuilder(torSettings: TorSettings): TorServiceController.Builder {
+        return TorServiceController.Builder(
+            app,
+            notificationBuilder,
+            BuildConfig.VERSION_CODE,
+            torSettings,
+            "common/geoip",
+            "common/geoip6"
+        )
+            .useCustomTorConfigFiles(torConfigFiles)
     }
 }
