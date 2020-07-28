@@ -213,41 +213,49 @@ internal class ServiceActionProcessor(private val torService: TorService): Servi
                             return@forEachIndexed
                         }
 
-                        when (command) {
-                            ActionCommand.DELAY -> {
-                                val delayLength = actionObject.consumeDelayLength()
-                                if (delayLength > 0L)
-                                    delay(delayLength)
-                            }
-                            ActionCommand.DESTROY -> {
-                                torServicePrefsListener.unregister()
-                                serviceNotification.remove()
-                                delay(300L)
-                                supervisorJob.cancel()
-                            }
-                            ActionCommand.NEW_ID -> {
-                                onionProxyManager.signalNewNym()
-                            }
-                            ActionCommand.START_TOR -> {
-                                if (!onionProxyManager.hasControlConnection) {
-                                    startTor()
-                                    delay(300L)
-                                }
-                            }
-                            ActionCommand.STOP_SERVICE -> {
-                                stopService()
-                            }
-                            ActionCommand.STOP_TOR -> {
-                                if (onionProxyManager.hasControlConnection) {
-                                    stopTor()
-                                    delay(300L)
-                                }
-                            }
-                        }
+                        processActionCommand(actionObject, command)
+
                         if (index == actionObject.commands.lastIndex) {
                             removeActionFromQueue(actionObject)
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private suspend fun processActionCommand(
+        actionObject: ActionCommands.ServiceActionObject,
+        @ActionCommand command: String
+    ) {
+        when (command) {
+            ActionCommand.DELAY -> {
+                val delayLength = actionObject.consumeDelayLength()
+                if (delayLength > 0L)
+                    delay(delayLength)
+            }
+            ActionCommand.DESTROY -> {
+                torServicePrefsListener.unregister()
+                serviceNotification.remove()
+                delay(300L)
+                supervisorJob.cancel()
+            }
+            ActionCommand.NEW_ID -> {
+                onionProxyManager.signalNewNym()
+            }
+            ActionCommand.START_TOR -> {
+                if (!onionProxyManager.hasControlConnection) {
+                    startTor()
+                    delay(300L)
+                }
+            }
+            ActionCommand.STOP_SERVICE -> {
+                stopService()
+            }
+            ActionCommand.STOP_TOR -> {
+                if (onionProxyManager.hasControlConnection) {
+                    stopTor()
+                    delay(300L)
                 }
             }
         }
