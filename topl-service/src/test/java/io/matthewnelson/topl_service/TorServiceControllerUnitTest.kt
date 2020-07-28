@@ -29,8 +29,8 @@ internal class TorServiceControllerUnitTest {
         )
     }
     private val torConfigFiles: TorConfigFiles by lazy {
-        TorConfigFiles.Builder(File("installDir"), File("configDir"))
-            .build()
+        // Cannot use factory methods used by default b/c not running on a device.
+        TorConfigFiles.Builder(File("installDir"), File("configDir")).build()
     }
     private lateinit var builder: TorServiceController.Builder
     private lateinit var torSettings: TestTorSettings
@@ -50,8 +50,25 @@ internal class TorServiceControllerUnitTest {
     }
 
     @Test(expected = RuntimeException::class)
-    fun `throw errors if called before build`() {
+    fun `throw errors if startTor called before build`() {
         TorServiceController.startTor()
+    }
+
+    @Test(expected = RuntimeException::class)
+    fun `throw errors if sendBroadcast called before build`() {
+        // sendBroadcast method used in newIdentity, restartTor, and stopTor
+        // which is what will throw the RuntimeException.
+        TorServiceController.newIdentity()
+    }
+
+    @Test(expected = RuntimeException::class)
+    fun `throw errors if getTorSettings called before build`() {
+        TorServiceController.getTorSettings()
+    }
+
+    @Test(expected = RuntimeException::class)
+    fun `throw errors if getTorConfigFiles called before build`() {
+        TorServiceController.getTorConfigFiles()
     }
 
     @Test
@@ -59,6 +76,7 @@ internal class TorServiceControllerUnitTest {
         builder.build()
         val initialHashCode = TorServiceController.getTorSettings().hashCode()
 
+        // Instantiate new TorSettings and try to overwrite things via the builder
         torSettings = TestTorSettings()
         builder = TorServiceController.Builder(
             app,
