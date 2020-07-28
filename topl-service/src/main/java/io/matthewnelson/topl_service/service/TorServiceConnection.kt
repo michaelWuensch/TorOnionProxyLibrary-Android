@@ -73,11 +73,11 @@ import android.os.IBinder
 internal class TorServiceConnection: ServiceConnection {
 
     @Volatile
-    var serviceBinder: BaseService.TorServiceBinder? = null
+    var serviceBinder: TorServiceBinder? = null
         private set
 
     /**
-     * Sets the reference to [BaseService.TorServiceBinder] to `null` because
+     * Sets the reference to [TorServiceBinder] to `null` because
      * [onServiceDisconnected] is not always called on disconnect, as the name
      * suggests.
      * */
@@ -93,7 +93,7 @@ internal class TorServiceConnection: ServiceConnection {
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         serviceBinder = if (service != null)
-            service as BaseService.TorServiceBinder
+            service as TorServiceBinder
         else
             null
     }

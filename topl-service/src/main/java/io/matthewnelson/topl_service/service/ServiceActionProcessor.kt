@@ -254,7 +254,7 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
     /////////////////////////
     private fun stopService() {
         broadcastDebugObjectDetailsMsg("Stopping: ", torService)
-        TorServiceController.unbindTorService(torService.context.applicationContext)
+        torService.unbindService()
         torService.stopSelf()
     }
 

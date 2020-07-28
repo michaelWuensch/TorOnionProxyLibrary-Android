@@ -63,107 +63,43 @@
 *     exception. If you modify "The Interfaces", this exception does not apply to your
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
- */
+* */
 package io.matthewnelson.topl_service.service
 
-import android.app.Service
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
-import io.matthewnelson.topl_core.OnionProxyManager
-import io.matthewnelson.topl_service.notification.ServiceNotification
-import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
-import kotlinx.coroutines.CoroutineScope
+import android.os.Binder
+import io.matthewnelson.topl_service.util.ServiceConsts
 
-/**
- * Contains all methods that are called from classes external to, and instantiated by
- * [TorService]. It acts as the glue and helps with testing such that intercepting the
- * calls are easier when testing the individual components.
- * */
-internal abstract class BaseService: Service() {
+internal class TorServiceBinder(private val torService: BaseService): Binder() {
 
-    companion object {
-        var buildConfigVersionCode: Int = -1
-            private set
-        var buildConfigDebug: Boolean? = null
-            private set
-        lateinit var geoipAssetPath: String
-            private set
-        lateinit var geoip6AssetPath: String
-            private set
-
-        fun initialize(
-            buildConfigVersionCode: Int,
-            buildConfigDebug: Boolean,
-            geoipAssetPath: String,
-            geoip6AssetPath: String
-        ) {
-            this.buildConfigVersionCode = buildConfigVersionCode
-            this.buildConfigDebug = buildConfigDebug
-            this.geoipAssetPath = geoipAssetPath
-            this.geoip6AssetPath = geoip6AssetPath
-        }
-
-        // For things that can't be saved to TorServicePrefs, such as BuildConfig.VERSION_CODE
-        fun getLocalPrefs(context: Context): SharedPreferences =
-            context.getSharedPreferences("TorServiceLocalPrefs", Context.MODE_PRIVATE)
+    private fun throwIllegalArgument(action: String?) {
+        throw IllegalArgumentException(
+            "$action is not an accepted argument for ${this.javaClass.simpleName}"
+        )
     }
 
-    // All classes that interact with System APIs which require context to do something
-    // call this in production (torService.context), such that in testing we can easily
-    // swap it out without needing to start the Service and still get functionality for
-    // that component.
-    abstract val context: Context
+    fun submitServiceActionIntent(serviceActionIntent: Intent) {
+        val action = serviceActionIntent.action
+        if (action != null && action.contains(ServiceConsts.ServiceAction.SERVICE_ACTION)) {
 
-
-    //////////////////
-    /// Coroutines ///
-    //////////////////
-    abstract fun cancelSupervisorJob()
-    abstract fun getScopeMain(): CoroutineScope
-
-
-    //////////////////////////////
-    /// ServiceActionProcessor ///
-    //////////////////////////////
-    abstract fun processIntent(serviceActionIntent: Intent)
-
-
-    ///////////////////////////////
-    /// TorServicePrefsListener ///
-    ///////////////////////////////
-    abstract fun unregisterPrefsListener()
-
-
-    /////////////////////////
-    /// BroadcastReceiver ///
-    /////////////////////////
-    abstract fun registerReceiver()
-    abstract fun unregisterReceiver()
-
-
-    ///////////////////////////
-    /// ServiceNotification ///
-    ///////////////////////////
-    abstract fun removeNotification()
-    abstract fun startForegroundService(): ServiceNotification
-    abstract fun stopForegroundService(): ServiceNotification
-    abstract fun addNotificationActions()
-    abstract fun removeNotificationActions()
-    abstract fun updateNotificationContentText(string: String)
-    abstract fun updateNotificationContentTitle(title: String)
-    abstract fun updateNotificationIcon(@NotificationImage notificationImage: Int)
-    abstract fun updateNotificationProgress(show: Boolean, progress: Int?)
-
-
-    ///////////////
-    /// Binding ///
-    ///////////////
-    abstract fun unbindService()
-
-
-    /////////////////
-    /// TOPL-Core ///
-    /////////////////
-    abstract val onionProxyManager: OnionProxyManager
+            when (action) {
+                ServiceConsts.ServiceAction.DESTROY,
+                ServiceConsts.ServiceAction.NEW_ID,
+                ServiceConsts.ServiceAction.RESTART_TOR,
+                ServiceConsts.ServiceAction.START,
+                ServiceConsts.ServiceAction.STOP -> {
+                    // Do not accept the above ServiceActions through use of this method.
+                    // DESTROY = internal Service use only (for onDestroy)
+                    // NEW_ID, RESTART_TOR, STOP = via BroadcastReceiver
+                    // START = to start TorService
+                    throwIllegalArgument(action)
+                }
+                else -> {
+                    torService.processIntent(serviceActionIntent)
+                }
+            }
+        } else {
+            throwIllegalArgument(action)
+        }
+    }
 }

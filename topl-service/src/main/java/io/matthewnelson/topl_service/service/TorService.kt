@@ -193,21 +193,18 @@ internal class TorService: BaseService() {
     ///////////////
     /// Binding ///
     ///////////////
-    /**
-     * Handled in [BaseService]
-     *
-     * @see [BaseService.torServiceBinder]
-     * @see [BaseService.TorServiceBinder]
-     * @see [BaseService.onBind]
-     * */
-    override fun onBind(intent: Intent?): IBinder? {
-        broadcastLogger.debug("Service has been bound")
-        return super.onBind(intent)
-    }
+    private val torServiceBinder = TorServiceBinder(this)
 
     override fun unbindService() {
         TorServiceController.unbindTorService(this)
+        broadcastLogger.debug("Service has been unbound")
     }
+    override fun onBind(intent: Intent?): IBinder? {
+        broadcastLogger.debug("Service has been bound")
+        return torServiceBinder
+    }
+
+
 
     override fun onCreate() {
         serviceNotification.buildNotification(this)
