@@ -191,6 +191,13 @@ class TorServiceController private constructor(): ServiceConsts() {
          * */
         fun build() {
 
+            // If TorSettings has been initialized already, return as to not
+            // overwrite things.
+            try {
+                getTorSettings()
+                return
+            } catch (e: RuntimeException) {}
+
             torServiceNotificationBuilder.build()
 
             Companion.torSettings = torSettings
