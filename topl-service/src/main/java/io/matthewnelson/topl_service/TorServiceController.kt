@@ -290,7 +290,7 @@ class TorServiceController private constructor(): ServiceConsts() {
         private lateinit var torSettings: TorSettings
 
         private fun builderDotBuildNotCalledException(): RuntimeException =
-            RuntimeException("${Builder::class.java.simpleName}.build has yet been called")
+            RuntimeException("Builder.build has not been called yet")
 
         /**
          * Get the [TorConfigFiles] that have been set after calling [Builder.build]
@@ -320,8 +320,8 @@ class TorServiceController private constructor(): ServiceConsts() {
                 throw builderDotBuildNotCalledException()
 
         /**
-         * Starts [TorService] and then Tor. You can call this as much as you want. If the Tor
-         * Process is already running, it will do nothing.
+         * Starts [TorService] and then Tor. You can call this as much as you want. If
+         * the Tor [Process] is already running, it will do nothing.
          *
          * @throws [RuntimeException] if called before [Builder.build]
          * */
@@ -337,7 +337,7 @@ class TorServiceController private constructor(): ServiceConsts() {
         }
 
         /**
-         * Stops [TorService]. Does nothing if called prior to calling [startTor]
+         * Stops [TorService].
          *
          * @throws [RuntimeException] if called before [Builder.build]
          * */
@@ -346,7 +346,7 @@ class TorServiceController private constructor(): ServiceConsts() {
             sendBroadcast(ServiceAction.STOP)
 
         /**
-         * Restarts Tor. Does nothing if called prior to calling [startTor]
+         * Restarts Tor.
          *
          * @throws [RuntimeException] if called before [Builder.build]
          * */
@@ -355,7 +355,7 @@ class TorServiceController private constructor(): ServiceConsts() {
             sendBroadcast(ServiceAction.RESTART_TOR)
 
         /**
-         * Changes identities. Does nothing if called prior to calling [startTor]
+         * Changes identities.
          *
          * @throws [RuntimeException] if called before [Builder.build]
          * */
