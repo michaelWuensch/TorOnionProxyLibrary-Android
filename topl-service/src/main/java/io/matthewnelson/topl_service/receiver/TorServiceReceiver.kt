@@ -97,8 +97,6 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
             private set
     }
 
-    private val serviceActionProcessor: ServiceActionProcessor
-        get() = torService.serviceActionProcessor
     private val broadcastLogger =
         torService.onionProxyManager.getBroadcastLogger(TorServiceReceiver::class.java)
 
@@ -139,7 +137,7 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
                     intent.getStringExtra(serviceAction)?.let {
                         newIntent.putExtra(serviceAction, it)
                     }
-                    serviceActionProcessor.processIntent(newIntent)
+                    torService.processIntent(newIntent)
                 }
                 else -> {
                     broadcastLogger.warn(

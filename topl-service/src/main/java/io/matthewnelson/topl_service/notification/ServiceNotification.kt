@@ -72,7 +72,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.os.RemoteException
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
@@ -454,9 +453,9 @@ class ServiceNotification internal constructor(
     }
 
     @Synchronized
-    internal fun stopForeground(torService: BaseService, removeNotification: Boolean = false): ServiceNotification {
+    internal fun stopForeground(torService: BaseService): ServiceNotification {
         if (inForeground) {
-            torService.stopForeground(if (removeNotification) true else !showNotification)
+            torService.stopForeground(!showNotification)
             inForeground = false
         }
         return serviceNotification

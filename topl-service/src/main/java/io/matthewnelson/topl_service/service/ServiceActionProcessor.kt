@@ -174,10 +174,6 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
     ////////////////////////
     /// Queue Processing ///
     ////////////////////////
-    private val supervisorJob: Job
-        get() = torService.supervisorJob
-    private val scopeMain: CoroutineScope
-        get() = torService.scopeMain
     private lateinit var processQueueJob: Job
 
     /**
@@ -185,7 +181,7 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
      * */
     private fun launchProcessQueueJob() {
         if (::processQueueJob.isInitialized && processQueueJob.isActive) return
-        processQueueJob = scopeMain.launch(Dispatchers.IO) {
+        processQueueJob = torService.getScopeMain().launch(Dispatchers.IO) {
             broadcastDebugObjectDetailsMsg("Processing Queue: ", this)
 
             while (actionQueue.size > 0 && isActive) {
@@ -226,10 +222,10 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
                     delay(delayLength)
             }
             ActionCommand.DESTROY -> {
-                torService.torServicePrefsListener.unregister()
+                torService.unregisterPrefsListener()
                 torService.removeNotification()
                 delay(300L)
-                supervisorJob.cancel()
+                torService.cancelSupervisorJob()
             }
             ActionCommand.NEW_ID -> {
                 onionProxyManager.signalNewNym()

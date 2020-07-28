@@ -74,11 +74,9 @@ import android.os.Binder
 import android.os.IBinder
 import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_service.notification.ServiceNotification
-import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
-import io.matthewnelson.topl_service.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.util.ServiceConsts
+import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 
 internal abstract class BaseService: Service() {
 
@@ -111,16 +109,29 @@ internal abstract class BaseService: Service() {
 
     abstract val context: Context
 
-    abstract val supervisorJob: Job
-    abstract val scopeMain: CoroutineScope
-    abstract val serviceActionProcessor: ServiceActionProcessor
-    abstract val torServicePrefsListener: TorServicePrefsListener
+
+    //////////////////
+    /// Coroutines ///
+    //////////////////
+    abstract fun cancelSupervisorJob()
+    abstract fun getScopeMain(): CoroutineScope
 
 
-    ////////////////
-    /// Receiver ///
-    ////////////////
-    abstract val torServiceReceiver: TorServiceReceiver
+    //////////////////////////////
+    /// ServiceActionProcessor ///
+    //////////////////////////////
+    abstract fun processIntent(serviceActionIntent: Intent)
+
+
+    ///////////////////////////////
+    /// TorServicePrefsListener ///
+    ///////////////////////////////
+    abstract fun unregisterPrefsListener()
+
+
+    /////////////////////////
+    /// BroadcastReceiver ///
+    /////////////////////////
     abstract fun registerReceiver()
     abstract fun unregisterReceiver()
 
@@ -128,9 +139,15 @@ internal abstract class BaseService: Service() {
     ///////////////////////////
     /// ServiceNotification ///
     ///////////////////////////
-    abstract val serviceNotification: ServiceNotification
     abstract fun removeNotification()
-    abstract fun stopForegroundService()
+    abstract fun startForegroundService(): ServiceNotification
+    abstract fun stopForegroundService(): ServiceNotification
+    abstract fun addNotificationActions()
+    abstract fun removeNotificationActions()
+    abstract fun updateNotificationContentText(string: String)
+    abstract fun updateNotificationContentTitle(title: String)
+    abstract fun updateNotificationIcon(@NotificationImage notificationImage: Int)
+    abstract fun updateNotificationProgress(show: Boolean, progress: Int?)
 
 
     ///////////////
@@ -164,7 +181,7 @@ internal abstract class BaseService: Service() {
                         throwIllegalArgument(action)
                     }
                     else -> {
-                        serviceActionProcessor.processIntent(serviceActionIntent)
+                        processIntent(serviceActionIntent)
                     }
                 }
             } else {

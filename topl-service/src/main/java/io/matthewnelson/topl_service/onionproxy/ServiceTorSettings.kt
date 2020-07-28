@@ -67,7 +67,6 @@
 package io.matthewnelson.topl_service.onionproxy
 
 import io.matthewnelson.topl_core_base.TorSettings
-import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyString
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyList
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyInt

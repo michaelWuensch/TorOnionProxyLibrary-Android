@@ -68,7 +68,6 @@ package io.matthewnelson.topl_service.service
 
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.IBinder
 import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
@@ -80,6 +79,7 @@ import io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller
 import io.matthewnelson.topl_service.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.receiver.TorServiceReceiver
+import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import kotlinx.coroutines.*
 
@@ -88,21 +88,49 @@ internal class TorService: BaseService() {
     override val context: Context
         get() = this
 
-    override val supervisorJob = SupervisorJob()
-    override val scopeMain = CoroutineScope(Dispatchers.Main + supervisorJob)
-    override val serviceActionProcessor by lazy { ServiceActionProcessor(this) }
-    override val torServicePrefsListener by lazy { TorServicePrefsListener(this) }
+
+    //////////////////
+    /// Coroutines ///
+    //////////////////
+    private val supervisorJob = SupervisorJob()
+    private val scopeMain = CoroutineScope(Dispatchers.Main + supervisorJob)
+
+    override fun cancelSupervisorJob() {
+        supervisorJob.cancel()
+    }
+    override fun getScopeMain(): CoroutineScope {
+        return scopeMain
+    }
+
+
+    //////////////////////////////
+    /// ServiceActionProcessor ///
+    //////////////////////////////
+    private val serviceActionProcessor by lazy { ServiceActionProcessor(this) }
+
+    override fun processIntent(serviceActionIntent: Intent) {
+        serviceActionProcessor.processIntent(serviceActionIntent)
+    }
+
+
+    ///////////////////////////////
+    /// TorServicePrefsListener ///
+    ///////////////////////////////
+    private val torServicePrefsListener by lazy { TorServicePrefsListener(this) }
+
+    override fun unregisterPrefsListener() {
+        torServicePrefsListener.unregister()
+    }
 
 
     ////////////////
     /// Receiver ///
     ////////////////
-    override val torServiceReceiver by lazy { TorServiceReceiver(this) }
+    private val torServiceReceiver by lazy { TorServiceReceiver(this) }
 
     override fun registerReceiver() {
         torServiceReceiver.register()
     }
-
     override fun unregisterReceiver() {
         torServiceReceiver.unregister()
     }
@@ -111,15 +139,36 @@ internal class TorService: BaseService() {
     ///////////////////////////
     /// ServiceNotification ///
     ///////////////////////////
-    override val serviceNotification = ServiceNotification.get()
+    private val serviceNotification = ServiceNotification.get()
 
     override fun removeNotification() {
         serviceNotification.remove()
     }
-
-    override fun stopForegroundService() {
-        serviceNotification.stopForeground(this)
+    override fun startForegroundService(): ServiceNotification {
+        return serviceNotification.startForeground(this)
     }
+    override fun stopForegroundService(): ServiceNotification {
+        return serviceNotification.stopForeground(this)
+    }
+    override fun addNotificationActions() {
+        serviceNotification.addActions(this)
+    }
+    override fun removeNotificationActions() {
+        serviceNotification.removeActions(this)
+    }
+    override fun updateNotificationContentText(string: String) {
+        serviceNotification.updateContentText(string)
+    }
+    override fun updateNotificationContentTitle(title: String) {
+        serviceNotification.updateContentTitle(title)
+    }
+    override fun updateNotificationIcon(@NotificationImage notificationImage: Int) {
+        serviceNotification.updateIcon(this, notificationImage)
+    }
+    override fun updateNotificationProgress(show: Boolean, progress: Int?) {
+        serviceNotification.updateProgress(show, progress)
+    }
+
 
 
     ////////////////////
@@ -187,7 +236,7 @@ internal class TorService: BaseService() {
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
-        serviceNotification.startForeground(this)
+        startForegroundService()
         broadcastLogger.debug("Task has been removed")
         serviceActionProcessor.processIntent(Intent(ServiceAction.STOP))
     }

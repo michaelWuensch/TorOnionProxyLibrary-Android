@@ -66,7 +66,6 @@
 * */
 package io.matthewnelson.topl_service.prefs
 
-import android.content.Context
 import android.content.SharedPreferences
 import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
@@ -89,8 +88,6 @@ internal class TorServicePrefsListener(
 
     private val onionProxyManager: OnionProxyManager
         get() = torService.onionProxyManager
-    private val serviceActionProcessor: ServiceActionProcessor
-        get() = torService.serviceActionProcessor
 
     private val torServicePrefs = TorServicePrefs(torService.context)
     private val broadcastLogger: BroadcastLogger =
