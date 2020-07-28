@@ -71,7 +71,7 @@ import androidx.test.core.app.ApplicationProvider
 import io.matthewnelson.test_helpers.TestBase
 import io.matthewnelson.test_helpers.TestEventBroadcaster
 import io.matthewnelson.test_helpers.TestTorSettings
-import io.matthewnelson.topl_service.service.TorService
+import io.matthewnelson.topl_service.service.BaseService
 import org.junit.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -126,7 +126,7 @@ internal class TorServiceControllerBuilderUnitTest: TestBase() {
     @Test
     fun `_z_ensure builder methods properly initialize variables when build called`() {
         // Hasn't been initialized yet
-        assertNull(TorService.buildConfigDebug)
+        assertNull(BaseService.buildConfigDebug)
         assertNull(TorServiceController.appEventBroadcaster)
         val initialRestartTorDelay = TorServiceController.restartTorDelayTime
         val initialStopServiceDelay = TorServiceController.stopServiceDelayTime
@@ -142,7 +142,7 @@ internal class TorServiceControllerBuilderUnitTest: TestBase() {
 
         assertEquals(TorServiceController.restartTorDelayTime, initialRestartTorDelay + timeToAdd)
         assertEquals(TorServiceController.stopServiceDelayTime, initialStopServiceDelay + timeToAdd)
-        assertEquals(TorService.buildConfigDebug, BuildConfig.DEBUG)
+        assertEquals(BaseService.buildConfigDebug, BuildConfig.DEBUG)
         assertNotNull(TorServiceController.appEventBroadcaster)
     }
 
@@ -150,12 +150,12 @@ internal class TorServiceControllerBuilderUnitTest: TestBase() {
     fun `_zz_ensure one-time initialization if build called more than once`() {
         try {
             TorServiceController.getTorSettings()
-            assertNotNull(TorService.buildConfigDebug)
+            assertNotNull(BaseService.buildConfigDebug)
             // build has been called in a previous test
         } catch (e: RuntimeException) {
-            assertNull(TorService.buildConfigDebug)
+            assertNull(BaseService.buildConfigDebug)
             getNewBuilder(app, torSettings).build()
-            assertNotNull(TorService.buildConfigDebug)
+            assertNotNull(BaseService.buildConfigDebug)
         }
 
         val initialHashCode = TorServiceController.getTorSettings().hashCode()

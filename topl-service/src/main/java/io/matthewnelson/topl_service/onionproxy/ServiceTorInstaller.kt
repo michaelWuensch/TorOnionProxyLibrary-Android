@@ -66,6 +66,7 @@
 * */
 package io.matthewnelson.topl_service.onionproxy
 
+import android.content.Context
 import io.matthewnelson.topl_core.util.FileUtilities
 import io.matthewnelson.topl_core.util.TorInstaller
 import io.matthewnelson.topl_core_base.TorConfigFiles
@@ -74,6 +75,7 @@ import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyList
 import io.matthewnelson.topl_service.prefs.TorServicePrefs
+import io.matthewnelson.topl_service.service.BaseService
 import java.io.*
 import java.util.concurrent.TimeoutException
 
@@ -82,24 +84,26 @@ import java.util.concurrent.TimeoutException
  *
  * See [io.matthewnelson.topl_service.TorServiceController.Builder]
  *
- * @param [torService] for context
+ * @param [torService] [BaseService] for context
  * */
-internal class ServiceTorInstaller(private val torService: TorService): TorInstaller() {
+internal class ServiceTorInstaller(private val torService: BaseService): TorInstaller() {
 
+    private val context: Context
+        get() = torService.context
     private val torConfigFiles: TorConfigFiles
         get() = TorServiceController.getTorConfigFiles()
     private val buildConfigVersionCode: Int
-        get() = TorService.buildConfigVersionCode
+        get() = BaseService.buildConfigVersionCode
     private val buildConfigDebug: Boolean
-        get() = TorService.buildConfigDebug ?: false
+        get() = BaseService.buildConfigDebug ?: false
     private val geoIpAssetPath: String
-        get() = TorService.geoipAssetPath
+        get() = BaseService.geoipAssetPath
     private val geoIp6AssetPath: String
-        get() = TorService.geoip6AssetPath
+        get() = BaseService.geoip6AssetPath
 
-    private val torServicePrefs = TorServicePrefs(torService)
+    private val torServicePrefs = TorServicePrefs(context)
 
-    private val localPrefs = TorService.getLocalPrefs(torService)
+    private val localPrefs = BaseService.getLocalPrefs(context)
     private lateinit var geoIpFileCopied: String
     private lateinit var geoIpv6FileCopied: String
 
@@ -149,7 +153,7 @@ internal class ServiceTorInstaller(private val torService: TorService): TorInsta
     @Throws(IOException::class)
     private fun copyAsset(assetPath: String, file: File) {
         try {
-            FileUtilities.copy(torService.assets.open(assetPath), file.outputStream())
+            FileUtilities.copy(context.assets.open(assetPath), file.outputStream())
             broadcastLogger?.debug("Asset copied from $assetPath -> $file")
         } catch (e: Exception) {
             throw IOException("Failed copying asset from $assetPath", e)
@@ -194,7 +198,7 @@ internal class ServiceTorInstaller(private val torService: TorService): TorInsta
             if (bridgeType.toInt() == 1)
                 ByteArrayInputStream(userDefinedBridgeList.toByteArray())
             else
-                torService.resources.openRawResource(R.raw.bridges)
+                context.resources.openRawResource(R.raw.bridges)
         return SequenceInputStream(bridgeTypeStream, bridgeStream)
     }
 

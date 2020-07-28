@@ -74,7 +74,7 @@ import android.os.IBinder
 internal class TorServiceConnection: ServiceConnection {
 
     @Volatile
-    var serviceBinder: TorService.TorServiceBinder? = null
+    var serviceBinder: BaseService.TorServiceBinder? = null
         private set
 
     /**
@@ -94,7 +94,7 @@ internal class TorServiceConnection: ServiceConnection {
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         serviceBinder = if (service != null)
-            service as TorService.TorServiceBinder
+            service as BaseService.TorServiceBinder
         else
             null
     }

@@ -70,6 +70,7 @@ import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.notification.ServiceNotification
+import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
@@ -89,9 +90,9 @@ import net.freehaven.tor.control.TorControlCommands
  * [ServiceEventListener] utilizes this class by sending it what Tor is spitting out
  * (selectively curated, ofc).
  *
- * @param [torService] [TorService] for context.
+ * @param [torService] [BaseService] for context.
  * */
-internal class ServiceEventBroadcaster(private val torService: TorService): EventBroadcaster() {
+internal class ServiceEventBroadcaster(private val torService: BaseService): EventBroadcaster() {
 
     private val serviceNotification: ServiceNotification
         get() = torService.serviceNotification

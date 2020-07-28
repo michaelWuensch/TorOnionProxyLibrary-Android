@@ -73,6 +73,7 @@ import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyList
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyInt
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyBoolean
 import io.matthewnelson.topl_service.prefs.TorServicePrefs
+import io.matthewnelson.topl_service.service.BaseService
 
 /**
  * This class is for enabling the updating of settings in a standardized manner
@@ -85,10 +86,10 @@ import io.matthewnelson.topl_service.prefs.TorServicePrefs
  * */
 internal class ServiceTorSettings(
     private val defaults: TorSettings,
-    torService: TorService
+    torService: BaseService
 ): TorSettings() {
 
-    private val prefs = TorServicePrefs(torService)
+    private val prefs = TorServicePrefs(torService.context)
 
     override val disableNetwork: Boolean
         get() = prefs.getBoolean(PrefKeyBoolean.DISABLE_NETWORK, defaults.disableNetwork)

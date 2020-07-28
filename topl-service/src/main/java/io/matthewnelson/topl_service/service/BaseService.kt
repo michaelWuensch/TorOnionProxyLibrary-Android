@@ -63,132 +63,123 @@
 *     exception. If you modify "The Interfaces", this exception does not apply to your
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
-* */
+ */
 package io.matthewnelson.topl_service.service
 
+import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Binder
 import android.os.IBinder
 import io.matthewnelson.topl_core.OnionProxyManager
-import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_service.notification.ServiceNotification
-import io.matthewnelson.topl_service.TorServiceController
-import io.matthewnelson.topl_service.onionproxy.ServiceEventBroadcaster
-import io.matthewnelson.topl_service.onionproxy.ServiceEventListener
-import io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller
-import io.matthewnelson.topl_service.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.receiver.TorServiceReceiver
-import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
-import kotlinx.coroutines.*
+import io.matthewnelson.topl_service.util.ServiceConsts
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 
-internal class TorService: BaseService() {
+internal abstract class BaseService: Service() {
 
-    override val context: Context
-        get() = this
+    companion object {
+        var buildConfigVersionCode: Int = -1
+            private set
+        var buildConfigDebug: Boolean? = null
+            private set
+        lateinit var geoipAssetPath: String
+            private set
+        lateinit var geoip6AssetPath: String
+            private set
 
-    override val supervisorJob = SupervisorJob()
-    override val scopeMain = CoroutineScope(Dispatchers.Main + supervisorJob)
-    override val serviceActionProcessor by lazy { ServiceActionProcessor(this) }
-    override val torServicePrefsListener by lazy { TorServicePrefsListener(this) }
+        fun initialize(
+            buildConfigVersionCode: Int,
+            buildConfigDebug: Boolean,
+            geoipAssetPath: String,
+            geoip6AssetPath: String
+        ) {
+            this.buildConfigVersionCode = buildConfigVersionCode
+            this.buildConfigDebug = buildConfigDebug
+            this.geoipAssetPath = geoipAssetPath
+            this.geoip6AssetPath = geoip6AssetPath
+        }
+
+        // For things that can't be saved to TorServicePrefs, such as BuildConfig.VERSION_CODE
+        fun getLocalPrefs(context: Context): SharedPreferences =
+            context.getSharedPreferences("TorServiceLocalPrefs", Context.MODE_PRIVATE)
+    }
+
+    abstract val context: Context
+
+    abstract val supervisorJob: Job
+    abstract val scopeMain: CoroutineScope
+    abstract val serviceActionProcessor: ServiceActionProcessor
+    abstract val torServicePrefsListener: TorServicePrefsListener
 
 
     ////////////////
     /// Receiver ///
     ////////////////
-    override val torServiceReceiver by lazy { TorServiceReceiver(this) }
-
-    override fun registerReceiver() {
-        torServiceReceiver.register()
-    }
-
-    override fun unregisterReceiver() {
-        torServiceReceiver.unregister()
-    }
+    abstract val torServiceReceiver: TorServiceReceiver
+    abstract fun registerReceiver()
+    abstract fun unregisterReceiver()
 
 
     ///////////////////////////
     /// ServiceNotification ///
     ///////////////////////////
-    override val serviceNotification = ServiceNotification.get()
-
-    override fun removeNotification() {
-        serviceNotification.remove()
-    }
-
-    override fun stopForegroundService() {
-        serviceNotification.stopForeground(this)
-    }
-
-
-    ////////////////////
-    /// TOPL-Android ///
-    ////////////////////
-    private val broadcastLogger: BroadcastLogger by lazy {
-        onionProxyManager.getBroadcastLogger(TorService::class.java)
-    }
-    override val onionProxyManager: OnionProxyManager by lazy {
-        OnionProxyManager(
-            this,
-            TorServiceController.getTorConfigFiles(),
-            ServiceTorInstaller(this),
-            ServiceTorSettings(TorServiceController.getTorSettings(), this),
-            ServiceEventListener(),
-            ServiceEventBroadcaster(this),
-            buildConfigDebug
-        )
-    }
+    abstract val serviceNotification: ServiceNotification
+    abstract fun removeNotification()
+    abstract fun stopForegroundService()
 
 
     ///////////////
     /// Binding ///
     ///////////////
-    /**
-     * Handled in [BaseService]
-     *
-     * @see [BaseService.torServiceBinder]
-     * @see [BaseService.TorServiceBinder]
-     * @see [BaseService.onBind]
-     * */
-    override fun onBind(intent: Intent?): IBinder? {
-        broadcastLogger.debug("Service has been bound")
-        return super.onBind(intent)
-    }
+    private val torServiceBinder = TorServiceBinder()
+    abstract fun unbindService()
 
-    override fun unbindService() {
-        TorServiceController.unbindTorService(this)
-    }
+    inner class TorServiceBinder: Binder() {
 
-    override fun onCreate() {
-        serviceNotification.buildNotification(this)
-        broadcastLogger.notice("BuildConfig.DEBUG set to: $buildConfigDebug")
-        torServicePrefsListener.register()
-    }
-
-    override fun onDestroy() {
-        serviceActionProcessor.processIntent(Intent(ServiceAction.DESTROY))
-    }
-
-    override fun onLowMemory() {
-        broadcastLogger.warn("Low memory!!!")
-    }
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        intent?.action?.let {
-            if (it == ServiceAction.START)
-                serviceActionProcessor.processIntent(intent)
-            else
-                throw IllegalArgumentException(
-                    "$it is not an accepted argument for use with startService()"
-                )
+        private fun throwIllegalArgument(action: String?) {
+            throw IllegalArgumentException(
+                "$action is not an accepted argument for ${this.javaClass.simpleName}"
+            )
         }
-        return START_NOT_STICKY
+
+        fun submitServiceActionIntent(serviceActionIntent: Intent) {
+            val action = serviceActionIntent.action
+            if (action != null && action.contains(ServiceConsts.ServiceAction.SERVICE_ACTION)) {
+
+                when (action) {
+                    ServiceConsts.ServiceAction.DESTROY,
+                    ServiceConsts.ServiceAction.NEW_ID,
+                    ServiceConsts.ServiceAction.RESTART_TOR,
+                    ServiceConsts.ServiceAction.START,
+                    ServiceConsts.ServiceAction.STOP -> {
+                        // Do not accept the above ServiceActions through use of this method.
+                        // DESTROY = internal Service use only (for onDestroy)
+                        // NEW_ID, RESTART_TOR, STOP = via BroadcastReceiver
+                        // START = to start TorService
+                        throwIllegalArgument(action)
+                    }
+                    else -> {
+                        serviceActionProcessor.processIntent(serviceActionIntent)
+                    }
+                }
+            } else {
+                throwIllegalArgument(action)
+            }
+        }
     }
 
-    override fun onTaskRemoved(rootIntent: Intent?) {
-        serviceNotification.startForeground(this)
-        broadcastLogger.debug("Task has been removed")
-        serviceActionProcessor.processIntent(Intent(ServiceAction.STOP))
+    override fun onBind(intent: Intent?): IBinder? {
+        return torServiceBinder
     }
+
+
+    /////////////////
+    /// TOPL-Core ///
+    /////////////////
+    abstract val onionProxyManager: OnionProxyManager
 }

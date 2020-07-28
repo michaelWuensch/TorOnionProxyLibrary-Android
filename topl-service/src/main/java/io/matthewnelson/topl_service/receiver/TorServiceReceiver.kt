@@ -70,6 +70,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
@@ -84,7 +85,7 @@ import java.security.SecureRandom
  *
  * @param [torService]
  * */
-internal class TorServiceReceiver(private val torService: TorService): BroadcastReceiver() {
+internal class TorServiceReceiver(private val torService: BaseService): BroadcastReceiver() {
 
     companion object {
         // Secures the intent filter at each application startup.
@@ -103,7 +104,8 @@ internal class TorServiceReceiver(private val torService: TorService): Broadcast
 
     fun register() {
         if (!isRegistered) {
-            torService.applicationContext.registerReceiver(this, IntentFilter(SERVICE_INTENT_FILTER))
+            torService.context.applicationContext
+                .registerReceiver(this, IntentFilter(SERVICE_INTENT_FILTER))
             isRegistered = true
             broadcastLogger.debug("Receiver registered")
         }
@@ -112,7 +114,7 @@ internal class TorServiceReceiver(private val torService: TorService): Broadcast
     fun unregister() {
         if (isRegistered) {
             try {
-                torService.applicationContext.unregisterReceiver(this)
+                torService.context.applicationContext.unregisterReceiver(this)
                 isRegistered = false
                 broadcastLogger.debug("Receiver unregistered")
             } catch (e: IllegalArgumentException) {

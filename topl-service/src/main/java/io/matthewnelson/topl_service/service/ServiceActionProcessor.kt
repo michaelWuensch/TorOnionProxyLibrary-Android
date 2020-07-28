@@ -70,9 +70,6 @@ import android.content.Intent
 import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_service.TorServiceController
-import io.matthewnelson.topl_service.notification.ServiceNotification
-import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
-import io.matthewnelson.topl_service.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.util.ServiceConsts
 import kotlinx.coroutines.*
 import java.io.IOException
@@ -88,18 +85,13 @@ import java.lang.reflect.InvocationTargetException
  * @param [torService] For accessing internally public values
  * @see [ActionCommands]
  * */
-internal class ServiceActionProcessor(private val torService: TorService): ServiceConsts() {
+internal class ServiceActionProcessor(private val torService: BaseService): ServiceConsts() {
 
     private val onionProxyManager: OnionProxyManager
         get() = torService.onionProxyManager
-    private val torServicePrefsListener: TorServicePrefsListener
-        get() = torService.torServicePrefsListener
-    private val serviceNotification: ServiceNotification
-        get() = torService.serviceNotification
-    private val torServiceReceiver: TorServiceReceiver
-        get() = torService.torServiceReceiver
 
-    private val broadcastLogger = onionProxyManager.getBroadcastLogger(ServiceActionProcessor::class.java)
+    private val broadcastLogger =
+        onionProxyManager.getBroadcastLogger(ServiceActionProcessor::class.java)
     private val serviceActionObjectGetter = ActionCommands.ServiceActionObjectGetter()
 
     fun processIntent(intent: Intent) {
@@ -115,18 +107,18 @@ internal class ServiceActionProcessor(private val torService: TorService): Servi
     private fun processActionObject(serviceActionObject: ActionCommands.ServiceActionObject) {
         when (serviceActionObject) {
             is ActionCommands.Destroy -> {
-                torServiceReceiver.unregister()
+                torService.unregisterReceiver()
                 clearActionQueue()
             }
             is ActionCommands.Stop -> {
-                torServiceReceiver.unregister()
+                torService.unregisterReceiver()
                 clearActionQueue()
                 broadcastLogger.notice(ServiceAction.STOP)
             }
             is ActionCommands.Start -> {
                 clearActionQueue()
-                torServiceReceiver.register()
-                serviceNotification.stopForeground(torService)
+                torService.registerReceiver()
+                torService.stopForegroundService()
             }
         }
 
@@ -234,8 +226,8 @@ internal class ServiceActionProcessor(private val torService: TorService): Servi
                     delay(delayLength)
             }
             ActionCommand.DESTROY -> {
-                torServicePrefsListener.unregister()
-                serviceNotification.remove()
+                torService.torServicePrefsListener.unregister()
+                torService.removeNotification()
                 delay(300L)
                 supervisorJob.cancel()
             }
@@ -266,7 +258,7 @@ internal class ServiceActionProcessor(private val torService: TorService): Servi
     /////////////////////////
     private fun stopService() {
         broadcastDebugObjectDetailsMsg("Stopping: ", torService)
-        TorServiceController.unbindTorService(torService.applicationContext)
+        TorServiceController.unbindTorService(torService.context.applicationContext)
         torService.stopSelf()
     }
 

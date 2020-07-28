@@ -75,6 +75,7 @@ import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.receiver.TorServiceReceiver
+import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts
 
@@ -265,7 +266,7 @@ class TorServiceController private constructor(): ServiceConsts() {
                 else
                     TorConfigFiles.createConfig(application.applicationContext)
 
-            TorService.initialize(
+            BaseService.initialize(
                 buildConfigVersionCode,
                 buildConfigDebug,
                 geoipAssetPath,
