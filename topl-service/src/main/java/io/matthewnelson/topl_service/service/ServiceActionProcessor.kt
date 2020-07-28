@@ -215,7 +215,9 @@ internal class ServiceActionProcessor(private val torService: TorService): Servi
 
                         when (command) {
                             ActionCommand.DELAY -> {
-                                delay(actionObject.consumeDelayLength())
+                                val delayLength = actionObject.consumeDelayLength()
+                                if (delayLength > 0L)
+                                    delay(delayLength)
                             }
                             ActionCommand.DESTROY -> {
                                 torServicePrefsListener.unregister()
