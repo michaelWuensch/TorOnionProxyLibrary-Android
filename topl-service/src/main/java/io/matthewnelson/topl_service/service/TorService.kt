@@ -66,6 +66,7 @@
 * */
 package io.matthewnelson.topl_service.service
 
+import android.content.ComponentCallbacks2
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
@@ -215,6 +216,11 @@ internal class TorService: BaseService() {
 
     override fun onLowMemory() {
         broadcastLogger.warn("Low memory!!!")
+    }
+
+    override fun onTrimMemory(level: Int) {
+        if (level == ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN)
+            broadcastLogger.debug("Application sent to background")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
