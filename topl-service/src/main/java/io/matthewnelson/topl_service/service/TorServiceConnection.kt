@@ -93,7 +93,10 @@ internal class TorServiceConnection: ServiceConnection {
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        serviceBinder = service as TorService.TorServiceBinder
+        serviceBinder = if (service != null)
+            service as TorService.TorServiceBinder
+        else
+            null
     }
 
 }
