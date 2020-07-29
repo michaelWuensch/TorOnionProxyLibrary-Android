@@ -68,7 +68,7 @@ package io.matthewnelson.topl_service
 
 import android.app.Application
 import androidx.test.core.app.ApplicationProvider
-import io.matthewnelson.test_helpers.TestBase
+import io.matthewnelson.test_helpers.UnitTestBase
 import io.matthewnelson.test_helpers.TestEventBroadcaster
 import io.matthewnelson.test_helpers.TestTorSettings
 import io.matthewnelson.topl_service.service.BaseService
@@ -85,7 +85,7 @@ import org.robolectric.annotation.Config
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @Config(minSdk = 16, maxSdk = 28)
 @RunWith(RobolectricTestRunner::class)
-internal class TorServiceControllerBuilderUnitTest: TestBase() {
+internal class TorServiceControllerUnitTest: UnitTestBase() {
 
     private val app: Application by lazy {
         ApplicationProvider.getApplicationContext() as Application

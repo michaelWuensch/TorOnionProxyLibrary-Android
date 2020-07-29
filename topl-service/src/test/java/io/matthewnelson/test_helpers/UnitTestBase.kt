@@ -12,7 +12,7 @@ import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import java.io.File
 
-internal abstract class TestBase: ServiceConsts() {
+internal abstract class UnitTestBase: ServiceConsts() {
 
     @get:Rule
     val testDirectory = TemporaryFolder()
