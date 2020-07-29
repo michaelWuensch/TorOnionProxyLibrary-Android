@@ -21,6 +21,7 @@ import io.matthewnelson.topl_service.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.TorServiceBinder
+import io.matthewnelson.topl_service.service.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import kotlinx.coroutines.*
@@ -32,6 +33,7 @@ import java.lang.reflect.InvocationTargetException
 internal class TestTorService(
     override val context: Context
 ): BaseService() {
+
 
     //////////////////
     /// Coroutines ///
@@ -57,6 +59,7 @@ internal class TestTorService(
 
     @Volatile
     var stopSelfCalled = false
+        private set
 
     /**
      * In production, this is where `stopSelf()` is called. Need to decouple from
@@ -77,6 +80,7 @@ internal class TestTorService(
 
     @Volatile
     var torServicePrefsListenerIsRegistered = false
+        private set
 
     override fun unregisterPrefsListener() {
         torServicePrefsListener.unregister()
@@ -130,7 +134,6 @@ internal class TestTorService(
     override fun updateNotificationProgress(show: Boolean, progress: Int?) {
         serviceNotification.updateProgress(show, progress)
     }
-
 
 
     /////////////////
@@ -239,6 +242,7 @@ internal class TestTorService(
 
     @Volatile
     var serviceIsBound = false
+        private set
 
     override fun unbindService() {
         serviceIsBound = false
