@@ -407,8 +407,7 @@ class ServiceNotification internal constructor(
 
     @Synchronized
     internal fun remove() {
-        if (!inForeground && showNotification)
-            notificationManager?.cancel(notificationID)
+        notificationManager?.cancel(notificationID)
     }
 
     /**
