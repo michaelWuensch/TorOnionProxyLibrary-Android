@@ -70,6 +70,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_service.notification.ServiceNotification
@@ -162,14 +163,18 @@ internal abstract class BaseService: Service() {
     /////////////////
     /// TOPL-Core ///
     /////////////////
+    @WorkerThread
     @Throws(IOException::class)
     abstract fun copyAsset(assetPath: String, file: File)
     abstract fun getBroadcastLogger(clazz: Class<*>): BroadcastLogger
     abstract fun hasControlConnection(): Boolean
     abstract fun isTorOff(): Boolean
     abstract fun refreshBroadcastLoggersHasDebugLogsVar()
+    @WorkerThread
     abstract suspend fun signalNewNym()
+    @WorkerThread
     abstract fun startTor()
+    @WorkerThread
     abstract fun stopTor()
 
 

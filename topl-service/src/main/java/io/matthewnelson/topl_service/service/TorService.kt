@@ -195,6 +195,7 @@ internal class TorService: BaseService() {
         )
     }
 
+    @WorkerThread
     @Throws(IOException::class)
     override fun copyAsset(assetPath: String, file: File) {
         try {
@@ -215,6 +216,7 @@ internal class TorService: BaseService() {
     override fun refreshBroadcastLoggersHasDebugLogsVar() {
         onionProxyManager.refreshBroadcastLoggersHasDebugLogsVar()
     }
+    @WorkerThread
     override suspend fun signalNewNym() {
         onionProxyManager.signalNewNym()
     }
