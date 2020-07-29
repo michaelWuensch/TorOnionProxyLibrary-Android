@@ -90,7 +90,15 @@ class TestEventBroadcaster: EventBroadcaster() {
 
     }
 
-    override fun broadcastTorState(state: String, networkState: String) {
+    @Volatile
+    var torState = TorState.OFF
+        private set
 
+    @Volatile
+    var torNetworkState = TorNetworkState.DISABLED
+        private set
+    override fun broadcastTorState(state: String, networkState: String) {
+        torState = state
+        torNetworkState = networkState
     }
 }
