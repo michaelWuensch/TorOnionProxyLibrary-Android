@@ -1,7 +1,7 @@
 package io.matthewnelson.test_helpers
 
 import android.app.Application
-import androidx.test.core.app.ApplicationProvider
+import io.matthewnelson.test_helpers.application_provided_classes.TestTorSettings
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.BuildConfig

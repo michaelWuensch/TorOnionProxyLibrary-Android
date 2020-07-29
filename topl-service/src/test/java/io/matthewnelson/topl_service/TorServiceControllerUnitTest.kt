@@ -69,8 +69,8 @@ package io.matthewnelson.topl_service
 import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import io.matthewnelson.test_helpers.UnitTestBase
-import io.matthewnelson.test_helpers.TestEventBroadcaster
-import io.matthewnelson.test_helpers.TestTorSettings
+import io.matthewnelson.test_helpers.application_provided_classes.TestEventBroadcaster
+import io.matthewnelson.test_helpers.application_provided_classes.TestTorSettings
 import io.matthewnelson.topl_service.service.BaseService
 import org.junit.*
 import org.junit.Assert.assertEquals
@@ -161,7 +161,8 @@ internal class TorServiceControllerUnitTest: UnitTestBase() {
         val initialHashCode = TorServiceController.getTorSettings().hashCode()
 
         // Instantiate new TorSettings and try to overwrite things via the builder
-        val newTorSettings = TestTorSettings()
+        val newTorSettings =
+            TestTorSettings()
         getNewBuilder(app, newTorSettings)
             .useCustomTorConfigFiles(torConfigFiles)
             .build()
