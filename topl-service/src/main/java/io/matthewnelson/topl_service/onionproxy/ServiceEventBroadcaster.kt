@@ -208,6 +208,7 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
     override fun broadcastNotice(msg: String) {
 
         // BOOTSTRAPPED
+        // NOTICE|BaseEventListener|Bootstrapped 5% (conn): Connecting to a relay
         if (msg.contains("Bootstrapped")) {
             val msgSplit = msg.split(" ")
             msgSplit.elementAtOrNull(2)?.let {
