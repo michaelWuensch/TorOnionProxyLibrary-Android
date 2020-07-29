@@ -68,32 +68,55 @@ package io.matthewnelson.topl_service
 
 import android.app.Application
 import androidx.test.core.app.ApplicationProvider
-import io.matthewnelson.test_helpers.UnitTestBase
 import io.matthewnelson.test_helpers.application_provided_classes.TestEventBroadcaster
 import io.matthewnelson.test_helpers.application_provided_classes.TestTorSettings
+import io.matthewnelson.topl_core_base.TorConfigFiles
+import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.BaseService
 import org.junit.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertNotNull
+import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.io.File
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @Config(minSdk = 16, maxSdk = 28)
 @RunWith(RobolectricTestRunner::class)
-internal class TorServiceControllerUnitTest: UnitTestBase() {
+internal class TorServiceControllerUnitTest {
+
+    @get:Rule
+    val testDirectory = TemporaryFolder()
 
     private val app: Application by lazy {
         ApplicationProvider.getApplicationContext() as Application
     }
+    private val notificationBuilder: ServiceNotification.Builder by lazy {
+        ServiceNotification.Builder(
+            "Test Channel Name",
+            "Test Channel ID",
+            "Test Channel Description",
+            615615
+        )
+    }
+    private val torSettings: TestTorSettings by lazy { TestTorSettings() }
+    private lateinit var installDir: File
+    private lateinit var configDir: File
+    private lateinit var torConfigFiles: TorConfigFiles
 
     @Before
     fun setup() {
-        setupTorConfigFiles()
+        testDirectory.create()
+        installDir = File("/usr/bin")
+        configDir = testDirectory.newFolder("configDir")
+        torConfigFiles = TorConfigFiles.Builder(installDir, configDir)
+            .torExecutable(File(installDir, "tor"))
+            .build()
     }
 
     @After
@@ -133,7 +156,7 @@ internal class TorServiceControllerUnitTest: UnitTestBase() {
 
         val timeToAdd = 300L
 
-        getNewBuilder(app, torSettings)
+        getNewControllerBuilder()
             .addTimeToRestartTorDelay(timeToAdd)
             .addTimeToStopServiceDelay(timeToAdd)
             .setBuildConfigDebug(BuildConfig.DEBUG)
@@ -154,7 +177,7 @@ internal class TorServiceControllerUnitTest: UnitTestBase() {
             // build has been called in a previous test
         } catch (e: RuntimeException) {
             assertNull(BaseService.buildConfigDebug)
-            getNewBuilder(app, torSettings).build()
+            getNewControllerBuilder().build()
             assertNotNull(BaseService.buildConfigDebug)
         }
 
@@ -163,7 +186,7 @@ internal class TorServiceControllerUnitTest: UnitTestBase() {
         // Instantiate new TorSettings and try to overwrite things via the builder
         val newTorSettings =
             TestTorSettings()
-        getNewBuilder(app, newTorSettings)
+        getNewControllerBuilder()
             .useCustomTorConfigFiles(torConfigFiles)
             .build()
 
@@ -171,5 +194,17 @@ internal class TorServiceControllerUnitTest: UnitTestBase() {
 
         assertNotEquals(newTorSettings.hashCode(), hashCodeAfterSecondBuildCall)
         assertEquals(initialHashCode, hashCodeAfterSecondBuildCall)
+    }
+
+    private fun getNewControllerBuilder(): TorServiceController.Builder {
+        return TorServiceController.Builder(
+            app,
+            notificationBuilder,
+            BuildConfig.VERSION_CODE,
+            torSettings,
+            "common/geoip",
+            "common/geoip6"
+        )
+            .useCustomTorConfigFiles(torConfigFiles)
     }
 }
