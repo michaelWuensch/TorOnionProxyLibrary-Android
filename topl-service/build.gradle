@@ -79,6 +79,7 @@ dependencies {
 
     testImplementation deps.androidx.test.core
     testImplementation deps.junit
+    testImplementation deps.kotlin.coroutinesTest
     testImplementation deps.robolectric
 
     androidTestImplementation deps.androidx.test.core
