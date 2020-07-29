@@ -4,9 +4,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import androidx.annotation.WorkerThread
+import io.matthewnelson.test_helpers.application_provided_classes.TestEventBroadcaster
 import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core.util.FileUtilities
+import io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState
+import io.matthewnelson.topl_core_base.BaseConsts.TorState
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.onionproxy.ServiceEventBroadcaster
@@ -20,10 +23,8 @@ import io.matthewnelson.topl_service.service.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.TorServiceBinder
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import net.freehaven.tor.control.TorControlCommands
 import java.io.File
 import java.io.IOException
 import java.lang.reflect.InvocationTargetException
@@ -81,7 +82,7 @@ internal class TestTorService(
         torServicePrefsListener.unregister()
         torServicePrefsListenerIsRegistered = false
     }
-    fun registerPrefsListener() {
+    private fun registerPrefsListener() {
         torServicePrefsListener.register()
         torServicePrefsListenerIsRegistered = true
     }
@@ -138,6 +139,9 @@ internal class TestTorService(
     private val broadcastLogger: BroadcastLogger by lazy {
         getBroadcastLogger(TestTorService::class.java)
     }
+    private val serviceEventBroadcaster: ServiceEventBroadcaster by lazy {
+        ServiceEventBroadcaster(this)
+    }
     private val onionProxyManager: OnionProxyManager by lazy {
         OnionProxyManager(
             context,
@@ -145,11 +149,22 @@ internal class TestTorService(
             ServiceTorInstaller(this),
             ServiceTorSettings(this, TorServiceController.getTorSettings()),
             ServiceEventListener(),
-            ServiceEventBroadcaster(this),
+            serviceEventBroadcaster,
             buildConfigDebug
         )
     }
 
+    /**
+     * Requires the use of [TorServiceController.Builder.setEventBroadcaster] to set
+     * [TestEventBroadcaster] so that [TorServiceController.appEventBroadcaster] is
+     * assuredly not null.
+     * */
+    private fun getSimulatedTorStates(): Pair<@TorState String, @TorNetworkState String> {
+        val appEventBroadcaster = TorServiceController.appEventBroadcaster!! as TestEventBroadcaster
+        return Pair(appEventBroadcaster.torState, appEventBroadcaster.torNetworkState)
+    }
+
+    @WorkerThread
     @Throws(IOException::class)
     override fun copyAsset(assetPath: String, file: File) {
         try {
@@ -162,16 +177,19 @@ internal class TestTorService(
         return onionProxyManager.getBroadcastLogger(clazz)
     }
     override fun hasControlConnection(): Boolean {
-        return onionProxyManager.hasControlConnection
+        return getSimulatedTorStates().first == TorState.ON
     }
     override fun isTorOff(): Boolean {
-        return onionProxyManager.torStateMachine.isOff
+        return getSimulatedTorStates().first == TorState.OFF
     }
     override fun refreshBroadcastLoggersHasDebugLogsVar() {
         onionProxyManager.refreshBroadcastLoggersHasDebugLogsVar()
     }
     override suspend fun signalNewNym() {
-        onionProxyManager.signalNewNym()
+        serviceEventBroadcaster.broadcastNotice(
+            "${TorControlCommands.SIGNAL_NEWNYM}: ${OnionProxyManager.NEWNYM_SUCCESS_MESSAGE}"
+        )
+        delay(50L)
     }
     @WorkerThread
     override fun startTor() {
@@ -179,7 +197,9 @@ internal class TestTorService(
             onionProxyManager.setup()
             generateTorrcFile()
 
-            onionProxyManager.start()
+            serviceEventBroadcaster.broadcastTorState(TorState.STARTING, TorNetworkState.DISABLED)
+            serviceEventBroadcaster.broadcastTorState(TorState.ON, TorNetworkState.DISABLED)
+            serviceEventBroadcaster.broadcastTorState(TorState.ON, TorNetworkState.ENABLED)
         } catch (e: Exception) {
             broadcastLogger.exception(e)
         }
@@ -187,7 +207,9 @@ internal class TestTorService(
     @WorkerThread
     override fun stopTor() {
         try {
-            onionProxyManager.stop()
+            serviceEventBroadcaster.broadcastTorState(TorState.STOPPING, TorNetworkState.ENABLED)
+            serviceEventBroadcaster.broadcastTorState(TorState.STOPPING, TorNetworkState.DISABLED)
+            serviceEventBroadcaster.broadcastTorState(TorState.OFF, TorNetworkState.DISABLED)
         } catch (e: Exception) {
             broadcastLogger.exception(e)
         }
@@ -229,6 +251,7 @@ internal class TestTorService(
 
     override fun onCreate() {
         serviceNotification.buildNotification(this)
+        broadcastLogger.notice("BuildConfig.DEBUG set to: $buildConfigDebug")
         registerPrefsListener()
     }
 
