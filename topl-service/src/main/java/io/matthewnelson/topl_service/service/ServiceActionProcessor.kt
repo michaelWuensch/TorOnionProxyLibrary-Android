@@ -118,8 +118,8 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
             }
             is ActionCommands.Start -> {
                 clearActionQueue()
-                torService.registerReceiver()
                 torService.stopForegroundService()
+                torService.registerReceiver()
             }
         }
 

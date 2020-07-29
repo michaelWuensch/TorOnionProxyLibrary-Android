@@ -226,15 +226,25 @@ internal class TorService: BaseService() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        intent?.action?.let {
-            if (it == ServiceAction.START)
-                processIntent(intent)
-            else
-                throw IllegalArgumentException(
-                    "$it is not an accepted argument for use with startService()"
-                )
+        if (intent != null) {
+
+                if (intent.action == ServiceAction.START) {
+                    processIntent(intent)
+                } else {
+                    broadcastLogger.warn(
+                        "${intent.action} was used with startService. Use only " +
+                                "${ServiceAction.START} to ensure proper startup of Tor"
+                    )
+                    processIntent(Intent(ServiceAction.START))
+                    processIntent(intent)
+                }
+
+        } else {
+            // If it's null, we're getting a re-start from the system via START_STICKY
+            // and need to relink everything.
+            TorServiceController.startTor()
         }
-        return START_NOT_STICKY
+        return START_STICKY
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
