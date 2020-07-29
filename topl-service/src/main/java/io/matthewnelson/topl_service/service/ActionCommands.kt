@@ -93,24 +93,22 @@ internal sealed class ActionCommands {
         abstract val commands: Array<@ActionCommand String>
 
         /**
-         * For every ActionCommand.DELAY called for, a value will be consumed
-         * when executing the DELAY command.
+         * For every ActionCommand.DELAY within [commands], a value will be consumed
+         * when executing it.
          *
          * Override this to define the values for each DELAY call.
          * */
         protected open val delayLengthQueue: MutableList<Long> = mutableListOf()
 
         /**
-         * Consumes the 0th element within [delayLengthQueue], removes, then returns it.
+         * Removes the 0th element within [delayLengthQueue] then returns it.
          * If [delayLengthQueue] is empty, returns 0L.
          *
          * @return The 0th element within [delayLengthQueue], or 0L if empty
          * */
         fun consumeDelayLength(): Long {
             return if (delayLengthQueue.isNotEmpty()) {
-                val delayLength = delayLengthQueue[0]
                 delayLengthQueue.removeAt(0)
-                delayLength
             } else {
                 0L
             }

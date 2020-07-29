@@ -169,9 +169,9 @@ internal class TorService: BaseService() {
 
 
 
-    ////////////////////
-    /// TOPL-Android ///
-    ////////////////////
+    /////////////////
+    /// TOPL-Core ///
+    /////////////////
     private val broadcastLogger: BroadcastLogger by lazy {
         onionProxyManager.getBroadcastLogger(TorService::class.java)
     }
@@ -191,7 +191,7 @@ internal class TorService: BaseService() {
     ///////////////
     /// Binding ///
     ///////////////
-    private val torServiceBinder = TorServiceBinder(this)
+    private val torServiceBinder: TorServiceBinder by lazy { TorServiceBinder(this) }
 
     override fun unbindService() {
         TorServiceController.unbindTorService(context)

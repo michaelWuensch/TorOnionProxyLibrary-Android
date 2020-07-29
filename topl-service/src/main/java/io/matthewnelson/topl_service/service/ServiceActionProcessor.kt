@@ -69,16 +69,17 @@ package io.matthewnelson.topl_service.service
 import android.content.Intent
 import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.OnionProxyManager
-import io.matthewnelson.topl_service.TorServiceController
+import io.matthewnelson.topl_service.service.ActionCommands.ServiceActionObject
+import io.matthewnelson.topl_service.service.ActionCommands.ServiceActionObjectGetter
 import io.matthewnelson.topl_service.util.ServiceConsts
 import kotlinx.coroutines.*
 import java.io.IOException
 import java.lang.reflect.InvocationTargetException
 
 /**
- * [ServiceConsts.ServiceAction]'s are translated to [ActionCommands.ServiceActionObject]'s,
+ * [ServiceConsts.ServiceAction]'s are translated to [ServiceActionObject]'s,
  * submitted to a queue, and then processed. This allows for sequential execution of
- * individual [ServiceConsts.ActionCommand]'s for each [ActionCommands.ServiceActionObject]
+ * individual [ServiceConsts.ActionCommand]'s for each [ServiceActionObject]
  * and the ability to quickly interrupt execution for reacting to User actions (such as
  * stopping, or clearing the task).
  *
@@ -92,7 +93,7 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
 
     private val broadcastLogger =
         onionProxyManager.getBroadcastLogger(ServiceActionProcessor::class.java)
-    private val serviceActionObjectGetter = ActionCommands.ServiceActionObjectGetter()
+    private val serviceActionObjectGetter = ServiceActionObjectGetter()
 
     fun processIntent(intent: Intent) {
         val actionObject = try {
@@ -104,7 +105,7 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
         processActionObject(actionObject)
     }
 
-    private fun processActionObject(serviceActionObject: ActionCommands.ServiceActionObject) {
+    private fun processActionObject(serviceActionObject: ServiceActionObject) {
         when (serviceActionObject) {
             is ActionCommands.Destroy -> {
                 torService.unregisterReceiver()
@@ -113,7 +114,7 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
             is ActionCommands.Stop -> {
                 torService.unregisterReceiver()
                 clearActionQueue()
-                broadcastLogger.notice(ServiceAction.STOP)
+                broadcastLogger.notice(serviceActionObject.serviceAction)
             }
             is ActionCommands.Start -> {
                 clearActionQueue()
@@ -137,9 +138,9 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
     /// Action Queue ///
     ////////////////////
     private val actionQueueLock = Object()
-    private val actionQueue = mutableListOf<ActionCommands.ServiceActionObject>()
+    private val actionQueue = mutableListOf<ServiceActionObject>()
 
-    private fun addActionToQueue(serviceActionObject: ActionCommands.ServiceActionObject): Boolean =
+    private fun addActionToQueue(serviceActionObject: ServiceActionObject): Boolean =
         synchronized(actionQueueLock) {
             return if (actionQueue.add(serviceActionObject)) {
                 broadcastDebugObjectDetailsMsg(
@@ -151,7 +152,7 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
             }
         }
 
-    private fun removeActionFromQueue(serviceActionObject: ActionCommands.ServiceActionObject) =
+    private fun removeActionFromQueue(serviceActionObject: ServiceActionObject) =
         synchronized(actionQueueLock) {
             if (actionQueue.remove(serviceActionObject))
                 broadcastDebugObjectDetailsMsg(
@@ -206,9 +207,8 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
                             delayLength = actionObject.consumeDelayLength()
                         processActionCommand(command, delayLength)
 
-                        if (index == actionObject.commands.lastIndex) {
+                        if (index == actionObject.commands.lastIndex)
                             removeActionFromQueue(actionObject)
-                        }
                     }
                 }
             }
@@ -237,7 +237,9 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
                 }
             }
             ActionCommand.STOP_SERVICE -> {
-                stopService()
+                torService.unbindService()
+                broadcastDebugObjectDetailsMsg("Stopping: ", torService)
+                torService.stopSelf()
             }
             ActionCommand.STOP_TOR -> {
                 if (onionProxyManager.hasControlConnection) {
@@ -252,12 +254,6 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
     /////////////////////////
     /// Execution Methods ///
     /////////////////////////
-    private fun stopService() {
-        torService.unbindService()
-        broadcastDebugObjectDetailsMsg("Stopping: ", torService)
-        torService.stopSelf()
-    }
-
     @WorkerThread
     private fun startTor() {
         try {
