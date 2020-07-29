@@ -67,14 +67,10 @@
 package io.matthewnelson.topl_service.service
 
 import android.content.Intent
-import androidx.annotation.WorkerThread
-import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_service.service.ActionCommands.ServiceActionObject
 import io.matthewnelson.topl_service.service.ActionCommands.ServiceActionObjectGetter
 import io.matthewnelson.topl_service.util.ServiceConsts
 import kotlinx.coroutines.*
-import java.io.IOException
-import java.lang.reflect.InvocationTargetException
 
 /**
  * [ServiceConsts.ServiceAction]'s are translated to [ServiceActionObject]'s,
@@ -172,13 +168,17 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
     /// Queue Processing ///
     ////////////////////////
     private lateinit var processQueueJob: Job
+    private val scopeMain: CoroutineScope
+        get() = torService.getScopeMain()
+    private val dispatcherIO: CoroutineDispatcher
+        get() = torService.getDispatcherIO()
 
     /**
      * Processes the [actionQueue].
      * */
     private fun launchProcessQueueJob() {
         if (::processQueueJob.isInitialized && processQueueJob.isActive) return
-        processQueueJob = torService.getScopeMain().launch(Dispatchers.IO) {
+        processQueueJob = scopeMain.launch(dispatcherIO) {
             broadcastDebugObjectDetailsMsg("Processing Queue: ", this)
 
             while (actionQueue.isNotEmpty()) {
@@ -219,8 +219,6 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
             }
             ActionCommand.DESTROY -> {
                 torService.unregisterPrefsListener()
-                torService.stopForegroundService()
-                torService.unbindService()
                 torService.removeNotification()
                 delay(300L)
                 torService.cancelSupervisorJob()

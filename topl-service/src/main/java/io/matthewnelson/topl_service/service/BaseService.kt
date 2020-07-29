@@ -71,10 +71,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import androidx.annotation.WorkerThread
-import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import java.io.File
 import java.io.IOException
@@ -125,6 +125,7 @@ internal abstract class BaseService: Service() {
     //////////////////
     abstract fun cancelSupervisorJob()
     abstract fun getScopeMain(): CoroutineScope
+    abstract fun getDispatcherIO(): CoroutineDispatcher
 
 
     //////////////////////////////

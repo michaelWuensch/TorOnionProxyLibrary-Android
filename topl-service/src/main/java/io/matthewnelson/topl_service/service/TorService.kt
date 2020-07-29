@@ -107,6 +107,9 @@ internal class TorService: BaseService() {
     override fun getScopeMain(): CoroutineScope {
         return scopeMain
     }
+    override fun getDispatcherIO(): CoroutineDispatcher {
+        return Dispatchers.IO
+    }
 
 
     //////////////////////////////
