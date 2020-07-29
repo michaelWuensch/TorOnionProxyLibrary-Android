@@ -241,7 +241,7 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
             ActionCommand.STOP_SERVICE -> {
                 torService.unbindService()
                 broadcastDebugObjectDetailsMsg("Stopping: ", torService)
-                torService.stopSelf()
+                torService.stopService()
             }
             ActionCommand.STOP_TOR -> {
                 if (onionProxyManager.hasControlConnection) {

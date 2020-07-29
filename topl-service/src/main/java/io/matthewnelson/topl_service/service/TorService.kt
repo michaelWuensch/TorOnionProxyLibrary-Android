@@ -112,6 +112,9 @@ internal class TorService: BaseService() {
     override fun processIntent(serviceActionIntent: Intent) {
         serviceActionProcessor.processIntent(serviceActionIntent)
     }
+    override fun stopService() {
+        stopSelf()
+    }
 
 
     ///////////////////////////////

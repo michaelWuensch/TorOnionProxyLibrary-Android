@@ -128,6 +128,7 @@ internal abstract class BaseService: Service() {
     /// ServiceActionProcessor ///
     //////////////////////////////
     abstract fun processIntent(serviceActionIntent: Intent)
+    abstract fun stopService()
 
 
     ///////////////////////////////
