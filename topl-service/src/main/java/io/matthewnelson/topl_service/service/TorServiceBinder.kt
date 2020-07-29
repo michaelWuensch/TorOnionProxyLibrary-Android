@@ -68,7 +68,7 @@ package io.matthewnelson.topl_service.service
 
 import android.content.Intent
 import android.os.Binder
-import io.matthewnelson.topl_service.util.ServiceConsts
+import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 
 internal class TorServiceBinder(private val torService: BaseService): Binder() {
 
@@ -78,16 +78,17 @@ internal class TorServiceBinder(private val torService: BaseService): Binder() {
         )
     }
 
+    @Throws(IllegalArgumentException::class)
     fun submitServiceActionIntent(serviceActionIntent: Intent) {
         val action = serviceActionIntent.action
-        if (action != null && action.contains(ServiceConsts.ServiceAction.SERVICE_ACTION)) {
+        if (action != null && action.contains(ServiceAction.SERVICE_ACTION)) {
 
             when (action) {
-                ServiceConsts.ServiceAction.DESTROY,
-                ServiceConsts.ServiceAction.NEW_ID,
-                ServiceConsts.ServiceAction.RESTART_TOR,
-                ServiceConsts.ServiceAction.START,
-                ServiceConsts.ServiceAction.STOP -> {
+                ServiceAction.DESTROY,
+                ServiceAction.NEW_ID,
+                ServiceAction.RESTART_TOR,
+                ServiceAction.START,
+                ServiceAction.STOP -> {
                     // Do not accept the above ServiceActions through use of this method.
                     // DESTROY = internal Service use only (for onDestroy)
                     // NEW_ID, RESTART_TOR, STOP = via BroadcastReceiver
