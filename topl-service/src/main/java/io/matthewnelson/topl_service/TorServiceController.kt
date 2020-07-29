@@ -404,6 +404,13 @@ class TorServiceController private constructor(): ServiceConsts() {
             )
         }
 
+        /**
+         * Unbinds [TorService] from the Application.
+         *
+         * @param [context]
+         * @throws [IllegalArgumentException] if no Service is bound (has already been unbound)
+         * */
+        @Throws(IllegalArgumentException::class)
         internal fun unbindTorService(context: Context) {
             torServiceConnection.clearServiceBinderReference()
             context.applicationContext.unbindService(torServiceConnection)

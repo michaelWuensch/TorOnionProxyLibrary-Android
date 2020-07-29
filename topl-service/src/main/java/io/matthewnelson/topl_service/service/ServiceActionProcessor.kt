@@ -223,6 +223,8 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
             }
             ActionCommand.DESTROY -> {
                 torService.unregisterPrefsListener()
+                torService.stopForegroundService()
+                torService.unbindService()
                 torService.removeNotification()
                 delay(300L)
                 torService.cancelSupervisorJob()
