@@ -14,6 +14,7 @@ import io.matthewnelson.topl_service.onionproxy.ServiceEventListener
 import io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller
 import io.matthewnelson.topl_service.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
+import io.matthewnelson.topl_service.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.TorServiceBinder
@@ -82,21 +83,20 @@ internal class TestTorService(
     }
     fun registerPrefsListener() {
         torServicePrefsListener.register()
-        torServiceReceiverIsRegistered = true
+        torServicePrefsListenerIsRegistered = true
     }
 
 
     /////////////////////////
     /// BroadcastReceiver ///
     /////////////////////////
-    @Volatile
-    var torServiceReceiverIsRegistered = false
+    val torServiceReceiver by lazy { TorServiceReceiver(this) }
 
     override fun registerReceiver() {
-        torServiceReceiverIsRegistered = true
+        torServiceReceiver.register()
     }
     override fun unregisterReceiver() {
-        torServiceReceiverIsRegistered = false
+        torServiceReceiver.unregister()
     }
 
 
