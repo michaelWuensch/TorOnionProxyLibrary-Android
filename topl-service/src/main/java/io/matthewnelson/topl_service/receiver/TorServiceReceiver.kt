@@ -123,7 +123,7 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context != null && intent != null) {
             // Only accept Intents from this package.
-            if (context.applicationInfo.dataDir != torService.applicationInfo.dataDir) return
+            if (context.applicationInfo.dataDir != torService.context.applicationInfo.dataDir) return
 
             when (val serviceAction = intent.getStringExtra(SERVICE_INTENT_FILTER)) {
 
