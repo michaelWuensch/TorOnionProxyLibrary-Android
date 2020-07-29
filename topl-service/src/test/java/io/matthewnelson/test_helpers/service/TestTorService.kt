@@ -7,7 +7,6 @@ import androidx.annotation.WorkerThread
 import io.matthewnelson.test_helpers.application_provided_classes.TestEventBroadcaster
 import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
-import io.matthewnelson.topl_core.util.FileUtilities
 import io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState
 import io.matthewnelson.topl_core_base.BaseConsts.TorState
 import io.matthewnelson.topl_service.TorServiceController
@@ -21,17 +20,18 @@ import io.matthewnelson.topl_service.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.TorServiceBinder
-import io.matthewnelson.topl_service.service.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import kotlinx.coroutines.*
+import kotlinx.coroutines.test.TestCoroutineScope
 import net.freehaven.tor.control.TorControlCommands
 import java.io.File
 import java.io.IOException
 import java.lang.reflect.InvocationTargetException
 
 internal class TestTorService(
-    override val context: Context
+    override val context: Context,
+    private val dispatcher: CoroutineDispatcher
 ): BaseService() {
 
 
@@ -39,12 +39,19 @@ internal class TestTorService(
     /// Coroutines ///
     //////////////////
     val supervisorJob = SupervisorJob()
-    val testScopeMain = CoroutineScope(Dispatchers.Main + supervisorJob)
+    @ExperimentalCoroutinesApi
+    val testCoroutineScope = TestCoroutineScope(dispatcher + supervisorJob)
+
     override fun cancelSupervisorJob() {
         supervisorJob.cancel()
     }
+    @ExperimentalCoroutinesApi
     override fun getScopeMain(): CoroutineScope {
-        return testScopeMain
+        return testCoroutineScope
+    }
+    @ExperimentalCoroutinesApi
+    override fun getDispatcherIO(): CoroutineDispatcher {
+        return dispatcher
     }
 
 
@@ -67,9 +74,10 @@ internal class TestTorService(
      * is simulated properly in that it will stop processing the queue and the Coroutine
      * Job will move to `complete`.
      * */
+    @ExperimentalCoroutinesApi
     override fun stopService() {
         stopSelfCalled = true
-        testScopeMain.launch { onDestroy() }
+        getScopeMain().launch { onDestroy() }
     }
 
 
@@ -142,15 +150,18 @@ internal class TestTorService(
     private val broadcastLogger: BroadcastLogger by lazy {
         getBroadcastLogger(TestTorService::class.java)
     }
-    private val serviceEventBroadcaster: ServiceEventBroadcaster by lazy {
+    val serviceEventBroadcaster: ServiceEventBroadcaster by lazy {
         ServiceEventBroadcaster(this)
     }
-    private val onionProxyManager: OnionProxyManager by lazy {
+    val serviceTorSettings: ServiceTorSettings by lazy {
+        ServiceTorSettings(this, TorServiceController.getTorSettings())
+    }
+    val onionProxyManager: OnionProxyManager by lazy {
         OnionProxyManager(
             context,
             TorServiceController.getTorConfigFiles(),
             ServiceTorInstaller(this),
-            ServiceTorSettings(this, TorServiceController.getTorSettings()),
+            serviceTorSettings,
             ServiceEventListener(),
             serviceEventBroadcaster,
             buildConfigDebug
@@ -162,7 +173,7 @@ internal class TestTorService(
      * [TestEventBroadcaster] so that [TorServiceController.appEventBroadcaster] is
      * assuredly not null.
      * */
-    private fun getSimulatedTorStates(): Pair<@TorState String, @TorNetworkState String> {
+    fun getSimulatedTorStates(): Pair<@TorState String, @TorNetworkState String> {
         val appEventBroadcaster = TorServiceController.appEventBroadcaster!! as TestEventBroadcaster
         return Pair(appEventBroadcaster.torState, appEventBroadcaster.torNetworkState)
     }
@@ -171,7 +182,7 @@ internal class TestTorService(
     @Throws(IOException::class)
     override fun copyAsset(assetPath: String, file: File) {
         try {
-            FileUtilities.copy(context.assets.open(assetPath), file.outputStream())
+//            FileUtilities.copy(context.assets.open(assetPath), file.outputStream())
         } catch (e: Exception) {
             throw IOException("Failed copying asset from $assetPath", e)
         }
@@ -185,23 +196,34 @@ internal class TestTorService(
     override fun isTorOff(): Boolean {
         return getSimulatedTorStates().first == TorState.OFF
     }
+
+    var refreshBroadcastLoggerWasCalled = false
     override fun refreshBroadcastLoggersHasDebugLogsVar() {
         onionProxyManager.refreshBroadcastLoggersHasDebugLogsVar()
+        refreshBroadcastLoggerWasCalled = true
     }
+
+
     override suspend fun signalNewNym() {
         serviceEventBroadcaster.broadcastNotice(
             "${TorControlCommands.SIGNAL_NEWNYM}: ${OnionProxyManager.NEWNYM_SUCCESS_MESSAGE}"
         )
-        delay(50L)
+        delay(1000L)
     }
     @WorkerThread
     override fun startTor() {
+        simulateStart()
+    }
+    @ExperimentalCoroutinesApi
+    private fun simulateStart() = getScopeMain().launch {
         try {
             onionProxyManager.setup()
             generateTorrcFile()
 
             serviceEventBroadcaster.broadcastTorState(TorState.STARTING, TorNetworkState.DISABLED)
+            delay(1000)
             serviceEventBroadcaster.broadcastTorState(TorState.ON, TorNetworkState.DISABLED)
+            delay(1000)
             serviceEventBroadcaster.broadcastTorState(TorState.ON, TorNetworkState.ENABLED)
         } catch (e: Exception) {
             broadcastLogger.exception(e)
@@ -230,7 +252,7 @@ internal class TestTorService(
     private fun generateTorrcFile() {
         onionProxyManager.getNewSettingsBuilder()
             .updateTorSettings()
-            .setGeoIpFiles()
+//            .setGeoIpFiles()
             .finishAndWriteToTorrcFile()
     }
 
