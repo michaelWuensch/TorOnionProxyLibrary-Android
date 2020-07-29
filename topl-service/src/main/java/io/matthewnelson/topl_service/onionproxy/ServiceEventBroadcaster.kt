@@ -71,6 +71,7 @@ import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.ServiceActionProcessor
+import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import io.matthewnelson.topl_service.util.ServiceUtilities
@@ -168,7 +169,7 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
     //////////////////
     override fun broadcastException(msg: String?, e: Exception) {
         if (!msg.isNullOrEmpty()) {
-            if (msg.contains(ServiceActionProcessor::class.java.simpleName)) {
+            if (msg.contains(TorService::class.java.simpleName)) {
                 torService.updateNotificationIcon(NotificationImage.ERROR)
                 val msgSplit = msg.split("|")
                 msgSplit.elementAtOrNull(2)?.let {

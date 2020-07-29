@@ -3,7 +3,10 @@ package io.matthewnelson.test_helpers.service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
+import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.OnionProxyManager
+import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
+import io.matthewnelson.topl_core.util.FileUtilities
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.onionproxy.ServiceEventBroadcaster
@@ -20,6 +23,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.IOException
+import java.lang.reflect.InvocationTargetException
 
 internal class TestTorService(
     override val context: Context
@@ -50,6 +56,12 @@ internal class TestTorService(
     @Volatile
     var stopSelfCalled = false
 
+    /**
+     * In production, this is where `stopSelf()` is called. Need to decouple from
+     * the thread it is called on so that funcitonality of the [ServiceActionProcessor]
+     * is simulated properly in that it will stop processing the queue and the Coroutine
+     * Job will move to `complete`.
+     * */
     override fun stopService() {
         stopSelfCalled = true
         testScopeMain.launch { onDestroy() }
@@ -123,7 +135,10 @@ internal class TestTorService(
     /////////////////
     /// TOPL-Core ///
     /////////////////
-    override val onionProxyManager: OnionProxyManager by lazy {
+    private val broadcastLogger: BroadcastLogger by lazy {
+        getBroadcastLogger(TestTorService::class.java)
+    }
+    private val onionProxyManager: OnionProxyManager by lazy {
         OnionProxyManager(
             context,
             TorServiceController.getTorConfigFiles(),
@@ -133,6 +148,65 @@ internal class TestTorService(
             ServiceEventBroadcaster(this),
             buildConfigDebug
         )
+    }
+
+    @Throws(IOException::class)
+    override fun copyAsset(assetPath: String, file: File) {
+        try {
+            FileUtilities.copy(context.assets.open(assetPath), file.outputStream())
+        } catch (e: Exception) {
+            throw IOException("Failed copying asset from $assetPath", e)
+        }
+    }
+    override fun getBroadcastLogger(clazz: Class<*>): BroadcastLogger {
+        return onionProxyManager.getBroadcastLogger(clazz)
+    }
+    override fun hasControlConnection(): Boolean {
+        return onionProxyManager.hasControlConnection
+    }
+    override fun isTorOff(): Boolean {
+        return onionProxyManager.torStateMachine.isOff
+    }
+    override fun refreshBroadcastLoggersHasDebugLogsVar() {
+        onionProxyManager.refreshBroadcastLoggersHasDebugLogsVar()
+    }
+    override suspend fun signalNewNym() {
+        onionProxyManager.signalNewNym()
+    }
+    @WorkerThread
+    override fun startTor() {
+        try {
+            onionProxyManager.setup()
+            generateTorrcFile()
+
+            onionProxyManager.start()
+        } catch (e: Exception) {
+            broadcastLogger.exception(e)
+        }
+    }
+    @WorkerThread
+    override fun stopTor() {
+        try {
+            onionProxyManager.stop()
+        } catch (e: Exception) {
+            broadcastLogger.exception(e)
+        }
+    }
+    @WorkerThread
+    @Throws(
+        SecurityException::class,
+        IllegalAccessException::class,
+        IllegalArgumentException::class,
+        InvocationTargetException::class,
+        NullPointerException::class,
+        ExceptionInInitializerError::class,
+        IOException::class
+    )
+    private fun generateTorrcFile() {
+        onionProxyManager.getNewSettingsBuilder()
+            .updateTorSettings()
+            .setGeoIpFiles()
+            .finishAndWriteToTorrcFile()
     }
 
 

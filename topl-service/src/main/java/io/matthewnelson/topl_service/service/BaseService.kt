@@ -75,6 +75,8 @@ import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import kotlinx.coroutines.CoroutineScope
+import java.io.File
+import java.io.IOException
 
 /**
  * Contains all methods that are called from classes external to, and instantiated by
@@ -157,14 +159,22 @@ internal abstract class BaseService: Service() {
     abstract fun updateNotificationProgress(show: Boolean, progress: Int?)
 
 
+    /////////////////
+    /// TOPL-Core ///
+    /////////////////
+    @Throws(IOException::class)
+    abstract fun copyAsset(assetPath: String, file: File)
+    abstract fun getBroadcastLogger(clazz: Class<*>): BroadcastLogger
+    abstract fun hasControlConnection(): Boolean
+    abstract fun isTorOff(): Boolean
+    abstract fun refreshBroadcastLoggersHasDebugLogsVar()
+    abstract suspend fun signalNewNym()
+    abstract fun startTor()
+    abstract fun stopTor()
+
+
     ///////////////
     /// Binding ///
     ///////////////
     abstract fun unbindService()
-
-
-    /////////////////
-    /// TOPL-Core ///
-    /////////////////
-    abstract val onionProxyManager: OnionProxyManager
 }

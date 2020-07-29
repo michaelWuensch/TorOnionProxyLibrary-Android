@@ -70,8 +70,10 @@ import android.content.ComponentCallbacks2
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
+import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
+import io.matthewnelson.topl_core.util.FileUtilities
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.onionproxy.ServiceEventBroadcaster
@@ -83,6 +85,9 @@ import io.matthewnelson.topl_service.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import kotlinx.coroutines.*
+import java.io.File
+import java.io.IOException
+import java.lang.reflect.InvocationTargetException
 
 internal class TorService: BaseService() {
 
@@ -176,9 +181,9 @@ internal class TorService: BaseService() {
     /// TOPL-Core ///
     /////////////////
     private val broadcastLogger: BroadcastLogger by lazy {
-        onionProxyManager.getBroadcastLogger(TorService::class.java)
+        getBroadcastLogger(TorService::class.java)
     }
-    override val onionProxyManager: OnionProxyManager by lazy {
+    private val onionProxyManager: OnionProxyManager by lazy {
         OnionProxyManager(
             context,
             TorServiceController.getTorConfigFiles(),
@@ -188,6 +193,65 @@ internal class TorService: BaseService() {
             ServiceEventBroadcaster(this),
             buildConfigDebug
         )
+    }
+
+    @Throws(IOException::class)
+    override fun copyAsset(assetPath: String, file: File) {
+        try {
+            FileUtilities.copy(context.assets.open(assetPath), file.outputStream())
+        } catch (e: Exception) {
+            throw IOException("Failed copying asset from $assetPath", e)
+        }
+    }
+    override fun getBroadcastLogger(clazz: Class<*>): BroadcastLogger {
+        return onionProxyManager.getBroadcastLogger(clazz)
+    }
+    override fun hasControlConnection(): Boolean {
+        return onionProxyManager.hasControlConnection
+    }
+    override fun isTorOff(): Boolean {
+        return onionProxyManager.torStateMachine.isOff
+    }
+    override fun refreshBroadcastLoggersHasDebugLogsVar() {
+        onionProxyManager.refreshBroadcastLoggersHasDebugLogsVar()
+    }
+    override suspend fun signalNewNym() {
+        onionProxyManager.signalNewNym()
+    }
+    @WorkerThread
+    override fun startTor() {
+        try {
+            onionProxyManager.setup()
+            generateTorrcFile()
+
+            onionProxyManager.start()
+        } catch (e: Exception) {
+            broadcastLogger.exception(e)
+        }
+    }
+    @WorkerThread
+    override fun stopTor() {
+        try {
+            onionProxyManager.stop()
+        } catch (e: Exception) {
+            broadcastLogger.exception(e)
+        }
+    }
+    @WorkerThread
+    @Throws(
+        SecurityException::class,
+        IllegalAccessException::class,
+        IllegalArgumentException::class,
+        InvocationTargetException::class,
+        NullPointerException::class,
+        ExceptionInInitializerError::class,
+        IOException::class
+    )
+    private fun generateTorrcFile() {
+        onionProxyManager.getNewSettingsBuilder()
+            .updateTorSettings()
+            .setGeoIpFiles()
+            .finishAndWriteToTorrcFile()
     }
 
 

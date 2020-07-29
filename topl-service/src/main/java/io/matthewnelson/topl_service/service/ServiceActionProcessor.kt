@@ -88,11 +88,7 @@ import java.lang.reflect.InvocationTargetException
  * */
 internal class ServiceActionProcessor(private val torService: BaseService): ServiceConsts() {
 
-    private val onionProxyManager: OnionProxyManager
-        get() = torService.onionProxyManager
-
-    private val broadcastLogger =
-        onionProxyManager.getBroadcastLogger(ServiceActionProcessor::class.java)
+    private val broadcastLogger = torService.getBroadcastLogger(ServiceActionProcessor::class.java)
     private val serviceActionObjectGetter = ServiceActionObjectGetter()
 
     fun processIntent(intent: Intent) {
@@ -230,11 +226,11 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
                 torService.cancelSupervisorJob()
             }
             ActionCommand.NEW_ID -> {
-                onionProxyManager.signalNewNym()
+                torService.signalNewNym()
             }
             ActionCommand.START_TOR -> {
-                if (!onionProxyManager.hasControlConnection) {
-                    startTor()
+                if (!torService.hasControlConnection()) {
+                    torService.startTor()
                     delay(300L)
                 }
             }
@@ -244,53 +240,11 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
                 torService.stopService()
             }
             ActionCommand.STOP_TOR -> {
-                if (onionProxyManager.hasControlConnection) {
-                    stopTor()
+                if (torService.hasControlConnection()) {
+                    torService.stopTor()
                     delay(300L)
                 }
             }
         }
-    }
-
-
-    /////////////////////////
-    /// Execution Methods ///
-    /////////////////////////
-    @WorkerThread
-    private fun startTor() {
-        try {
-            onionProxyManager.setup()
-            generateTorrcFile()
-
-            onionProxyManager.start()
-        } catch (e: Exception) {
-            broadcastLogger.exception(e)
-        }
-    }
-
-    @WorkerThread
-    private fun stopTor() {
-        try {
-            onionProxyManager.stop()
-        } catch (e: Exception) {
-            broadcastLogger.exception(e)
-        }
-    }
-
-    @WorkerThread
-    @Throws(
-        SecurityException::class,
-        IllegalAccessException::class,
-        IllegalArgumentException::class,
-        InvocationTargetException::class,
-        NullPointerException::class,
-        ExceptionInInitializerError::class,
-        IOException::class
-    )
-    private fun generateTorrcFile() {
-        onionProxyManager.getNewSettingsBuilder()
-            .updateTorSettings()
-            .setGeoIpFiles()
-            .finishAndWriteToTorrcFile()
     }
 }

@@ -134,23 +134,19 @@ internal class ServiceTorInstaller(private val torService: BaseService): TorInst
 
     private fun copyGeoIpAsset() =
         synchronized(torConfigFiles.geoIpFileLock) {
-            copyAsset(BaseService.geoipAssetPath, torConfigFiles.geoIpFile)
+            torService.copyAsset(BaseService.geoipAssetPath, torConfigFiles.geoIpFile)
+            broadcastLogger?.debug(
+                "Asset copied from ${BaseService.geoipAssetPath} -> ${torConfigFiles.geoIpFile}"
+            )
         }
 
     private fun copyGeoIpv6Asset() =
         synchronized(torConfigFiles.geoIpv6FileLock) {
-            copyAsset(BaseService.geoip6AssetPath, torConfigFiles.geoIpv6File)
+            torService.copyAsset(BaseService.geoip6AssetPath, torConfigFiles.geoIpv6File)
+            broadcastLogger?.debug(
+                "Asset copied from ${BaseService.geoip6AssetPath} -> ${torConfigFiles.geoIpv6File}"
+            )
         }
-
-    @Throws(IOException::class)
-    private fun copyAsset(assetPath: String, file: File) {
-        try {
-            FileUtilities.copy(torService.context.assets.open(assetPath), file.outputStream())
-            broadcastLogger?.debug("Asset copied from $assetPath -> $file")
-        } catch (e: Exception) {
-            throw IOException("Failed copying asset from $assetPath", e)
-        }
-    }
 
     @Throws(IOException::class, TimeoutException::class)
     override fun updateTorConfigCustom(content: String?) {

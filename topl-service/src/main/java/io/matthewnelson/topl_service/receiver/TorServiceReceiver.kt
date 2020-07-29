@@ -97,8 +97,7 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
             private set
     }
 
-    private val broadcastLogger =
-        torService.onionProxyManager.getBroadcastLogger(TorServiceReceiver::class.java)
+    private val broadcastLogger = torService.getBroadcastLogger(TorServiceReceiver::class.java)
 
     fun register() {
         if (!isRegistered) {
