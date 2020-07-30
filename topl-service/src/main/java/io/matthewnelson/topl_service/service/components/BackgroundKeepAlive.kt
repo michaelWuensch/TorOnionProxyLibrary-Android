@@ -69,6 +69,7 @@ package io.matthewnelson.topl_service.service.components
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
+import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.TorService
 import kotlinx.coroutines.Job
@@ -114,7 +115,7 @@ internal class BackgroundKeepAlive(
 
         heartbeatJob = torService.getScopeIO().launch {
             while (isActive) {
-                delay(30_000L)
+                delay(TorServiceController.backgroundHeartbeatTime)
                 if (isActive) {
                     torService.signalControlConnection(TorControlCommands.SIGNAL_HEARTBEAT)
                     torService.startForegroundService().stopForeground(torService)

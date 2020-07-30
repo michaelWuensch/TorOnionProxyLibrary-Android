@@ -159,6 +159,7 @@ internal class TorServiceControllerUnitTest {
         getNewControllerBuilder()
             .addTimeToRestartTorDelay(timeToAdd)
             .addTimeToStopServiceDelay(timeToAdd)
+            .setBackgroundHeartbeatTime(40_000)
             .setBuildConfigDebug(BuildConfig.DEBUG)
             .setEventBroadcaster(TestEventBroadcaster())
             .build()

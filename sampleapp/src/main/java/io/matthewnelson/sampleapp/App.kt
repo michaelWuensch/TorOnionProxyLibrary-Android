@@ -137,6 +137,7 @@ class App: Application() {
         )
             .addTimeToRestartTorDelay(milliseconds = 100L)
             .addTimeToStopServiceDelay(milliseconds = 100L)
+            .setBackgroundHeartbeatTime(milliseconds = 30_000L)
             .setBuildConfigDebug(buildConfigDebug = BuildConfig.DEBUG)
 
             // Can instantiate directly here then access it from

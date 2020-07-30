@@ -103,7 +103,7 @@ class TorServiceController private constructor(): ServiceConsts() {
      *
      * You can see how the [TorSettings] sent here are used in [TorService] by looking at
      * [io.matthewnelson.topl_service.onionproxy.ServiceTorSettings] and
-     * [TorService.initTOPLCore].
+     * [TorService.onionProxyManager].
      *
      * @param [application] [Application], for obtaining context
      * @param [torServiceNotificationBuilder] The [ServiceNotification.Builder] for
@@ -129,6 +129,7 @@ class TorServiceController private constructor(): ServiceConsts() {
     ) {
 
         private lateinit var appEventBroadcaster: EventBroadcaster
+        private var backgroundHeartbeatTime = Companion.backgroundHeartbeatTime
         private var restartTorDelayTime = Companion.restartTorDelayTime
         private var stopServiceDelayTime = Companion.stopServiceDelayTime
         private lateinit var torConfigFiles: TorConfigFiles
@@ -140,19 +141,19 @@ class TorServiceController private constructor(): ServiceConsts() {
          * Default is set to 500ms, (what this method adds time to).
          *
          * A slight delay is required when starting and stopping Tor to allow the [Process]
-         * for which it is running in to settle. This method adds time to the the cautionary
+         * for which it is running in to settle. This method adds time to the cautionary
          * delay between execution of stopTor and startTor, which are the individual calls
          * executed when using the [restartTor] method.
          *
          * The call to [restartTor] executes individual commands to:
          *
-         *   - stop tor + stop tor delay (300ms)
-         *   - delay <---------------------- what this method will modify
-         *   - start tor + start tor delay (300ms)
+         *   - stop tor + delay (300ms)
+         *   - delay (500ms) <---------------------- what this method will add to
+         *   - start tor + delay (300ms)
          *
          * @param [milliseconds] A value greater than 0
-         * @see [io.matthewnelson.topl_service.service.ActionCommands.RestartTor]
-         * @see [io.matthewnelson.topl_service.service.ServiceActionProcessor.processActionCommand]
+         * @see [io.matthewnelson.topl_service.service.components.ActionCommands.RestartTor]
+         * @see [io.matthewnelson.topl_service.service.components.ServiceActionProcessor.processActionCommand]
          * */
         fun addTimeToRestartTorDelay(milliseconds: Long): Builder {
             if (milliseconds > 0L)
@@ -164,22 +165,44 @@ class TorServiceController private constructor(): ServiceConsts() {
          * Default is set to 100ms (what this method adds time to).
          *
          * A slight delay is required when starting and stopping Tor to allow the [Process]
-         * for which it is running in to settle. This method adds time to the the cautionary
+         * for which it is running in to settle. This method adds time to the cautionary
          * delay between execution of stopping Tor and stopping [TorService].
          *
          * The call to [stopTor] executes individual commands to:
          *
-         *   - stop tor + stop tor delay (300ms)
-         *   - delay <---------------------- what this method will modify
+         *   - stop tor + delay (300ms)
+         *   - delay (100ms) <---------------------- what this method will add to
          *   - stop service
          *
          * @param [milliseconds] A value greater than 0
-         * @see [io.matthewnelson.topl_service.service.ActionCommands.Stop]
-         * @see [io.matthewnelson.topl_service.service.ServiceActionProcessor.processActionCommand]
+         * @see [io.matthewnelson.topl_service.service.components.ActionCommands.Stop]
+         * @see [io.matthewnelson.topl_service.service.components.ServiceActionProcessor.processActionCommand]
          * */
         fun addTimeToStopServiceDelay(milliseconds: Long): Builder {
             if (milliseconds > 0L)
                 this.stopServiceDelayTime += milliseconds
+            return this
+        }
+
+        /**
+         * Default is set to 30_000ms
+         *
+         * When the user sends your application to the background (recent app's tray),
+         * [io.matthewnelson.topl_service.service.components.BackgroundKeepAlive] begins
+         * a heartbeat for Tor, as well as cycling [TorService] between foreground and
+         * background as to keep the OS from killing things due to being idle for too long.
+         *
+         * If the user returns the application to the foreground, the heartbeat and
+         * foreground/background cycling stops.
+         *
+         * This method sets the time between each heartbeat.
+         *
+         * @param [milliseconds] A Long between 15_000 and 45_000. Will fallback to default
+         *   value if not between that range
+         * */
+        fun setBackgroundHeartbeatTime(milliseconds: Long): Builder {
+            if (milliseconds in 15_000L..45_000L)
+                backgroundHeartbeatTime = milliseconds
             return this
         }
 
@@ -253,6 +276,7 @@ class TorServiceController private constructor(): ServiceConsts() {
 
             torServiceNotificationBuilder.build()
 
+            Companion.backgroundHeartbeatTime = this.backgroundHeartbeatTime
             Companion.restartTorDelayTime = this.restartTorDelayTime
             Companion.stopServiceDelayTime = this.stopServiceDelayTime
 
@@ -285,6 +309,7 @@ class TorServiceController private constructor(): ServiceConsts() {
         private lateinit var appContext: Context
         var appEventBroadcaster: EventBroadcaster? = null
             private set
+        internal var backgroundHeartbeatTime = 30_000L
         internal var restartTorDelayTime = 500L
         internal var stopServiceDelayTime = 100L
         private lateinit var torConfigFiles: TorConfigFiles
