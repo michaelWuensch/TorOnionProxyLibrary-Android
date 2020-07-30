@@ -66,9 +66,7 @@
 * */
 package io.matthewnelson.topl_service.service
 
-import android.content.ComponentCallbacks2
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.os.IBinder
 import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.OnionProxyManager
@@ -82,6 +80,7 @@ import io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller
 import io.matthewnelson.topl_service.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.receiver.TorServiceReceiver
+import io.matthewnelson.topl_service.service.components.BackgroundKeepAlive
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import kotlinx.coroutines.*
@@ -95,43 +94,49 @@ internal class TorService: BaseService() {
         get() = this
 
 
-    //////////////////
-    /// Coroutines ///
-    //////////////////
-    private val supervisorJob = SupervisorJob()
-    private val scopeMain = CoroutineScope(Dispatchers.Main + supervisorJob)
+    ///////////////////////////
+    /// BackgroundKeepAlive ///
+    ///////////////////////////
+    private var backgroundKeepAlive: BackgroundKeepAlive? = null
 
-    override fun cancelSupervisorJob() {
-        supervisorJob.cancel()
+    override fun registerBackgroundKeepAlive() {
+        backgroundKeepAlive?.unregister()
+        backgroundKeepAlive = BackgroundKeepAlive(this)
     }
-    override fun getScopeMain(): CoroutineScope {
-        return scopeMain
+    override fun unregisterBackgroundKeepAlive() {
+        backgroundKeepAlive?.unregister()
+        backgroundKeepAlive = null
     }
-    override fun getDispatcherIO(): CoroutineDispatcher {
-        return Dispatchers.IO
+    override fun onTrimMemory(level: Int) {
+        when (level) {
+            ComponentCallbacks2.TRIM_MEMORY_COMPLETE -> {
+            }
+            ComponentCallbacks2.TRIM_MEMORY_MODERATE -> {
+                startForegroundService().stopForeground(this)
+            }
+            ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN -> {
+                broadcastLogger.debug("Application sent to background")
+                registerBackgroundKeepAlive()
+            }
+            else -> {}
+        }
     }
 
 
-    //////////////////////////////
-    /// ServiceActionProcessor ///
-    //////////////////////////////
-    private val serviceActionProcessor by lazy { ServiceActionProcessor(this) }
+    ///////////////
+    /// Binding ///
+    ///////////////
+    private val torServiceBinder: TorServiceBinder by lazy { TorServiceBinder(this) }
 
-    override fun processIntent(serviceActionIntent: Intent) {
-        serviceActionProcessor.processIntent(serviceActionIntent)
+    override fun unbindService() {
+        try {
+            TorServiceController.unbindTorService(context)
+            broadcastLogger.debug("Has been unbound")
+        } catch (e: IllegalArgumentException) {}
     }
-    override fun stopService() {
-        stopSelf()
-    }
-
-
-    ///////////////////////////////
-    /// TorServicePrefsListener ///
-    ///////////////////////////////
-    private val torServicePrefsListener by lazy { TorServicePrefsListener(this) }
-
-    override fun unregisterPrefsListener() {
-        torServicePrefsListener.unregister()
+    override fun onBind(intent: Intent?): IBinder? {
+        broadcastLogger.debug("Has been bound")
+        return torServiceBinder
     }
 
 
@@ -148,22 +153,53 @@ internal class TorService: BaseService() {
     }
 
 
+    //////////////////
+    /// Coroutines ///
+    //////////////////
+    private val supervisorJob = SupervisorJob()
+    private val scopeIO = CoroutineScope(Dispatchers.IO + supervisorJob)
+    private val scopeMain = CoroutineScope(Dispatchers.Main + supervisorJob)
+
+    override fun getScopeIO(): CoroutineScope {
+        return scopeIO
+    }
+    override fun getScopeMain(): CoroutineScope {
+        return scopeMain
+    }
+
+
+    //////////////////////////////
+    /// ServiceActionProcessor ///
+    //////////////////////////////
+    private val serviceActionProcessor by lazy { ServiceActionProcessor(this) }
+
+    override fun processIntent(serviceActionIntent: Intent) {
+        serviceActionProcessor.processIntent(serviceActionIntent)
+    }
+    override fun stopService() {
+        stopSelf()
+    }
+
+
     ///////////////////////////
     /// ServiceNotification ///
     ///////////////////////////
     private val serviceNotification = ServiceNotification.get()
 
-    override fun removeNotification() {
-        serviceNotification.remove()
-    }
-    override fun stopForegroundService(): ServiceNotification {
-        return serviceNotification.stopForeground(this)
-    }
     override fun addNotificationActions() {
         serviceNotification.addActions(this)
     }
+    override fun removeNotification() {
+        serviceNotification.remove()
+    }
     override fun removeNotificationActions() {
         serviceNotification.removeActions(this)
+    }
+    override fun startForegroundService(): ServiceNotification {
+        return serviceNotification.startForeground(this)
+    }
+    override fun stopForegroundService(): ServiceNotification {
+        return serviceNotification.stopForeground(this)
     }
     override fun updateNotificationContentText(string: String) {
         serviceNotification.updateContentText(string)
@@ -219,6 +255,11 @@ internal class TorService: BaseService() {
     override fun refreshBroadcastLoggersHasDebugLogsVar() {
         onionProxyManager.refreshBroadcastLoggersHasDebugLogsVar()
     }
+
+    @WorkerThread
+    override fun signalControlConnection(torControlCommand: String): Boolean {
+        return onionProxyManager.signalControlConnection(torControlCommand)
+    }
     @WorkerThread
     override suspend fun signalNewNym() {
         onionProxyManager.signalNewNym()
@@ -260,41 +301,32 @@ internal class TorService: BaseService() {
     }
 
 
-    ///////////////
-    /// Binding ///
-    ///////////////
-    private val torServiceBinder: TorServiceBinder by lazy { TorServiceBinder(this) }
+    ///////////////////////////////
+    /// TorServicePrefsListener ///
+    ///////////////////////////////
+    private var torServicePrefsListener: TorServicePrefsListener? = null
 
-    override fun unbindService() {
-        try {
-            TorServiceController.unbindTorService(context)
-            broadcastLogger.debug("Service has been unbound")
-        } catch (e: IllegalArgumentException) {}
+    override fun registerPrefsListener() {
+        torServicePrefsListener?.unregister()
+        torServicePrefsListener = TorServicePrefsListener(this)
     }
-    override fun onBind(intent: Intent?): IBinder? {
-        broadcastLogger.debug("Service has been bound")
-        return torServiceBinder
+    override fun unregisterPrefsListener() {
+        torServicePrefsListener?.unregister()
+        torServicePrefsListener = null
     }
-
 
 
     override fun onCreate() {
         serviceNotification.buildNotification(this)
         broadcastLogger.notice("BuildConfig.DEBUG set to: $buildConfigDebug")
-        torServicePrefsListener.register()
+        registerPrefsListener()
     }
 
     override fun onDestroy() {
-        processIntent(Intent(ServiceAction.DESTROY))
-    }
-
-    override fun onLowMemory() {
-        broadcastLogger.warn("Low memory!!!")
-    }
-
-    override fun onTrimMemory(level: Int) {
-        if (level == ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN)
-            broadcastLogger.debug("Application sent to background")
+        unregisterPrefsListener()
+        unregisterBackgroundKeepAlive()
+        removeNotification()
+        supervisorJob.cancel()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -320,7 +352,7 @@ internal class TorService: BaseService() {
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
-        serviceNotification.startForeground(this)
+        startForegroundService()
         broadcastLogger.debug("Task has been removed")
         processIntent(Intent(ServiceAction.STOP))
     }

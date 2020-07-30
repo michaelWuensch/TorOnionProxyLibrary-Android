@@ -74,7 +74,6 @@ import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import java.io.File
 import java.io.IOException
@@ -120,25 +119,17 @@ internal abstract class BaseService: Service() {
     abstract val context: Context
 
 
-    //////////////////
-    /// Coroutines ///
-    //////////////////
-    abstract fun cancelSupervisorJob()
-    abstract fun getScopeMain(): CoroutineScope
-    abstract fun getDispatcherIO(): CoroutineDispatcher
+    ///////////////////////////
+    /// BackgroundKeepAlive ///
+    ///////////////////////////
+    abstract fun registerBackgroundKeepAlive()
+    abstract fun unregisterBackgroundKeepAlive()
 
 
-    //////////////////////////////
-    /// ServiceActionProcessor ///
-    //////////////////////////////
-    abstract fun processIntent(serviceActionIntent: Intent)
-    abstract fun stopService()
-
-
-    ///////////////////////////////
-    /// TorServicePrefsListener ///
-    ///////////////////////////////
-    abstract fun unregisterPrefsListener()
+    ///////////////
+    /// Binding ///
+    ///////////////
+    abstract fun unbindService()
 
 
     /////////////////////////
@@ -148,13 +139,28 @@ internal abstract class BaseService: Service() {
     abstract fun unregisterReceiver()
 
 
+    //////////////////
+    /// Coroutines ///
+    //////////////////
+    abstract fun getScopeIO(): CoroutineScope
+    abstract fun getScopeMain(): CoroutineScope
+
+
+    //////////////////////////////
+    /// ServiceActionProcessor ///
+    //////////////////////////////
+    abstract fun processIntent(serviceActionIntent: Intent)
+    abstract fun stopService()
+
+
     ///////////////////////////
     /// ServiceNotification ///
     ///////////////////////////
-    abstract fun removeNotification()
-    abstract fun stopForegroundService(): ServiceNotification
     abstract fun addNotificationActions()
+    abstract fun removeNotification()
     abstract fun removeNotificationActions()
+    abstract fun startForegroundService(): ServiceNotification
+    abstract fun stopForegroundService(): ServiceNotification
     abstract fun updateNotificationContentText(string: String)
     abstract fun updateNotificationContentTitle(title: String)
     abstract fun updateNotificationIcon(@NotificationImage notificationImage: Int)
@@ -172,6 +178,8 @@ internal abstract class BaseService: Service() {
     abstract fun isTorOff(): Boolean
     abstract fun refreshBroadcastLoggersHasDebugLogsVar()
     @WorkerThread
+    abstract fun signalControlConnection(torControlCommand: String): Boolean
+    @WorkerThread
     abstract suspend fun signalNewNym()
     @WorkerThread
     abstract fun startTor()
@@ -179,8 +187,9 @@ internal abstract class BaseService: Service() {
     abstract fun stopTor()
 
 
-    ///////////////
-    /// Binding ///
-    ///////////////
-    abstract fun unbindService()
+    ///////////////////////////////
+    /// TorServicePrefsListener ///
+    ///////////////////////////////
+    abstract fun registerPrefsListener()
+    abstract fun unregisterPrefsListener()
 }
