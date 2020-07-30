@@ -71,7 +71,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.service.ServiceActionProcessor
+import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import java.math.BigInteger

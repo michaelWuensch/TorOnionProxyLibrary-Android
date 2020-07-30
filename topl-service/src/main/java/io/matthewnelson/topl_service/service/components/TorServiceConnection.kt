@@ -64,7 +64,7 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.topl_service.service
+package io.matthewnelson.topl_service.service.components
 
 import android.content.ComponentName
 import android.content.ServiceConnection

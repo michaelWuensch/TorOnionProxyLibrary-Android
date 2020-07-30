@@ -64,10 +64,11 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.topl_service.service
+package io.matthewnelson.topl_service.service.components
 
 import android.content.Intent
 import android.os.Binder
+import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 
 internal class TorServiceBinder(private val torService: BaseService): Binder() {

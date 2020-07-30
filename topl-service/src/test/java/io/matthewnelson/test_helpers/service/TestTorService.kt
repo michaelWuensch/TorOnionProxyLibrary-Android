@@ -18,8 +18,8 @@ import io.matthewnelson.topl_service.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.service.ServiceActionProcessor
-import io.matthewnelson.topl_service.service.TorServiceBinder
+import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
+import io.matthewnelson.topl_service.service.components.TorServiceBinder
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import kotlinx.coroutines.*
