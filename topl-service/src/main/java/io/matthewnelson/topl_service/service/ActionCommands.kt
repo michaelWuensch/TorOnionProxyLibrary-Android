@@ -93,7 +93,7 @@ internal sealed class ActionCommands {
         abstract val commands: Array<@ActionCommand String>
 
         /**
-         * For every ActionCommand.DELAY within [commands], a value will be consumed
+         * For every [ActionCommand.DELAY] within [commands], a value will be consumed
          * when executing it.
          *
          * Override this to define the values for each DELAY call.
@@ -113,14 +113,6 @@ internal sealed class ActionCommands {
                 0L
             }
         }
-    }
-
-    class Destroy(override val serviceAction: String) : ServiceActionObject() {
-        override val commands: Array<String>
-            get() = arrayOf(
-                ActionCommand.STOP_TOR,
-                ActionCommand.DESTROY
-            )
     }
 
     class NewId(override val serviceAction: String) : ServiceActionObject() {
@@ -172,9 +164,6 @@ internal sealed class ActionCommands {
         @Throws(IllegalArgumentException::class)
         fun get(intent: Intent): ServiceActionObject {
             return when (val action = intent.action) {
-                ServiceAction.DESTROY -> {
-                    Destroy(action)
-                }
                 ServiceAction.NEW_ID -> {
                     NewId(action)
                 }

@@ -99,10 +99,6 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
 
     private fun processActionObject(serviceActionObject: ServiceActionObject) {
         when (serviceActionObject) {
-            is ActionCommands.Destroy -> {
-                torService.unregisterReceiver()
-                clearActionQueue()
-            }
             is ActionCommands.Stop -> {
                 torService.unregisterReceiver()
                 clearActionQueue()
@@ -168,17 +164,13 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
     /// Queue Processing ///
     ////////////////////////
     private lateinit var processQueueJob: Job
-    private val scopeMain: CoroutineScope
-        get() = torService.getScopeMain()
-    private val dispatcherIO: CoroutineDispatcher
-        get() = torService.getDispatcherIO()
 
     /**
      * Processes the [actionQueue].
      * */
     private fun launchProcessQueueJob() {
         if (::processQueueJob.isInitialized && processQueueJob.isActive) return
-        processQueueJob = scopeMain.launch(dispatcherIO) {
+        processQueueJob = torService.getScopeIO().launch {
             broadcastDebugObjectDetailsMsg("Processing Queue: ", this)
 
             while (actionQueue.isNotEmpty()) {
@@ -216,12 +208,6 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
             ActionCommand.DELAY -> {
                 if (delayLength > 0L)
                     delay(delayLength)
-            }
-            ActionCommand.DESTROY -> {
-                torService.unregisterPrefsListener()
-                torService.removeNotification()
-                delay(300L)
-                torService.cancelSupervisorJob()
             }
             ActionCommand.NEW_ID -> {
                 torService.signalNewNym()

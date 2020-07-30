@@ -84,13 +84,11 @@ internal class TorServiceBinder(private val torService: BaseService): Binder() {
         if (action != null && action.contains(ServiceAction.SERVICE_ACTION)) {
 
             when (action) {
-                ServiceAction.DESTROY,
                 ServiceAction.NEW_ID,
                 ServiceAction.RESTART_TOR,
                 ServiceAction.START,
                 ServiceAction.STOP -> {
                     // Do not accept the above ServiceActions through use of this method.
-                    // DESTROY = internal Service use only (for onDestroy)
                     // NEW_ID, RESTART_TOR, STOP = via BroadcastReceiver
                     // START = to start TorService
                     throwIllegalArgument(action)
