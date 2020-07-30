@@ -88,16 +88,13 @@ internal class TorServicePrefsListener(
     private val torServicePrefs = TorServicePrefs(torService.context)
     private val broadcastLogger = torService.getBroadcastLogger(TorServicePrefsListener::class.java)
 
-    /**
-     * Called from [TorService.onCreate]
-     * */
-    fun register() {
+    init {
         torServicePrefs.registerListener(this)
         broadcastLogger.debug("Listener registered")
     }
 
     /**
-     * Called from [ServiceActionProcessor.processActionCommand]'s DESTROY block.
+     * Called from [TorService.onDestroy].
      * */
     fun unregister() {
         torServicePrefs.unregisterListener(this)
