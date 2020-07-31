@@ -356,14 +356,7 @@ class TorServiceController private constructor(): ServiceConsts() {
         fun startTor() {
             if (!::appContext.isInitialized)
                 throw builderDotBuildNotCalledException()
-            startTor(TorService::class.java, TorService.torServiceConnection)
-        }
-
-        internal fun startTor(clazz: Class<*>, serviceConn: BaseServiceConnection) {
-            val startServiceIntent = Intent(appContext, clazz)
-            startServiceIntent.action = ServiceAction.START
-            appContext.startService(startServiceIntent)
-            BaseService.bindService(appContext, serviceConn, clazz)
+            BaseService.startService(appContext, TorService::class.java, TorService.torServiceConnection)
         }
 
         /**

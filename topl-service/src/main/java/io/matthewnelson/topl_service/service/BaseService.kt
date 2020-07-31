@@ -72,6 +72,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
+import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.components.BaseServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts
@@ -114,8 +115,14 @@ internal abstract class BaseService: Service() {
             context.getSharedPreferences("TorServiceLocalPrefs", Context.MODE_PRIVATE)
 
         //////////////////////
-        /// ServiceBinding ///
+        /// ServiceStartup ///
         //////////////////////
+        fun startService(context: Context, clazz: Class<*>, serviceConn: BaseServiceConnection) {
+            val startServiceIntent = Intent(context.applicationContext, clazz)
+            startServiceIntent.action = ServiceConsts.ServiceAction.START
+            context.applicationContext.startService(startServiceIntent)
+            bindService(context.applicationContext, serviceConn, clazz)
+        }
         /**
          * Binds to the provided [Service] class using the provided [BaseServiceConnection]
          *
@@ -123,7 +130,7 @@ internal abstract class BaseService: Service() {
          * @param [serviceConn] The [BaseServiceConnection] to bind
          * @param [clazz] The [Service]'s class you wish to unbind
          * */
-        fun bindService(context: Context, serviceConn: BaseServiceConnection, clazz: Class<*>) {
+        private fun bindService(context: Context, serviceConn: BaseServiceConnection, clazz: Class<*>) {
             val bindingIntent = Intent(context.applicationContext, clazz)
             bindingIntent.action = ServiceConsts.ServiceAction.START
 
