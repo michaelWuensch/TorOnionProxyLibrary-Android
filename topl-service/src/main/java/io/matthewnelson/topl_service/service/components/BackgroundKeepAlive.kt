@@ -64,64 +64,113 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.topl_service.prefs
+package io.matthewnelson.topl_service.service.components
 
-import android.content.SharedPreferences
+import android.app.Activity
+import android.app.Application
+import android.os.Bundle
+import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.TorService
-import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyBoolean
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import net.freehaven.tor.control.TorControlCommands
 
 /**
- * Listens to [TorServicePrefs] for changes such that while Tor is running, it can
- * query [TorService.onionProxyManager] to have it updated immediately (if the setting doesn't
- * require a restart), as well as submit Actions to [ServiceActionProcessor] to be queued
- * for execution.
+ * This gets instantiated when the user sends the application to the recent apps's tray.
+ * It starts a heartbeat for Tor and cycles [TorService] between foreground and background
+ * to inhibit the OS from killing it due to being idle.
  *
- * @param [torService] To instantiate [TorServicePrefs]
+ * When a user sends the application to the recent app's tray:
+ *
+ *   - [TorService.onTrimMemory] - TRIM_MEMORY_UI_HIDDEN (when this gets instantiated)
+ *   - [onActivityStopped]
+ *   - [onActivitySaveInstanceState] <-- Where we pickup the activity in question.
+ *
+ * If the user returns the application to the foreground:
+ *
+ *   - [onActivityStarted] <-- Where we unregister and continue with our day.
+ *   - [onActivityResumed]
+ *
+ * When a user removes the application from the recent app's tray:
+ *
+ *   - [onActivityDestroyed] <-- Where we shutdown Tor, and then [TorService]
+ *
+ * @param [torService] [BaseService]
  * */
-internal class TorServicePrefsListener(
+internal class BackgroundKeepAlive(
     private val torService: BaseService
-): SharedPreferences.OnSharedPreferenceChangeListener {
+): Application.ActivityLifecycleCallbacks {
 
-    private val torServicePrefs = TorServicePrefs(torService.context)
-    private val broadcastLogger = torService.getBroadcastLogger(TorServicePrefsListener::class.java)
+    companion object {
+        var backgroundHeartbeatTime = 30_000L
+            private set
+        fun initialize(milliseconds: Long) {
+            backgroundHeartbeatTime = milliseconds
+        }
+    }
+
+    private val broadcastLogger = torService.getBroadcastLogger(BackgroundKeepAlive::class.java)
+    private val heartbeatJob: Job
 
     init {
-        torServicePrefs.registerListener(this)
-        broadcastLogger.debug("Listener registered")
-    }
+        (torService.context.applicationContext as Application)
+            .registerActivityLifecycleCallbacks(this)
 
-    /**
-     * Called from [TorService.onDestroy].
-     * */
-    fun unregister() {
-        torServicePrefs.unregisterListener(this)
-        broadcastLogger.debug("Listener unregistered")
-    }
+        broadcastLogger.debug("Has been registered")
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        if (!key.isNullOrEmpty()) {
-            broadcastLogger.debug("$key was modified")
-            when (key) {
-                PrefKeyBoolean.HAS_DEBUG_LOGS -> {
-                    // TODO: Think about doing something with local prefs such that it
-                    //  turns Debugging off at every application start automatically?
-                    //  .
-                    //  Especially necessary if I switch Tor's debug output location from
-                    //  SystemOut to log to a file (more secure).
-                    //  .
-                    //  Will need to create another class available to Library user
-                    //  strictly for Tor logs if logging to a file, such that they can
-                    //  easily query, read, and load them to views.
-                    //  Maybe a `TorDebugLogHelper` class?
-                    //  .
-                    //  Will need some way of automatically clearing old log files, too.
-                    if (!torService.isTorOff())
-                        torService.refreshBroadcastLoggersHasDebugLogsVar()
+        heartbeatJob = torService.getScopeIO().launch {
+            while (isActive) {
+                delay(backgroundHeartbeatTime)
+                if (isActive) {
+                    torService.startForegroundService().stopForeground(torService)
+                    if (torService.signalControlConnection(TorControlCommands.SIGNAL_HEARTBEAT)) {
+                        torService.registerReceiver()
+                        torService.addNotificationActions()
+                    }
                 }
             }
         }
     }
 
+    fun unregister() {
+        try {
+            (torService.context.applicationContext as Application)
+                .unregisterActivityLifecycleCallbacks(this)
+            heartbeatJob.cancel()
+            broadcastLogger.debug("Has been unregistered")
+        } catch (e: Exception) {
+            broadcastLogger.exception(e)
+        }
+    }
+
+    private fun broadcastLCE(activity: Activity, event: String) =
+        broadcastLogger.debug("${activity.javaClass.simpleName}@${activity.hashCode()} - $event")
+
+    // If destroyed -> task removed from recent apps tray
+    // If started/resumed -> task back in foreground
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
+
+    override fun onActivityStarted(activity: Activity) {
+        broadcastLCE(activity, "onActivityStarted")
+        torService.unregisterBackgroundKeepAlive()
+    }
+
+    override fun onActivityResumed(activity: Activity) {}
+
+    override fun onActivityPaused(activity: Activity) {}
+
+    override fun onActivityStopped(activity: Activity) {}
+
+    override fun onActivityDestroyed(activity: Activity) {
+        broadcastLCE(activity, "onActivityDestroyed")
+        // TorService.onTaskRemoved will handle the swap to foreground
+        torService.unregisterBackgroundKeepAlive()
+    }
+
+    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+        broadcastLCE(activity, "onActivitySaveInstanceState")
+    }
 }

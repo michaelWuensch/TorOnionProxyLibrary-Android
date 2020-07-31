@@ -70,7 +70,7 @@ import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.service.ServiceActionProcessor
+import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage

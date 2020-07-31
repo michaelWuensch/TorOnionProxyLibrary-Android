@@ -64,19 +64,18 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.topl_service.service
+package io.matthewnelson.topl_service.service.components
 
 import android.content.Intent
-import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.util.ServiceConsts.ActionCommand
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 
 /**
  * Facilitates mapping of a [ServiceAction] to an object which allows for individual command
- * execution by [io.matthewnelson.topl_service.service.ServiceActionProcessor] in a repeatable
- * manner. This allows for structured execution depending on the [ServiceAction] passed to
- * [TorService] via Intent, while still maintaining an easy way to interrupt coroutine command
- * execution for quickly responding to user actions.
+ * execution by [io.matthewnelson.topl_service.service.components.ServiceActionProcessor] in a
+ * repeatable manner. This allows for structured execution depending on the [ServiceAction] passed
+ * to [io.matthewnelson.topl_service.service.TorService] via Intent, while still maintaining an
+ * easy way to interrupt coroutine command execution for quickly responding to user actions.
  *
  * Think, running machine code to grok.
  * */
@@ -88,12 +87,12 @@ internal sealed class ActionCommands {
 
         /**
          * Individual [ActionCommand]'s to executed sequentially by
-         * [io.matthewnelson.topl_service.service.ServiceActionProcessor].
+         * [io.matthewnelson.topl_service.service.components.ServiceActionProcessor].
          * */
         abstract val commands: Array<@ActionCommand String>
 
         /**
-         * For every ActionCommand.DELAY within [commands], a value will be consumed
+         * For every [ActionCommand.DELAY] within [commands], a value will be consumed
          * when executing it.
          *
          * Override this to define the values for each DELAY call.
@@ -115,14 +114,6 @@ internal sealed class ActionCommands {
         }
     }
 
-    class Destroy(override val serviceAction: String) : ServiceActionObject() {
-        override val commands: Array<String>
-            get() = arrayOf(
-                ActionCommand.STOP_TOR,
-                ActionCommand.DESTROY
-            )
-    }
-
     class NewId(override val serviceAction: String) : ServiceActionObject() {
         override val commands: Array<String>
             get() = arrayOf(
@@ -138,7 +129,7 @@ internal sealed class ActionCommands {
                 ActionCommand.START_TOR
             )
         override val delayLengthQueue =
-            mutableListOf(TorServiceController.restartTorDelayTime)
+            mutableListOf(ServiceActionProcessor.restartTorDelayTime)
     }
 
     class Start(override val serviceAction: String) : ServiceActionObject() {
@@ -156,7 +147,7 @@ internal sealed class ActionCommands {
                 ActionCommand.STOP_SERVICE
             )
         override val delayLengthQueue =
-            mutableListOf(TorServiceController.stopServiceDelayTime)
+            mutableListOf(ServiceActionProcessor.stopServiceDelayTime)
     }
 
     class ServiceActionObjectGetter {
@@ -165,16 +156,13 @@ internal sealed class ActionCommands {
          * Processes an Intent by it's contained action and returns a
          * [ServiceActionObject] for the passed [ServiceAction]
          *
-         * @param [intent] The intent from [TorService.onStartCommand]
+         * @param [intent] The intent containing an appropriate [ServiceAction]
          * @return [ServiceActionObject] associated with the intent's action (a [ServiceAction])
          * @throws [IllegalArgumentException] if the intent's action isn't a [ServiceAction]
          * */
         @Throws(IllegalArgumentException::class)
         fun get(intent: Intent): ServiceActionObject {
             return when (val action = intent.action) {
-                ServiceAction.DESTROY -> {
-                    Destroy(action)
-                }
                 ServiceAction.NEW_ID -> {
                     NewId(action)
                 }

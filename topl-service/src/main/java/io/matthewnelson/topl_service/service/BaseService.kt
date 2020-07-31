@@ -66,15 +66,20 @@
  */
 package io.matthewnelson.topl_service.service
 
+import android.app.Application
 import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
+import io.matthewnelson.topl_core_base.TorConfigFiles
+import io.matthewnelson.topl_core_base.TorSettings
+import io.matthewnelson.topl_service.BuildConfig
 import io.matthewnelson.topl_service.notification.ServiceNotification
+import io.matthewnelson.topl_service.service.components.BaseServiceConnection
+import io.matthewnelson.topl_service.util.ServiceConsts
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import java.io.File
 import java.io.IOException
@@ -87,58 +92,106 @@ import java.io.IOException
 internal abstract class BaseService: Service() {
 
     companion object {
+        var application: Application? = null
+            private set
         var buildConfigVersionCode: Int = -1
             private set
-        var buildConfigDebug: Boolean? = null
+        var buildConfigDebug: Boolean = BuildConfig.DEBUG
             private set
-        lateinit var geoipAssetPath: String
+        var geoipAssetPath: String = ""
             private set
-        lateinit var geoip6AssetPath: String
+        var geoip6AssetPath: String = ""
             private set
+        lateinit var torConfigFiles: TorConfigFiles
+        lateinit var torSettings: TorSettings
 
         fun initialize(
+            application: Application,
             buildConfigVersionCode: Int,
             buildConfigDebug: Boolean,
             geoipAssetPath: String,
-            geoip6AssetPath: String
+            geoip6AssetPath: String,
+            torConfigFiles: TorConfigFiles,
+            torSettings: TorSettings
         ) {
+            this.application = application
             this.buildConfigVersionCode = buildConfigVersionCode
             this.buildConfigDebug = buildConfigDebug
             this.geoipAssetPath = geoipAssetPath
             this.geoip6AssetPath = geoip6AssetPath
+            this.torConfigFiles = torConfigFiles
+            this.torSettings = torSettings
         }
+
+        @Throws(RuntimeException::class)
+        fun getAppContext(): Context =
+            application?.applicationContext
+                ?: throw RuntimeException("Builder.build has not been called yet")
 
         // For things that can't be saved to TorServicePrefs, such as BuildConfig.VERSION_CODE
         fun getLocalPrefs(context: Context): SharedPreferences =
             context.getSharedPreferences("TorServiceLocalPrefs", Context.MODE_PRIVATE)
+
+        //////////////////////
+        /// ServiceStartup ///
+        //////////////////////
+        fun startService(context: Context, clazz: Class<*>, serviceConn: BaseServiceConnection) {
+            val startServiceIntent = Intent(context.applicationContext, clazz)
+            startServiceIntent.action = ServiceConsts.ServiceAction.START
+            context.applicationContext.startService(startServiceIntent)
+            bindService(context.applicationContext, serviceConn, clazz)
+        }
+        /**
+         * Binds to the provided [Service] class using the provided [BaseServiceConnection]
+         *
+         * @param [context] [Context]
+         * @param [serviceConn] The [BaseServiceConnection] to bind
+         * @param [clazz] The [Service]'s class you wish to unbind
+         * */
+        private fun bindService(context: Context, serviceConn: BaseServiceConnection, clazz: Class<*>) {
+            val bindingIntent = Intent(context.applicationContext, clazz)
+            bindingIntent.action = ServiceConsts.ServiceAction.START
+
+            context.applicationContext.bindService(
+                bindingIntent,
+                serviceConn,
+                Context.BIND_AUTO_CREATE
+            )
+        }
+
+        /**
+         * Unbinds [TorService] from the Application and clears the
+         * [BaseServiceConnection.serviceBinder] reference.
+         *
+         * @param [context] [Context]
+         * @param [serviceConn] The [BaseServiceConnection] to unbind
+         * @throws [IllegalArgumentException] If no binding exists for the provided [serviceConn]
+         * */
+        @Throws(IllegalArgumentException::class)
+        fun unbindService(context: Context, serviceConn: BaseServiceConnection) {
+            serviceConn.clearServiceBinderReference()
+            context.applicationContext.unbindService(serviceConn)
+        }
     }
 
     // All classes that interact with System APIs which require context to do something
     // call this in production (torService.context), such that in testing we can easily
     // swap it out without needing to start the Service and still get functionality for
-    // that component.
+    // the components that make TorService work.
     abstract val context: Context
 
 
-    //////////////////
-    /// Coroutines ///
-    //////////////////
-    abstract fun cancelSupervisorJob()
-    abstract fun getScopeMain(): CoroutineScope
-    abstract fun getDispatcherIO(): CoroutineDispatcher
+    ///////////////////////////
+    /// BackgroundKeepAlive ///
+    ///////////////////////////
+    abstract fun registerBackgroundKeepAlive()
+    abstract fun unregisterBackgroundKeepAlive()
 
 
-    //////////////////////////////
-    /// ServiceActionProcessor ///
-    //////////////////////////////
-    abstract fun processIntent(serviceActionIntent: Intent)
-    abstract fun stopService()
-
-
-    ///////////////////////////////
-    /// TorServicePrefsListener ///
-    ///////////////////////////////
-    abstract fun unregisterPrefsListener()
+    ///////////////
+    /// Binding ///
+    ///////////////
+    abstract fun unbindService()
 
 
     /////////////////////////
@@ -148,13 +201,28 @@ internal abstract class BaseService: Service() {
     abstract fun unregisterReceiver()
 
 
+    //////////////////
+    /// Coroutines ///
+    //////////////////
+    abstract fun getScopeIO(): CoroutineScope
+    abstract fun getScopeMain(): CoroutineScope
+
+
+    //////////////////////////////
+    /// ServiceActionProcessor ///
+    //////////////////////////////
+    abstract fun processIntent(serviceActionIntent: Intent)
+    abstract fun stopService()
+
+
     ///////////////////////////
     /// ServiceNotification ///
     ///////////////////////////
-    abstract fun removeNotification()
-    abstract fun stopForegroundService(): ServiceNotification
     abstract fun addNotificationActions()
+    abstract fun removeNotification()
     abstract fun removeNotificationActions()
+    abstract fun startForegroundService(): ServiceNotification
+    abstract fun stopForegroundService(): ServiceNotification
     abstract fun updateNotificationContentText(string: String)
     abstract fun updateNotificationContentTitle(title: String)
     abstract fun updateNotificationIcon(@NotificationImage notificationImage: Int)
@@ -172,6 +240,8 @@ internal abstract class BaseService: Service() {
     abstract fun isTorOff(): Boolean
     abstract fun refreshBroadcastLoggersHasDebugLogsVar()
     @WorkerThread
+    abstract fun signalControlConnection(torControlCommand: String): Boolean
+    @WorkerThread
     abstract suspend fun signalNewNym()
     @WorkerThread
     abstract fun startTor()
@@ -179,8 +249,9 @@ internal abstract class BaseService: Service() {
     abstract fun stopTor()
 
 
-    ///////////////
-    /// Binding ///
-    ///////////////
-    abstract fun unbindService()
+    ///////////////////////////////
+    /// TorServicePrefsListener ///
+    ///////////////////////////////
+    abstract fun registerPrefsListener()
+    abstract fun unregisterPrefsListener()
 }

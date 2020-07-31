@@ -68,7 +68,6 @@ package io.matthewnelson.topl_service
 
 import android.app.Application
 import android.content.Context
-import android.content.Intent
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_core_base.EventBroadcaster
@@ -76,7 +75,9 @@ import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.service.TorServiceConnection
+import io.matthewnelson.topl_service.service.components.BackgroundKeepAlive
+import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
+import io.matthewnelson.topl_service.service.components.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts
 
 class TorServiceController private constructor(): ServiceConsts() {
@@ -103,7 +104,7 @@ class TorServiceController private constructor(): ServiceConsts() {
      *
      * You can see how the [TorSettings] sent here are used in [TorService] by looking at
      * [io.matthewnelson.topl_service.onionproxy.ServiceTorSettings] and
-     * [TorService.initTOPLCore].
+     * [TorService.onionProxyManager].
      *
      * @param [application] [Application], for obtaining context
      * @param [torServiceNotificationBuilder] The [ServiceNotification.Builder] for
@@ -128,31 +129,32 @@ class TorServiceController private constructor(): ServiceConsts() {
         private val geoip6AssetPath: String
     ) {
 
-        private lateinit var appEventBroadcaster: EventBroadcaster
-        private var restartTorDelayTime = Companion.restartTorDelayTime
-        private var stopServiceDelayTime = Companion.stopServiceDelayTime
-        private lateinit var torConfigFiles: TorConfigFiles
+        private var appEventBroadcaster: EventBroadcaster? = Companion.appEventBroadcaster
+        private var backgroundHeartbeatTime = BackgroundKeepAlive.backgroundHeartbeatTime
+        private var restartTorDelayTime = ServiceActionProcessor.restartTorDelayTime
+        private var stopServiceDelayTime = ServiceActionProcessor.stopServiceDelayTime
+        private var torConfigFiles: TorConfigFiles? = null
 
         // On published releases of this Library, this value will **always** be `false`.
-        private var buildConfigDebug = BuildConfig.DEBUG
+        private var buildConfigDebug = BaseService.buildConfigDebug
 
         /**
          * Default is set to 500ms, (what this method adds time to).
          *
          * A slight delay is required when starting and stopping Tor to allow the [Process]
-         * for which it is running in to settle. This method adds time to the the cautionary
+         * for which it is running in to settle. This method adds time to the cautionary
          * delay between execution of stopTor and startTor, which are the individual calls
          * executed when using the [restartTor] method.
          *
          * The call to [restartTor] executes individual commands to:
          *
-         *   - stop tor + stop tor delay (300ms)
-         *   - delay <---------------------- what this method will modify
-         *   - start tor + start tor delay (300ms)
+         *   - stop tor + delay (300ms)
+         *   - delay (500ms) <---------------------- what this method will add to
+         *   - start tor + delay (300ms)
          *
          * @param [milliseconds] A value greater than 0
-         * @see [io.matthewnelson.topl_service.service.ActionCommands.RestartTor]
-         * @see [io.matthewnelson.topl_service.service.ServiceActionProcessor.processActionCommand]
+         * @see [io.matthewnelson.topl_service.service.components.ActionCommands.RestartTor]
+         * @see [io.matthewnelson.topl_service.service.components.ServiceActionProcessor.processActionCommand]
          * */
         fun addTimeToRestartTorDelay(milliseconds: Long): Builder {
             if (milliseconds > 0L)
@@ -164,22 +166,44 @@ class TorServiceController private constructor(): ServiceConsts() {
          * Default is set to 100ms (what this method adds time to).
          *
          * A slight delay is required when starting and stopping Tor to allow the [Process]
-         * for which it is running in to settle. This method adds time to the the cautionary
+         * for which it is running in to settle. This method adds time to the cautionary
          * delay between execution of stopping Tor and stopping [TorService].
          *
          * The call to [stopTor] executes individual commands to:
          *
-         *   - stop tor + stop tor delay (300ms)
-         *   - delay <---------------------- what this method will modify
+         *   - stop tor + delay (300ms)
+         *   - delay (100ms) <---------------------- what this method will add to
          *   - stop service
          *
          * @param [milliseconds] A value greater than 0
-         * @see [io.matthewnelson.topl_service.service.ActionCommands.Stop]
-         * @see [io.matthewnelson.topl_service.service.ServiceActionProcessor.processActionCommand]
+         * @see [io.matthewnelson.topl_service.service.components.ActionCommands.Stop]
+         * @see [io.matthewnelson.topl_service.service.components.ServiceActionProcessor.processActionCommand]
          * */
         fun addTimeToStopServiceDelay(milliseconds: Long): Builder {
             if (milliseconds > 0L)
                 this.stopServiceDelayTime += milliseconds
+            return this
+        }
+
+        /**
+         * Default is set to 30_000ms
+         *
+         * When the user sends your application to the background (recent app's tray),
+         * [io.matthewnelson.topl_service.service.components.BackgroundKeepAlive] begins
+         * a heartbeat for Tor, as well as cycling [TorService] between foreground and
+         * background as to keep the OS from killing things due to being idle for too long.
+         *
+         * If the user returns the application to the foreground, the heartbeat and
+         * foreground/background cycling stops.
+         *
+         * This method sets the time between each heartbeat.
+         *
+         * @param [milliseconds] A Long between 15_000 and 45_000. Will fallback to default
+         *   value if not between that range
+         * */
+        fun setBackgroundHeartbeatTime(milliseconds: Long): Builder {
+            if (milliseconds in 15_000L..45_000L)
+                backgroundHeartbeatTime = milliseconds
             return this
         }
 
@@ -242,37 +266,28 @@ class TorServiceController private constructor(): ServiceConsts() {
          * */
         fun build() {
 
-            appContext = application.applicationContext
-
-            // If TorSettings has been initialized already, return as to not
-            // overwrite things.
+            // If `BaseService.application` has been initialized
+            // already, return as to not overwrite things.
             try {
-                getTorSettings()
+                BaseService.getAppContext()
                 return
             } catch (e: RuntimeException) {}
 
-            torServiceNotificationBuilder.build()
-
-            Companion.restartTorDelayTime = this.restartTorDelayTime
-            Companion.stopServiceDelayTime = this.stopServiceDelayTime
-
-            if (::appEventBroadcaster.isInitialized)
-                Companion.appEventBroadcaster = this.appEventBroadcaster
-
-            Companion.torSettings = torSettings
-            Companion.torConfigFiles =
-                if (::torConfigFiles.isInitialized)
-                    torConfigFiles
-                else
-                    TorConfigFiles.createConfig(application.applicationContext)
-
             BaseService.initialize(
+                application,
                 buildConfigVersionCode,
                 buildConfigDebug,
                 geoipAssetPath,
-                geoip6AssetPath
+                geoip6AssetPath,
+                torConfigFiles ?: TorConfigFiles.createConfig(application.applicationContext),
+                torSettings
             )
+            BackgroundKeepAlive.initialize(backgroundHeartbeatTime)
+            ServiceActionProcessor.initialize(restartTorDelayTime, stopServiceDelayTime)
 
+            Companion.appEventBroadcaster = this.appEventBroadcaster
+
+            torServiceNotificationBuilder.build()
             ServiceNotification.get().setupNotificationChannel(application.applicationContext)
         }
     }
@@ -281,17 +296,8 @@ class TorServiceController private constructor(): ServiceConsts() {
      * Where everything needed to interact with [TorService] resides.
      * */
     companion object {
-
-        private lateinit var appContext: Context
         var appEventBroadcaster: EventBroadcaster? = null
             private set
-        internal var restartTorDelayTime = 500L
-        internal var stopServiceDelayTime = 100L
-        private lateinit var torConfigFiles: TorConfigFiles
-        private lateinit var torSettings: TorSettings
-
-        private fun builderDotBuildNotCalledException(): RuntimeException =
-            RuntimeException("Builder.build has not been called yet")
 
         /**
          * Get the [TorConfigFiles] that have been set after calling [Builder.build]
@@ -300,11 +306,10 @@ class TorServiceController private constructor(): ServiceConsts() {
          * @throws [RuntimeException] if called before [Builder.build]
          * */
         @Throws(RuntimeException::class)
-        fun getTorConfigFiles(): TorConfigFiles =
-            if (::torConfigFiles.isInitialized)
-                torConfigFiles
-            else
-                throw builderDotBuildNotCalledException()
+        fun getTorConfigFiles(): TorConfigFiles {
+            BaseService.getAppContext()
+            return BaseService.torConfigFiles
+        }
 
         /**
          * Get the [TorSettings] that have been set after calling [Builder.build]. These are
@@ -314,11 +319,10 @@ class TorServiceController private constructor(): ServiceConsts() {
          * @throws [RuntimeException] if called before [Builder.build]
          * */
         @Throws(RuntimeException::class)
-        fun getTorSettings(): TorSettings =
-            if (::torSettings.isInitialized)
-                torSettings
-            else
-                throw builderDotBuildNotCalledException()
+        fun getTorSettings(): TorSettings {
+            BaseService.getAppContext()
+            return BaseService.torSettings
+        }
 
         /**
          * Starts [TorService] and then Tor. You can call this as much as you want. If
@@ -327,15 +331,12 @@ class TorServiceController private constructor(): ServiceConsts() {
          * @throws [RuntimeException] if called before [Builder.build]
          * */
         @Throws(RuntimeException::class)
-        fun startTor() {
-            if (!::appContext.isInitialized)
-                throw builderDotBuildNotCalledException()
-
-            val startServiceIntent = Intent(appContext, TorService::class.java)
-            startServiceIntent.action = ServiceAction.START
-            appContext.startService(startServiceIntent)
-            bindTorService(appContext)
-        }
+        fun startTor() =
+            BaseService.startService(
+                BaseService.getAppContext(),
+                TorService::class.java,
+                TorServiceConnection.torServiceConnection
+            )
 
         /**
          * Stops [TorService].
@@ -364,56 +365,8 @@ class TorServiceController private constructor(): ServiceConsts() {
         fun newIdentity() =
             sendBroadcast(ServiceAction.NEW_ID)
 
-        /**
-         * Adding a StringExtra to the Intent by passing a value for [extrasString] will
-         * always use the [action] as the key for retrieving it.
-         *
-         * @param [action] A [ServiceConsts.ServiceAction] to be processed by [TorService]
-         * @param [extrasString] To be included in the intent.
-         * @throws [RuntimeException] if called before [Builder.build]
-         * */
         @Throws(RuntimeException::class)
-        private fun sendBroadcast(@ServiceAction action: String, extrasString: String? = null) {
-            if (!::appContext.isInitialized)
-                throw builderDotBuildNotCalledException()
-
-            val broadcastIntent = Intent(TorServiceReceiver.SERVICE_INTENT_FILTER)
-            broadcastIntent.putExtra(TorServiceReceiver.SERVICE_INTENT_FILTER, action)
-            broadcastIntent.setPackage(appContext.packageName)
-
-            if (extrasString != null)
-                broadcastIntent.putExtra(action, extrasString)
-
-            appContext.sendBroadcast(broadcastIntent)
-        }
-
-
-        /////////////////////
-        /// ServiceBinder ///
-        /////////////////////
-        private val torServiceConnection = TorServiceConnection()
-
-        private fun bindTorService(context: Context) {
-            val bindingIntent = Intent(context.applicationContext, TorService::class.java)
-            bindingIntent.action = ServiceAction.START
-
-            context.applicationContext.bindService(
-                bindingIntent,
-                torServiceConnection,
-                Context.BIND_AUTO_CREATE
-            )
-        }
-
-        /**
-         * Unbinds [TorService] from the Application.
-         *
-         * @param [context]
-         * @throws [IllegalArgumentException] if no Service is bound (has already been unbound)
-         * */
-        @Throws(IllegalArgumentException::class)
-        internal fun unbindTorService(context: Context) {
-            torServiceConnection.clearServiceBinderReference()
-            context.applicationContext.unbindService(torServiceConnection)
-        }
+        private fun sendBroadcast(@ServiceAction action: String) =
+            TorServiceReceiver.sendBroadcast(BaseService.getAppContext(), action, null)
     }
 }

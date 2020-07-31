@@ -212,7 +212,6 @@ abstract class ServiceConsts: BaseConsts() {
     //////////////////////
     @Target(AnnotationTarget.CLASS, AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.TYPE)
     @StringDef(
-        ServiceAction.DESTROY,
         ServiceAction.NEW_ID,
         ServiceAction.RESTART_TOR,
         ServiceAction.START,
@@ -222,7 +221,6 @@ abstract class ServiceConsts: BaseConsts() {
     internal annotation class ServiceAction {
         companion object {
             const val SERVICE_ACTION = "ServiceAction_"
-            const val DESTROY = "${SERVICE_ACTION}DESTROY"
             const val NEW_ID = "${SERVICE_ACTION}NEW_ID"
             const val RESTART_TOR = "${SERVICE_ACTION}RESTART_TOR"
             const val START = "${SERVICE_ACTION}START"
@@ -237,7 +235,6 @@ abstract class ServiceConsts: BaseConsts() {
     @Target(AnnotationTarget.TYPE, AnnotationTarget.CLASS, AnnotationTarget.VALUE_PARAMETER)
     @StringDef(
         ActionCommand.DELAY,
-        ActionCommand.DESTROY,
         ActionCommand.NEW_ID,
         ActionCommand.START_TOR,
         ActionCommand.STOP_SERVICE,
@@ -248,7 +245,6 @@ abstract class ServiceConsts: BaseConsts() {
         companion object {
             private const val ACTION_COMMAND = "ActionCommand_"
             const val DELAY = "${ACTION_COMMAND}DELAY"
-            const val DESTROY = "${ACTION_COMMAND}DESTROY"
             const val NEW_ID = "${ACTION_COMMAND}NEW_ID"
             const val START_TOR = "${ACTION_COMMAND}START_TOR"
             const val STOP_SERVICE = "${ACTION_COMMAND}STOP_SERVICE"

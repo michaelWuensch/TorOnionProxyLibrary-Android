@@ -64,38 +64,27 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.topl_service.service
+package io.matthewnelson.topl_service.service.components
 
 import android.content.ComponentName
-import android.content.ServiceConnection
 import android.os.IBinder
 
-internal class TorServiceConnection: ServiceConnection {
+internal class TorServiceConnection: BaseServiceConnection() {
 
-    @Volatile
-    var serviceBinder: TorServiceBinder? = null
-        private set
-
-    /**
-     * Sets the reference to [TorServiceBinder] to `null` because
-     * [onServiceDisconnected] is not always called on disconnect, as the name
-     * suggests.
-     * */
-    fun clearServiceBinderReference() {
-        serviceBinder = null
+    companion object {
+        val torServiceConnection = TorServiceConnection()
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
         // TODO: Implement logic for detecting undesired calls to this method (which
         //  is primarily when this gets fired off).
-        serviceBinder = null
+        clearServiceBinderReference()
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        serviceBinder = if (service != null)
-            service as TorServiceBinder
+        if (service != null)
+            setServiceBinder(service as TorServiceBinder)
         else
-            null
+            clearServiceBinderReference()
     }
-
 }

@@ -68,6 +68,7 @@ package io.matthewnelson.sampleapp
 
 import android.app.Application
 import android.content.Context
+import android.os.Process
 import androidx.core.app.NotificationCompat
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_service.TorServiceController
@@ -82,6 +83,11 @@ class App: Application() {
     override fun onCreate() {
         super.onCreate()
         setupTorServices(this, TorConfigFiles.createConfig(this))
+        TorServiceController.appEventBroadcaster?.let {
+            (it as MyEventBroadcaster).broadcastLogMessage(
+                "SampleApp|Application|Process ID: ${Process.myPid()}"
+            )
+        }
     }
 
     private fun generateTorServiceNotificationBuilder(): ServiceNotification.Builder {
@@ -131,6 +137,7 @@ class App: Application() {
         )
             .addTimeToRestartTorDelay(milliseconds = 100L)
             .addTimeToStopServiceDelay(milliseconds = 100L)
+            .setBackgroundHeartbeatTime(milliseconds = 30_000L)
             .setBuildConfigDebug(buildConfigDebug = BuildConfig.DEBUG)
 
             // Can instantiate directly here then access it from

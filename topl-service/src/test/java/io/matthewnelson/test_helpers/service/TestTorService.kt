@@ -18,8 +18,8 @@ import io.matthewnelson.topl_service.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.service.ServiceActionProcessor
-import io.matthewnelson.topl_service.service.TorServiceBinder
+import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
+import io.matthewnelson.topl_service.service.components.TorServiceBinder
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import kotlinx.coroutines.*
@@ -31,8 +31,50 @@ import java.lang.reflect.InvocationTargetException
 
 internal class TestTorService(
     override val context: Context,
-    private val dispatcher: CoroutineDispatcher
+    dispatcher: CoroutineDispatcher
 ): BaseService() {
+
+
+    ///////////////////////////
+    /// BackgroundKeepAlive ///
+    ///////////////////////////
+    override fun registerBackgroundKeepAlive() {
+
+    }
+    override fun unregisterBackgroundKeepAlive() {
+
+    }
+
+
+    ///////////////
+    /// Binding ///
+    ///////////////
+    val torServiceBinder: TorServiceBinder by lazy { TorServiceBinder(this) }
+
+    @Volatile
+    var serviceIsBound = false
+        private set
+
+    override fun unbindService() {
+        serviceIsBound = false
+    }
+    override fun onBind(intent: Intent?): IBinder? {
+        serviceIsBound = true
+        return torServiceBinder
+    }
+
+
+    /////////////////////////
+    /// BroadcastReceiver ///
+    /////////////////////////
+    val torServiceReceiver by lazy { TorServiceReceiver(this) }
+
+    override fun registerReceiver() {
+        torServiceReceiver.register()
+    }
+    override fun unregisterReceiver() {
+        torServiceReceiver.unregister()
+    }
 
 
     //////////////////
@@ -42,16 +84,13 @@ internal class TestTorService(
     @ExperimentalCoroutinesApi
     val testCoroutineScope = TestCoroutineScope(dispatcher + supervisorJob)
 
-    override fun cancelSupervisorJob() {
-        supervisorJob.cancel()
+    @ExperimentalCoroutinesApi
+    override fun getScopeIO(): CoroutineScope {
+        return testCoroutineScope
     }
     @ExperimentalCoroutinesApi
     override fun getScopeMain(): CoroutineScope {
         return testCoroutineScope
-    }
-    @ExperimentalCoroutinesApi
-    override fun getDispatcherIO(): CoroutineDispatcher {
-        return dispatcher
     }
 
 
@@ -70,7 +109,7 @@ internal class TestTorService(
 
     /**
      * In production, this is where `stopSelf()` is called. Need to decouple from
-     * the thread it is called on so that funcitonality of the [ServiceActionProcessor]
+     * the thread it is called on so that functionality of the [ServiceActionProcessor]
      * is simulated properly in that it will stop processing the queue and the Coroutine
      * Job will move to `complete`.
      * */
@@ -81,54 +120,25 @@ internal class TestTorService(
     }
 
 
-    ///////////////////////////////
-    /// TorServicePrefsListener ///
-    ///////////////////////////////
-    val torServicePrefsListener by lazy { TorServicePrefsListener(this) }
-
-    @Volatile
-    var torServicePrefsListenerIsRegistered = false
-        private set
-
-    override fun unregisterPrefsListener() {
-        torServicePrefsListener.unregister()
-        torServicePrefsListenerIsRegistered = false
-    }
-    private fun registerPrefsListener() {
-        torServicePrefsListener.register()
-        torServicePrefsListenerIsRegistered = true
-    }
-
-
-    /////////////////////////
-    /// BroadcastReceiver ///
-    /////////////////////////
-    val torServiceReceiver by lazy { TorServiceReceiver(this) }
-
-    override fun registerReceiver() {
-        torServiceReceiver.register()
-    }
-    override fun unregisterReceiver() {
-        torServiceReceiver.unregister()
-    }
-
-
     ///////////////////////////
     /// ServiceNotification ///
     ///////////////////////////
     val serviceNotification = ServiceNotification.get()
 
-    override fun removeNotification() {
-        serviceNotification.remove()
-    }
-    override fun stopForegroundService(): ServiceNotification {
-        return serviceNotification.stopForeground(this)
-    }
     override fun addNotificationActions() {
         serviceNotification.addActions(this)
     }
+    override fun removeNotification() {
+        serviceNotification.remove()
+    }
     override fun removeNotificationActions() {
         serviceNotification.removeActions(this)
+    }
+    override fun startForegroundService(): ServiceNotification {
+        return serviceNotification.startForeground(this)
+    }
+    override fun stopForegroundService(): ServiceNotification {
+        return serviceNotification.stopForeground(this)
     }
     override fun updateNotificationContentText(string: String) {
         serviceNotification.updateContentText(string)
@@ -210,12 +220,15 @@ internal class TestTorService(
         )
         delay(1000L)
     }
+    override fun signalControlConnection(torControlCommand: String): Boolean {
+        return true
+    }
     @WorkerThread
     override fun startTor() {
         simulateStart()
     }
     @ExperimentalCoroutinesApi
-    private fun simulateStart() = getScopeMain().launch {
+    private fun simulateStart() = getScopeIO().launch {
         try {
             onionProxyManager.setup()
             generateTorrcFile()
@@ -257,21 +270,25 @@ internal class TestTorService(
     }
 
 
-    ///////////////
-    /// Binding ///
-    ///////////////
-    val torServiceBinder: TorServiceBinder by lazy { TorServiceBinder(this) }
-
-    @Volatile
-    var serviceIsBound = false
+    ///////////////////////////////
+    /// TorServicePrefsListener ///
+    ///////////////////////////////
+    var torServicePrefsListener: TorServicePrefsListener? = null
         private set
 
-    override fun unbindService() {
-        serviceIsBound = false
+    @Volatile
+    var torServicePrefsListenerIsRegistered = false
+        private set
+
+    override fun registerPrefsListener() {
+        torServicePrefsListener?.unregister()
+        torServicePrefsListener = TorServicePrefsListener(this)
+        torServicePrefsListenerIsRegistered = true
     }
-    override fun onBind(intent: Intent?): IBinder? {
-        serviceIsBound = true
-        return torServiceBinder
+    override fun unregisterPrefsListener() {
+        torServicePrefsListener?.unregister()
+        torServicePrefsListener = null
+        torServicePrefsListenerIsRegistered = false
     }
 
 
@@ -282,7 +299,7 @@ internal class TestTorService(
     }
 
     override fun onDestroy() {
-        processIntent(Intent(ServiceAction.DESTROY))
+//        processIntent(Intent(ServiceAction.DESTROY))
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
