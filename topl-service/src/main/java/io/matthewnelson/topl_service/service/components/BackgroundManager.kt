@@ -69,7 +69,6 @@ package io.matthewnelson.topl_service.service.components
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
-import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.TorService
 import kotlinx.coroutines.Job
@@ -96,23 +95,23 @@ import net.freehaven.tor.control.TorControlCommands
  *
  * When a user removes the application from the recent app's tray:
  *
- *   - [onActivityDestroyed] <-- Where we shutdown Tor, and then [TorService]
+ *   - [onActivityDestroyed] <-- Where we shutdown Tor, and then stop [TorService]
  *
  * @param [torService] [BaseService]
  * */
-internal class BackgroundKeepAlive(
+class BackgroundManager internal constructor(
     private val torService: BaseService
 ): Application.ActivityLifecycleCallbacks {
 
     companion object {
-        var backgroundHeartbeatTime = 30_000L
+        var heartbeatTime = 30_000L
             private set
         fun initialize(milliseconds: Long) {
-            backgroundHeartbeatTime = milliseconds
+            heartbeatTime = milliseconds
         }
     }
 
-    private val broadcastLogger = torService.getBroadcastLogger(BackgroundKeepAlive::class.java)
+    private val broadcastLogger = torService.getBroadcastLogger(BackgroundManager::class.java)
     private val heartbeatJob: Job
 
     init {
@@ -123,7 +122,7 @@ internal class BackgroundKeepAlive(
 
         heartbeatJob = torService.getScopeIO().launch {
             while (isActive) {
-                delay(backgroundHeartbeatTime)
+                delay(heartbeatTime)
                 if (isActive) {
                     torService.startForegroundService().stopForeground(torService)
                     if (torService.signalControlConnection(TorControlCommands.SIGNAL_HEARTBEAT)) {
@@ -155,7 +154,7 @@ internal class BackgroundKeepAlive(
 
     override fun onActivityStarted(activity: Activity) {
         broadcastLCE(activity, "onActivityStarted")
-        torService.unregisterBackgroundKeepAlive()
+        torService.unregisterBackgroundManager()
     }
 
     override fun onActivityResumed(activity: Activity) {}
@@ -167,7 +166,7 @@ internal class BackgroundKeepAlive(
     override fun onActivityDestroyed(activity: Activity) {
         broadcastLCE(activity, "onActivityDestroyed")
         // TorService.onTaskRemoved will handle the swap to foreground
-        torService.unregisterBackgroundKeepAlive()
+        torService.unregisterBackgroundManager()
     }
 
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {

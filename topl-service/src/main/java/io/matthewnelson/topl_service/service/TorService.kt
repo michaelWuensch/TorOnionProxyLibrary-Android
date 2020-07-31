@@ -80,7 +80,7 @@ import io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller
 import io.matthewnelson.topl_service.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.receiver.TorServiceReceiver
-import io.matthewnelson.topl_service.service.components.BackgroundKeepAlive
+import io.matthewnelson.topl_service.service.components.BackgroundManager
 import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.TorServiceBinder
 import io.matthewnelson.topl_service.service.components.TorServiceConnection
@@ -97,18 +97,18 @@ internal class TorService: BaseService() {
         get() = this
 
 
-    ///////////////////////////
-    /// BackgroundKeepAlive ///
-    ///////////////////////////
-    private var backgroundKeepAlive: BackgroundKeepAlive? = null
+    /////////////////////////
+    /// BackgroundManager ///
+    /////////////////////////
+    private var backgroundManager: BackgroundManager? = null
 
-    override fun registerBackgroundKeepAlive() {
-        backgroundKeepAlive?.unregister()
-        backgroundKeepAlive = BackgroundKeepAlive(this)
+    override fun registerBackgroundManager() {
+        backgroundManager?.unregister()
+        backgroundManager = BackgroundManager(this)
     }
-    override fun unregisterBackgroundKeepAlive() {
-        backgroundKeepAlive?.unregister()
-        backgroundKeepAlive = null
+    override fun unregisterBackgroundManager() {
+        backgroundManager?.unregister()
+        backgroundManager = null
     }
     override fun onTrimMemory(level: Int) {
         when (level) {
@@ -119,7 +119,7 @@ internal class TorService: BaseService() {
             }
             ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN -> {
                 broadcastLogger.debug("Application sent to background")
-                registerBackgroundKeepAlive()
+                registerBackgroundManager()
             }
             else -> {}
         }
@@ -327,7 +327,7 @@ internal class TorService: BaseService() {
 
     override fun onDestroy() {
         unregisterPrefsListener()
-        unregisterBackgroundKeepAlive()
+        unregisterBackgroundManager()
         removeNotification()
         supervisorJob.cancel()
     }

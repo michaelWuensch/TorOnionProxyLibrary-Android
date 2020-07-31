@@ -38,10 +38,10 @@ internal class TestTorService(
     ///////////////////////////
     /// BackgroundKeepAlive ///
     ///////////////////////////
-    override fun registerBackgroundKeepAlive() {
+    override fun registerBackgroundManager() {
 
     }
-    override fun unregisterBackgroundKeepAlive() {
+    override fun unregisterBackgroundManager() {
 
     }
 

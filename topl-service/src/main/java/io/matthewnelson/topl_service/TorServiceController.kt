@@ -75,7 +75,7 @@ import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.service.components.BackgroundKeepAlive
+import io.matthewnelson.topl_service.service.components.BackgroundManager
 import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts
@@ -130,7 +130,7 @@ class TorServiceController private constructor(): ServiceConsts() {
     ) {
 
         private var appEventBroadcaster: EventBroadcaster? = Companion.appEventBroadcaster
-        private var backgroundHeartbeatTime = BackgroundKeepAlive.backgroundHeartbeatTime
+        private var heartbeatTime = BackgroundManager.heartbeatTime
         private var restartTorDelayTime = ServiceActionProcessor.restartTorDelayTime
         private var stopServiceDelayTime = ServiceActionProcessor.stopServiceDelayTime
         private var torConfigFiles: TorConfigFiles? = null
@@ -189,7 +189,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * Default is set to 30_000ms
          *
          * When the user sends your application to the background (recent app's tray),
-         * [io.matthewnelson.topl_service.service.components.BackgroundKeepAlive] begins
+         * [io.matthewnelson.topl_service.service.components.BackgroundManager] begins
          * a heartbeat for Tor, as well as cycling [TorService] between foreground and
          * background as to keep the OS from killing things due to being idle for too long.
          *
@@ -203,7 +203,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * */
         fun setBackgroundHeartbeatTime(milliseconds: Long): Builder {
             if (milliseconds in 15_000L..45_000L)
-                backgroundHeartbeatTime = milliseconds
+                heartbeatTime = milliseconds
             return this
         }
 
@@ -282,7 +282,7 @@ class TorServiceController private constructor(): ServiceConsts() {
                 torConfigFiles ?: TorConfigFiles.createConfig(application.applicationContext),
                 torSettings
             )
-            BackgroundKeepAlive.initialize(backgroundHeartbeatTime)
+            BackgroundManager.initialize(heartbeatTime)
             ServiceActionProcessor.initialize(restartTorDelayTime, stopServiceDelayTime)
 
             Companion.appEventBroadcaster = this.appEventBroadcaster
