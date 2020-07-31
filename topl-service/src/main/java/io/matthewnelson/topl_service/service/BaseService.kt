@@ -66,12 +66,16 @@
  */
 package io.matthewnelson.topl_service.service
 
+import android.app.Application
 import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
+import io.matthewnelson.topl_core_base.TorConfigFiles
+import io.matthewnelson.topl_core_base.TorSettings
+import io.matthewnelson.topl_service.BuildConfig
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.components.BaseServiceConnection
@@ -89,26 +93,41 @@ import java.io.IOException
 internal abstract class BaseService: Service() {
 
     companion object {
+        var application: Application? = null
+            private set
         var buildConfigVersionCode: Int = -1
             private set
-        var buildConfigDebug: Boolean? = null
+        var buildConfigDebug: Boolean = BuildConfig.DEBUG
             private set
-        lateinit var geoipAssetPath: String
+        var geoipAssetPath: String = ""
             private set
-        lateinit var geoip6AssetPath: String
+        var geoip6AssetPath: String = ""
             private set
+        lateinit var torConfigFiles: TorConfigFiles
+        lateinit var torSettings: TorSettings
 
         fun initialize(
+            application: Application,
             buildConfigVersionCode: Int,
             buildConfigDebug: Boolean,
             geoipAssetPath: String,
-            geoip6AssetPath: String
+            geoip6AssetPath: String,
+            torConfigFiles: TorConfigFiles,
+            torSettings: TorSettings
         ) {
+            this.application = application
             this.buildConfigVersionCode = buildConfigVersionCode
             this.buildConfigDebug = buildConfigDebug
             this.geoipAssetPath = geoipAssetPath
             this.geoip6AssetPath = geoip6AssetPath
+            this.torConfigFiles = torConfigFiles
+            this.torSettings = torSettings
         }
+
+        @Throws(RuntimeException::class)
+        fun getAppContext(): Context =
+            application?.applicationContext
+                ?: throw RuntimeException("Builder.build has not been called yet")
 
         // For things that can't be saved to TorServicePrefs, such as BuildConfig.VERSION_CODE
         fun getLocalPrefs(context: Context): SharedPreferences =

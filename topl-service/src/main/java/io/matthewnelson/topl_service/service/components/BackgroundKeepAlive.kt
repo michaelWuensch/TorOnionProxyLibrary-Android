@@ -104,6 +104,14 @@ internal class BackgroundKeepAlive(
     private val torService: BaseService
 ): Application.ActivityLifecycleCallbacks {
 
+    companion object {
+        var backgroundHeartbeatTime = 30_000L
+            private set
+        fun initialize(milliseconds: Long) {
+            backgroundHeartbeatTime = milliseconds
+        }
+    }
+
     private val broadcastLogger = torService.getBroadcastLogger(BackgroundKeepAlive::class.java)
     private val heartbeatJob: Job
 
@@ -115,7 +123,7 @@ internal class BackgroundKeepAlive(
 
         heartbeatJob = torService.getScopeIO().launch {
             while (isActive) {
-                delay(TorServiceController.backgroundHeartbeatTime)
+                delay(backgroundHeartbeatTime)
                 if (isActive) {
                     torService.startForegroundService().stopForeground(torService)
                     if (torService.signalControlConnection(TorControlCommands.SIGNAL_HEARTBEAT)) {

@@ -85,6 +85,17 @@ import kotlinx.coroutines.*
  * */
 internal class ServiceActionProcessor(private val torService: BaseService): ServiceConsts() {
 
+    companion object {
+        var restartTorDelayTime = 500L
+            private set
+        var stopServiceDelayTime = 100L
+            private set
+        fun initialize(restartMilliseconds: Long, stopServiceMilliseconds: Long) {
+            restartTorDelayTime = restartMilliseconds
+            stopServiceDelayTime = stopServiceMilliseconds
+        }
+    }
+
     private val broadcastLogger = torService.getBroadcastLogger(ServiceActionProcessor::class.java)
     private val serviceActionObjectGetter = ServiceActionObjectGetter()
 

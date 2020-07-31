@@ -91,7 +91,7 @@ internal class ServiceTorInstaller(private val torService: BaseService): TorInst
     private val buildConfigVersionCode: Int
         get() = BaseService.buildConfigVersionCode
     private val buildConfigDebug: Boolean
-        get() = BaseService.buildConfigDebug ?: false
+        get() = BaseService.buildConfigDebug
 
     private val torServicePrefs = TorServicePrefs(torService.context)
 

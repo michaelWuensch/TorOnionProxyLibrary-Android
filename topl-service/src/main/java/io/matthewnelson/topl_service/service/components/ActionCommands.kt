@@ -130,7 +130,7 @@ internal sealed class ActionCommands {
                 ActionCommand.START_TOR
             )
         override val delayLengthQueue =
-            mutableListOf(TorServiceController.restartTorDelayTime)
+            mutableListOf(ServiceActionProcessor.restartTorDelayTime)
     }
 
     class Start(override val serviceAction: String) : ServiceActionObject() {
@@ -148,7 +148,7 @@ internal sealed class ActionCommands {
                 ActionCommand.STOP_SERVICE
             )
         override val delayLengthQueue =
-            mutableListOf(TorServiceController.stopServiceDelayTime)
+            mutableListOf(ServiceActionProcessor.stopServiceDelayTime)
     }
 
     class ServiceActionObjectGetter {

@@ -73,6 +73,7 @@ import io.matthewnelson.test_helpers.application_provided_classes.TestTorSetting
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.BaseService
+import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
 import org.junit.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -149,10 +150,10 @@ internal class TorServiceControllerUnitTest {
     @Test
     fun `_z_ensure builder methods properly initialize variables when build called`() {
         // Hasn't been initialized yet
-        assertNull(BaseService.buildConfigDebug)
+        assertEquals(BuildConfig.DEBUG, BaseService.buildConfigDebug)
         assertNull(TorServiceController.appEventBroadcaster)
-        val initialRestartTorDelay = TorServiceController.restartTorDelayTime
-        val initialStopServiceDelay = TorServiceController.stopServiceDelayTime
+        val initialRestartTorDelay = ServiceActionProcessor.restartTorDelayTime
+        val initialStopServiceDelay = ServiceActionProcessor.stopServiceDelayTime
 
         val timeToAdd = 300L
 
@@ -160,13 +161,13 @@ internal class TorServiceControllerUnitTest {
             .addTimeToRestartTorDelay(timeToAdd)
             .addTimeToStopServiceDelay(timeToAdd)
             .setBackgroundHeartbeatTime(40_000)
-            .setBuildConfigDebug(BuildConfig.DEBUG)
+            .setBuildConfigDebug(!BuildConfig.DEBUG)
             .setEventBroadcaster(TestEventBroadcaster())
             .build()
 
-        assertEquals(TorServiceController.restartTorDelayTime, initialRestartTorDelay + timeToAdd)
-        assertEquals(TorServiceController.stopServiceDelayTime, initialStopServiceDelay + timeToAdd)
-        assertEquals(BaseService.buildConfigDebug, BuildConfig.DEBUG)
+        assertEquals(ServiceActionProcessor.restartTorDelayTime, initialRestartTorDelay + timeToAdd)
+        assertEquals(ServiceActionProcessor.stopServiceDelayTime, initialStopServiceDelay + timeToAdd)
+        assertEquals(BaseService.buildConfigDebug, !BuildConfig.DEBUG)
         assertNotNull(TorServiceController.appEventBroadcaster)
     }
 
