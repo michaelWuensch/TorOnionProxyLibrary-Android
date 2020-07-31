@@ -76,6 +76,7 @@ import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.service.BaseService
+import io.matthewnelson.topl_service.service.components.BaseServiceConnection
 import io.matthewnelson.topl_service.service.components.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts
 
@@ -355,11 +356,14 @@ class TorServiceController private constructor(): ServiceConsts() {
         fun startTor() {
             if (!::appContext.isInitialized)
                 throw builderDotBuildNotCalledException()
+            startTor(TorService::class.java, TorService.torServiceConnection)
+        }
 
-            val startServiceIntent = Intent(appContext, TorService::class.java)
+        internal fun startTor(clazz: Class<*>, serviceConn: BaseServiceConnection) {
+            val startServiceIntent = Intent(appContext, clazz)
             startServiceIntent.action = ServiceAction.START
             appContext.startService(startServiceIntent)
-            bindTorService(appContext)
+            BaseService.bindService(appContext, serviceConn, clazz)
         }
 
         /**
