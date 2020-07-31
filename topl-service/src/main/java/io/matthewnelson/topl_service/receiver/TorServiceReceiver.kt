@@ -100,12 +100,11 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
     private val broadcastLogger = torService.getBroadcastLogger(TorServiceReceiver::class.java)
 
     fun register() {
-        if (!isRegistered) {
-            torService.context.applicationContext
-                .registerReceiver(this, IntentFilter(SERVICE_INTENT_FILTER))
-            isRegistered = true
+        torService.context.applicationContext
+            .registerReceiver(this, IntentFilter(SERVICE_INTENT_FILTER))
+        if (!isRegistered)
             broadcastLogger.debug("Receiver registered")
-        }
+        isRegistered = true
     }
 
     fun unregister() {
