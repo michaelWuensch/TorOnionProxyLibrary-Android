@@ -67,20 +67,19 @@
 package io.matthewnelson.topl_service.service
 
 import android.content.ComponentName
-import android.content.Context
 import android.content.ServiceConnection
 import android.os.IBinder
 
 internal class TorServiceConnection: ServiceConnection {
 
     @Volatile
-    var serviceBinder: TorService.TorServiceBinder? = null
+    var serviceBinder: TorServiceBinder? = null
         private set
 
     /**
-     * Sets the reference to [TorService.TorServiceBinder] to `null` because
-     * [onServiceDisconnected] is not always called when [Context.unbindService]
-     * is made.
+     * Sets the reference to [TorServiceBinder] to `null` because
+     * [onServiceDisconnected] is not always called on disconnect, as the name
+     * suggests.
      * */
     fun clearServiceBinderReference() {
         serviceBinder = null
@@ -93,7 +92,10 @@ internal class TorServiceConnection: ServiceConnection {
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        serviceBinder = service as TorService.TorServiceBinder
+        serviceBinder = if (service != null)
+            service as TorServiceBinder
+        else
+            null
     }
 
 }

@@ -69,7 +69,7 @@ package io.matthewnelson.topl_service.onionproxy
 import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_service.TorServiceController
-import io.matthewnelson.topl_service.notification.ServiceNotification
+import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
@@ -89,14 +89,12 @@ import net.freehaven.tor.control.TorControlCommands
  * [ServiceEventListener] utilizes this class by sending it what Tor is spitting out
  * (selectively curated, ofc).
  *
- * @param [torService] [TorService] for context.
+ * @param [torService] [BaseService] for context.
  * */
-internal class ServiceEventBroadcaster(private val torService: TorService): EventBroadcaster() {
+internal class ServiceEventBroadcaster(private val torService: BaseService): EventBroadcaster() {
 
-    private val serviceNotification: ServiceNotification
-        get() = torService.serviceNotification
     private val scopeMain: CoroutineScope
-        get() = torService.scopeMain
+        get() = torService.getScopeMain()
 
     /////////////////
     /// Bandwidth ///
@@ -132,9 +130,9 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
                 updateBandwidth(read, written)
 
                 if (read == 0L && written == 0L)
-                    serviceNotification.updateIcon(torService, NotificationImage.ENABLED)
+                    torService.updateNotificationIcon(NotificationImage.ENABLED)
                 else
-                    serviceNotification.updateIcon(torService, NotificationImage.DATA)
+                    torService.updateNotificationIcon(NotificationImage.DATA)
             }
         }
 
@@ -150,7 +148,7 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
      * */
     private fun updateBandwidth(download: Long, upload: Long) {
         if (::noticeMsgToContentTextJob.isInitialized && noticeMsgToContentTextJob.isActive) return
-        serviceNotification.updateContentText(
+        torService.updateNotificationContentText(
             ServiceUtilities.getFormattedBandwidthString(download, upload)
         )
     }
@@ -171,12 +169,12 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
     //////////////////
     override fun broadcastException(msg: String?, e: Exception) {
         if (!msg.isNullOrEmpty()) {
-            if (msg.contains(ServiceActionProcessor::class.java.simpleName)) {
-                serviceNotification.updateIcon(torService, NotificationImage.ERROR)
+            if (msg.contains(TorService::class.java.simpleName)) {
+                torService.updateNotificationIcon(NotificationImage.ERROR)
                 val msgSplit = msg.split("|")
                 msgSplit.elementAtOrNull(2)?.let {
-                    serviceNotification.updateContentText(it)
-                    serviceNotification.updateProgress(show = false)
+                    torService.updateNotificationContentText(it)
+                    torService.updateNotificationProgress(false, null)
                 }
             }
         }
@@ -210,19 +208,20 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
     override fun broadcastNotice(msg: String) {
 
         // BOOTSTRAPPED
+        // NOTICE|BaseEventListener|Bootstrapped 5% (conn): Connecting to a relay
         if (msg.contains("Bootstrapped")) {
             val msgSplit = msg.split(" ")
             msgSplit.elementAtOrNull(2)?.let {
                 val bootstrapped = "${msgSplit[0]} ${msgSplit[1]}".split("|")[2]
 
                 if (bootstrapped != bootstrapProgress) {
-                    serviceNotification.updateContentText(bootstrapped)
+                    torService.updateNotificationContentText(bootstrapped)
 
                     if (bootstrapped == "Bootstrapped 100%") {
-                        serviceNotification.updateIcon(torService, NotificationImage.ENABLED)
-                        serviceNotification.updateProgress(show = true, progress = 100)
-                        serviceNotification.updateProgress(show = false)
-                        serviceNotification.addActions(torService)
+                        torService.updateNotificationIcon(NotificationImage.ENABLED)
+                        torService.updateNotificationProgress(true, 100)
+                        torService.updateNotificationProgress(false, null)
+                        torService.addNotificationActions()
                     } else {
                         val progress: Int? = try {
                             bootstrapped.split(" ")[1].split("%")[0].toInt()
@@ -230,7 +229,7 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
                             null
                         }
                         progress?.let {
-                            serviceNotification.updateProgress(show = true, progress = progress)
+                            torService.updateNotificationProgress(true, progress)
                         }
                     }
 
@@ -278,7 +277,7 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
                 }
             }
             msgToShow?.let {
-                serviceNotification.updateContentText(it)
+                torService.updateNotificationContentText(it)
             }
         }
 
@@ -294,16 +293,16 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
      * */
     private fun displayMessageToContentText(message: String, delayMilliSeconds: Long) {
         noticeMsgToContentTextJob = scopeMain.launch {
-            serviceNotification.updateContentText(message)
+            torService.updateNotificationContentText(message)
             delay(delayMilliSeconds)
 
             // Publish the last bandwidth broadcast to overwrite the message.
             if (torNetworkState == TorNetworkState.ENABLED) {
-                serviceNotification.updateContentText(
+                torService.updateNotificationContentText(
                     ServiceUtilities.getFormattedBandwidthString(bytesRead, bytesWritten)
                 )
             } else if (isBootstrappingComplete()){
-                serviceNotification.updateContentText(
+                torService.updateNotificationContentText(
                     ServiceUtilities.getFormattedBandwidthString(0L, 0L)
                 )
             }
@@ -322,23 +321,23 @@ internal class ServiceEventBroadcaster(private val torService: TorService): Even
     override fun broadcastTorState(@TorState state: String, @TorNetworkState networkState: String) {
         if (torState == TorState.ON && state != torState) {
             bootstrapProgress = ""
-            serviceNotification.removeActions(torService)
+            torService.removeNotificationActions()
         }
 
         if (state != TorState.ON)
-            serviceNotification.updateProgress(show = true)
+            torService.updateNotificationProgress(true, null)
 
-        serviceNotification.updateContentTitle(state)
+        torService.updateNotificationContentTitle(state)
         torState = state
 
         if (networkState == TorNetworkState.DISABLED) {
             // Update torNetworkState _before_ setting the icon to `disabled` so bandwidth won't
             // overwrite the icon with an update
             torNetworkState = networkState
-            serviceNotification.updateIcon(torService, NotificationImage.DISABLED)
+            torService.updateNotificationIcon(NotificationImage.DISABLED)
         } else {
             if (isBootstrappingComplete())
-                serviceNotification.updateIcon(torService, NotificationImage.ENABLED)
+                torService.updateNotificationIcon(NotificationImage.ENABLED)
 
             // Update torNetworkState _after_ setting the icon to `enabled` so bandwidth changes
             // occur afterwards and this won't overwrite ImageState.DATA

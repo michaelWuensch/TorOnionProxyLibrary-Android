@@ -67,44 +67,41 @@
 package io.matthewnelson.topl_service.prefs
 
 import android.content.SharedPreferences
-import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
+import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyBoolean
 
 /**
  * Listens to [TorServicePrefs] for changes such that while Tor is running, it can
- * query [onionProxyManager] to have it updated immediately (if the setting doesn't
+ * query [TorService.onionProxyManager] to have it updated immediately (if the setting doesn't
  * require a restart), as well as submit Actions to [ServiceActionProcessor] to be queued
  * for execution.
  *
  * @param [torService] To instantiate [TorServicePrefs]
  * */
 internal class TorServicePrefsListener(
-    private val torService: TorService
+    private val torService: BaseService
 ): SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private val onionProxyManager: OnionProxyManager
-        get() = torService.onionProxyManager
-    private val serviceActionProcessor: ServiceActionProcessor
-        get() = torService.serviceActionProcessor
+    private val torServicePrefs = TorServicePrefs(torService.context)
+    private val broadcastLogger = torService.getBroadcastLogger(TorServicePrefsListener::class.java)
 
-    private val torServicePrefs = TorServicePrefs(torService)
-    private val broadcastLogger: BroadcastLogger =
-        onionProxyManager.getBroadcastLogger(TorServicePrefsListener::class.java)
-
-
-    // Register itself immediately upon instantiation.
-    init {
+    /**
+     * Called from [TorService.onCreate]
+     * */
+    fun register() {
         torServicePrefs.registerListener(this)
+        broadcastLogger.debug("Listener registered")
     }
 
     /**
-     * Called from [io.matthewnelson.topl_service.service.TorService.onDestroy].
+     * Called from [ServiceActionProcessor.processActionCommand]'s DESTROY block.
      * */
     fun unregister() {
         torServicePrefs.unregisterListener(this)
+        broadcastLogger.debug("Listener unregistered")
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
@@ -124,8 +121,8 @@ internal class TorServicePrefsListener(
                     //  Maybe a `TorDebugLogHelper` class?
                     //  .
                     //  Will need some way of automatically clearing old log files, too.
-                    if (!onionProxyManager.torStateMachine.isOff)
-                        onionProxyManager.refreshBroadcastLoggersHasDebugLogsVar()
+                    if (!torService.isTorOff())
+                        torService.refreshBroadcastLoggersHasDebugLogsVar()
                 }
             }
         }

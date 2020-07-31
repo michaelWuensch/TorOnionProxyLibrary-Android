@@ -67,12 +67,12 @@
 package io.matthewnelson.topl_service.onionproxy
 
 import io.matthewnelson.topl_core_base.TorSettings
-import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyString
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyList
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyInt
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyBoolean
 import io.matthewnelson.topl_service.prefs.TorServicePrefs
+import io.matthewnelson.topl_service.service.BaseService
 
 /**
  * This class is for enabling the updating of settings in a standardized manner
@@ -80,15 +80,15 @@ import io.matthewnelson.topl_service.prefs.TorServicePrefs
  * and then call [io.matthewnelson.topl_service.TorServiceController.restartTor] to have
  * them applied to the Tor Process.
  *
- * @param [defaults] Default values to fall back on if nothing is returned from [TorServicePrefs]
  * @param [torService] To instantiate [TorServicePrefs]
+ * @param [defaults] Default values to fall back on if nothing is returned from [TorServicePrefs]
  * */
 internal class ServiceTorSettings(
-    private val defaults: TorSettings,
-    torService: TorService
+    torService: BaseService,
+    private val defaults: TorSettings
 ): TorSettings() {
 
-    private val prefs = TorServicePrefs(torService)
+    private val prefs = TorServicePrefs(torService.context)
 
     override val disableNetwork: Boolean
         get() = prefs.getBoolean(PrefKeyBoolean.DISABLE_NETWORK, defaults.disableNetwork)

@@ -129,6 +129,8 @@ class App: Application() {
             geoipAssetPath = "common/geoip",
             geoip6AssetPath = "common/geoip6"
         )
+            .addTimeToRestartTorDelay(milliseconds = 100L)
+            .addTimeToStopServiceDelay(milliseconds = 100L)
             .setBuildConfigDebug(buildConfigDebug = BuildConfig.DEBUG)
 
             // Can instantiate directly here then access it from

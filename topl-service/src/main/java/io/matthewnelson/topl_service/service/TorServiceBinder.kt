@@ -64,86 +64,43 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.topl_service.receiver
+package io.matthewnelson.topl_service.service
 
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
-import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.service.ServiceActionProcessor
-import io.matthewnelson.topl_service.service.TorService
+import android.os.Binder
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
-import java.math.BigInteger
-import java.security.SecureRandom
 
-/**
- * Is registered at startup of [TorService], and unregistered when it is stopped.
- * Sending an intent here to start [TorService] will do nothing as all intents are piped
- * to [ServiceActionProcessor] directly. To start the service (and Tor), call the
- * [io.matthewnelson.topl_service.TorServiceController.startTor] method.
- *
- * @param [torService]
- * */
-internal class TorServiceReceiver(private val torService: BaseService): BroadcastReceiver() {
+internal class TorServiceBinder(private val torService: BaseService): Binder() {
 
-    companion object {
-        // Secures the intent filter at each application startup.
-        // Also serves as the key to string extras containing the ServiceAction to be executed.
-        val SERVICE_INTENT_FILTER: String = BigInteger(130, SecureRandom()).toString(32)
-
-        @Volatile
-        var isRegistered = false
-            private set
+    private fun throwIllegalArgument(action: String?) {
+        throw IllegalArgumentException(
+            "$action is not an accepted argument for ${this.javaClass.simpleName}"
+        )
     }
 
-    private val broadcastLogger = torService.getBroadcastLogger(TorServiceReceiver::class.java)
+    @Throws(IllegalArgumentException::class)
+    fun submitServiceActionIntent(serviceActionIntent: Intent) {
+        val action = serviceActionIntent.action
+        if (action != null && action.contains(ServiceAction.SERVICE_ACTION)) {
 
-    fun register() {
-        if (!isRegistered) {
-            torService.context.applicationContext
-                .registerReceiver(this, IntentFilter(SERVICE_INTENT_FILTER))
-            isRegistered = true
-            broadcastLogger.debug("Receiver registered")
-        }
-    }
-
-    fun unregister() {
-        if (isRegistered) {
-            try {
-                torService.context.applicationContext.unregisterReceiver(this)
-                isRegistered = false
-                broadcastLogger.debug("Receiver unregistered")
-            } catch (e: IllegalArgumentException) {
-                broadcastLogger.exception(e)
-            }
-        }
-    }
-
-    override fun onReceive(context: Context?, intent: Intent?) {
-        if (context != null && intent != null) {
-            // Only accept Intents from this package.
-            if (context.applicationInfo.dataDir != torService.context.applicationInfo.dataDir) return
-
-            when (val serviceAction = intent.getStringExtra(SERVICE_INTENT_FILTER)) {
-
-                // Only accept these 3 ServiceActions.
-                ServiceAction.NEW_ID, ServiceAction.RESTART_TOR, ServiceAction.STOP -> {
-                    val newIntent = Intent(serviceAction)
-
-                    // If the broadcast intent has any string extras, their key will be the
-                    // ServiceAction that was included.
-                    intent.getStringExtra(serviceAction)?.let {
-                        newIntent.putExtra(serviceAction, it)
-                    }
-                    torService.processIntent(newIntent)
+            when (action) {
+                ServiceAction.DESTROY,
+                ServiceAction.NEW_ID,
+                ServiceAction.RESTART_TOR,
+                ServiceAction.START,
+                ServiceAction.STOP -> {
+                    // Do not accept the above ServiceActions through use of this method.
+                    // DESTROY = internal Service use only (for onDestroy)
+                    // NEW_ID, RESTART_TOR, STOP = via BroadcastReceiver
+                    // START = to start TorService
+                    throwIllegalArgument(action)
                 }
                 else -> {
-                    broadcastLogger.warn(
-                        "This class does not accept $serviceAction as an argument."
-                    )
+                    torService.processIntent(serviceActionIntent)
                 }
             }
+        } else {
+            throwIllegalArgument(action)
         }
     }
 }

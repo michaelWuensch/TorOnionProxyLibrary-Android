@@ -63,87 +63,42 @@
 *     exception. If you modify "The Interfaces", this exception does not apply to your
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
-* */
-package io.matthewnelson.topl_service.receiver
+ */
+package io.matthewnelson.test_helpers.application_provided_classes
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.service.ServiceActionProcessor
-import io.matthewnelson.topl_service.service.TorService
-import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
-import java.math.BigInteger
-import java.security.SecureRandom
+import io.matthewnelson.topl_core_base.EventBroadcaster
 
-/**
- * Is registered at startup of [TorService], and unregistered when it is stopped.
- * Sending an intent here to start [TorService] will do nothing as all intents are piped
- * to [ServiceActionProcessor] directly. To start the service (and Tor), call the
- * [io.matthewnelson.topl_service.TorServiceController.startTor] method.
- *
- * @param [torService]
- * */
-internal class TorServiceReceiver(private val torService: BaseService): BroadcastReceiver() {
+class TestEventBroadcaster: EventBroadcaster() {
 
-    companion object {
-        // Secures the intent filter at each application startup.
-        // Also serves as the key to string extras containing the ServiceAction to be executed.
-        val SERVICE_INTENT_FILTER: String = BigInteger(130, SecureRandom()).toString(32)
+    override fun broadcastBandwidth(bytesRead: String, bytesWritten: String) {
 
-        @Volatile
-        var isRegistered = false
-            private set
     }
 
-    private val broadcastLogger = torService.getBroadcastLogger(TorServiceReceiver::class.java)
+    override fun broadcastDebug(msg: String) {
 
-    fun register() {
-        if (!isRegistered) {
-            torService.context.applicationContext
-                .registerReceiver(this, IntentFilter(SERVICE_INTENT_FILTER))
-            isRegistered = true
-            broadcastLogger.debug("Receiver registered")
-        }
     }
 
-    fun unregister() {
-        if (isRegistered) {
-            try {
-                torService.context.applicationContext.unregisterReceiver(this)
-                isRegistered = false
-                broadcastLogger.debug("Receiver unregistered")
-            } catch (e: IllegalArgumentException) {
-                broadcastLogger.exception(e)
-            }
-        }
+    override fun broadcastException(msg: String?, e: Exception) {
+
     }
 
-    override fun onReceive(context: Context?, intent: Intent?) {
-        if (context != null && intent != null) {
-            // Only accept Intents from this package.
-            if (context.applicationInfo.dataDir != torService.context.applicationInfo.dataDir) return
+    override fun broadcastLogMessage(logMessage: String?) {
 
-            when (val serviceAction = intent.getStringExtra(SERVICE_INTENT_FILTER)) {
+    }
 
-                // Only accept these 3 ServiceActions.
-                ServiceAction.NEW_ID, ServiceAction.RESTART_TOR, ServiceAction.STOP -> {
-                    val newIntent = Intent(serviceAction)
+    override fun broadcastNotice(msg: String) {
 
-                    // If the broadcast intent has any string extras, their key will be the
-                    // ServiceAction that was included.
-                    intent.getStringExtra(serviceAction)?.let {
-                        newIntent.putExtra(serviceAction, it)
-                    }
-                    torService.processIntent(newIntent)
-                }
-                else -> {
-                    broadcastLogger.warn(
-                        "This class does not accept $serviceAction as an argument."
-                    )
-                }
-            }
-        }
+    }
+
+    @Volatile
+    var torState = TorState.OFF
+        private set
+
+    @Volatile
+    var torNetworkState = TorNetworkState.DISABLED
+        private set
+    override fun broadcastTorState(state: String, networkState: String) {
+        torState = state
+        torNetworkState = networkState
     }
 }

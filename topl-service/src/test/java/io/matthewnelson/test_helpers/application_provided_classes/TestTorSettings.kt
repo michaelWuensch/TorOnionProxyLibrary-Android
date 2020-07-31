@@ -63,87 +63,121 @@
 *     exception. If you modify "The Interfaces", this exception does not apply to your
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
-* */
-package io.matthewnelson.topl_service.receiver
+ */
+package io.matthewnelson.test_helpers.application_provided_classes
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.service.ServiceActionProcessor
-import io.matthewnelson.topl_service.service.TorService
-import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
-import java.math.BigInteger
-import java.security.SecureRandom
+import io.matthewnelson.topl_core_base.TorSettings
 
-/**
- * Is registered at startup of [TorService], and unregistered when it is stopped.
- * Sending an intent here to start [TorService] will do nothing as all intents are piped
- * to [ServiceActionProcessor] directly. To start the service (and Tor), call the
- * [io.matthewnelson.topl_service.TorServiceController.startTor] method.
- *
- * @param [torService]
- * */
-internal class TorServiceReceiver(private val torService: BaseService): BroadcastReceiver() {
+internal class TestTorSettings: TorSettings() {
 
-    companion object {
-        // Secures the intent filter at each application startup.
-        // Also serves as the key to string extras containing the ServiceAction to be executed.
-        val SERVICE_INTENT_FILTER: String = BigInteger(130, SecureRandom()).toString(32)
+    override val disableNetwork: Boolean
+        get() = DEFAULT__DISABLE_NETWORK
 
-        @Volatile
-        var isRegistered = false
-            private set
-    }
+    override val dnsPort: String
+        get() = DEFAULT__DNS_PORT
 
-    private val broadcastLogger = torService.getBroadcastLogger(TorServiceReceiver::class.java)
+    override val customTorrc: String?
+        get() = null
 
-    fun register() {
-        if (!isRegistered) {
-            torService.context.applicationContext
-                .registerReceiver(this, IntentFilter(SERVICE_INTENT_FILTER))
-            isRegistered = true
-            broadcastLogger.debug("Receiver registered")
-        }
-    }
+    override val entryNodes: String?
+        get() = DEFAULT__ENTRY_NODES
 
-    fun unregister() {
-        if (isRegistered) {
-            try {
-                torService.context.applicationContext.unregisterReceiver(this)
-                isRegistered = false
-                broadcastLogger.debug("Receiver unregistered")
-            } catch (e: IllegalArgumentException) {
-                broadcastLogger.exception(e)
-            }
-        }
-    }
+    override val excludeNodes: String?
+        get() = DEFAULT__EXCLUDED_NODES
 
-    override fun onReceive(context: Context?, intent: Intent?) {
-        if (context != null && intent != null) {
-            // Only accept Intents from this package.
-            if (context.applicationInfo.dataDir != torService.context.applicationInfo.dataDir) return
+    override val exitNodes: String?
+        get() = DEFAULT__EXIT_NODES
 
-            when (val serviceAction = intent.getStringExtra(SERVICE_INTENT_FILTER)) {
+    override val httpTunnelPort: String
+        get() = DEFAULT__HTTP_TUNNEL_PORT
 
-                // Only accept these 3 ServiceActions.
-                ServiceAction.NEW_ID, ServiceAction.RESTART_TOR, ServiceAction.STOP -> {
-                    val newIntent = Intent(serviceAction)
+    override val listOfSupportedBridges: List<@SupportedBridges String>
+        get() = arrayListOf(SupportedBridges.MEEK, SupportedBridges.OBFS4)
 
-                    // If the broadcast intent has any string extras, their key will be the
-                    // ServiceAction that was included.
-                    intent.getStringExtra(serviceAction)?.let {
-                        newIntent.putExtra(serviceAction, it)
-                    }
-                    torService.processIntent(newIntent)
-                }
-                else -> {
-                    broadcastLogger.warn(
-                        "This class does not accept $serviceAction as an argument."
-                    )
-                }
-            }
-        }
-    }
+    override val proxyHost: String?
+        get() = DEFAULT__PROXY_HOST
+
+    override val proxyPassword: String?
+        get() = DEFAULT__PROXY_PASSWORD
+
+    override val proxyPort: Int?
+        get() = null
+
+    override val proxySocks5Host: String?
+        get() = DEFAULT__PROXY_SOCKS5_HOST
+
+    override val proxySocks5ServerPort: Int?
+        get() = null
+
+    override val proxyType: String?
+        get() = DEFAULT__PROXY_TYPE
+
+    override val proxyUser: String?
+        get() = DEFAULT__PROXY_USER
+
+    override val reachableAddressPorts: String
+        get() = DEFAULT__REACHABLE_ADDRESS_PORTS
+
+    override val relayNickname: String?
+        get() = DEFAULT__RELAY_NICKNAME
+
+    override val relayPort: Int?
+        get() = null
+
+    override val socksPort: String
+        get() = "9051"
+
+    override val virtualAddressNetwork: String?
+        get() = "10.192.0.2/10"
+
+    override val hasBridges: Boolean
+        get() = DEFAULT__HAS_BRIDGES
+
+    override val connectionPadding: @ConnectionPadding String
+        get() = DEFAULT__HAS_CONNECTION_PADDING
+
+    override val hasCookieAuthentication: Boolean
+        get() = DEFAULT__HAS_COOKIE_AUTHENTICATION
+
+    override val hasDebugLogs: Boolean
+        get() = DEFAULT__HAS_DEBUG_LOGS
+
+    override val hasDormantCanceledByStartup: Boolean
+        get() = DEFAULT__HAS_DORMANT_CANCELED_BY_STARTUP
+
+    override val hasIsolationAddressFlagForTunnel: Boolean
+        get() = DEFAULT__HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL
+
+    override val hasOpenProxyOnAllInterfaces: Boolean
+        get() = DEFAULT__HAS_OPEN_PROXY_ON_ALL_INTERFACES
+
+    override val hasReachableAddress: Boolean
+        get() = DEFAULT__HAS_REACHABLE_ADDRESS
+
+    override val hasReducedConnectionPadding: Boolean
+        get() = DEFAULT__HAS_REDUCED_CONNECTION_PADDING
+
+    override val hasSafeSocks: Boolean
+        get() = DEFAULT__HAS_SAFE_SOCKS
+
+    override val hasStrictNodes: Boolean
+        get() = DEFAULT__HAS_STRICT_NODES
+
+    override val hasTestSocks: Boolean
+        get() = DEFAULT__HAS_TEST_SOCKS
+
+    override val isAutoMapHostsOnResolve: Boolean
+        get() = DEFAULT__IS_AUTO_MAP_HOSTS_ON_RESOLVE
+
+    override val isRelay: Boolean
+        get() = DEFAULT__IS_RELAY
+
+    override val runAsDaemon: Boolean
+        get() = DEFAULT__RUN_AS_DAEMON
+
+    override val transPort: String
+        get() = DEFAULT__TRANS_PORT
+
+    override val useSocks5: Boolean
+        get() = DEFAULT__USE_SOCKS5
 }

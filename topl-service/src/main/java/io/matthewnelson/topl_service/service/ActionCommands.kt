@@ -67,6 +67,7 @@
 package io.matthewnelson.topl_service.service
 
 import android.content.Intent
+import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.util.ServiceConsts.ActionCommand
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 
@@ -92,24 +93,22 @@ internal sealed class ActionCommands {
         abstract val commands: Array<@ActionCommand String>
 
         /**
-         * For every ActionCommand.DELAY called for, a value will be consumed
-         * when executing the DELAY command.
+         * For every ActionCommand.DELAY within [commands], a value will be consumed
+         * when executing it.
          *
          * Override this to define the values for each DELAY call.
          * */
         protected open val delayLengthQueue: MutableList<Long> = mutableListOf()
 
         /**
-         * Consumes the 0th element within [delayLengthQueue], removes, then returns it.
+         * Removes the 0th element within [delayLengthQueue] then returns it.
          * If [delayLengthQueue] is empty, returns 0L.
          *
          * @return The 0th element within [delayLengthQueue], or 0L if empty
          * */
         fun consumeDelayLength(): Long {
             return if (delayLengthQueue.isNotEmpty()) {
-                val delayLength = delayLengthQueue[0]
                 delayLengthQueue.removeAt(0)
-                delayLength
             } else {
                 0L
             }
@@ -139,7 +138,7 @@ internal sealed class ActionCommands {
                 ActionCommand.START_TOR
             )
         override val delayLengthQueue =
-            mutableListOf(700L)
+            mutableListOf(TorServiceController.restartTorDelayTime)
     }
 
     class Start(override val serviceAction: String) : ServiceActionObject() {
@@ -153,8 +152,11 @@ internal sealed class ActionCommands {
         override val commands: Array<String>
             get() = arrayOf(
                 ActionCommand.STOP_TOR,
+                ActionCommand.DELAY,
                 ActionCommand.STOP_SERVICE
             )
+        override val delayLengthQueue =
+            mutableListOf(TorServiceController.stopServiceDelayTime)
     }
 
     class ServiceActionObjectGetter {

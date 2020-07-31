@@ -71,9 +71,9 @@ import io.matthewnelson.topl_core.util.TorInstaller
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_service.R
 import io.matthewnelson.topl_service.TorServiceController
-import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyList
 import io.matthewnelson.topl_service.prefs.TorServicePrefs
+import io.matthewnelson.topl_service.service.BaseService
 import java.io.*
 import java.util.concurrent.TimeoutException
 
@@ -82,24 +82,20 @@ import java.util.concurrent.TimeoutException
  *
  * See [io.matthewnelson.topl_service.TorServiceController.Builder]
  *
- * @param [torService] for context
+ * @param [torService] [BaseService] for context
  * */
-internal class ServiceTorInstaller(private val torService: TorService): TorInstaller() {
+internal class ServiceTorInstaller(private val torService: BaseService): TorInstaller() {
 
     private val torConfigFiles: TorConfigFiles
         get() = TorServiceController.getTorConfigFiles()
     private val buildConfigVersionCode: Int
-        get() = TorService.buildConfigVersionCode
+        get() = BaseService.buildConfigVersionCode
     private val buildConfigDebug: Boolean
-        get() = TorService.buildConfigDebug ?: false
-    private val geoIpAssetPath: String
-        get() = TorService.geoipAssetPath
-    private val geoIp6AssetPath: String
-        get() = TorService.geoip6AssetPath
+        get() = BaseService.buildConfigDebug ?: false
 
-    private val torServicePrefs = TorServicePrefs(torService)
+    private val torServicePrefs = TorServicePrefs(torService.context)
 
-    private val localPrefs = TorService.getLocalPrefs(torService)
+    private val localPrefs = BaseService.getLocalPrefs(torService.context)
     private lateinit var geoIpFileCopied: String
     private lateinit var geoIpv6FileCopied: String
 
@@ -138,23 +134,19 @@ internal class ServiceTorInstaller(private val torService: TorService): TorInsta
 
     private fun copyGeoIpAsset() =
         synchronized(torConfigFiles.geoIpFileLock) {
-            copyAsset(geoIpAssetPath, torConfigFiles.geoIpFile)
+            torService.copyAsset(BaseService.geoipAssetPath, torConfigFiles.geoIpFile)
+            broadcastLogger?.debug(
+                "Asset copied from ${BaseService.geoipAssetPath} -> ${torConfigFiles.geoIpFile}"
+            )
         }
 
     private fun copyGeoIpv6Asset() =
         synchronized(torConfigFiles.geoIpv6FileLock) {
-            copyAsset(geoIp6AssetPath, torConfigFiles.geoIpv6File)
+            torService.copyAsset(BaseService.geoip6AssetPath, torConfigFiles.geoIpv6File)
+            broadcastLogger?.debug(
+                "Asset copied from ${BaseService.geoip6AssetPath} -> ${torConfigFiles.geoIpv6File}"
+            )
         }
-
-    @Throws(IOException::class)
-    private fun copyAsset(assetPath: String, file: File) {
-        try {
-            FileUtilities.copy(torService.assets.open(assetPath), file.outputStream())
-            broadcastLogger?.debug("Asset copied from $assetPath -> $file")
-        } catch (e: Exception) {
-            throw IOException("Failed copying asset from $assetPath", e)
-        }
-    }
 
     @Throws(IOException::class, TimeoutException::class)
     override fun updateTorConfigCustom(content: String?) {
@@ -194,7 +186,7 @@ internal class ServiceTorInstaller(private val torService: TorService): TorInsta
             if (bridgeType.toInt() == 1)
                 ByteArrayInputStream(userDefinedBridgeList.toByteArray())
             else
-                torService.resources.openRawResource(R.raw.bridges)
+                torService.context.resources.openRawResource(R.raw.bridges)
         return SequenceInputStream(bridgeTypeStream, bridgeStream)
     }
 
