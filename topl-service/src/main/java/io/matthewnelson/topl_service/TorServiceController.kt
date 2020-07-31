@@ -405,15 +405,7 @@ class TorServiceController private constructor(): ServiceConsts() {
         private fun sendBroadcast(@ServiceAction action: String, extrasString: String? = null) {
             if (!::appContext.isInitialized)
                 throw builderDotBuildNotCalledException()
-
-            val broadcastIntent = Intent(TorServiceReceiver.SERVICE_INTENT_FILTER)
-            broadcastIntent.putExtra(TorServiceReceiver.SERVICE_INTENT_FILTER, action)
-            broadcastIntent.setPackage(appContext.packageName)
-
-            if (extrasString != null)
-                broadcastIntent.putExtra(action, extrasString)
-
-            appContext.sendBroadcast(broadcastIntent)
+            TorServiceReceiver.sendBroadcast(appContext, action, extrasString)
         }
     }
 }

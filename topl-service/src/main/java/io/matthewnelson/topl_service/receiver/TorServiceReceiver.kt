@@ -70,9 +70,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import io.matthewnelson.topl_service.TorServiceController
+import io.matthewnelson.topl_service.TorServiceController.Builder
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.TorService
+import io.matthewnelson.topl_service.util.ServiceConsts
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import java.math.BigInteger
 import java.security.SecureRandom
@@ -95,6 +98,25 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
         @Volatile
         var isRegistered = false
             private set
+
+        /**
+         * Adding a StringExtra to the Intent by passing a value for [extrasString] will
+         * always use the [action] as the key for retrieving it.
+         *
+         * @param [context] [Context]
+         * @param [action] A [ServiceConsts.ServiceAction] to be processed by [TorService]
+         * @param [extrasString] To be included in the intent.
+         * */
+        fun sendBroadcast(context: Context, @ServiceAction action: String, extrasString: String?) {
+            val broadcastIntent = Intent(SERVICE_INTENT_FILTER)
+            broadcastIntent.putExtra(SERVICE_INTENT_FILTER, action)
+            broadcastIntent.setPackage(context.applicationContext.packageName)
+
+            if (extrasString != null)
+                broadcastIntent.putExtra(action, extrasString)
+
+            context.applicationContext.sendBroadcast(broadcastIntent)
+        }
     }
 
     private val broadcastLogger = torService.getBroadcastLogger(TorServiceReceiver::class.java)
