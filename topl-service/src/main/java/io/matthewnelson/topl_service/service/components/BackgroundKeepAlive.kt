@@ -117,8 +117,11 @@ internal class BackgroundKeepAlive(
             while (isActive) {
                 delay(TorServiceController.backgroundHeartbeatTime)
                 if (isActive) {
-                    torService.signalControlConnection(TorControlCommands.SIGNAL_HEARTBEAT)
                     torService.startForegroundService().stopForeground(torService)
+                    if (torService.signalControlConnection(TorControlCommands.SIGNAL_HEARTBEAT)) {
+                        torService.registerReceiver()
+                        torService.addNotificationActions()
+                    }
                 }
             }
         }
@@ -135,14 +138,6 @@ internal class BackgroundKeepAlive(
         }
     }
 
-    private var currentActivity: Activity? = null
-    private fun updateCurrentActivity(activity: Activity, event: String) {
-        broadcastLCE(activity, event)
-        if (currentActivity != activity) {
-            currentActivity = activity
-        }
-    }
-
     private fun broadcastLCE(activity: Activity, event: String) =
         broadcastLogger.debug("${activity.javaClass.simpleName}@${activity.hashCode()} - $event")
 
@@ -151,7 +146,7 @@ internal class BackgroundKeepAlive(
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
 
     override fun onActivityStarted(activity: Activity) {
-        updateCurrentActivity(activity, "onActivityStarted")
+        broadcastLCE(activity, "onActivityStarted")
         torService.unregisterBackgroundKeepAlive()
     }
 
@@ -163,12 +158,11 @@ internal class BackgroundKeepAlive(
 
     override fun onActivityDestroyed(activity: Activity) {
         broadcastLCE(activity, "onActivityDestroyed")
-        if (currentActivity == activity) {
-            torService.startForegroundService()
-        }
+        // TorService.onTaskRemoved will handle the swap to foreground
+        torService.unregisterBackgroundKeepAlive()
     }
 
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
-        updateCurrentActivity(activity, "onActivitySaveInstanceState")
+        broadcastLCE(activity, "onActivitySaveInstanceState")
     }
 }
