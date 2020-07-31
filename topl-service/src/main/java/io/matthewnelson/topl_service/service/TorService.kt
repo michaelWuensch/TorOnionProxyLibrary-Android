@@ -345,12 +345,12 @@ internal class TorService: BaseService() {
                     processIntent(intent)
                 }
 
-        } else {
+        }/* else {
             // If it's null, we're getting a re-start from the system via START_STICKY
             // and need to relink everything.
             TorServiceController.startTor()
-        }
-        return START_STICKY
+        }*/
+        return /*START_STICKY*/START_NOT_STICKY
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
