@@ -83,6 +83,7 @@ import io.matthewnelson.topl_service.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.service.components.BackgroundKeepAlive
 import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.TorServiceBinder
+import io.matthewnelson.topl_service.service.components.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import kotlinx.coroutines.*
@@ -91,6 +92,10 @@ import java.io.IOException
 import java.lang.reflect.InvocationTargetException
 
 internal class TorService: BaseService() {
+
+    companion object {
+        val torServiceConnection = TorServiceConnection()
+    }
 
     override val context: Context
         get() = this
@@ -132,7 +137,7 @@ internal class TorService: BaseService() {
 
     override fun unbindService() {
         try {
-            TorServiceController.unbindTorService(context)
+            BaseService.unbindService(context, torServiceConnection)
             broadcastLogger.debug("Has been unbound")
         } catch (e: IllegalArgumentException) {}
     }

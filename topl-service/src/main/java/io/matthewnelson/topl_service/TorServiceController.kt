@@ -415,34 +415,5 @@ class TorServiceController private constructor(): ServiceConsts() {
 
             appContext.sendBroadcast(broadcastIntent)
         }
-
-
-        /////////////////////
-        /// ServiceBinder ///
-        /////////////////////
-        private val torServiceConnection = TorServiceConnection()
-
-        private fun bindTorService(context: Context) {
-            val bindingIntent = Intent(context.applicationContext, TorService::class.java)
-            bindingIntent.action = ServiceAction.START
-
-            context.applicationContext.bindService(
-                bindingIntent,
-                torServiceConnection,
-                Context.BIND_AUTO_CREATE
-            )
-        }
-
-        /**
-         * Unbinds [TorService] from the Application.
-         *
-         * @param [context]
-         * @throws [IllegalArgumentException] if no Service is bound (has already been unbound)
-         * */
-        @Throws(IllegalArgumentException::class)
-        internal fun unbindTorService(context: Context) {
-            torServiceConnection.clearServiceBinderReference()
-            context.applicationContext.unbindService(torServiceConnection)
-        }
     }
 }

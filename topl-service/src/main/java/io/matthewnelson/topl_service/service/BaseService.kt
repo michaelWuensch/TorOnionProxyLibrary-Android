@@ -73,6 +73,8 @@ import android.content.SharedPreferences
 import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_service.notification.ServiceNotification
+import io.matthewnelson.topl_service.service.components.BaseServiceConnection
+import io.matthewnelson.topl_service.util.ServiceConsts
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import kotlinx.coroutines.CoroutineScope
 import java.io.File
@@ -110,12 +112,47 @@ internal abstract class BaseService: Service() {
         // For things that can't be saved to TorServicePrefs, such as BuildConfig.VERSION_CODE
         fun getLocalPrefs(context: Context): SharedPreferences =
             context.getSharedPreferences("TorServiceLocalPrefs", Context.MODE_PRIVATE)
+
+        //////////////////////
+        /// ServiceBinding ///
+        //////////////////////
+        /**
+         * Binds to the provided [Service] class using the provided [BaseServiceConnection]
+         *
+         * @param [context] [Context]
+         * @param [serviceConn] The [BaseServiceConnection] to bind
+         * @param [clazz] The [Service]'s class you wish to unbind
+         * */
+        fun bindService(context: Context, serviceConn: BaseServiceConnection, clazz: Class<*>) {
+            val bindingIntent = Intent(context.applicationContext, clazz)
+            bindingIntent.action = ServiceConsts.ServiceAction.START
+
+            context.applicationContext.bindService(
+                bindingIntent,
+                serviceConn,
+                Context.BIND_AUTO_CREATE
+            )
+        }
+
+        /**
+         * Unbinds [TorService] from the Application and clears the
+         * [BaseServiceConnection.serviceBinder] reference.
+         *
+         * @param [context] [Context]
+         * @param [serviceConn] The [BaseServiceConnection] to unbind
+         * @throws [IllegalArgumentException] If no binding exists for the provided [serviceConn]
+         * */
+        @Throws(IllegalArgumentException::class)
+        fun unbindService(context: Context, serviceConn: BaseServiceConnection) {
+            serviceConn.clearServiceBinderReference()
+            context.applicationContext.unbindService(serviceConn)
+        }
     }
 
     // All classes that interact with System APIs which require context to do something
     // call this in production (torService.context), such that in testing we can easily
     // swap it out without needing to start the Service and still get functionality for
-    // that component.
+    // the components that make TorService work.
     abstract val context: Context
 
 
