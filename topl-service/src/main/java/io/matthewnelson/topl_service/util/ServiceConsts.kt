@@ -217,7 +217,7 @@ abstract class ServiceConsts: BaseConsts() {
         ServiceAction.START,
         ServiceAction.STOP
     )
-    @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
+    @Retention(AnnotationRetention.SOURCE)
     internal annotation class ServiceAction {
         companion object {
             const val SERVICE_ACTION = "ServiceAction_"
@@ -240,7 +240,7 @@ abstract class ServiceConsts: BaseConsts() {
         ActionCommand.STOP_SERVICE,
         ActionCommand.STOP_TOR
     )
-    @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
+    @Retention(AnnotationRetention.SOURCE)
     internal annotation class ActionCommand {
         companion object {
             private const val ACTION_COMMAND = "ActionCommand_"
@@ -253,4 +253,19 @@ abstract class ServiceConsts: BaseConsts() {
     }
 
 
+    ///////////////////////////////
+    /// BackgroundManagerPolicy ///
+    ///////////////////////////////
+    @StringDef(
+        BackgroundPolicy.FOREGROUND,
+        BackgroundPolicy.STOP_THEN_START
+    )
+    @Retention(AnnotationRetention.SOURCE)
+    internal annotation class BackgroundPolicy {
+        companion object {
+            const val BACKGROUND_POLICY = "BackgroundPolicy_"
+            const val FOREGROUND = "${BACKGROUND_POLICY}FOREGROUND"
+            const val STOP_THEN_START = "${BACKGROUND_POLICY}STOP_THEN_START"
+        }
+    }
 }

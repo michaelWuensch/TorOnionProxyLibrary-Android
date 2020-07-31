@@ -71,6 +71,7 @@ import android.app.Application
 import android.os.Bundle
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.TorService
+import io.matthewnelson.topl_service.util.ServiceConsts
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -100,12 +101,118 @@ import net.freehaven.tor.control.TorControlCommands
  * @param [torService] [BaseService]
  * */
 class BackgroundManager internal constructor(
-    private val torService: BaseService
-): Application.ActivityLifecycleCallbacks {
+    private val torService: BaseService/*,
+    private val application: Application,
+    @BackgroundPolicy private val policy: String,
+    private val executionDelay: Long*/
+): ServiceConsts(), Application.ActivityLifecycleCallbacks {
 
-    companion object {
+
+    /**
+     * When your application is sent to the background (the Recent App's tray), the chosen
+     * [BackgroundManager.Builder.Policy] will be executed after the number of seconds you've
+     * declared, unless brought *back* into the foreground by the user.
+     *
+     * While your application is in the foreground the only way to stop the service is by
+     * calling [io.matthewnelson.topl_service.TorServiceController.stopTor], or via the
+     * [io.matthewnelson.topl_service.notification.ServiceNotification] Action (if enabled);
+     * The OS will not kill a service started using `Context.startService` &
+     * `Context.bindService` (how [TorService] is started).
+     *
+     * When the user sends your application to the Recent App's tray though, the OS will kill
+     * your app after being idle for a period of time (random AF... typically 0.5m to 1.25m)
+     * to recoup resources. This is not an issue if the user removes the task before the OS
+     * kills the app, as Tor will be able to shutdown properly and the service will stop.
+     *
+     * This is where Services get sketch AF (especially when trying to implement an always
+     * running service for networking), and is the purpose of the [BackgroundManager] class.
+     *
+     * This [BackgroundManager.Builder] sets how you want the service to operate while your
+     * app is in the background (the Recent App's tray), such that we don't hog resources
+     * unnecessarily, and run reliably based off of your application's needs.
+     *
+     * @sample [io.matthewnelson.sampleapp.App.generateBackgroundManagerPolicy]
+     * */
+    class Builder {
+
+        @BackgroundPolicy private lateinit var chosenPolicy: String
+        private var executionDelay: Long = 30_000L
+
+        /**
+         * While your application is in the background (the Recent App's tray), run
+         * [TorService] in the foreground to prevent going idle and being killed. A
+         * Notification will be displayed no matter if you set
+         * [io.matthewnelson.topl_service.notification.ServiceNotification.Builder.showNotification]
+         * to `false` or not.
+         *
+         * @param [secondsFrom15To45]? Seconds before the [Policy] is executed after the
+         *   Application goes to the background. Sending null will use the default (30s)
+         * @return [BackgroundManager.Builder.Policy] To use when initializing
+         *   [io.matthewnelson.topl_service.TorServiceController.Builder]
+         * */
+        fun switchServiceToForeground(secondsFrom15To45: Int? = null): Policy {
+            chosenPolicy = BackgroundPolicy.FOREGROUND
+            if (secondsFrom15To45 != null && secondsFrom15To45 in 15..45)
+                executionDelay = (secondsFrom15To45 * 1000).toLong()
+            return Policy(this)
+        }
+
+        /**
+         * Stops [TorService], and then starts it up again if your application is brought back
+         * into the foreground between when the [Policy] is executed and the application is
+         * killed by the OS.
+         *
+         * Your application won't go through it's normal `Application.onCreate` process, but
+         * [TorService] will have been stopped when the policy gets executed. Electing
+         * this option ensures [TorService] gets restarted in a more reliable manner then
+         * returning `Context.START_STICKY` in [TorService.onStartCommand]. It also allows for
+         * a proper shutdown of Tor prior to the service being stopped instead of it being
+         * killed along with your application (which causes problems sometimes).
+         *
+         * If killed by the OS then this class gets garbage collected such that in the event
+         * the user brings your application back into the foreground (after it had been killed),
+         * this will be re-instantiated when going through `Application.onCreate` again, and
+         * [TorService] started by however you have it implemented.
+         *
+         * @param [secondsFrom15To45]? Seconds before the [Policy] is executed after the
+         *   Application goes to the background. Sending null will use the default (30s)
+         * @return [BackgroundManager.Builder.Policy] To use when initializing
+         *   [io.matthewnelson.topl_service.TorServiceController.Builder]
+         * */
+        fun stopServiceThenStartIfBroughtBackIntoForeground(secondsFrom15To45: Int? = null): Policy {
+            chosenPolicy = BackgroundPolicy.STOP_THEN_START
+            if (secondsFrom15To45 != null && secondsFrom15To45 in 15..45)
+                executionDelay = (secondsFrom15To45 * 1000).toLong()
+            return Policy(this)
+        }
+
+        /**
+         * Holds the chosen policy to be built in
+         * [io.matthewnelson.topl_service.TorServiceController.Builder.build].
+         *
+         * @param [policyBuilder] The [BackgroundManager.Builder] to be built during initialization
+         * */
+        class Policy(private val policyBuilder: BackgroundManager.Builder) {
+
+            internal fun build(application: Application) {
+//                backgroundManager = BackgroundManager(
+//                    application,
+//                    policyBuilder.chosenPolicy,
+//                    policyBuilder.executionDelay
+//                )
+            }
+        }
+    }
+
+    internal companion object {
+        lateinit var backgroundManager: BackgroundManager
+
+//        @BackgroundPolicy private lateinit var backgroundPolicy: String
+//        private var delayLength = 30_000L
+
         var heartbeatTime = 30_000L
             private set
+
         fun initialize(milliseconds: Long) {
             heartbeatTime = milliseconds
         }

@@ -109,6 +109,8 @@ class TorServiceController private constructor(): ServiceConsts() {
      * @param [application] [Application], for obtaining context
      * @param [torServiceNotificationBuilder] The [ServiceNotification.Builder] for
      *   customizing [TorService]'s notification
+     * @param [backgroundManagerPolicy] The [BackgroundManager.Builder.Policy] to be executed
+     *   while your application is in the background (the Recent App's tray).
      * @param [buildConfigVersionCode] send [BuildConfig.VERSION_CODE]. Mitigates copying of geoip
      *   files to app updates only
      * @param [torSettings] [TorSettings] used to create your torrc file on start of Tor
@@ -118,11 +120,13 @@ class TorServiceController private constructor(): ServiceConsts() {
      *   assets/common directory, send this variable "common/geoip6")
      *
      * @sample [io.matthewnelson.sampleapp.App.generateTorServiceNotificationBuilder]
+     * @sample [io.matthewnelson.sampleapp.App.generateBackgroundManagerPolicy]
      * @sample [io.matthewnelson.sampleapp.App.setupTorServices]
      * */
     class Builder(
         private val application: Application,
         private val torServiceNotificationBuilder: ServiceNotification.Builder,
+        private val backgroundManagerPolicy: BackgroundManager.Builder.Policy,
         private val buildConfigVersionCode: Int,
         private val torSettings: TorSettings,
         private val geoipAssetPath: String,
@@ -289,6 +293,8 @@ class TorServiceController private constructor(): ServiceConsts() {
 
             torServiceNotificationBuilder.build()
             ServiceNotification.get().setupNotificationChannel(application.applicationContext)
+
+            backgroundManagerPolicy.build(application)
         }
     }
 

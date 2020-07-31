@@ -73,6 +73,7 @@ import androidx.core.app.NotificationCompat
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.notification.ServiceNotification
+import io.matthewnelson.topl_service.service.components.BackgroundManager
 import java.io.File
 
 /**
@@ -117,11 +118,19 @@ class App: Application() {
 //  }
     }
 
+    private fun generateBackgroundManagerPolicy(): BackgroundManager.Builder.Policy {
+//  private fun generateBackgroundManagerPolicy(): BackgroundManager.Builder.Policy {
+        return BackgroundManager.Builder()
+            .stopServiceThenStartIfBroughtBackIntoForeground(secondsFrom15To45 = 30)
+//  }
+    }
+
     private fun setupTorServices(application: Application, torConfigFiles: TorConfigFiles) {
 //  private fun setupTorServices(application: Application, torConfigFiles: TorConfigFiles ) {
         TorServiceController.Builder(
             application = application,
             torServiceNotificationBuilder = generateTorServiceNotificationBuilder(),
+            backgroundManagerPolicy = generateBackgroundManagerPolicy(),
             buildConfigVersionCode = BuildConfig.VERSION_CODE,
 
             // Can instantiate directly here then access it from
