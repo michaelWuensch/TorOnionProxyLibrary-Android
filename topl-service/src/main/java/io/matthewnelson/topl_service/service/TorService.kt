@@ -93,10 +93,6 @@ import java.lang.reflect.InvocationTargetException
 
 internal class TorService: BaseService() {
 
-    companion object {
-        val torServiceConnection = TorServiceConnection()
-    }
-
     override val context: Context
         get() = this
 
@@ -137,7 +133,7 @@ internal class TorService: BaseService() {
 
     override fun unbindService() {
         try {
-            BaseService.unbindService(context, torServiceConnection)
+            BaseService.unbindService(context, TorServiceConnection.torServiceConnection)
             broadcastLogger.debug("Has been unbound")
         } catch (e: IllegalArgumentException) {}
     }

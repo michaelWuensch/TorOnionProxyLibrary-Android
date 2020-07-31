@@ -71,6 +71,10 @@ import android.os.IBinder
 
 internal class TorServiceConnection: BaseServiceConnection() {
 
+    companion object {
+        val torServiceConnection = TorServiceConnection()
+    }
+
     override fun onServiceDisconnected(name: ComponentName?) {
         // TODO: Implement logic for detecting undesired calls to this method (which
         //  is primarily when this gets fired off).
