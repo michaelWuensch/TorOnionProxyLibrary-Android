@@ -75,6 +75,7 @@ import io.matthewnelson.topl_service.TorServiceController.Builder
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.TorService
+import io.matthewnelson.topl_service.service.components.BackgroundManager
 import io.matthewnelson.topl_service.util.ServiceConsts
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import java.math.BigInteger
@@ -125,7 +126,7 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
         torService.context.applicationContext
             .registerReceiver(this, IntentFilter(SERVICE_INTENT_FILTER))
         if (!isRegistered)
-            broadcastLogger.debug("Receiver registered")
+            broadcastLogger.debug("Has been registered")
         isRegistered = true
     }
 
@@ -134,13 +135,15 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
             try {
                 torService.context.applicationContext.unregisterReceiver(this)
                 isRegistered = false
-                broadcastLogger.debug("Receiver unregistered")
+                broadcastLogger.debug("Has been unregistered")
             } catch (e: IllegalArgumentException) {
                 broadcastLogger.exception(e)
             }
         }
     }
 
+    // TODO: Funnel everything through the binder that is instantiated in order to handle
+    //  BackgroundManager execution stuff properly and in a single spot.
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context != null && intent != null) {
             // Only accept Intents from this package.
@@ -151,6 +154,13 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
                 // Only accept these 3 ServiceActions.
                 ServiceAction.NEW_ID, ServiceAction.RESTART_TOR, ServiceAction.STOP -> {
                     val newIntent = Intent(serviceAction)
+
+                    // To STOP, user either clicks notification Action STOP (if enabled),
+                    // or TorServiceController.StopTor was called (sending a broadcast here).
+                    // Either way we need to stop listening to the Activity LCEs so the return
+                    // to foreground doesn't go off.
+                    if (serviceAction == ServiceAction.STOP)
+                        torService.unregisterBackgroundManager(executeRestart = false)
 
                     // If the broadcast intent has any string extras, their key will be the
                     // ServiceAction that was included.
