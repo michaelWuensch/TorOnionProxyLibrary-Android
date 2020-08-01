@@ -439,10 +439,10 @@ class ServiceNotification internal constructor(
     /// Foreground Service ///
     //////////////////////////
     @Volatile
-    var inForeground = false
+    internal var inForeground = false
         private set
     @Volatile
-    var notificationShowing = false
+    internal var notificationShowing = false
         private set
 
     @Synchronized
@@ -472,7 +472,7 @@ class ServiceNotification internal constructor(
     /// Actions ///
     ///////////////
     @Volatile
-    var actionsPresent = false
+    internal var actionsPresent = false
         private set
 
     @Synchronized
@@ -529,7 +529,7 @@ class ServiceNotification internal constructor(
     /// Content Text ///
     ////////////////////
     @Volatile
-    var currentContentText = "Waiting..."
+    internal var currentContentText = "Waiting..."
         private set
 
     @Synchronized
@@ -546,7 +546,7 @@ class ServiceNotification internal constructor(
     /// Content Title ///
     /////////////////////
     @Volatile
-    var currentContentTitle = TorState.OFF
+    internal var currentContentTitle = TorState.OFF
         private set
 
     @Synchronized
@@ -563,7 +563,7 @@ class ServiceNotification internal constructor(
     /// Icon ///
     ////////////
     @Volatile
-    var currentIcon = imageNetworkDisabled
+    internal var currentIcon = imageNetworkDisabled
         private set
 
     @Synchronized
@@ -602,7 +602,7 @@ class ServiceNotification internal constructor(
     /// Progress Bar ///
     ////////////////////
     @Volatile
-    var progressBarShown = false
+    internal var progressBarShown = false
         private set
 
     @Synchronized
