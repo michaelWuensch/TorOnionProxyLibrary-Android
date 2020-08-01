@@ -17,6 +17,7 @@ ext.deps = [
         lifecycle: [
             commonJava8: "androidx.lifecycle:lifecycle-common-java8:${versions.lifecycle}",
             liveData: "androidx.lifecycle:lifecycle-livedata-ktx:${versions.lifecycle}",
+            processLifecycleOwner: "androidx.lifecycle:lifecycle-process:${versions.lifecycle}",
             reactiveStreams: "androidx.lifecycle:lifecycle-reactivestreams-ktx:${versions.lifecycle}",
             runtime: "androidx.lifecycle:lifecycle-runtime-ktx:${versions.lifecycle}",
             service: "androidx.lifecycle:lifecycle-service:${versions.lifecycle}",

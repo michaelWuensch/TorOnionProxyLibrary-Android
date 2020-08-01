@@ -68,6 +68,7 @@ package io.matthewnelson.topl_service
 
 import android.app.Application
 import android.content.Context
+import android.content.Intent
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_core_base.EventBroadcaster
@@ -75,10 +76,12 @@ import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.service.components.BackgroundKeepAlive
+import io.matthewnelson.topl_service.service.components.BackgroundManager
+import io.matthewnelson.topl_service.service.components.BaseServiceConnection
 import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts
+import kotlinx.coroutines.Dispatchers
 
 class TorServiceController private constructor(): ServiceConsts() {
 
@@ -109,6 +112,8 @@ class TorServiceController private constructor(): ServiceConsts() {
      * @param [application] [Application], for obtaining context
      * @param [torServiceNotificationBuilder] The [ServiceNotification.Builder] for
      *   customizing [TorService]'s notification
+     * @param [backgroundManagerPolicy] The [BackgroundManager.Builder.Policy] to be executed
+     *   while your application is in the background (the Recent App's tray).
      * @param [buildConfigVersionCode] send [BuildConfig.VERSION_CODE]. Mitigates copying of geoip
      *   files to app updates only
      * @param [torSettings] [TorSettings] used to create your torrc file on start of Tor
@@ -118,11 +123,13 @@ class TorServiceController private constructor(): ServiceConsts() {
      *   assets/common directory, send this variable "common/geoip6")
      *
      * @sample [io.matthewnelson.sampleapp.App.generateTorServiceNotificationBuilder]
+     * @sample [io.matthewnelson.sampleapp.App.generateBackgroundManagerPolicy]
      * @sample [io.matthewnelson.sampleapp.App.setupTorServices]
      * */
     class Builder(
         private val application: Application,
         private val torServiceNotificationBuilder: ServiceNotification.Builder,
+        private val backgroundManagerPolicy: BackgroundManager.Builder.Policy,
         private val buildConfigVersionCode: Int,
         private val torSettings: TorSettings,
         private val geoipAssetPath: String,
@@ -130,7 +137,7 @@ class TorServiceController private constructor(): ServiceConsts() {
     ) {
 
         private var appEventBroadcaster: EventBroadcaster? = Companion.appEventBroadcaster
-        private var backgroundHeartbeatTime = BackgroundKeepAlive.backgroundHeartbeatTime
+//        private var heartbeatTime = BackgroundManager.heartbeatTime
         private var restartTorDelayTime = ServiceActionProcessor.restartTorDelayTime
         private var stopServiceDelayTime = ServiceActionProcessor.stopServiceDelayTime
         private var torConfigFiles: TorConfigFiles? = null
@@ -185,27 +192,27 @@ class TorServiceController private constructor(): ServiceConsts() {
             return this
         }
 
-        /**
-         * Default is set to 30_000ms
-         *
-         * When the user sends your application to the background (recent app's tray),
-         * [io.matthewnelson.topl_service.service.components.BackgroundKeepAlive] begins
-         * a heartbeat for Tor, as well as cycling [TorService] between foreground and
-         * background as to keep the OS from killing things due to being idle for too long.
-         *
-         * If the user returns the application to the foreground, the heartbeat and
-         * foreground/background cycling stops.
-         *
-         * This method sets the time between each heartbeat.
-         *
-         * @param [milliseconds] A Long between 15_000 and 45_000. Will fallback to default
-         *   value if not between that range
-         * */
-        fun setBackgroundHeartbeatTime(milliseconds: Long): Builder {
-            if (milliseconds in 15_000L..45_000L)
-                backgroundHeartbeatTime = milliseconds
-            return this
-        }
+//        /**
+//         * Default is set to 30_000ms
+//         *
+//         * When the user sends your application to the background (recent app's tray),
+//         * [io.matthewnelson.topl_service.service.components.BackgroundManager] begins
+//         * a heartbeat for Tor, as well as cycling [TorService] between foreground and
+//         * background as to keep the OS from killing things due to being idle for too long.
+//         *
+//         * If the user returns the application to the foreground, the heartbeat and
+//         * foreground/background cycling stops.
+//         *
+//         * This method sets the time between each heartbeat.
+//         *
+//         * @param [milliseconds] A Long between 15_000 and 45_000. Will fallback to default
+//         *   value if not between that range
+//         * */
+//        fun setBackgroundHeartbeatTime(milliseconds: Long): Builder {
+//            if (milliseconds in 15_000L..45_000L)
+//                heartbeatTime = milliseconds
+//            return this
+//        }
 
         /**
          * This makes it such that on your Application's **Debug** builds, the `topl-core` and
@@ -282,13 +289,19 @@ class TorServiceController private constructor(): ServiceConsts() {
                 torConfigFiles ?: TorConfigFiles.createConfig(application.applicationContext),
                 torSettings
             )
-            BackgroundKeepAlive.initialize(backgroundHeartbeatTime)
+
+//            BackgroundManager.initialize(heartbeatTime)
             ServiceActionProcessor.initialize(restartTorDelayTime, stopServiceDelayTime)
 
             Companion.appEventBroadcaster = this.appEventBroadcaster
 
             torServiceNotificationBuilder.build()
             ServiceNotification.get().setupNotificationChannel(application.applicationContext)
+
+            backgroundManagerPolicy.build(
+                TorService::class.java,
+                TorServiceConnection.torServiceConnection
+            )
         }
     }
 
@@ -340,33 +353,26 @@ class TorServiceController private constructor(): ServiceConsts() {
 
         /**
          * Stops [TorService].
-         *
-         * @throws [RuntimeException] if called before [Builder.build]
          * */
-        @Throws(RuntimeException::class)
         fun stopTor() =
-            sendBroadcast(ServiceAction.STOP)
+            BaseServiceConnection.serviceBinder?.submitServiceActionIntent(
+                Intent(ServiceAction.STOP)
+            )
 
         /**
          * Restarts Tor.
-         *
-         * @throws [RuntimeException] if called before [Builder.build]
          * */
-        @Throws(RuntimeException::class)
         fun restartTor() =
-            sendBroadcast(ServiceAction.RESTART_TOR)
+            BaseServiceConnection.serviceBinder?.submitServiceActionIntent(
+                Intent(ServiceAction.RESTART_TOR)
+            )
 
         /**
          * Changes identities.
-         *
-         * @throws [RuntimeException] if called before [Builder.build]
          * */
-        @Throws(RuntimeException::class)
         fun newIdentity() =
-            sendBroadcast(ServiceAction.NEW_ID)
-
-        @Throws(RuntimeException::class)
-        private fun sendBroadcast(@ServiceAction action: String) =
-            TorServiceReceiver.sendBroadcast(BaseService.getAppContext(), action, null)
+            BaseServiceConnection.serviceBinder?.submitServiceActionIntent(
+                Intent(ServiceAction.NEW_ID)
+            )
     }
 }

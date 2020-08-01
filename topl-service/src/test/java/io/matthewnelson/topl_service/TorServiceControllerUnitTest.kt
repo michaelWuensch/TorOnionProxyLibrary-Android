@@ -73,6 +73,7 @@ import io.matthewnelson.test_helpers.application_provided_classes.TestTorSetting
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.BaseService
+import io.matthewnelson.topl_service.service.components.BackgroundManager
 import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
 import org.junit.*
 import org.junit.Assert.assertEquals
@@ -131,13 +132,6 @@ internal class TorServiceControllerUnitTest {
     }
 
     @Test(expected = RuntimeException::class)
-    fun `_throw errors if sendBroadcast called before build`() {
-        // sendBroadcast method used in newIdentity, restartTor, and stopTor
-        // which is what will throw the RuntimeException.
-        TorServiceController.newIdentity()
-    }
-
-    @Test(expected = RuntimeException::class)
     fun `_throw errors if getTorSettings called before build`() {
         TorServiceController.getTorSettings()
     }
@@ -160,7 +154,7 @@ internal class TorServiceControllerUnitTest {
         getNewControllerBuilder()
             .addTimeToRestartTorDelay(timeToAdd)
             .addTimeToStopServiceDelay(timeToAdd)
-            .setBackgroundHeartbeatTime(40_000)
+//            .setBackgroundHeartbeatTime(40_000)
             .setBuildConfigDebug(!BuildConfig.DEBUG)
             .setEventBroadcaster(TestEventBroadcaster())
             .build()
@@ -202,6 +196,7 @@ internal class TorServiceControllerUnitTest {
         return TorServiceController.Builder(
             app,
             notificationBuilder,
+            BackgroundManager.Builder().respectResourcesWhileInBackground(30),
             BuildConfig.VERSION_CODE,
             torSettings,
             "common/geoip",

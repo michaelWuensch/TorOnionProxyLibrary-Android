@@ -80,7 +80,7 @@ import io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller
 import io.matthewnelson.topl_service.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.receiver.TorServiceReceiver
-import io.matthewnelson.topl_service.service.components.BackgroundKeepAlive
+import io.matthewnelson.topl_service.service.components.BackgroundManager
 import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.TorServiceBinder
 import io.matthewnelson.topl_service.service.components.TorServiceConnection
@@ -95,35 +95,6 @@ internal class TorService: BaseService() {
 
     override val context: Context
         get() = this
-
-
-    ///////////////////////////
-    /// BackgroundKeepAlive ///
-    ///////////////////////////
-    private var backgroundKeepAlive: BackgroundKeepAlive? = null
-
-    override fun registerBackgroundKeepAlive() {
-        backgroundKeepAlive?.unregister()
-        backgroundKeepAlive = BackgroundKeepAlive(this)
-    }
-    override fun unregisterBackgroundKeepAlive() {
-        backgroundKeepAlive?.unregister()
-        backgroundKeepAlive = null
-    }
-    override fun onTrimMemory(level: Int) {
-        when (level) {
-            ComponentCallbacks2.TRIM_MEMORY_COMPLETE -> {
-            }
-            ComponentCallbacks2.TRIM_MEMORY_MODERATE -> {
-                startForegroundService().stopForeground(this)
-            }
-            ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN -> {
-                broadcastLogger.debug("Application sent to background")
-                registerBackgroundKeepAlive()
-            }
-            else -> {}
-        }
-    }
 
 
     ///////////////
@@ -319,6 +290,8 @@ internal class TorService: BaseService() {
     }
 
 
+
+
     override fun onCreate() {
         serviceNotification.buildNotification(this)
         broadcastLogger.notice("BuildConfig.DEBUG set to: $buildConfigDebug")
@@ -327,36 +300,44 @@ internal class TorService: BaseService() {
 
     override fun onDestroy() {
         unregisterPrefsListener()
-        unregisterBackgroundKeepAlive()
         removeNotification()
         supervisorJob.cancel()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent != null) {
+        intent?.action?.let {
+            if (it == ServiceAction.START) {
+                updateLastAcceptedServiceAction(it)
+                processIntent(intent)
+            } else {
+                broadcastLogger.warn(
+                    "$it was used with startService. Use only ${ServiceAction.START} to" +
+                            "ensure proper startup of Tor"
+                )
+                updateLastAcceptedServiceAction(ServiceAction.START)
+                processIntent(Intent(ServiceAction.START))
 
-                if (intent.action == ServiceAction.START) {
+                if (it.contains(ServiceAction.SERVICE_ACTION)) {
                     processIntent(intent)
-                } else {
-                    broadcastLogger.warn(
-                        "${intent.action} was used with startService. Use only " +
-                                "${ServiceAction.START} to ensure proper startup of Tor"
-                    )
-                    processIntent(Intent(ServiceAction.START))
-                    processIntent(intent)
+                    updateLastAcceptedServiceAction(it)
                 }
-
-        }/* else {
-            // If it's null, we're getting a re-start from the system via START_STICKY
-            // and need to relink everything.
-            TorServiceController.startTor()
-        }*/
-        return /*START_STICKY*/START_NOT_STICKY
+            }
+        }
+        return START_NOT_STICKY
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
+        // Move to the foreground so we can properly shutdown w/o interrupting the
+        // application's normal lifecycle (Context.startServiceForeground does... thus,
+        // the complexity)
         startForegroundService()
+
+        // Cancel the BackgroundManager's coroutine if it's active so it doesn't execute
+        torServiceBinder.cancelExecuteBackgroundPolicyJob(BackgroundManager.getPolicy())
+
         broadcastLogger.debug("Task has been removed")
+
+        // Shutdown Tor and stop the Service
         processIntent(Intent(ServiceAction.STOP))
     }
 }

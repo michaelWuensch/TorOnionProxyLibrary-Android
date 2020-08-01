@@ -89,7 +89,7 @@ internal class TorServicePrefsListener(
 
     init {
         torServicePrefs.registerListener(this)
-        broadcastLogger.debug("Listener registered")
+        broadcastLogger.debug("Has been registered")
     }
 
     /**
@@ -97,7 +97,7 @@ internal class TorServicePrefsListener(
      * */
     fun unregister() {
         torServicePrefs.unregisterListener(this)
-        broadcastLogger.debug("Listener unregistered")
+        broadcastLogger.debug("Has been unregistered")
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {

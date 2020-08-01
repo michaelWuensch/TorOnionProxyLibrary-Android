@@ -69,37 +69,86 @@ package io.matthewnelson.topl_service.service.components
 import android.content.Intent
 import android.os.Binder
 import io.matthewnelson.topl_service.service.BaseService
+import io.matthewnelson.topl_service.util.ServiceConsts.BackgroundPolicy
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+
 
 internal class TorServiceBinder(private val torService: BaseService): Binder() {
 
-    private fun throwIllegalArgument(action: String?) {
-        throw IllegalArgumentException(
-            "$action is not an accepted argument for ${this.javaClass.simpleName}"
-        )
-    }
+    private val broadcastLogger = torService.getBroadcastLogger(TorServiceBinder::class.java)
 
-    @Throws(IllegalArgumentException::class)
     fun submitServiceActionIntent(serviceActionIntent: Intent) {
         val action = serviceActionIntent.action
         if (action != null && action.contains(ServiceAction.SERVICE_ACTION)) {
 
             when (action) {
-                ServiceAction.NEW_ID,
-                ServiceAction.RESTART_TOR,
-                ServiceAction.START,
-                ServiceAction.STOP -> {
+                ServiceAction.START -> {
                     // Do not accept the above ServiceActions through use of this method.
-                    // NEW_ID, RESTART_TOR, STOP = via BroadcastReceiver
                     // START = to start TorService
-                    throwIllegalArgument(action)
+                    broadcastLogger.warn("$action is not an accepted intent action for this class")
                 }
                 else -> {
+                    BaseService.updateLastAcceptedServiceAction(action)
                     torService.processIntent(serviceActionIntent)
                 }
             }
-        } else {
-            throwIllegalArgument(action)
+        }
+    }
+
+
+    //////////////////////////////////////////
+    /// BackgroundManager Policy Execution ///
+    //////////////////////////////////////////
+
+    val bgMgrBroadcastLogger = torService.getBroadcastLogger(BackgroundManager::class.java)
+    private var backgroundPolicyExecutionJob: Job? = null
+
+    /**
+     * Execution of a [BackgroundPolicy] takes place here in order to stay within the lifecycle
+     * of [io.matthewnelson.topl_service.service.TorService] so that we prevent any potential
+     * leaks from occurring.
+     *
+     * @param [policy] The [BackgroundPolicy] to be executed
+     * @param [executionDelay] the time expressed in your [BackgroundManager.Builder.Policy]
+     * */
+    fun executeBackgroundPolicyJob(@BackgroundPolicy policy: String, executionDelay: Long) {
+        cancelExecuteBackgroundPolicyJob(policy)
+        backgroundPolicyExecutionJob = torService.getScopeMain().launch {
+            when (policy) {
+                BackgroundPolicy.KEEP_ALIVE -> {
+                    while (isActive && BaseServiceConnection.serviceBinder != null) {
+                        delay(executionDelay)
+                        if (isActive && BaseServiceConnection.serviceBinder != null) {
+                            bgMgrBroadcastLogger.debug("Executing $policy")
+                            torService.startForegroundService()
+                            torService.stopForegroundService()
+                        }
+                    }
+                }
+                BackgroundPolicy.RESPECT_RESOURCES -> {
+                    delay(executionDelay)
+                    bgMgrBroadcastLogger.debug("Executing $policy")
+                    torService.processIntent(Intent(ServiceAction.STOP))
+                }
+            }
+        }
+    }
+
+    /**
+     * Cancels the coroutine executing the [BackgroundPolicy] if it is active.
+     *
+     * @param [policy] the [BackgroundPolicy] being cancelled
+     * */
+    fun cancelExecuteBackgroundPolicyJob(@BackgroundPolicy policy: String) {
+        if (backgroundPolicyExecutionJob?.isActive == true) {
+            backgroundPolicyExecutionJob?.let {
+                it.cancel()
+                bgMgrBroadcastLogger.debug("Execution of $policy has been cancelled")
+            }
         }
     }
 }

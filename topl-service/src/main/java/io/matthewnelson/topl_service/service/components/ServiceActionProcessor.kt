@@ -112,6 +112,7 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
     private fun processActionObject(serviceActionObject: ServiceActionObject) {
         when (serviceActionObject) {
             is ActionCommands.Stop -> {
+                torService.unbindService()
                 torService.unregisterReceiver()
                 clearActionQueue()
                 broadcastLogger.notice(serviceActionObject.serviceAction)
@@ -231,7 +232,6 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
                 }
             }
             ActionCommand.STOP_SERVICE -> {
-                torService.unbindService()
                 broadcastDebugObjectDetailsMsg("Stopping: ", torService)
                 torService.stopService()
             }

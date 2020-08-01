@@ -78,7 +78,7 @@ import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.BuildConfig
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.components.BaseServiceConnection
-import io.matthewnelson.topl_service.util.ServiceConsts
+import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import kotlinx.coroutines.CoroutineScope
 import java.io.File
@@ -132,12 +132,35 @@ internal abstract class BaseService: Service() {
         fun getLocalPrefs(context: Context): SharedPreferences =
             context.getSharedPreferences("TorServiceLocalPrefs", Context.MODE_PRIVATE)
 
+
+        ///////////////////////////////////
+        /// Last Accepted ServiceAction ///
+        ///////////////////////////////////
+        @Volatile
+        @ServiceAction var lastAcceptedServiceAction: String = ServiceAction.STOP
+            private set
+
+        /**
+         * Updates [lastAcceptedServiceAction] in several key places so that we can keep the
+         * Service's state in sync with the latest calls coming from the Application using
+         * the Library. It is used in [TorService.onStartCommand] and
+         * [io.matthewnelson.topl_service.service.components.TorServiceBinder.submitServiceActionIntent]
+         *
+         * @param [serviceAction] The [ServiceAction] to update [lastAcceptedServiceAction] to
+         * */
+        fun updateLastAcceptedServiceAction(@ServiceAction serviceAction: String) {
+            lastAcceptedServiceAction = serviceAction
+        }
+        fun wasLastAcceptedServiceActionStop(): Boolean =
+            lastAcceptedServiceAction == ServiceAction.STOP
+
         //////////////////////
         /// ServiceStartup ///
         //////////////////////
+
         fun startService(context: Context, clazz: Class<*>, serviceConn: BaseServiceConnection) {
             val startServiceIntent = Intent(context.applicationContext, clazz)
-            startServiceIntent.action = ServiceConsts.ServiceAction.START
+            startServiceIntent.action = ServiceAction.START
             context.applicationContext.startService(startServiceIntent)
             bindService(context.applicationContext, serviceConn, clazz)
         }
@@ -150,7 +173,7 @@ internal abstract class BaseService: Service() {
          * */
         private fun bindService(context: Context, serviceConn: BaseServiceConnection, clazz: Class<*>) {
             val bindingIntent = Intent(context.applicationContext, clazz)
-            bindingIntent.action = ServiceConsts.ServiceAction.START
+            bindingIntent.action = ServiceAction.START
 
             context.applicationContext.bindService(
                 bindingIntent,
@@ -179,13 +202,6 @@ internal abstract class BaseService: Service() {
     // swap it out without needing to start the Service and still get functionality for
     // the components that make TorService work.
     abstract val context: Context
-
-
-    ///////////////////////////
-    /// BackgroundKeepAlive ///
-    ///////////////////////////
-    abstract fun registerBackgroundKeepAlive()
-    abstract fun unregisterBackgroundKeepAlive()
 
 
     ///////////////

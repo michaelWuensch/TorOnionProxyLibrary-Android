@@ -15,6 +15,8 @@ import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.onionproxy.ServiceEventBroadcaster
 import io.matthewnelson.topl_service.prefs.TorServicePrefs
 import io.matthewnelson.topl_service.receiver.TorServiceReceiver
+import io.matthewnelson.topl_service.service.components.BackgroundManager
+import io.matthewnelson.topl_service.service.components.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyBoolean
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import io.matthewnelson.topl_service.util.ServiceUtilities
@@ -100,9 +102,20 @@ internal class TorServiceUnitTest {
     private fun getNewControllerBuilder(
         notificationBuilder: ServiceNotification.Builder
     ): TorServiceController.Builder {
+        val backgroundPolicyBuilder = BackgroundManager.Builder()
+            .respectResourcesWhileInBackground(5)
+
+        // Build it prior to initializing TorServiceController with the builder
+        // so we get our test classes initialized which won't be overwritten.
+        backgroundPolicyBuilder.build(
+            TestTorService::class.java,
+            TorServiceConnection.torServiceConnection
+        )
+
         return TorServiceController.Builder(
             app,
             notificationBuilder,
+            backgroundPolicyBuilder,
             BuildConfig.VERSION_CODE,
             torSettings,
             "common/geoip",

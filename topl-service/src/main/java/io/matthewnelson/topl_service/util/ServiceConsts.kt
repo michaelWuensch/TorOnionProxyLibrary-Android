@@ -210,14 +210,16 @@ abstract class ServiceConsts: BaseConsts() {
     //////////////////////
     /// ServiceActions ///
     //////////////////////
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.TYPE)
+    @Target(AnnotationTarget.CLASS, AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.TYPE,
+        AnnotationTarget.PROPERTY
+    )
     @StringDef(
         ServiceAction.NEW_ID,
         ServiceAction.RESTART_TOR,
         ServiceAction.START,
         ServiceAction.STOP
     )
-    @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
+    @Retention(AnnotationRetention.SOURCE)
     internal annotation class ServiceAction {
         companion object {
             const val SERVICE_ACTION = "ServiceAction_"
@@ -240,7 +242,7 @@ abstract class ServiceConsts: BaseConsts() {
         ActionCommand.STOP_SERVICE,
         ActionCommand.STOP_TOR
     )
-    @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
+    @Retention(AnnotationRetention.SOURCE)
     internal annotation class ActionCommand {
         companion object {
             private const val ACTION_COMMAND = "ActionCommand_"
@@ -253,4 +255,25 @@ abstract class ServiceConsts: BaseConsts() {
     }
 
 
+    ///////////////////////////////
+    /// BackgroundManagerPolicy ///
+    ///////////////////////////////
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.PROPERTY,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.TYPE
+    )
+    @StringDef(
+        BackgroundPolicy.KEEP_ALIVE,
+        BackgroundPolicy.RESPECT_RESOURCES
+    )
+    @Retention(AnnotationRetention.SOURCE)
+    internal annotation class BackgroundPolicy {
+        companion object {
+            private const val BACKGROUND_POLICY = "BackgroundPolicy_"
+            const val KEEP_ALIVE = "${BACKGROUND_POLICY}KEEP_ALIVE"
+            const val RESPECT_RESOURCES = "${BACKGROUND_POLICY}RESPECT_RESOURCES"
+        }
+    }
 }

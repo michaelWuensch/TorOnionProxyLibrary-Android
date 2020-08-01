@@ -35,17 +35,6 @@ internal class TestTorService(
 ): BaseService() {
 
 
-    ///////////////////////////
-    /// BackgroundKeepAlive ///
-    ///////////////////////////
-    override fun registerBackgroundKeepAlive() {
-
-    }
-    override fun unregisterBackgroundKeepAlive() {
-
-    }
-
-
     ///////////////
     /// Binding ///
     ///////////////
