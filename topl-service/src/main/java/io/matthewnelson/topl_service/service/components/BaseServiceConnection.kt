@@ -4,9 +4,11 @@ import android.content.ServiceConnection
 
 internal abstract class BaseServiceConnection: ServiceConnection {
 
-    @Volatile
-    var serviceBinder: TorServiceBinder? = null
-        private set
+    companion object {
+        @Volatile
+        var serviceBinder: TorServiceBinder? = null
+            private set
+    }
 
     /**
      * Sets the reference to [TorServiceBinder] to `null` because
