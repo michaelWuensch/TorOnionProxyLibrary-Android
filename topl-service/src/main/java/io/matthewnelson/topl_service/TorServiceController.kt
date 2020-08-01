@@ -81,6 +81,7 @@ import io.matthewnelson.topl_service.service.components.BaseServiceConnection
 import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts
+import kotlinx.coroutines.Dispatchers
 
 class TorServiceController private constructor(): ServiceConsts() {
 
@@ -288,6 +289,7 @@ class TorServiceController private constructor(): ServiceConsts() {
                 torConfigFiles ?: TorConfigFiles.createConfig(application.applicationContext),
                 torSettings
             )
+
 //            BackgroundManager.initialize(heartbeatTime)
             ServiceActionProcessor.initialize(restartTorDelayTime, stopServiceDelayTime)
 
@@ -297,7 +299,6 @@ class TorServiceController private constructor(): ServiceConsts() {
             ServiceNotification.get().setupNotificationChannel(application.applicationContext)
 
             backgroundManagerPolicy.build(
-                application,
                 TorService::class.java,
                 TorServiceConnection.torServiceConnection
             )

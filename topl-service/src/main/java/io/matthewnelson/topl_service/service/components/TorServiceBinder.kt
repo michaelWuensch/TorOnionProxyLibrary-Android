@@ -73,6 +73,7 @@ import io.matthewnelson.topl_service.util.ServiceConsts.BackgroundPolicy
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 
@@ -87,15 +88,11 @@ internal class TorServiceBinder(private val torService: BaseService): Binder() {
             when (action) {
                 ServiceAction.START -> {
                     // Do not accept the above ServiceActions through use of this method.
-                    // NEW_ID, RESTART_TOR, STOP = via BroadcastReceiver
                     // START = to start TorService
                     broadcastLogger.warn("$action is not an accepted intent action for this class")
                 }
-                ServiceAction.STOP -> {
-                    torService.unregisterBackgroundManager(executeRestart = false)
-                    torService.processIntent(serviceActionIntent)
-                }
                 else -> {
+                    BaseService.updateLastAcceptedServiceAction(action)
                     torService.processIntent(serviceActionIntent)
                 }
             }
@@ -122,10 +119,17 @@ internal class TorServiceBinder(private val torService: BaseService): Binder() {
         cancelExecuteBackgroundPolicyJob(policy)
         backgroundPolicyExecutionJob = torService.getScopeMain().launch {
             when (policy) {
-                BackgroundPolicy.FOREGROUND -> {
-
+                BackgroundPolicy.KEEP_ALIVE -> {
+                    while (isActive && BaseServiceConnection.serviceBinder != null) {
+                        delay(executionDelay)
+                        if (isActive && BaseServiceConnection.serviceBinder != null) {
+                            bgMgrBroadcastLogger.debug("Executing $policy")
+                            torService.startForegroundService()
+                            torService.stopForegroundService()
+                        }
+                    }
                 }
-                BackgroundPolicy.STOP_THEN_START -> {
+                BackgroundPolicy.RESPECT_RESOURCES -> {
                     delay(executionDelay)
                     bgMgrBroadcastLogger.debug("Executing $policy")
                     torService.processIntent(Intent(ServiceAction.STOP))

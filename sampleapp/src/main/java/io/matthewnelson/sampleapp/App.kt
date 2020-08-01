@@ -122,7 +122,11 @@ class App: Application() {
     private fun generateBackgroundManagerPolicy(): BackgroundManager.Builder.Policy {
 //  private fun generateBackgroundManagerPolicy(): BackgroundManager.Builder.Policy {
         return BackgroundManager.Builder()
-            .stopServiceThenStartIfBroughtBackIntoForeground(secondsFrom5To45 = 5)
+
+              // Can only choose 1 option, but this is the other unselected one.
+//            .keepAliveWhileInBackground(secondsFrom20To40 = 30)
+            .respectResourcesWhileInBackground(secondsFrom5To45 = 20)
+
 //  }
     }
 

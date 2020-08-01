@@ -210,7 +210,9 @@ abstract class ServiceConsts: BaseConsts() {
     //////////////////////
     /// ServiceActions ///
     //////////////////////
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.TYPE)
+    @Target(AnnotationTarget.CLASS, AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.TYPE,
+        AnnotationTarget.PROPERTY
+    )
     @StringDef(
         ServiceAction.NEW_ID,
         ServiceAction.RESTART_TOR,
@@ -256,16 +258,22 @@ abstract class ServiceConsts: BaseConsts() {
     ///////////////////////////////
     /// BackgroundManagerPolicy ///
     ///////////////////////////////
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.PROPERTY,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.TYPE
+    )
     @StringDef(
-        BackgroundPolicy.FOREGROUND,
-        BackgroundPolicy.STOP_THEN_START
+        BackgroundPolicy.KEEP_ALIVE,
+        BackgroundPolicy.RESPECT_RESOURCES
     )
     @Retention(AnnotationRetention.SOURCE)
     internal annotation class BackgroundPolicy {
         companion object {
-            const val BACKGROUND_POLICY = "BackgroundPolicy_"
-            const val FOREGROUND = "${BACKGROUND_POLICY}FOREGROUND"
-            const val STOP_THEN_START = "${BACKGROUND_POLICY}STOP_THEN_START"
+            private const val BACKGROUND_POLICY = "BackgroundPolicy_"
+            const val KEEP_ALIVE = "${BACKGROUND_POLICY}KEEP_ALIVE"
+            const val RESPECT_RESOURCES = "${BACKGROUND_POLICY}RESPECT_RESOURCES"
         }
     }
 }
