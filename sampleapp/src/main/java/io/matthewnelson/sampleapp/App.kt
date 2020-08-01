@@ -89,6 +89,7 @@ class App: Application() {
                 "SampleApp|Application|Process ID: ${Process.myPid()}"
             )
         }
+        TorServiceController.startTor()
     }
 
     private fun generateTorServiceNotificationBuilder(): ServiceNotification.Builder {
@@ -121,7 +122,7 @@ class App: Application() {
     private fun generateBackgroundManagerPolicy(): BackgroundManager.Builder.Policy {
 //  private fun generateBackgroundManagerPolicy(): BackgroundManager.Builder.Policy {
         return BackgroundManager.Builder()
-            .stopServiceThenStartIfBroughtBackIntoForeground(secondsFrom15To45 = 30)
+            .stopServiceThenStartIfBroughtBackIntoForeground(secondsFrom5To45 = 5)
 //  }
     }
 
@@ -146,7 +147,6 @@ class App: Application() {
         )
             .addTimeToRestartTorDelay(milliseconds = 100L)
             .addTimeToStopServiceDelay(milliseconds = 100L)
-            .setBackgroundHeartbeatTime(milliseconds = 30_000L)
             .setBuildConfigDebug(buildConfigDebug = BuildConfig.DEBUG)
 
             // Can instantiate directly here then access it from

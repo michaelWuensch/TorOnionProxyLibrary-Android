@@ -68,6 +68,7 @@ package io.matthewnelson.topl_service
 
 import android.app.Application
 import android.content.Context
+import android.content.Intent
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_core_base.EventBroadcaster
@@ -76,6 +77,7 @@ import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.components.BackgroundManager
+import io.matthewnelson.topl_service.service.components.BaseServiceConnection
 import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts
@@ -134,7 +136,7 @@ class TorServiceController private constructor(): ServiceConsts() {
     ) {
 
         private var appEventBroadcaster: EventBroadcaster? = Companion.appEventBroadcaster
-        private var heartbeatTime = BackgroundManager.heartbeatTime
+//        private var heartbeatTime = BackgroundManager.heartbeatTime
         private var restartTorDelayTime = ServiceActionProcessor.restartTorDelayTime
         private var stopServiceDelayTime = ServiceActionProcessor.stopServiceDelayTime
         private var torConfigFiles: TorConfigFiles? = null
@@ -189,27 +191,27 @@ class TorServiceController private constructor(): ServiceConsts() {
             return this
         }
 
-        /**
-         * Default is set to 30_000ms
-         *
-         * When the user sends your application to the background (recent app's tray),
-         * [io.matthewnelson.topl_service.service.components.BackgroundManager] begins
-         * a heartbeat for Tor, as well as cycling [TorService] between foreground and
-         * background as to keep the OS from killing things due to being idle for too long.
-         *
-         * If the user returns the application to the foreground, the heartbeat and
-         * foreground/background cycling stops.
-         *
-         * This method sets the time between each heartbeat.
-         *
-         * @param [milliseconds] A Long between 15_000 and 45_000. Will fallback to default
-         *   value if not between that range
-         * */
-        fun setBackgroundHeartbeatTime(milliseconds: Long): Builder {
-            if (milliseconds in 15_000L..45_000L)
-                heartbeatTime = milliseconds
-            return this
-        }
+//        /**
+//         * Default is set to 30_000ms
+//         *
+//         * When the user sends your application to the background (recent app's tray),
+//         * [io.matthewnelson.topl_service.service.components.BackgroundManager] begins
+//         * a heartbeat for Tor, as well as cycling [TorService] between foreground and
+//         * background as to keep the OS from killing things due to being idle for too long.
+//         *
+//         * If the user returns the application to the foreground, the heartbeat and
+//         * foreground/background cycling stops.
+//         *
+//         * This method sets the time between each heartbeat.
+//         *
+//         * @param [milliseconds] A Long between 15_000 and 45_000. Will fallback to default
+//         *   value if not between that range
+//         * */
+//        fun setBackgroundHeartbeatTime(milliseconds: Long): Builder {
+//            if (milliseconds in 15_000L..45_000L)
+//                heartbeatTime = milliseconds
+//            return this
+//        }
 
         /**
          * This makes it such that on your Application's **Debug** builds, the `topl-core` and
@@ -286,7 +288,7 @@ class TorServiceController private constructor(): ServiceConsts() {
                 torConfigFiles ?: TorConfigFiles.createConfig(application.applicationContext),
                 torSettings
             )
-            BackgroundManager.initialize(heartbeatTime)
+//            BackgroundManager.initialize(heartbeatTime)
             ServiceActionProcessor.initialize(restartTorDelayTime, stopServiceDelayTime)
 
             Companion.appEventBroadcaster = this.appEventBroadcaster
@@ -294,7 +296,11 @@ class TorServiceController private constructor(): ServiceConsts() {
             torServiceNotificationBuilder.build()
             ServiceNotification.get().setupNotificationChannel(application.applicationContext)
 
-            backgroundManagerPolicy.build(application)
+            backgroundManagerPolicy.build(
+                application,
+                TorService::class.java,
+                TorServiceConnection.torServiceConnection
+            )
         }
     }
 
@@ -352,6 +358,7 @@ class TorServiceController private constructor(): ServiceConsts() {
         @Throws(RuntimeException::class)
         fun stopTor() =
             sendBroadcast(ServiceAction.STOP)
+//            BaseServiceConnection.serviceBinder?.submitServiceActionIntent(Intent(ServiceAction.STOP))
 
         /**
          * Restarts Tor.
@@ -361,6 +368,7 @@ class TorServiceController private constructor(): ServiceConsts() {
         @Throws(RuntimeException::class)
         fun restartTor() =
             sendBroadcast(ServiceAction.RESTART_TOR)
+//            BaseServiceConnection.serviceBinder?.submitServiceActionIntent(Intent(ServiceAction.RESTART_TOR))
 
         /**
          * Changes identities.
@@ -370,6 +378,7 @@ class TorServiceController private constructor(): ServiceConsts() {
         @Throws(RuntimeException::class)
         fun newIdentity() =
             sendBroadcast(ServiceAction.NEW_ID)
+//            BaseServiceConnection.serviceBinder?.submitServiceActionIntent(Intent(ServiceAction.NEW_ID))
 
         @Throws(RuntimeException::class)
         private fun sendBroadcast(@ServiceAction action: String) =
