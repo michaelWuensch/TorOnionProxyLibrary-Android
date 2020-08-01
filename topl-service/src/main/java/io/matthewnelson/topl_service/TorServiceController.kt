@@ -352,36 +352,26 @@ class TorServiceController private constructor(): ServiceConsts() {
 
         /**
          * Stops [TorService].
-         *
-         * @throws [RuntimeException] if called before [Builder.build]
          * */
-        @Throws(RuntimeException::class)
         fun stopTor() =
-            sendBroadcast(ServiceAction.STOP)
-//            BaseServiceConnection.serviceBinder?.submitServiceActionIntent(Intent(ServiceAction.STOP))
+            BaseServiceConnection.serviceBinder?.submitServiceActionIntent(
+                Intent(ServiceAction.STOP)
+            )
 
         /**
          * Restarts Tor.
-         *
-         * @throws [RuntimeException] if called before [Builder.build]
          * */
-        @Throws(RuntimeException::class)
         fun restartTor() =
-            sendBroadcast(ServiceAction.RESTART_TOR)
-//            BaseServiceConnection.serviceBinder?.submitServiceActionIntent(Intent(ServiceAction.RESTART_TOR))
+            BaseServiceConnection.serviceBinder?.submitServiceActionIntent(
+                Intent(ServiceAction.RESTART_TOR)
+            )
 
         /**
          * Changes identities.
-         *
-         * @throws [RuntimeException] if called before [Builder.build]
          * */
-        @Throws(RuntimeException::class)
         fun newIdentity() =
-            sendBroadcast(ServiceAction.NEW_ID)
-//            BaseServiceConnection.serviceBinder?.submitServiceActionIntent(Intent(ServiceAction.NEW_ID))
-
-        @Throws(RuntimeException::class)
-        private fun sendBroadcast(@ServiceAction action: String) =
-            TorServiceReceiver.sendBroadcast(BaseService.getAppContext(), action, null)
+            BaseServiceConnection.serviceBinder?.submitServiceActionIntent(
+                Intent(ServiceAction.NEW_ID)
+            )
     }
 }

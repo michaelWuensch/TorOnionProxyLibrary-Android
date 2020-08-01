@@ -80,20 +80,20 @@ internal class TorServiceBinder(private val torService: BaseService): Binder() {
 
     private val broadcastLogger = torService.getBroadcastLogger(TorServiceBinder::class.java)
 
-    @Throws(IllegalArgumentException::class)
     fun submitServiceActionIntent(serviceActionIntent: Intent) {
         val action = serviceActionIntent.action
         if (action != null && action.contains(ServiceAction.SERVICE_ACTION)) {
 
             when (action) {
-                ServiceAction.NEW_ID,
-                ServiceAction.RESTART_TOR,
-                ServiceAction.START,
-                ServiceAction.STOP -> {
+                ServiceAction.START -> {
                     // Do not accept the above ServiceActions through use of this method.
                     // NEW_ID, RESTART_TOR, STOP = via BroadcastReceiver
                     // START = to start TorService
                     broadcastLogger.warn("$action is not an accepted intent action for this class")
+                }
+                ServiceAction.STOP -> {
+                    torService.unregisterBackgroundManager(executeRestart = false)
+                    torService.processIntent(serviceActionIntent)
                 }
                 else -> {
                     torService.processIntent(serviceActionIntent)

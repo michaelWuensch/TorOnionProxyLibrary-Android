@@ -76,6 +76,7 @@ import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.service.components.BackgroundManager
+import io.matthewnelson.topl_service.service.components.BaseServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import java.math.BigInteger
@@ -99,25 +100,6 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
         @Volatile
         var isRegistered = false
             private set
-
-        /**
-         * Adding a StringExtra to the Intent by passing a value for [extrasString] will
-         * always use the [action] as the key for retrieving it.
-         *
-         * @param [context] [Context]
-         * @param [action] A [ServiceConsts.ServiceAction] to be processed by [TorService]
-         * @param [extrasString] To be included in the intent.
-         * */
-        fun sendBroadcast(context: Context, @ServiceAction action: String, extrasString: String?) {
-            val broadcastIntent = Intent(SERVICE_INTENT_FILTER)
-            broadcastIntent.putExtra(SERVICE_INTENT_FILTER, action)
-            broadcastIntent.setPackage(context.applicationContext.packageName)
-
-            if (extrasString != null)
-                broadcastIntent.putExtra(action, extrasString)
-
-            context.applicationContext.sendBroadcast(broadcastIntent)
-        }
     }
 
     private val broadcastLogger = torService.getBroadcastLogger(TorServiceReceiver::class.java)
@@ -142,37 +124,20 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
         }
     }
 
-    // TODO: Funnel everything through the binder that is instantiated in order to handle
-    //  BackgroundManager execution stuff properly and in a single spot.
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context != null && intent != null) {
             // Only accept Intents from this package.
             if (context.applicationInfo.dataDir != torService.context.applicationInfo.dataDir) return
 
             when (val serviceAction = intent.getStringExtra(SERVICE_INTENT_FILTER)) {
-
                 // Only accept these 3 ServiceActions.
                 ServiceAction.NEW_ID, ServiceAction.RESTART_TOR, ServiceAction.STOP -> {
-                    val newIntent = Intent(serviceAction)
-
-                    // To STOP, user either clicks notification Action STOP (if enabled),
-                    // or TorServiceController.StopTor was called (sending a broadcast here).
-                    // Either way we need to stop listening to the Activity LCEs so the return
-                    // to foreground doesn't go off.
-                    if (serviceAction == ServiceAction.STOP)
-                        torService.unregisterBackgroundManager(executeRestart = false)
-
-                    // If the broadcast intent has any string extras, their key will be the
-                    // ServiceAction that was included.
-                    intent.getStringExtra(serviceAction)?.let {
-                        newIntent.putExtra(serviceAction, it)
-                    }
-                    torService.processIntent(newIntent)
+                    BaseServiceConnection.serviceBinder?.submitServiceActionIntent(
+                        Intent(serviceAction)
+                    )
                 }
                 else -> {
-                    broadcastLogger.warn(
-                        "This class does not accept $serviceAction as an argument."
-                    )
+                    broadcastLogger.warn("This class does not accept $serviceAction as an argument.")
                 }
             }
         }
