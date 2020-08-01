@@ -72,61 +72,61 @@ import android.os.Bundle
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.ServiceConsts
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
-import net.freehaven.tor.control.TorControlCommands
 
 /**
- * This gets instantiated when the user sends the application to the recent apps's tray.
- * It starts a heartbeat for Tor and cycles [TorService] between foreground and background
- * to inhibit the OS from killing it due to being idle.
+ * When your application is sent to the background (the Recent App's tray), the chosen
+ * [BackgroundManager.Builder.Policy] will be executed after the number of seconds you've
+ * declared, *unless* brought *back* into the foreground by the user (where execution is then
+ * canceled and services resume as they were).
+ *
+ * While your application is in the foreground the only way to stop the service is by
+ * calling [io.matthewnelson.topl_service.TorServiceController.stopTor], or via the
+ * [io.matthewnelson.topl_service.notification.ServiceNotification] Action (if enabled);
+ * The OS will not kill a service started using `Context.startService` &
+ * `Context.bindService` (how [TorService] is started).
+ *
+ * When the user sends your application to the Recent App's tray though, the OS will kill
+ * your app after being idle for a period of time (random AF... typically 0.75m to 1.25m)
+ * to recoup resources. This is not an issue if the user removes the task before the OS
+ * kills the app, as Tor will be able to shutdown properly and the service will stop.
+ *
+ * This is where Services get sketchy (especially when trying to implement an always
+ * running service for networking), and is the purpose of the [BackgroundManager] class.
  *
  * When a user sends the application to the recent app's tray:
  *
- *   - [TorService.onTrimMemory] - TRIM_MEMORY_UI_HIDDEN (when this gets instantiated)
+ *   - [TorService.onTrimMemory] - TRIM_MEMORY_UI_HIDDEN (when [registerActivityLCEs] is called)
  *   - [onActivityStopped]
- *   - [onActivitySaveInstanceState] <-- Where we pickup the activity in question.
+ *   - [onActivitySaveInstanceState]
  *
  * If the user returns the application to the foreground:
  *
- *   - [onActivityStarted] <-- Where we unregister and continue with our day.
+ *   - [onActivityStarted] <-- Where [unregisterActivityLCEs] is called to get a restart
  *   - [onActivityResumed]
  *
- * When a user removes the application from the recent app's tray:
+ * If the user removes the application from the recent app's tray:
  *
- *   - [onActivityDestroyed] <-- Where we shutdown Tor, and then stop [TorService]
+ *   - [onActivityDestroyed] <-- Where [unregisterActivityLCEs] is called w/o a restart
  *
- * @param [torService] [BaseService]
+ * @param [application] [Application] For registering to callbacks
+ * @param [policy] The chosen [ServiceConsts.BackgroundPolicy] to be executed.
+ * @param [executionDelay] Length of time before the policy gets executed *after* the application
+ *   is sent to the background.
+ * @param [clazz] The Service class being managed
+ * @param [serviceConnection] The ServiceConnection being used to bind with
+ * @see [TorServiceBinder.executeBackgroundPolicyJob]
+ * @see [TorServiceBinder.cancelExecuteBackgroundPolicyJob]
  * */
 class BackgroundManager internal constructor(
-    private val torService: BaseService/*,
     private val application: Application,
     @BackgroundPolicy private val policy: String,
-    private val executionDelay: Long*/
+    private val executionDelay: Long,
+    private val clazz: Class<*>,
+    private val serviceConnection: BaseServiceConnection
 ): ServiceConsts(), Application.ActivityLifecycleCallbacks {
 
 
     /**
-     * When your application is sent to the background (the Recent App's tray), the chosen
-     * [BackgroundManager.Builder.Policy] will be executed after the number of seconds you've
-     * declared, unless brought *back* into the foreground by the user.
-     *
-     * While your application is in the foreground the only way to stop the service is by
-     * calling [io.matthewnelson.topl_service.TorServiceController.stopTor], or via the
-     * [io.matthewnelson.topl_service.notification.ServiceNotification] Action (if enabled);
-     * The OS will not kill a service started using `Context.startService` &
-     * `Context.bindService` (how [TorService] is started).
-     *
-     * When the user sends your application to the Recent App's tray though, the OS will kill
-     * your app after being idle for a period of time (random AF... typically 0.5m to 1.25m)
-     * to recoup resources. This is not an issue if the user removes the task before the OS
-     * kills the app, as Tor will be able to shutdown properly and the service will stop.
-     *
-     * This is where Services get sketch AF (especially when trying to implement an always
-     * running service for networking), and is the purpose of the [BackgroundManager] class.
-     *
      * This [BackgroundManager.Builder] sets how you want the service to operate while your
      * app is in the background (the Recent App's tray), such that we don't hog resources
      * unnecessarily, and run reliably based off of your application's needs.
@@ -135,27 +135,32 @@ class BackgroundManager internal constructor(
      * */
     class Builder {
 
-        @BackgroundPolicy private lateinit var chosenPolicy: String
+        @BackgroundPolicy
+        private lateinit var chosenPolicy: String
         private var executionDelay: Long = 30_000L
 
-        /**
-         * While your application is in the background (the Recent App's tray), run
-         * [TorService] in the foreground to prevent going idle and being killed. A
-         * Notification will be displayed no matter if you set
-         * [io.matthewnelson.topl_service.notification.ServiceNotification.Builder.showNotification]
-         * to `false` or not.
-         *
-         * @param [secondsFrom15To45]? Seconds before the [Policy] is executed after the
-         *   Application goes to the background. Sending null will use the default (30s)
-         * @return [BackgroundManager.Builder.Policy] To use when initializing
-         *   [io.matthewnelson.topl_service.TorServiceController.Builder]
-         * */
-        fun switchServiceToForeground(secondsFrom15To45: Int? = null): Policy {
-            chosenPolicy = BackgroundPolicy.FOREGROUND
-            if (secondsFrom15To45 != null && secondsFrom15To45 in 15..45)
-                executionDelay = (secondsFrom15To45 * 1000).toLong()
-            return Policy(this)
-        }
+        // TODO: Needs more work... running in the foreground is inhibiting the Application from
+        //  performing it's normal lifecycle after user swipes it away such that it's not going
+        //  through Application.onCreate, but is holding onto references. (same problem when
+        //  starting the service using Context.startForegroundService), which is bullshit.
+//        /**
+//         * While your application is in the background (the Recent App's tray), run
+//         * [TorService] in the foreground to prevent going idle and being killed. A
+//         * Notification will be displayed no matter if you set
+//         * [io.matthewnelson.topl_service.notification.ServiceNotification.Builder.showNotification]
+//         * to `false` or not.
+//         *
+//         * @param [secondsFrom5To30]? Seconds before the [Policy] is executed after the
+//         *   Application goes to the background. Sending null will use the default (30s)
+//         * @return [BackgroundManager.Builder.Policy] To use when initializing
+//         *   [io.matthewnelson.topl_service.TorServiceController.Builder]
+//         * */
+//        fun switchServiceToForeground(secondsFrom5To30: Int? = null): Policy {
+//            chosenPolicy = BackgroundPolicy.FOREGROUND
+//            if (secondsFrom5To30 != null && secondsFrom5To30 in 5..30)
+//                executionDelay = (secondsFrom5To30 * 1000).toLong()
+//            return Policy(this)
+//        }
 
         /**
          * Stops [TorService], and then starts it up again if your application is brought back
@@ -174,15 +179,15 @@ class BackgroundManager internal constructor(
          * this will be re-instantiated when going through `Application.onCreate` again, and
          * [TorService] started by however you have it implemented.
          *
-         * @param [secondsFrom15To45]? Seconds before the [Policy] is executed after the
+         * @param [secondsFrom5To45]? Seconds before the [Policy] is executed after the
          *   Application goes to the background. Sending null will use the default (30s)
          * @return [BackgroundManager.Builder.Policy] To use when initializing
          *   [io.matthewnelson.topl_service.TorServiceController.Builder]
          * */
-        fun stopServiceThenStartIfBroughtBackIntoForeground(secondsFrom15To45: Int? = null): Policy {
+        fun stopServiceThenStartIfBroughtBackIntoForeground(secondsFrom5To45: Int? = null): Policy {
             chosenPolicy = BackgroundPolicy.STOP_THEN_START
-            if (secondsFrom15To45 != null && secondsFrom15To45 in 15..45)
-                executionDelay = (secondsFrom15To45 * 1000).toLong()
+            if (secondsFrom5To45 != null && secondsFrom5To45 in 5..45)
+                executionDelay = (secondsFrom5To45 * 1000).toLong()
             return Policy(this)
         }
 
@@ -194,74 +199,77 @@ class BackgroundManager internal constructor(
          * */
         class Policy(private val policyBuilder: BackgroundManager.Builder) {
 
-            internal fun build(application: Application) {
-//                backgroundManager = BackgroundManager(
-//                    application,
-//                    policyBuilder.chosenPolicy,
-//                    policyBuilder.executionDelay
-//                )
+            /**
+             * Only available internally, so this is where we intercept for integration testing.
+             * After calling [io.matthewnelson.topl_service.TorServiceController.Builder.build],
+             * Re-build the [Policy] and the [BackgroundManager] will be re-initialized using
+             * the desired test components (Test classes, test service conn).
+             * */
+            internal fun build(
+                application: Application,
+                clazz: Class<*>,
+                serviceConnection: BaseServiceConnection
+            ) {
+                backgroundManager = BackgroundManager(
+                    application,
+                    policyBuilder.chosenPolicy,
+                    policyBuilder.executionDelay,
+                    clazz,
+                    serviceConnection
+                )
             }
         }
     }
 
     internal companion object {
-        lateinit var backgroundManager: BackgroundManager
+        private lateinit var backgroundManager: BackgroundManager
 
-//        @BackgroundPolicy private lateinit var backgroundPolicy: String
-//        private var delayLength = 30_000L
+        fun registerActivityLCEs() =
+            backgroundManager.registerActivityLCEs()
 
-        var heartbeatTime = 30_000L
-            private set
+        fun unregisterActivityLCEs(executeRestart: Boolean = true) =
+            backgroundManager.unregisterActivityLCEs(executeRestart)
 
-        fun initialize(milliseconds: Long) {
-            heartbeatTime = milliseconds
-        }
+        // TODO: re-implement in BaseService as a monitor for Tor's state so it can automatically
+        //  handle hiccups (such as network getting stuck b/c Android is sometimes unreliable,
+        //  or Bootstrapping stalling).
+//        var heartbeatTime = 30_000L
+//            private set
+//
+//        fun initialize(milliseconds: Long) {
+//            heartbeatTime = milliseconds
+//        }
     }
 
-    private val broadcastLogger = torService.getBroadcastLogger(BackgroundManager::class.java)
-    private val heartbeatJob: Job
-
-    init {
-        (torService.context.applicationContext as Application)
-            .registerActivityLifecycleCallbacks(this)
-
-        broadcastLogger.debug("Has been registered")
-
-        heartbeatJob = torService.getScopeIO().launch {
-            while (isActive) {
-                delay(heartbeatTime)
-                if (isActive) {
-                    torService.startForegroundService().stopForeground(torService)
-                    if (torService.signalControlConnection(TorControlCommands.SIGNAL_HEARTBEAT)) {
-                        torService.registerReceiver()
-                        torService.addNotificationActions()
-                    }
-                }
-            }
-        }
+    private fun registerActivityLCEs() {
+        BaseServiceConnection.serviceBinder?.executeBackgroundPolicyJob(policy, executionDelay)
+        application.registerActivityLifecycleCallbacks(this)
     }
 
-    fun unregister() {
-        try {
-            (torService.context.applicationContext as Application)
-                .unregisterActivityLifecycleCallbacks(this)
-            heartbeatJob.cancel()
-            broadcastLogger.debug("Has been unregistered")
-        } catch (e: Exception) {
-            broadcastLogger.exception(e)
-        }
+    private fun unregisterActivityLCEs(executeRestart: Boolean) {
+        // Cancel the job if possible
+        BaseServiceConnection.serviceBinder?.cancelExecuteBackgroundPolicyJob(policy)
+        application.unregisterActivityLifecycleCallbacks(this)
+
+        // Ensure it's re-started if executeRestart is true
+        if (executeRestart)
+                BaseService.startService(application.applicationContext, clazz, serviceConnection)
     }
 
-    private fun broadcastLCE(activity: Activity, event: String) =
-        broadcastLogger.debug("${activity.javaClass.simpleName}@${activity.hashCode()} - $event")
 
-    // If destroyed -> task removed from recent apps tray
-    // If started/resumed -> task back in foreground
+    /////////////////////////////////
+    /// Activity LifeCycle Events ///
+    /////////////////////////////////
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
 
+    /**
+     * If Activity gets started/resumed -> task has been brought back into the foreground
+     * */
     override fun onActivityStarted(activity: Activity) {
-        broadcastLCE(activity, "onActivityStarted")
-        torService.unregisterBackgroundManager()
+        unregisterActivityLCEs(executeRestart = true)
+        BaseServiceConnection.serviceBinder?.bgMgrBroadcastLogger?.debug(
+            "${activity.javaClass.simpleName}@${activity.hashCode()} onActivityStarted"
+        )
     }
 
     override fun onActivityResumed(activity: Activity) {}
@@ -270,13 +278,12 @@ class BackgroundManager internal constructor(
 
     override fun onActivityStopped(activity: Activity) {}
 
+    /**
+     * If the Activity is destroyed -> task has been removed from recent apps tray
+     * */
     override fun onActivityDestroyed(activity: Activity) {
-        broadcastLCE(activity, "onActivityDestroyed")
-        // TorService.onTaskRemoved will handle the swap to foreground
-        torService.unregisterBackgroundManager()
+        unregisterActivityLCEs(executeRestart = false)
     }
 
-    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
-        broadcastLCE(activity, "onActivitySaveInstanceState")
-    }
+    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 }
