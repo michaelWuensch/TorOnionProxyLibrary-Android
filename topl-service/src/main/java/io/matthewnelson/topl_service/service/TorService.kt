@@ -100,16 +100,13 @@ internal class TorService: BaseService() {
     /////////////////////////
     /// BackgroundManager ///
     /////////////////////////
-    private var backgroundManager: BackgroundManager? = null
-
     override fun registerBackgroundManager() {
-        backgroundManager?.unregister()
-        backgroundManager = BackgroundManager(this)
+        BackgroundManager.registerActivityLCEs()
     }
-    override fun unregisterBackgroundManager() {
-        backgroundManager?.unregister()
-        backgroundManager = null
+    override fun unregisterBackgroundManager(executeRestart: Boolean) {
+        BackgroundManager.unregisterActivityLCEs(executeRestart)
     }
+
     override fun onTrimMemory(level: Int) {
         when (level) {
             ComponentCallbacks2.TRIM_MEMORY_COMPLETE -> {
@@ -327,7 +324,6 @@ internal class TorService: BaseService() {
 
     override fun onDestroy() {
         unregisterPrefsListener()
-        unregisterBackgroundManager()
         removeNotification()
         supervisorJob.cancel()
     }

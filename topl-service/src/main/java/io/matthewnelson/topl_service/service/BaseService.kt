@@ -185,7 +185,7 @@ internal abstract class BaseService: Service() {
     /// BackgroundKeepAlive ///
     ///////////////////////////
     abstract fun registerBackgroundManager()
-    abstract fun unregisterBackgroundManager()
+    abstract fun unregisterBackgroundManager(executeRestart: Boolean)
 
 
     ///////////////
