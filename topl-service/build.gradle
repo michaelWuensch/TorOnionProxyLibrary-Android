@@ -72,6 +72,8 @@ dependencies {
     implementation project(':topl-core')
     implementation project(':topl-core-base')
     implementation deps.androidx.core
+    implementation deps.androidx.lifecycle.runtime
+    implementation deps.androidx.lifecycle.processLifecycleOwner
     implementation deps.jtorctl
     implementation deps.kotlin.coroutinesAndroid
     implementation deps.kotlin.coroutinesCore
