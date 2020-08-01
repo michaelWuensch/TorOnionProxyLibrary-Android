@@ -101,8 +101,9 @@ import io.matthewnelson.topl_service.util.ServiceConsts
  * This is where Services get sketchy (especially when trying to implement an always
  * running service for networking), and is the purpose of the [BackgroundManager] class.
  *
- * This class tracks the number of Activities started and stopped in order to tell when the
- * Application's UI is hidden (either by lock screen, or being sent to the recent apps tray).
+ * This class starts your chosen [BackgroundManager.Builder.Policy] as soon as your
+ * application is sent to the background, waits for the time you declared, and then executes.
+ * See the [Builder] for more detail.
  *
  * @param [policy] The chosen [ServiceConsts.BackgroundPolicy] to be executed.
  * @param [executionDelay] Length of time before the policy gets executed *after* the application
