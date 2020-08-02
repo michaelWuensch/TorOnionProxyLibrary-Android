@@ -75,7 +75,7 @@ import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.service.components.BackgroundManager
+import io.matthewnelson.topl_service.lifecycle.BackgroundManager
 import io.matthewnelson.topl_service.service.components.binding.BaseServiceConnection
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
@@ -194,7 +194,7 @@ class TorServiceController private constructor(): ServiceConsts() {
 //         * Default is set to 30_000ms
 //         *
 //         * When the user sends your application to the background (recent app's tray),
-//         * [io.matthewnelson.topl_service.service.components.BackgroundManager] begins
+//         * [io.matthewnelson.topl_service.lifecycle.BackgroundManager] begins
 //         * a heartbeat for Tor, as well as cycling [TorService] between foreground and
 //         * background as to keep the OS from killing things due to being idle for too long.
 //         *

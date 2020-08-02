@@ -73,7 +73,7 @@ import androidx.core.app.NotificationCompat
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.notification.ServiceNotification
-import io.matthewnelson.topl_service.service.components.BackgroundManager
+import io.matthewnelson.topl_service.lifecycle.BackgroundManager
 import java.io.File
 
 /**

@@ -73,7 +73,7 @@ import io.matthewnelson.test_helpers.application_provided_classes.TestTorSetting
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.service.components.BackgroundManager
+import io.matthewnelson.topl_service.lifecycle.BackgroundManager
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
 import org.junit.*
 import org.junit.Assert.assertEquals

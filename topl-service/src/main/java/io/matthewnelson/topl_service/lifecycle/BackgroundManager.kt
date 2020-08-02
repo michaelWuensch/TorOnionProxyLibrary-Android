@@ -64,7 +64,7 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.topl_service.service.components
+package io.matthewnelson.topl_service.lifecycle
 
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
@@ -166,7 +166,9 @@ class BackgroundManager internal constructor(
             chosenPolicy = BackgroundPolicy.KEEP_ALIVE
             if (secondsFrom20To40 != null && secondsFrom20To40 in 20..40)
                 executionDelay = (secondsFrom20To40 * 1000).toLong()
-            return Policy(this)
+            return Policy(
+                this
+            )
         }
 
         /**
@@ -194,7 +196,9 @@ class BackgroundManager internal constructor(
             chosenPolicy = BackgroundPolicy.RESPECT_RESOURCES
             if (secondsFrom5To45 != null && secondsFrom5To45 in 5..45)
                 executionDelay = (secondsFrom5To45 * 1000).toLong()
-            return Policy(this)
+            return Policy(
+                this
+            )
         }
 
         /**
@@ -203,7 +207,7 @@ class BackgroundManager internal constructor(
          *
          * @param [policyBuilder] The [BackgroundManager.Builder] to be built during initialization
          * */
-        class Policy(private val policyBuilder: BackgroundManager.Builder) {
+        class Policy(private val policyBuilder: Builder) {
 
             /**
              * Only available internally, so this is where we intercept for integration testing.
@@ -221,12 +225,13 @@ class BackgroundManager internal constructor(
                 try {
                     backgroundManager.hashCode()
                 } catch (e: UninitializedPropertyAccessException) {
-                    backgroundManager = BackgroundManager(
-                        policyBuilder.chosenPolicy,
-                        policyBuilder.executionDelay,
-                        serviceClass,
-                        serviceConnection
-                    )
+                    backgroundManager =
+                        BackgroundManager(
+                            policyBuilder.chosenPolicy,
+                            policyBuilder.executionDelay,
+                            serviceClass,
+                            serviceConnection
+                        )
                 }
             }
         }

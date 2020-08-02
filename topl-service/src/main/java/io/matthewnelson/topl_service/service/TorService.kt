@@ -80,7 +80,7 @@ import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorIns
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.service.components.receiver.TorServiceReceiver
-import io.matthewnelson.topl_service.service.components.BackgroundManager
+import io.matthewnelson.topl_service.lifecycle.BackgroundManager
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.binding.TorServiceBinder
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
