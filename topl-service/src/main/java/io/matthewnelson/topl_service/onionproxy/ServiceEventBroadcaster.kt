@@ -147,7 +147,7 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
      * finishes.
      * */
     private fun updateBandwidth(download: Long, upload: Long) {
-        if (::noticeMsgToContentTextJob.isInitialized && noticeMsgToContentTextJob.isActive) return
+        if (noticeMsgToContentTextJob?.isActive == true) return
         torService.updateNotificationContentText(
             ServiceUtilities.getFormattedBandwidthString(download, upload)
         )
@@ -198,7 +198,7 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
     ///////////////
     /// Notices ///
     ///////////////
-    private lateinit var noticeMsgToContentTextJob: Job
+    private var noticeMsgToContentTextJob: Job? = null
 
     @Volatile
     private var bootstrapProgress = ""
@@ -253,8 +253,8 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
                     }
                 }
 
-            if (::noticeMsgToContentTextJob.isInitialized && noticeMsgToContentTextJob.isActive)
-                noticeMsgToContentTextJob.cancel()
+            if (noticeMsgToContentTextJob?.isActive == true)
+                noticeMsgToContentTextJob?.cancel()
 
             msgToShow?.let {
                 displayMessageToContentText(it, 3500L)
