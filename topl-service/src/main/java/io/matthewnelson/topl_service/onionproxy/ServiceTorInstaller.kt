@@ -66,7 +66,6 @@
 * */
 package io.matthewnelson.topl_service.onionproxy
 
-import io.matthewnelson.topl_core.util.FileUtilities
 import io.matthewnelson.topl_core.util.TorInstaller
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_service.R
@@ -86,49 +85,46 @@ import java.util.concurrent.TimeoutException
  * */
 internal class ServiceTorInstaller(private val torService: BaseService): TorInstaller() {
 
+    private companion object {
+        const val APP_VERSION_CODE = "APP_VERSION_CODE"
+    }
+
     private val torConfigFiles: TorConfigFiles
         get() = TorServiceController.getTorConfigFiles()
-    private val buildConfigVersionCode: Int
-        get() = BaseService.buildConfigVersionCode
-    private val buildConfigDebug: Boolean
-        get() = BaseService.buildConfigDebug
 
     private val torServicePrefs = TorServicePrefs(torService.context)
-
     private val localPrefs = BaseService.getLocalPrefs(torService.context)
-    private lateinit var geoIpFileCopied: String
-    private lateinit var geoIpv6FileCopied: String
+    private var geoIpFileCopied = false
+    private var geoIpv6FileCopied = false
 
     // broadcastLogger is available from TorInstaller and is instantiated as soon as
     // OnionProxyManager gets initialized.
 //    private lateinit var broadcastLogger: BroadcastLogger
 
-    companion object {
-        private const val APP_VERSION_CODE = "APP_VERSION_CODE"
-    }
-
     @Throws(IOException::class, SecurityException::class)
     override fun setup() {
         if (!torConfigFiles.geoIpFile.exists()) {
             copyGeoIpAsset()
-            geoIpFileCopied = ""
+            geoIpFileCopied = true
         }
         if (!torConfigFiles.geoIpv6File.exists()) {
             copyGeoIpv6Asset()
-            geoIpv6FileCopied = ""
+            geoIpv6FileCopied = true
         }
 
         // If the app version has been increased, or if this is a debug build, copy over
         // geoip assets then update SharedPreferences with the new version code. This
         // mitigates copying to be done only if a version upgrade is had.
-        if (buildConfigDebug || buildConfigVersionCode > localPrefs.getInt(APP_VERSION_CODE, -1)) {
-            if (!::geoIpFileCopied.isInitialized) {
+        if (BaseService.buildConfigDebug ||
+            BaseService.buildConfigVersionCode > localPrefs.getInt(APP_VERSION_CODE, -1)
+        ) {
+            if (!geoIpFileCopied)
                 copyGeoIpAsset()
-            }
-            if (!::geoIpv6FileCopied.isInitialized) {
+            if (!geoIpv6FileCopied)
                 copyGeoIpv6Asset()
-            }
-            localPrefs.edit().putInt(APP_VERSION_CODE, buildConfigVersionCode).apply()
+            localPrefs.edit()
+                .putInt(APP_VERSION_CODE, BaseService.buildConfigVersionCode)
+                .apply()
         }
     }
 
