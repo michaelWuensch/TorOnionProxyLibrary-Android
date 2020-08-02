@@ -67,7 +67,7 @@
 package io.matthewnelson.topl_service.service.components.actions
 
 import android.content.Intent
-import io.matthewnelson.topl_service.util.ServiceConsts.ActionCommand
+import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionCommand
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 
 /**
@@ -92,13 +92,13 @@ internal sealed class ServiceActions {
         abstract val serviceActionName: String
 
         /**
-         * Individual [ActionCommand]'s to executed sequentially by
+         * Individual [ServiceActionCommand]'s to executed sequentially by
          * [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor].
          * */
-        abstract val commands: Array<@ActionCommand String>
+        abstract val commands: Array<@ServiceActionCommand String>
 
         /**
-         * For every [ActionCommand.DELAY] within [commands], a value will be consumed
+         * For every [ServiceActionCommand.DELAY] within [commands], a value will be consumed
          * when executing it.
          *
          * Override this to define the values for each DELAY call.
@@ -127,7 +127,7 @@ internal sealed class ServiceActions {
 
         override val commands: Array<String>
             get() = arrayOf(
-                ActionCommand.NEW_ID
+                ServiceActionCommand.NEW_ID
             )
     }
 
@@ -138,9 +138,9 @@ internal sealed class ServiceActions {
 
         override val commands: Array<String>
             get() = arrayOf(
-                ActionCommand.STOP_TOR,
-                ActionCommand.DELAY,
-                ActionCommand.START_TOR
+                ServiceActionCommand.STOP_TOR,
+                ServiceActionCommand.DELAY,
+                ServiceActionCommand.START_TOR
             )
 
         override val delayLengthQueue = mutableListOf(ServiceActionProcessor.restartTorDelayTime)
@@ -153,7 +153,7 @@ internal sealed class ServiceActions {
 
         override val commands: Array<String>
             get() = arrayOf(
-                ActionCommand.START_TOR
+                ServiceActionCommand.START_TOR
             )
     }
 
@@ -164,9 +164,9 @@ internal sealed class ServiceActions {
 
         override val commands: Array<String>
             get() = arrayOf(
-                ActionCommand.STOP_TOR,
-                ActionCommand.DELAY,
-                ActionCommand.STOP_SERVICE
+                ServiceActionCommand.STOP_TOR,
+                ServiceActionCommand.DELAY,
+                ServiceActionCommand.STOP_SERVICE
             )
 
         override val delayLengthQueue = mutableListOf(ServiceActionProcessor.stopServiceDelayTime)

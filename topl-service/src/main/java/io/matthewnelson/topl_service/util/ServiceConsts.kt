@@ -73,30 +73,6 @@ import io.matthewnelson.topl_core_base.BaseConsts
 abstract class ServiceConsts: BaseConsts() {
 
 
-    //////////////////////
-    /// ActionCommands ///
-    //////////////////////
-    @Target(AnnotationTarget.TYPE, AnnotationTarget.CLASS, AnnotationTarget.VALUE_PARAMETER)
-    @StringDef(
-        ActionCommand.DELAY,
-        ActionCommand.NEW_ID,
-        ActionCommand.START_TOR,
-        ActionCommand.STOP_SERVICE,
-        ActionCommand.STOP_TOR
-    )
-    @Retention(AnnotationRetention.SOURCE)
-    internal annotation class ActionCommand {
-        companion object {
-            private const val ACTION_COMMAND = "ActionCommand_"
-            const val DELAY = "${ACTION_COMMAND}DELAY"
-            const val NEW_ID = "${ACTION_COMMAND}NEW_ID"
-            const val START_TOR = "${ACTION_COMMAND}START_TOR"
-            const val STOP_SERVICE = "${ACTION_COMMAND}STOP_SERVICE"
-            const val STOP_TOR = "${ACTION_COMMAND}STOP_TOR"
-        }
-    }
-
-
     ///////////////////////////////
     /// BackgroundManagerPolicy ///
     ///////////////////////////////
@@ -140,10 +116,37 @@ abstract class ServiceConsts: BaseConsts() {
     }
 
 
-    ///////////////////////////
-    /// ServiceAction Names ///
-    ///////////////////////////
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.TYPE,
+    //////////////////////
+    /// ServiceActions ///
+    //////////////////////
+    @Target(
+        AnnotationTarget.TYPE,
+        AnnotationTarget.CLASS,
+        AnnotationTarget.VALUE_PARAMETER
+    )
+    @StringDef(
+        ServiceActionCommand.DELAY,
+        ServiceActionCommand.NEW_ID,
+        ServiceActionCommand.START_TOR,
+        ServiceActionCommand.STOP_SERVICE,
+        ServiceActionCommand.STOP_TOR
+    )
+    @Retention(AnnotationRetention.SOURCE)
+    internal annotation class ServiceActionCommand {
+        companion object {
+            private const val ACTION_COMMAND = "ActionCommand_"
+            const val DELAY = "${ACTION_COMMAND}DELAY"
+            const val NEW_ID = "${ACTION_COMMAND}NEW_ID"
+            const val START_TOR = "${ACTION_COMMAND}START_TOR"
+            const val STOP_SERVICE = "${ACTION_COMMAND}STOP_SERVICE"
+            const val STOP_TOR = "${ACTION_COMMAND}STOP_TOR"
+        }
+    }
+
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.TYPE,
         AnnotationTarget.PROPERTY
     )
     @StringDef(

@@ -76,7 +76,7 @@ import kotlinx.coroutines.*
 /**
  * [ServiceConsts.ServiceActionName]'s are translated to [ServiceAction]'s,
  * submitted to a queue, and then processed. This allows for sequential execution of
- * individual [ServiceConsts.ActionCommand]'s for each [ServiceAction]
+ * individual [ServiceConsts.ServiceActionCommand]'s for each [ServiceAction]
  * and the ability to quickly interrupt execution for reacting to User actions (such as
  * stopping, or clearing the task).
  *
@@ -199,25 +199,25 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
                         }
 
                         when (command) {
-                            ActionCommand.DELAY -> {
+                            ServiceActionCommand.DELAY -> {
                                 val delayLength = serviceAction.consumeDelayLength()
                                 if (delayLength > 0L)
                                     delay(delayLength)
                             }
-                            ActionCommand.NEW_ID -> {
+                            ServiceActionCommand.NEW_ID -> {
                                 torService.signalNewNym()
                             }
-                            ActionCommand.START_TOR -> {
+                            ServiceActionCommand.START_TOR -> {
                                 if (!torService.hasControlConnection()) {
                                     torService.startTor()
                                     delay(300L)
                                 }
                             }
-                            ActionCommand.STOP_SERVICE -> {
+                            ServiceActionCommand.STOP_SERVICE -> {
                                 broadcastDebugMsgWithObjectDetails("Stopping: ", torService)
                                 torService.stopService()
                             }
-                            ActionCommand.STOP_TOR -> {
+                            ServiceActionCommand.STOP_TOR -> {
                                 if (torService.hasControlConnection()) {
                                     torService.stopTor()
                                     delay(300L)
