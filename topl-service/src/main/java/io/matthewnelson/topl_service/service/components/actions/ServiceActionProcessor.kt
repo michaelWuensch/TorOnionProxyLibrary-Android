@@ -80,7 +80,7 @@ import kotlinx.coroutines.*
  * and the ability to quickly interrupt execution for reacting to User actions (such as
  * stopping, or clearing the task).
  *
- * @param [torService] For accessing internally public values
+ * @param [torService] [BaseService] for interacting with other components of the Service
  * @see [ServiceActions]
  * */
 internal class ServiceActionProcessor(private val torService: BaseService): ServiceConsts() {
@@ -162,9 +162,6 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
                 )
         }
 
-    /**
-     * Clears the [actionQueue]
-     * */
     private fun clearActionQueue() =
         synchronized(actionQueueLock) {
             if (!actionQueue.isNullOrEmpty()) {
@@ -179,9 +176,6 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
     ////////////////////////
     private lateinit var processQueueJob: Job
 
-    /**
-     * Processes the [actionQueue].
-     * */
     private fun launchProcessQueueJob() {
         if (::processQueueJob.isInitialized && processQueueJob.isActive) return
         processQueueJob = torService.getScopeIO().launch {

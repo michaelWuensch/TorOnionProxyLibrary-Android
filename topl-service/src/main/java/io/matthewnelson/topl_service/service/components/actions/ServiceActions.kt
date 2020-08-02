@@ -71,11 +71,13 @@ import io.matthewnelson.topl_service.util.ServiceConsts.ActionCommand
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 
 /**
- * Facilitates mapping of a [ServiceActionName] to an object which allows for individual command
- * execution by [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor]
- * in a repeatable manner. This allows for structured execution depending on the [ServiceActionName]
- * passed to [io.matthewnelson.topl_service.service.TorService] via Intent, while still maintaining
- * an easy way to interrupt coroutine command execution for quickly responding to user actions.
+ * There are multiple avenues to interacting with a Service (BroadcastReceiver, Binder,
+ * Context.startService). This class provides a standardized way of processing those requests, no
+ * matter what avenue or form (Intents). Each [ServiceActions.ServiceAction] has a defined list
+ * of commands that are executed by the
+ * [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor] so that it
+ * breaks up the steps in a manner which can be interrupted for quickly responding to the User's
+ * commands.
  *
  * Think, running machine code to grok.
  * */
