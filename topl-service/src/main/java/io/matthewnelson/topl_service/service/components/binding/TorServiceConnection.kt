@@ -64,7 +64,7 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.topl_service.service.components
+package io.matthewnelson.topl_service.service.components.binding
 
 import android.content.ComponentName
 import android.os.IBinder
@@ -72,7 +72,8 @@ import android.os.IBinder
 internal class TorServiceConnection: BaseServiceConnection() {
 
     companion object {
-        val torServiceConnection = TorServiceConnection()
+        val torServiceConnection =
+            TorServiceConnection()
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {

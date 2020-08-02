@@ -82,8 +82,8 @@ import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.service.components.BackgroundManager
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
-import io.matthewnelson.topl_service.service.components.TorServiceBinder
-import io.matthewnelson.topl_service.service.components.TorServiceConnection
+import io.matthewnelson.topl_service.service.components.binding.TorServiceBinder
+import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import kotlinx.coroutines.*
@@ -100,7 +100,11 @@ internal class TorService: BaseService() {
     ///////////////
     /// Binding ///
     ///////////////
-    private val torServiceBinder: TorServiceBinder by lazy { TorServiceBinder(this) }
+    private val torServiceBinder: TorServiceBinder by lazy {
+        TorServiceBinder(
+            this
+        )
+    }
 
     override fun unbindService() {
         try {

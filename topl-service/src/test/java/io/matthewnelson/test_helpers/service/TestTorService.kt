@@ -19,7 +19,7 @@ import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
-import io.matthewnelson.topl_service.service.components.TorServiceBinder
+import io.matthewnelson.topl_service.service.components.binding.TorServiceBinder
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import kotlinx.coroutines.*
@@ -38,7 +38,11 @@ internal class TestTorService(
     ///////////////
     /// Binding ///
     ///////////////
-    val torServiceBinder: TorServiceBinder by lazy { TorServiceBinder(this) }
+    val torServiceBinder: TorServiceBinder by lazy {
+        TorServiceBinder(
+            this
+        )
+    }
 
     @Volatile
     var serviceIsBound = false

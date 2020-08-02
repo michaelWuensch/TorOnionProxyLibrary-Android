@@ -64,11 +64,12 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.topl_service.service.components
+package io.matthewnelson.topl_service.service.components.binding
 
 import android.content.Intent
 import android.os.Binder
 import io.matthewnelson.topl_service.service.BaseService
+import io.matthewnelson.topl_service.service.components.BackgroundManager
 import io.matthewnelson.topl_service.util.ServiceConsts.BackgroundPolicy
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import kotlinx.coroutines.Job

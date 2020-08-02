@@ -16,7 +16,7 @@ import io.matthewnelson.topl_service.onionproxy.ServiceEventBroadcaster
 import io.matthewnelson.topl_service.prefs.TorServicePrefs
 import io.matthewnelson.topl_service.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.service.components.BackgroundManager
-import io.matthewnelson.topl_service.service.components.TorServiceConnection
+import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyBoolean
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import io.matthewnelson.topl_service.util.ServiceUtilities

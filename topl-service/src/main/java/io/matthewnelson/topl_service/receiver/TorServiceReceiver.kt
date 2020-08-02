@@ -72,7 +72,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.TorService
-import io.matthewnelson.topl_service.service.components.BaseServiceConnection
+import io.matthewnelson.topl_service.service.components.binding.BaseServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import java.math.BigInteger
 import java.security.SecureRandom
