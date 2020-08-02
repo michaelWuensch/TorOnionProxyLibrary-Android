@@ -11,10 +11,10 @@ import io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState
 import io.matthewnelson.topl_core_base.BaseConsts.TorState
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.notification.ServiceNotification
-import io.matthewnelson.topl_service.onionproxy.ServiceEventBroadcaster
-import io.matthewnelson.topl_service.onionproxy.ServiceEventListener
-import io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller
-import io.matthewnelson.topl_service.onionproxy.ServiceTorSettings
+import io.matthewnelson.topl_service.service.components.onionproxy.ServiceEventBroadcaster
+import io.matthewnelson.topl_service.service.components.onionproxy.ServiceEventListener
+import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorInstaller
+import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.service.components.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.service.BaseService

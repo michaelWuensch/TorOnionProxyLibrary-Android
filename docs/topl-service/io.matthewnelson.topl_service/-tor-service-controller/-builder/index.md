@@ -24,7 +24,7 @@ I plan to implement a
 immediately for the settings that don't require a restart, but a stable release comes first).
 
 You can see how the [TorSettings](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) sent here are used in [TorService](#) by looking at
-[io.matthewnelson.topl_service.onionproxy.ServiceTorSettings](#) and
+[io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings](#) and
 [TorService.initTOPLCore](#).
 
 ``` kotlin
