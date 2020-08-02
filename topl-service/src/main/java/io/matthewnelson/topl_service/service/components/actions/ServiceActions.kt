@@ -89,7 +89,7 @@ internal sealed class ServiceActions {
     abstract class ServiceAction: ServiceActions() {
 
         @ServiceActionName
-        abstract val serviceActionName: String
+        abstract val name: String
 
         /**
          * Individual [ServiceActionCommand]'s to executed sequentially by
@@ -123,7 +123,7 @@ internal sealed class ServiceActions {
     class NewId: ServiceAction() {
 
         @ServiceActionName
-        override val serviceActionName: String = ServiceActionName.NEW_ID
+        override val name: String = ServiceActionName.NEW_ID
 
         override val commands: Array<String>
             get() = arrayOf(
@@ -134,7 +134,7 @@ internal sealed class ServiceActions {
     class RestartTor: ServiceAction() {
 
         @ServiceActionName
-        override val serviceActionName: String = ServiceActionName.RESTART_TOR
+        override val name: String = ServiceActionName.RESTART_TOR
 
         override val commands: Array<String>
             get() = arrayOf(
@@ -149,7 +149,7 @@ internal sealed class ServiceActions {
     class Start: ServiceAction() {
 
         @ServiceActionName
-        override val serviceActionName: String = ServiceActionName.START
+        override val name: String = ServiceActionName.START
 
         override val commands: Array<String>
             get() = arrayOf(
@@ -160,7 +160,7 @@ internal sealed class ServiceActions {
     class Stop: ServiceAction() {
 
         @ServiceActionName
-        override val serviceActionName: String = ServiceActionName.STOP
+        override val name: String = ServiceActionName.STOP
 
         override val commands: Array<String>
             get() = arrayOf(

@@ -116,7 +116,7 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
                 torService.unbindService()
                 torService.unregisterReceiver()
                 clearActionQueue()
-                broadcastLogger.notice(serviceAction.serviceActionName)
+                broadcastLogger.notice(serviceAction.name)
             }
             is ServiceActions.Start -> {
                 clearActionQueue()
@@ -186,7 +186,7 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
                 if (serviceAction == null) {
                     return@launch
                 } else {
-                    broadcastLogger.notice(serviceAction.serviceActionName)
+                    broadcastLogger.notice(serviceAction.name)
                     serviceAction.commands.forEachIndexed { index, command ->
 
                         // Check if the current actionObject being executed has been
