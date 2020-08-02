@@ -204,42 +204,36 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
                             return@forEachIndexed
                         }
 
-                        var delayLength = 0L
-                        if (command == ActionCommand.DELAY)
-                            delayLength = actionObject.consumeDelayLength()
-                        processActionCommand(command, delayLength)
+                        when (command) {
+                            ActionCommand.DELAY -> {
+                                val delayLength = actionObject.consumeDelayLength()
+                                if (delayLength > 0L)
+                                    delay(delayLength)
+                            }
+                            ActionCommand.NEW_ID -> {
+                                torService.signalNewNym()
+                            }
+                            ActionCommand.START_TOR -> {
+                                if (!torService.hasControlConnection()) {
+                                    torService.startTor()
+                                    delay(300L)
+                                }
+                            }
+                            ActionCommand.STOP_SERVICE -> {
+                                broadcastDebugObjectDetailsMsg("Stopping: ", torService)
+                                torService.stopService()
+                            }
+                            ActionCommand.STOP_TOR -> {
+                                if (torService.hasControlConnection()) {
+                                    torService.stopTor()
+                                    delay(300L)
+                                }
+                            }
+                        }
 
                         if (index == actionObject.commands.lastIndex)
                             removeActionFromQueue(actionObject)
                     }
-                }
-            }
-        }
-    }
-
-    private suspend fun processActionCommand(@ActionCommand command: String, delayLength: Long) {
-        when (command) {
-            ActionCommand.DELAY -> {
-                if (delayLength > 0L)
-                    delay(delayLength)
-            }
-            ActionCommand.NEW_ID -> {
-                torService.signalNewNym()
-            }
-            ActionCommand.START_TOR -> {
-                if (!torService.hasControlConnection()) {
-                    torService.startTor()
-                    delay(300L)
-                }
-            }
-            ActionCommand.STOP_SERVICE -> {
-                broadcastDebugObjectDetailsMsg("Stopping: ", torService)
-                torService.stopService()
-            }
-            ActionCommand.STOP_TOR -> {
-                if (torService.hasControlConnection()) {
-                    torService.stopTor()
-                    delay(300L)
                 }
             }
         }
