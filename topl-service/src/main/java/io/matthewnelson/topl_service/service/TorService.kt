@@ -91,6 +91,11 @@ import java.io.File
 import java.io.IOException
 import java.lang.reflect.InvocationTargetException
 
+/**
+ * The glue for everything within the [io.matthewnelson.topl_service.service.components] package.
+ *
+ * @see [BaseService]
+ * */
 internal class TorService: BaseService() {
 
     override val context: Context
@@ -101,9 +106,7 @@ internal class TorService: BaseService() {
     /// Binding ///
     ///////////////
     private val torServiceBinder: TorServiceBinder by lazy {
-        TorServiceBinder(
-            this
-        )
+        TorServiceBinder(this)
     }
 
     override fun unbindService() {
@@ -122,9 +125,7 @@ internal class TorService: BaseService() {
     /// BroadcastReceiver ///
     /////////////////////////
     private val torServiceReceiver by lazy {
-        TorServiceReceiver(
-            this
-        )
+        TorServiceReceiver(this)
     }
 
     override fun registerReceiver() {
@@ -154,9 +155,7 @@ internal class TorService: BaseService() {
     /// ServiceActionProcessor ///
     //////////////////////////////
     private val serviceActionProcessor by lazy {
-        ServiceActionProcessor(
-            this
-        )
+        ServiceActionProcessor(this)
     }
 
     override fun processIntent(serviceActionIntent: Intent) {
@@ -241,7 +240,6 @@ internal class TorService: BaseService() {
     override fun refreshBroadcastLoggersHasDebugLogsVar() {
         onionProxyManager.refreshBroadcastLoggersHasDebugLogsVar()
     }
-
     @WorkerThread
     override fun signalControlConnection(torControlCommand: String): Boolean {
         return onionProxyManager.signalControlConnection(torControlCommand)
@@ -306,7 +304,7 @@ internal class TorService: BaseService() {
 
     override fun onCreate() {
         serviceNotification.buildNotification(this)
-        broadcastLogger.notice("BuildConfig.DEBUG set to: $buildConfigDebug")
+        broadcastLogger.notice("Created. BuildConfig.DEBUG set to: $buildConfigDebug")
         registerPrefsListener()
     }
 
