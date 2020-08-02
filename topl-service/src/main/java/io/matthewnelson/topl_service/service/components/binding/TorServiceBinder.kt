@@ -98,7 +98,6 @@ internal class TorServiceBinder(private val torService: BaseService): Binder() {
     //////////////////////////////////////////
     /// BackgroundManager Policy Execution ///
     //////////////////////////////////////////
-
     private val bgMgrBroadcastLogger = torService.getBroadcastLogger(BackgroundManager::class.java)
     private var backgroundPolicyExecutionJob: Job? = null
 
