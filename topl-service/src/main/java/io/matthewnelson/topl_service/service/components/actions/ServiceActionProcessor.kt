@@ -90,6 +90,7 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
             private set
         var stopServiceDelayTime = 100L
             private set
+
         fun initialize(restartMilliseconds: Long, stopServiceMilliseconds: Long) {
             restartTorDelayTime = restartMilliseconds
             stopServiceDelayTime = stopServiceMilliseconds

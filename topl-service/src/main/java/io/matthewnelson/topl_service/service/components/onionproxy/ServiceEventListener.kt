@@ -78,7 +78,7 @@ internal class ServiceEventListener: BaseEventListener() {
 
     // broadcastLogger is available from BaseEventListener and is instantiated as soon as
     // OnionProxyManager gets initialized.
-//    private lateinit var broadcastLogger: BroadcastLogger
+//    var broadcastLogger: BroadcastLogger? = null
 
     override val CONTROL_COMMAND_EVENTS: Array<String>
         get() = arrayOf(

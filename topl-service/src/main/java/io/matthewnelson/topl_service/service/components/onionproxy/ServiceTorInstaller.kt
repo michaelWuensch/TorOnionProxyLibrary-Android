@@ -99,7 +99,7 @@ internal class ServiceTorInstaller(private val torService: BaseService): TorInst
 
     // broadcastLogger is available from TorInstaller and is instantiated as soon as
     // OnionProxyManager gets initialized.
-//    private lateinit var broadcastLogger: BroadcastLogger
+//    var broadcastLogger: BroadcastLogger? = null
 
     @Throws(IOException::class, SecurityException::class)
     override fun setup() {

@@ -77,7 +77,7 @@ import io.matthewnelson.topl_service.util.ServiceConsts
  * the [io.matthewnelson.topl_service.TorServiceController.Builder] can be updated. The
  * values saved to [TorServicePrefs] are always preferred over the defaults declared.
  *
- * See [io.matthewnelson.topl_service.onionproxy.ServiceTorSettings]
+ * See [io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings]
  * */
 class TorServicePrefs(context: Context): ServiceConsts() {
 
