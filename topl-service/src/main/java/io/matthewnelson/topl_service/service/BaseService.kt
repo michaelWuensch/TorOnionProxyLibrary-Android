@@ -86,14 +86,13 @@ import java.io.IOException
 
 /**
  * Contains all methods that are called from classes external to, and instantiated by
- * [TorService]. It acts as the glue and helps with testing such that intercepting the
- * calls are easier when testing the individual components.
+ * [TorService]. It acts as the glue and helps with integration testing of the individual
+ * components that make [TorService] work.
  * */
 internal abstract class BaseService: Service() {
 
     companion object {
-        var application: Application? = null
-            private set
+        private var application: Application? = null
         var buildConfigVersionCode: Int = -1
             private set
         var buildConfigDebug: Boolean = BuildConfig.DEBUG
@@ -125,8 +124,9 @@ internal abstract class BaseService: Service() {
 
         @Throws(RuntimeException::class)
         fun getAppContext(): Context =
-            application?.applicationContext
-                ?: throw RuntimeException("Builder.build has not been called yet")
+            application?.applicationContext ?: throw RuntimeException(
+                "Builder.build has not been called yet"
+            )
 
         // For things that can't be saved to TorServicePrefs, such as BuildConfig.VERSION_CODE
         fun getLocalPrefs(context: Context): SharedPreferences =
@@ -137,14 +137,15 @@ internal abstract class BaseService: Service() {
         /// Last Accepted ServiceAction ///
         ///////////////////////////////////
         @Volatile
-        @ServiceAction var lastAcceptedServiceAction: String = ServiceAction.STOP
+        @ServiceAction
+        var lastAcceptedServiceAction: String = ServiceAction.STOP
             private set
 
         /**
          * Updates [lastAcceptedServiceAction] in several key places so that we can keep the
-         * Service's state in sync with the latest calls coming from the Application using
+         * [TorService]'s state in sync with the latest calls coming from the Application using
          * the Library. It is used in [TorService.onStartCommand] and
-         * [io.matthewnelson.topl_service.service.components.TorServiceBinder.submitServiceActionIntent]
+         * [io.matthewnelson.topl_service.service.components.binding.TorServiceBinder.submitServiceActionIntent]
          *
          * @param [serviceAction] The [ServiceAction] to update [lastAcceptedServiceAction] to
          * */
@@ -153,6 +154,7 @@ internal abstract class BaseService: Service() {
         }
         fun wasLastAcceptedServiceActionStop(): Boolean =
             lastAcceptedServiceAction == ServiceAction.STOP
+
 
         //////////////////////
         /// ServiceStartup ///
@@ -168,12 +170,13 @@ internal abstract class BaseService: Service() {
             context.applicationContext.startService(startServiceIntent)
             bindService(context.applicationContext, serviceClass, serviceConn)
         }
+
         /**
          * Binds to the provided [Service] class using the provided [BaseServiceConnection]
          *
          * @param [context] [Context]
-         * @param [serviceClass] The [Service]'s class you wish to unbind
-         * @param [serviceConn] The [BaseServiceConnection] to bind
+         * @param [serviceClass] The [Service]'s class you wish to bind
+         * @param [serviceConn] The [BaseServiceConnection] to bind with
          * */
         private fun bindService(
             context: Context,
@@ -191,8 +194,8 @@ internal abstract class BaseService: Service() {
         }
 
         /**
-         * Unbinds [TorService] from the Application and clears the
-         * [BaseServiceConnection.serviceBinder] reference.
+         * Unbinds [TorService] from the Application and clears the reference to
+         * [BaseServiceConnection.serviceBinder].
          *
          * @param [context] [Context]
          * @param [serviceConn] The [BaseServiceConnection] to unbind
@@ -205,10 +208,9 @@ internal abstract class BaseService: Service() {
         }
     }
 
-    // All classes that interact with System APIs which require context to do something
-    // call this in production (torService.context), such that in testing we can easily
-    // swap it out without needing to start the Service and still get functionality for
-    // the components that make TorService work.
+    // All classes that interact with APIs which require Context to do something
+    // call this in production (torService.context). This allows for easily
+    // swapping it out with what we want to use when testing.
     abstract val context: Context
 
 
