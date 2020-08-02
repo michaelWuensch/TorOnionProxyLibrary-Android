@@ -70,14 +70,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import io.matthewnelson.topl_service.TorServiceController
-import io.matthewnelson.topl_service.TorServiceController.Builder
 import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.TorService
-import io.matthewnelson.topl_service.service.components.BackgroundManager
 import io.matthewnelson.topl_service.service.components.BaseServiceConnection
-import io.matthewnelson.topl_service.util.ServiceConsts
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import java.math.BigInteger
 import java.security.SecureRandom
@@ -85,7 +80,7 @@ import java.security.SecureRandom
 /**
  * Is registered at startup of [TorService], and unregistered when it is stopped.
  * Sending an intent here to start [TorService] will do nothing as all intents are piped
- * to [ServiceActionProcessor] directly. To start the service (and Tor), call the
+ * to [BaseServiceConnection.serviceBinder]. To start the service (and Tor), call the
  * [io.matthewnelson.topl_service.TorServiceController.startTor] method.
  *
  * @param [torService]
@@ -105,8 +100,9 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
     private val broadcastLogger = torService.getBroadcastLogger(TorServiceReceiver::class.java)
 
     fun register() {
-        torService.context.applicationContext
-            .registerReceiver(this, IntentFilter(SERVICE_INTENT_FILTER))
+        torService.context.applicationContext.registerReceiver(
+            this, IntentFilter(SERVICE_INTENT_FILTER)
+        )
         if (!isRegistered)
             broadcastLogger.debug("Has been registered")
         isRegistered = true
