@@ -139,8 +139,7 @@ internal abstract class BaseService: Service() {
         ///////////////////////////////////
         @Volatile
         @ServiceActionName
-        var lastAcceptedServiceAction: String = ServiceActionName.STOP
-            private set
+        private var lastAcceptedServiceAction: String = ServiceActionName.STOP
 
         /**
          * Updates [lastAcceptedServiceAction] in several key places so that we can keep
