@@ -174,10 +174,10 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
     ////////////////////////
     /// Queue Processing ///
     ////////////////////////
-    private lateinit var processQueueJob: Job
+    private var processQueueJob: Job? = null
 
     private fun launchProcessQueueJob() {
-        if (::processQueueJob.isInitialized && processQueueJob.isActive) return
+        if (processQueueJob?.isActive == true) return
         processQueueJob = torService.getScopeIO().launch {
             broadcastDebugMsgWithObjectDetails("Processing Queue: ", this)
 
