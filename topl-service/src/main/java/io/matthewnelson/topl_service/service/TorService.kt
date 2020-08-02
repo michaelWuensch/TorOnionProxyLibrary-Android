@@ -82,6 +82,7 @@ import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.service.components.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
+import io.matthewnelson.topl_service.service.components.actions.ServiceActions.ServiceAction
 import io.matthewnelson.topl_service.service.components.binding.TorServiceBinder
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
@@ -160,6 +161,10 @@ internal class TorService: BaseService() {
 
     override fun processIntent(serviceActionIntent: Intent) {
         serviceActionProcessor.processIntent(serviceActionIntent)
+    }
+
+    override fun processServiceAction(serviceAction: ServiceAction) {
+        serviceActionProcessor.processServiceAction(serviceAction)
     }
     override fun stopService() {
         stopSelf()

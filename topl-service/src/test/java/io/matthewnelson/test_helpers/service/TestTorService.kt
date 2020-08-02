@@ -19,6 +19,7 @@ import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.service.components.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
+import io.matthewnelson.topl_service.service.components.actions.ServiceActions.ServiceAction
 import io.matthewnelson.topl_service.service.components.binding.TorServiceBinder
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
@@ -102,6 +103,9 @@ internal class TestTorService(
 
     override fun processIntent(serviceActionIntent: Intent) {
         serviceActionProcessor.processIntent(serviceActionIntent)
+    }
+    override fun processServiceAction(serviceAction: ServiceAction) {
+        serviceActionProcessor.processServiceAction(serviceAction)
     }
 
     @Volatile

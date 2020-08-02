@@ -77,6 +77,7 @@ import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.BuildConfig
 import io.matthewnelson.topl_service.notification.ServiceNotification
+import io.matthewnelson.topl_service.service.components.actions.ServiceActions.ServiceAction
 import io.matthewnelson.topl_service.service.components.binding.BaseServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
@@ -238,6 +239,7 @@ internal abstract class BaseService: Service() {
     /// ServiceActionProcessor ///
     //////////////////////////////
     abstract fun processIntent(serviceActionIntent: Intent)
+    abstract fun processServiceAction(serviceAction: ServiceAction)
     abstract fun stopService()
 
 
