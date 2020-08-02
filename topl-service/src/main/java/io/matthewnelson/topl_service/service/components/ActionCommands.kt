@@ -153,8 +153,8 @@ internal sealed class ActionCommands {
     class ServiceActionObjectGetter {
 
         /**
-         * Processes an Intent by it's contained action and returns a
-         * [ServiceActionObject] for the passed [ServiceAction]
+         * Processes an Intent by it's contained action and returns a [ServiceActionObject]
+         * for the passed [ServiceAction]
          *
          * @param [intent] The intent containing an appropriate [ServiceAction]
          * @return [ServiceActionObject] associated with the intent's action (a [ServiceAction])
