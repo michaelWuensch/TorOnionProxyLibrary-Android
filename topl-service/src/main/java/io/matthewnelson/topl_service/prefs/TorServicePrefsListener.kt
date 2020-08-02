@@ -74,7 +74,7 @@ import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyBoolean
 /**
  * Listens to [TorServicePrefs] for changes such that while Tor is running, it can
  * query [TorService.onionProxyManager] to have it updated immediately (if the setting doesn't
- * require a restart), or submit [io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction]'s
+ * require a restart), or submit [io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName]'s
  * to [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor] to be
  * queued for execution.
  *

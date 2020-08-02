@@ -85,7 +85,7 @@ import io.matthewnelson.topl_service.service.components.actions.ServiceActionPro
 import io.matthewnelson.topl_service.service.components.binding.TorServiceBinder
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
-import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
+import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.IOException
@@ -316,18 +316,18 @@ internal class TorService: BaseService() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.action?.let {
-            if (it == ServiceAction.START) {
+            if (it == ServiceActionName.START) {
                 updateLastAcceptedServiceAction(it)
                 processIntent(intent)
             } else {
                 broadcastLogger.warn(
-                    "$it was used with startService. Use only ${ServiceAction.START} to" +
+                    "$it was used with startService. Use only ${ServiceActionName.START} to" +
                             "ensure proper startup of Tor"
                 )
-                updateLastAcceptedServiceAction(ServiceAction.START)
-                processIntent(Intent(ServiceAction.START))
+                updateLastAcceptedServiceAction(ServiceActionName.START)
+                processIntent(Intent(ServiceActionName.START))
 
-                if (it.contains(ServiceAction.SERVICE_ACTION)) {
+                if (it.contains(ServiceActionName.SERVICE_ACTION_NAME)) {
                     processIntent(intent)
                     updateLastAcceptedServiceAction(it)
                 }
@@ -348,6 +348,6 @@ internal class TorService: BaseService() {
         broadcastLogger.debug("Task has been removed")
 
         // Shutdown Tor and stop the Service
-        processIntent(Intent(ServiceAction.STOP))
+        processIntent(Intent(ServiceActionName.STOP))
     }
 }

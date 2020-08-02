@@ -73,7 +73,7 @@ import android.content.IntentFilter
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.service.components.binding.BaseServiceConnection
-import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
+import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import java.math.BigInteger
 import java.security.SecureRandom
 
@@ -127,7 +127,7 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
 
             when (val serviceAction = intent.getStringExtra(SERVICE_INTENT_FILTER)) {
                 // Only accept these 3 ServiceActions.
-                ServiceAction.NEW_ID, ServiceAction.RESTART_TOR, ServiceAction.STOP -> {
+                ServiceActionName.NEW_ID, ServiceActionName.RESTART_TOR, ServiceActionName.STOP -> {
                     BaseServiceConnection.serviceBinder?.submitServiceActionIntent(
                         Intent(serviceAction)
                     )

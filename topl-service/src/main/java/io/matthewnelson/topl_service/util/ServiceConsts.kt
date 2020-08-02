@@ -140,26 +140,26 @@ abstract class ServiceConsts: BaseConsts() {
     }
 
 
-    //////////////////////
-    /// ServiceActions ///
-    //////////////////////
+    ///////////////////////////
+    /// ServiceAction Names ///
+    ///////////////////////////
     @Target(AnnotationTarget.CLASS, AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.TYPE,
         AnnotationTarget.PROPERTY
     )
     @StringDef(
-        ServiceAction.NEW_ID,
-        ServiceAction.RESTART_TOR,
-        ServiceAction.START,
-        ServiceAction.STOP
+        ServiceActionName.NEW_ID,
+        ServiceActionName.RESTART_TOR,
+        ServiceActionName.START,
+        ServiceActionName.STOP
     )
     @Retention(AnnotationRetention.SOURCE)
-    internal annotation class ServiceAction {
+    internal annotation class ServiceActionName {
         companion object {
-            const val SERVICE_ACTION = "ServiceAction_"
-            const val NEW_ID = "${SERVICE_ACTION}NEW_ID"
-            const val RESTART_TOR = "${SERVICE_ACTION}RESTART_TOR"
-            const val START = "${SERVICE_ACTION}START"
-            const val STOP = "${SERVICE_ACTION}STOP"
+            const val SERVICE_ACTION_NAME = "ServiceActionName_"
+            const val NEW_ID = "${SERVICE_ACTION_NAME}NEW_ID"
+            const val RESTART_TOR = "${SERVICE_ACTION_NAME}RESTART_TOR"
+            const val START = "${SERVICE_ACTION_NAME}START"
+            const val STOP = "${SERVICE_ACTION_NAME}STOP"
         }
     }
 

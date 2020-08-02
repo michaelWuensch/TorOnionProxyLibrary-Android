@@ -71,7 +71,7 @@ import android.os.Binder
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
 import io.matthewnelson.topl_service.util.ServiceConsts.BackgroundPolicy
-import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
+import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -84,10 +84,10 @@ internal class TorServiceBinder(private val torService: BaseService): Binder() {
 
     fun submitServiceActionIntent(serviceActionIntent: Intent) {
         val action = serviceActionIntent.action
-        if (action != null && action.contains(ServiceAction.SERVICE_ACTION)) {
+        if (action != null && action.contains(ServiceActionName.SERVICE_ACTION_NAME)) {
 
             when (action) {
-                ServiceAction.START -> {
+                ServiceActionName.START -> {
                     // Do not accept the above ServiceActions through use of this method.
                     // START = to start TorService
                     broadcastLogger.warn("$action is not an accepted intent action for this class")
@@ -133,7 +133,7 @@ internal class TorServiceBinder(private val torService: BaseService): Binder() {
                 BackgroundPolicy.RESPECT_RESOURCES -> {
                     delay(executionDelay)
                     bgMgrBroadcastLogger.debug("Executing background management policy")
-                    torService.processIntent(Intent(ServiceAction.STOP))
+                    torService.processIntent(Intent(ServiceActionName.STOP))
                 }
             }
         }

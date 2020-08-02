@@ -78,7 +78,7 @@ import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.BuildConfig
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.components.binding.BaseServiceConnection
-import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
+import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import kotlinx.coroutines.CoroutineScope
 import java.io.File
@@ -137,8 +137,8 @@ internal abstract class BaseService: Service() {
         /// Last Accepted ServiceAction ///
         ///////////////////////////////////
         @Volatile
-        @ServiceAction
-        var lastAcceptedServiceAction: String = ServiceAction.STOP
+        @ServiceActionName
+        var lastAcceptedServiceAction: String = ServiceActionName.STOP
             private set
 
         /**
@@ -147,13 +147,13 @@ internal abstract class BaseService: Service() {
          * the Library. It is used in [TorService.onStartCommand] and
          * [io.matthewnelson.topl_service.service.components.binding.TorServiceBinder.submitServiceActionIntent]
          *
-         * @param [serviceAction] The [ServiceAction] to update [lastAcceptedServiceAction] to
+         * @param [serviceAction] The [ServiceActionName] to update [lastAcceptedServiceAction] to
          * */
-        fun updateLastAcceptedServiceAction(@ServiceAction serviceAction: String) {
+        fun updateLastAcceptedServiceAction(@ServiceActionName serviceAction: String) {
             lastAcceptedServiceAction = serviceAction
         }
         fun wasLastAcceptedServiceActionStop(): Boolean =
-            lastAcceptedServiceAction == ServiceAction.STOP
+            lastAcceptedServiceAction == ServiceActionName.STOP
 
 
         //////////////////////
@@ -166,7 +166,7 @@ internal abstract class BaseService: Service() {
             serviceConn: BaseServiceConnection
         ) {
             val startServiceIntent = Intent(context.applicationContext, serviceClass)
-            startServiceIntent.action = ServiceAction.START
+            startServiceIntent.action = ServiceActionName.START
             context.applicationContext.startService(startServiceIntent)
             bindService(context.applicationContext, serviceClass, serviceConn)
         }
@@ -184,7 +184,7 @@ internal abstract class BaseService: Service() {
             serviceConn: BaseServiceConnection
         ) {
             val bindingIntent = Intent(context.applicationContext, serviceClass)
-            bindingIntent.action = ServiceAction.START
+            bindingIntent.action = ServiceActionName.START
 
             context.applicationContext.bindService(
                 bindingIntent,

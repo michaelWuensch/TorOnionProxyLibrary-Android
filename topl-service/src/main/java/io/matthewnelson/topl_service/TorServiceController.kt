@@ -354,7 +354,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * */
         fun stopTor() =
             BaseServiceConnection.serviceBinder?.submitServiceActionIntent(
-                Intent(ServiceAction.STOP)
+                Intent(ServiceActionName.STOP)
             )
 
         /**
@@ -362,7 +362,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * */
         fun restartTor() =
             BaseServiceConnection.serviceBinder?.submitServiceActionIntent(
-                Intent(ServiceAction.RESTART_TOR)
+                Intent(ServiceActionName.RESTART_TOR)
             )
 
         /**
@@ -370,7 +370,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * */
         fun newIdentity() =
             BaseServiceConnection.serviceBinder?.submitServiceActionIntent(
-                Intent(ServiceAction.NEW_ID)
+                Intent(ServiceActionName.NEW_ID)
             )
     }
 }

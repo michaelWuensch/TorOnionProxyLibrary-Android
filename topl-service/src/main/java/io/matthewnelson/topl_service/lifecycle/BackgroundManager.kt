@@ -83,11 +83,11 @@ import io.matthewnelson.topl_service.util.ServiceConsts
  * If brought back into the foreground by the user:
  *
  *   - **Before Policy execution**: Execution is canceled. If [BaseService.lastAcceptedServiceAction]
- *   was **not** [ServiceConsts.ServiceAction.STOP], a startService call is made to ensure it's
+ *   was **not** [ServiceConsts.ServiceActionName.STOP], a startService call is made to ensure it's
  *   started.
  *
  *   - **After Policy execution**: If [BaseService.lastAcceptedServiceAction]
- *   was **not** [ServiceConsts.ServiceAction.STOP], a startService call is made to ensure it's
+ *   was **not** [ServiceConsts.ServiceActionName.STOP], a startService call is made to ensure it's
  *   started.
  *
  *   - See [BaseService.updateLastAcceptedServiceAction] and [TorService.onTaskRemoved] for

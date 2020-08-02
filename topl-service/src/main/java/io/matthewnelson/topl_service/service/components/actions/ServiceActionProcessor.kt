@@ -74,7 +74,7 @@ import io.matthewnelson.topl_service.util.ServiceConsts
 import kotlinx.coroutines.*
 
 /**
- * [ServiceConsts.ServiceAction]'s are translated to [ServiceActionObject]'s,
+ * [ServiceConsts.ServiceActionName]'s are translated to [ServiceActionObject]'s,
  * submitted to a queue, and then processed. This allows for sequential execution of
  * individual [ServiceConsts.ActionCommand]'s for each [ServiceActionObject]
  * and the ability to quickly interrupt execution for reacting to User actions (such as
@@ -116,7 +116,7 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
                 torService.unbindService()
                 torService.unregisterReceiver()
                 clearActionQueue()
-                broadcastLogger.notice(serviceActionObject.serviceAction)
+                broadcastLogger.notice(serviceActionObject.serviceActionName)
             }
             is ActionCommands.Start -> {
                 clearActionQueue()
@@ -192,7 +192,7 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
                 if (actionObject == null) {
                     return@launch
                 } else {
-                    broadcastLogger.notice(actionObject.serviceAction)
+                    broadcastLogger.notice(actionObject.serviceActionName)
                     actionObject.commands.forEachIndexed { index, command ->
 
                         // Check if the current actionObject being executed has been

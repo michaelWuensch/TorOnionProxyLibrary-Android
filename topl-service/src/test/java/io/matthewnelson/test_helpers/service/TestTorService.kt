@@ -21,7 +21,7 @@ import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.binding.TorServiceBinder
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
-import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
+import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.TestCoroutineScope
 import net.freehaven.tor.control.TorControlCommands
@@ -311,6 +311,6 @@ internal class TestTorService(
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         serviceNotification.startForeground(this)
-        processIntent(Intent(ServiceAction.STOP))
+        processIntent(Intent(ServiceActionName.STOP))
     }
 }

@@ -68,12 +68,12 @@ package io.matthewnelson.topl_service.service.components.actions
 
 import android.content.Intent
 import io.matthewnelson.topl_service.util.ServiceConsts.ActionCommand
-import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
+import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 
 /**
- * Facilitates mapping of a [ServiceAction] to an object which allows for individual command
+ * Facilitates mapping of a [ServiceActionName] to an object which allows for individual command
  * execution by [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor]
- * in a repeatable manner. This allows for structured execution depending on the [ServiceAction]
+ * in a repeatable manner. This allows for structured execution depending on the [ServiceActionName]
  * passed to [io.matthewnelson.topl_service.service.TorService] via Intent, while still maintaining
  * an easy way to interrupt coroutine command execution for quickly responding to user actions.
  *
@@ -83,7 +83,7 @@ internal sealed class ActionCommands {
 
     abstract class ServiceActionObject: ActionCommands() {
 
-        abstract val serviceAction: @ServiceAction String
+        abstract val serviceActionName: @ServiceActionName String
 
         /**
          * Individual [ActionCommand]'s to executed sequentially by
@@ -114,14 +114,14 @@ internal sealed class ActionCommands {
         }
     }
 
-    class NewId(override val serviceAction: String) : ServiceActionObject() {
+    class NewId(override val serviceActionName: String) : ServiceActionObject() {
         override val commands: Array<String>
             get() = arrayOf(
                 ActionCommand.NEW_ID
             )
     }
 
-    class RestartTor(override val serviceAction: String) : ServiceActionObject() {
+    class RestartTor(override val serviceActionName: String) : ServiceActionObject() {
         override val commands: Array<String>
             get() = arrayOf(
                 ActionCommand.STOP_TOR,
@@ -132,14 +132,14 @@ internal sealed class ActionCommands {
             mutableListOf(ServiceActionProcessor.restartTorDelayTime)
     }
 
-    class Start(override val serviceAction: String) : ServiceActionObject() {
+    class Start(override val serviceActionName: String) : ServiceActionObject() {
         override val commands: Array<String>
             get() = arrayOf(
                 ActionCommand.START_TOR
             )
     }
 
-    class Stop(override val serviceAction: String) : ServiceActionObject() {
+    class Stop(override val serviceActionName: String) : ServiceActionObject() {
         override val commands: Array<String>
             get() = arrayOf(
                 ActionCommand.STOP_TOR,
@@ -154,25 +154,25 @@ internal sealed class ActionCommands {
 
         /**
          * Processes an Intent by it's contained action and returns a [ServiceActionObject]
-         * for the passed [ServiceAction]
+         * for the passed [ServiceActionName]
          *
-         * @param [intent] The intent containing an appropriate [ServiceAction]
-         * @return [ServiceActionObject] associated with the intent's action (a [ServiceAction])
-         * @throws [IllegalArgumentException] if the intent's action isn't a [ServiceAction]
+         * @param [intent] The intent containing an appropriate [ServiceActionName]
+         * @return [ServiceActionObject] associated with the intent's action (a [ServiceActionName])
+         * @throws [IllegalArgumentException] if the intent's action isn't a [ServiceActionName]
          * */
         @Throws(IllegalArgumentException::class)
         fun get(intent: Intent): ServiceActionObject {
             return when (val action = intent.action) {
-                ServiceAction.NEW_ID -> {
+                ServiceActionName.NEW_ID -> {
                     NewId(action)
                 }
-                ServiceAction.RESTART_TOR -> {
+                ServiceActionName.RESTART_TOR -> {
                     RestartTor(action)
                 }
-                ServiceAction.START -> {
+                ServiceActionName.START -> {
                     Start(action)
                 }
-                ServiceAction.STOP -> {
+                ServiceActionName.STOP -> {
                     Stop(action)
                 }
                 else -> {
