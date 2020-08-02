@@ -72,7 +72,7 @@ import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.TorService
-import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
+import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import io.matthewnelson.topl_service.util.ServiceUtilities
 import kotlinx.coroutines.CoroutineScope
@@ -284,10 +284,10 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
         val msgSplit = msg.split("|")
         val msgToShow: String? = msgSplit.elementAtOrNull(2)?.let {
             when (it) {
-                ServiceAction.RESTART_TOR -> {
+                ServiceActionName.RESTART_TOR -> {
                     "Restarting Tor..."
                 }
-                ServiceAction.STOP -> {
+                ServiceActionName.STOP -> {
                     "Stopping Service..."
                 }
                 else -> {

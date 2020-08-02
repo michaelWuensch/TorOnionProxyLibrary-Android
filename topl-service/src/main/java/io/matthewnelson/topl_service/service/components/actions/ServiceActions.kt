@@ -66,33 +66,38 @@
 * */
 package io.matthewnelson.topl_service.service.components.actions
 
-import android.content.Intent
-import io.matthewnelson.topl_service.util.ServiceConsts.ActionCommand
-import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
+import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionCommand
+import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 
 /**
- * Facilitates mapping of a [ServiceAction] to an object which allows for individual command
- * execution by [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor]
- * in a repeatable manner. This allows for structured execution depending on the [ServiceAction]
- * passed to [io.matthewnelson.topl_service.service.TorService] via Intent, while still maintaining
- * an easy way to interrupt coroutine command execution for quickly responding to user actions.
+ * There are multiple avenues to interacting with a Service (BroadcastReceiver, Binder,
+ * Context.startService). This class provides a standardized way of processing those requests, no
+ * matter what avenue or form (Intents). Each [ServiceActions.ServiceAction] has a defined list
+ * of commands that are executed by the
+ * [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor] so that it
+ * breaks up the steps in a manner which can be interrupted for quickly responding to the User's
+ * commands.
  *
  * Think, running machine code to grok.
  * */
-internal sealed class ActionCommands {
+internal sealed class ServiceActions {
 
-    abstract class ServiceActionObject: ActionCommands() {
+    /**
+     * The template that all [ServiceActions] use.
+     * */
+    abstract class ServiceAction: ServiceActions() {
 
-        abstract val serviceAction: @ServiceAction String
+        @ServiceActionName
+        abstract val name: String
 
         /**
-         * Individual [ActionCommand]'s to executed sequentially by
+         * Individual [ServiceActionCommand]'s to executed sequentially by
          * [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor].
          * */
-        abstract val commands: Array<@ActionCommand String>
+        abstract val commands: Array<@ServiceActionCommand String>
 
         /**
-         * For every [ActionCommand.DELAY] within [commands], a value will be consumed
+         * For every [ServiceActionCommand.DELAY] within [commands], a value will be consumed
          * when executing it.
          *
          * Override this to define the values for each DELAY call.
@@ -105,80 +110,62 @@ internal sealed class ActionCommands {
          *
          * @return The 0th element within [delayLengthQueue], or 0L if empty
          * */
-        fun consumeDelayLength(): Long {
-            return if (delayLengthQueue.isNotEmpty()) {
+        fun consumeDelayLength(): Long =
+            if (delayLengthQueue.isNotEmpty())
                 delayLengthQueue.removeAt(0)
-            } else {
+            else
                 0L
-            }
-        }
     }
 
-    class NewId(override val serviceAction: String) : ServiceActionObject() {
+    class NewId: ServiceAction() {
+
+        @ServiceActionName
+        override val name: String = ServiceActionName.NEW_ID
+
         override val commands: Array<String>
             get() = arrayOf(
-                ActionCommand.NEW_ID
+                ServiceActionCommand.NEW_ID
             )
     }
 
-    class RestartTor(override val serviceAction: String) : ServiceActionObject() {
+    class RestartTor: ServiceAction() {
+
+        @ServiceActionName
+        override val name: String = ServiceActionName.RESTART_TOR
+
         override val commands: Array<String>
             get() = arrayOf(
-                ActionCommand.STOP_TOR,
-                ActionCommand.DELAY,
-                ActionCommand.START_TOR
+                ServiceActionCommand.STOP_TOR,
+                ServiceActionCommand.DELAY,
+                ServiceActionCommand.START_TOR
             )
-        override val delayLengthQueue =
-            mutableListOf(ServiceActionProcessor.restartTorDelayTime)
+
+        override val delayLengthQueue = mutableListOf(ServiceActionProcessor.restartTorDelayTime)
     }
 
-    class Start(override val serviceAction: String) : ServiceActionObject() {
+    class Start: ServiceAction() {
+
+        @ServiceActionName
+        override val name: String = ServiceActionName.START
+
         override val commands: Array<String>
             get() = arrayOf(
-                ActionCommand.START_TOR
+                ServiceActionCommand.START_TOR
             )
     }
 
-    class Stop(override val serviceAction: String) : ServiceActionObject() {
+    class Stop: ServiceAction() {
+
+        @ServiceActionName
+        override val name: String = ServiceActionName.STOP
+
         override val commands: Array<String>
             get() = arrayOf(
-                ActionCommand.STOP_TOR,
-                ActionCommand.DELAY,
-                ActionCommand.STOP_SERVICE
+                ServiceActionCommand.STOP_TOR,
+                ServiceActionCommand.DELAY,
+                ServiceActionCommand.STOP_SERVICE
             )
-        override val delayLengthQueue =
-            mutableListOf(ServiceActionProcessor.stopServiceDelayTime)
-    }
 
-    class ServiceActionObjectGetter {
-
-        /**
-         * Processes an Intent by it's contained action and returns a [ServiceActionObject]
-         * for the passed [ServiceAction]
-         *
-         * @param [intent] The intent containing an appropriate [ServiceAction]
-         * @return [ServiceActionObject] associated with the intent's action (a [ServiceAction])
-         * @throws [IllegalArgumentException] if the intent's action isn't a [ServiceAction]
-         * */
-        @Throws(IllegalArgumentException::class)
-        fun get(intent: Intent): ServiceActionObject {
-            return when (val action = intent.action) {
-                ServiceAction.NEW_ID -> {
-                    NewId(action)
-                }
-                ServiceAction.RESTART_TOR -> {
-                    RestartTor(action)
-                }
-                ServiceAction.START -> {
-                    Start(action)
-                }
-                ServiceAction.STOP -> {
-                    Stop(action)
-                }
-                else -> {
-                    throw (IllegalArgumentException())
-                }
-            }
-        }
+        override val delayLengthQueue = mutableListOf(ServiceActionProcessor.stopServiceDelayTime)
     }
 }

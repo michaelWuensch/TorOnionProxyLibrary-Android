@@ -77,8 +77,9 @@ import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.BuildConfig
 import io.matthewnelson.topl_service.notification.ServiceNotification
+import io.matthewnelson.topl_service.service.components.actions.ServiceActions.ServiceAction
 import io.matthewnelson.topl_service.service.components.binding.BaseServiceConnection
-import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
+import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import kotlinx.coroutines.CoroutineScope
 import java.io.File
@@ -137,23 +138,22 @@ internal abstract class BaseService: Service() {
         /// Last Accepted ServiceAction ///
         ///////////////////////////////////
         @Volatile
-        @ServiceAction
-        var lastAcceptedServiceAction: String = ServiceAction.STOP
-            private set
+        @ServiceActionName
+        private var lastAcceptedServiceAction: String = ServiceActionName.STOP
 
         /**
-         * Updates [lastAcceptedServiceAction] in several key places so that we can keep the
+         * Updates [lastAcceptedServiceAction] in several key places so that we can keep
          * [TorService]'s state in sync with the latest calls coming from the Application using
          * the Library. It is used in [TorService.onStartCommand] and
-         * [io.matthewnelson.topl_service.service.components.binding.TorServiceBinder.submitServiceActionIntent]
+         * [io.matthewnelson.topl_service.service.components.binding.TorServiceBinder.submitServiceAction]
          *
-         * @param [serviceAction] The [ServiceAction] to update [lastAcceptedServiceAction] to
+         * @param [serviceAction] The [ServiceActionName] to update [lastAcceptedServiceAction] to
          * */
-        fun updateLastAcceptedServiceAction(@ServiceAction serviceAction: String) {
+        fun updateLastAcceptedServiceAction(@ServiceActionName serviceAction: String) {
             lastAcceptedServiceAction = serviceAction
         }
         fun wasLastAcceptedServiceActionStop(): Boolean =
-            lastAcceptedServiceAction == ServiceAction.STOP
+            lastAcceptedServiceAction == ServiceActionName.STOP
 
 
         //////////////////////
@@ -165,32 +165,9 @@ internal abstract class BaseService: Service() {
             serviceClass: Class<*>,
             serviceConn: BaseServiceConnection
         ) {
-            val startServiceIntent = Intent(context.applicationContext, serviceClass)
-            startServiceIntent.action = ServiceAction.START
-            context.applicationContext.startService(startServiceIntent)
-            bindService(context.applicationContext, serviceClass, serviceConn)
-        }
-
-        /**
-         * Binds to the provided [Service] class using the provided [BaseServiceConnection]
-         *
-         * @param [context] [Context]
-         * @param [serviceClass] The [Service]'s class you wish to bind
-         * @param [serviceConn] The [BaseServiceConnection] to bind with
-         * */
-        private fun bindService(
-            context: Context,
-            serviceClass: Class<*>,
-            serviceConn: BaseServiceConnection
-        ) {
-            val bindingIntent = Intent(context.applicationContext, serviceClass)
-            bindingIntent.action = ServiceAction.START
-
-            context.applicationContext.bindService(
-                bindingIntent,
-                serviceConn,
-                Context.BIND_AUTO_CREATE
-            )
+            val intent = Intent(context.applicationContext, serviceClass)
+            context.applicationContext.startService(intent)
+            context.applicationContext.bindService(intent, serviceConn, Context.BIND_AUTO_CREATE)
         }
 
         /**
@@ -237,7 +214,7 @@ internal abstract class BaseService: Service() {
     //////////////////////////////
     /// ServiceActionProcessor ///
     //////////////////////////////
-    abstract fun processIntent(serviceActionIntent: Intent)
+    abstract fun processServiceAction(serviceAction: ServiceAction)
     abstract fun stopService()
 
 

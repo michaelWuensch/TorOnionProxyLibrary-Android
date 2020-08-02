@@ -18,7 +18,7 @@ import io.matthewnelson.topl_service.service.components.receiver.TorServiceRecei
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyBoolean
-import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
+import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import io.matthewnelson.topl_service.util.ServiceUtilities
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.TestCoroutineDispatcher
@@ -201,7 +201,7 @@ internal class TorServiceUnitTest {
 
     private fun simulateStartService() {
         testTorService.onCreate()
-        testTorService.onStartCommand(Intent(ServiceAction.START), 0, 0)
+        testTorService.onStartCommand(Intent(ServiceActionName.START), 0, 0)
         testTorService.onBind(null)
     }
 }

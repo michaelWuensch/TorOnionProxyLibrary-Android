@@ -68,7 +68,6 @@ package io.matthewnelson.topl_service
 
 import android.app.Application
 import android.content.Context
-import android.content.Intent
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_core_base.EventBroadcaster
@@ -78,6 +77,7 @@ import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
 import io.matthewnelson.topl_service.service.components.binding.BaseServiceConnection
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
+import io.matthewnelson.topl_service.service.components.actions.ServiceActions
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts
 
@@ -104,7 +104,7 @@ class TorServiceController private constructor(): ServiceConsts() {
      * immediately for the settings that don't require a restart, but a stable release comes first).
      *
      * You can see how the [TorSettings] sent here are used in [TorService] by looking at
-     * [io.matthewnelson.topl_service.onionproxy.ServiceTorSettings] and
+     * [io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings] and
      * [TorService.onionProxyManager].
      *
      * @param [application] [Application], for obtaining context
@@ -158,8 +158,8 @@ class TorServiceController private constructor(): ServiceConsts() {
          *   - start tor + delay (300ms)
          *
          * @param [milliseconds] A value greater than 0
-         * @see [io.matthewnelson.topl_service.service.components.ActionCommands.RestartTor]
-         * @see [io.matthewnelson.topl_service.service.components.ServiceActionProcessor.processActionCommand]
+         * @see [io.matthewnelson.topl_service.service.components.actions.ServiceActions.RestartTor]
+         * @see [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor.processServiceAction]
          * */
         fun addTimeToRestartTorDelay(milliseconds: Long): Builder {
             if (milliseconds > 0L)
@@ -181,8 +181,8 @@ class TorServiceController private constructor(): ServiceConsts() {
          *   - stop service
          *
          * @param [milliseconds] A value greater than 0
-         * @see [io.matthewnelson.topl_service.service.components.ActionCommands.Stop]
-         * @see [io.matthewnelson.topl_service.service.components.ServiceActionProcessor.processActionCommand]
+         * @see [io.matthewnelson.topl_service.service.components.actions.ServiceActions.Stop]
+         * @see [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor.processServiceAction]
          * */
         fun addTimeToStopServiceDelay(milliseconds: Long): Builder {
             if (milliseconds > 0L)
@@ -353,24 +353,18 @@ class TorServiceController private constructor(): ServiceConsts() {
          * Stops [TorService].
          * */
         fun stopTor() =
-            BaseServiceConnection.serviceBinder?.submitServiceActionIntent(
-                Intent(ServiceAction.STOP)
-            )
+            BaseServiceConnection.serviceBinder?.submitServiceAction(ServiceActions.Stop())
 
         /**
          * Restarts Tor.
          * */
         fun restartTor() =
-            BaseServiceConnection.serviceBinder?.submitServiceActionIntent(
-                Intent(ServiceAction.RESTART_TOR)
-            )
+            BaseServiceConnection.serviceBinder?.submitServiceAction(ServiceActions.RestartTor())
 
         /**
          * Changes identities.
          * */
         fun newIdentity() =
-            BaseServiceConnection.serviceBinder?.submitServiceActionIntent(
-                Intent(ServiceAction.NEW_ID)
-            )
+            BaseServiceConnection.serviceBinder?.submitServiceAction(ServiceActions.NewId())
     }
 }

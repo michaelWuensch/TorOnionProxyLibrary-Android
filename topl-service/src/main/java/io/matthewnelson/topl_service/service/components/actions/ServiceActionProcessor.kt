@@ -66,22 +66,20 @@
 * */
 package io.matthewnelson.topl_service.service.components.actions
 
-import android.content.Intent
 import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.service.components.actions.ActionCommands.ServiceActionObject
-import io.matthewnelson.topl_service.service.components.actions.ActionCommands.ServiceActionObjectGetter
+import io.matthewnelson.topl_service.service.components.actions.ServiceActions.ServiceAction
 import io.matthewnelson.topl_service.util.ServiceConsts
 import kotlinx.coroutines.*
 
 /**
- * [ServiceConsts.ServiceAction]'s are translated to [ServiceActionObject]'s,
+ * [ServiceConsts.ServiceActionName]'s are translated to [ServiceAction]'s,
  * submitted to a queue, and then processed. This allows for sequential execution of
- * individual [ServiceConsts.ActionCommand]'s for each [ServiceActionObject]
+ * individual [ServiceConsts.ServiceActionCommand]'s for each [ServiceAction]
  * and the ability to quickly interrupt execution for reacting to User actions (such as
  * stopping, or clearing the task).
  *
- * @param [torService] For accessing internally public values
- * @see [ActionCommands]
+ * @param [torService] [BaseService] for interacting with other components of the Service
+ * @see [ServiceActions]
  * */
 internal class ServiceActionProcessor(private val torService: BaseService): ServiceConsts() {
 
@@ -98,38 +96,27 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
     }
 
     private val broadcastLogger = torService.getBroadcastLogger(ServiceActionProcessor::class.java)
-    private val serviceActionObjectGetter = ServiceActionObjectGetter()
 
-    fun processIntent(intent: Intent) {
-        val actionObject = try {
-            serviceActionObjectGetter.get(intent)
-        } catch (e: IllegalArgumentException) {
-            broadcastLogger.exception(e)
-            return
-        }
-        processActionObject(actionObject)
-    }
-
-    private fun processActionObject(serviceActionObject: ServiceActionObject) {
-        when (serviceActionObject) {
-            is ActionCommands.Stop -> {
+    fun processServiceAction(serviceAction: ServiceAction) {
+        when (serviceAction) {
+            is ServiceActions.Stop -> {
                 torService.unbindService()
                 torService.unregisterReceiver()
                 clearActionQueue()
-                broadcastLogger.notice(serviceActionObject.serviceAction)
+                broadcastLogger.notice(serviceAction.name)
             }
-            is ActionCommands.Start -> {
+            is ServiceActions.Start -> {
                 clearActionQueue()
                 torService.stopForegroundService()
                 torService.registerReceiver()
             }
         }
 
-        if (addActionToQueue(serviceActionObject))
+        if (addActionToQueue(serviceAction))
             launchProcessQueueJob()
     }
 
-    private fun broadcastDebugObjectDetailsMsg(prefix: String, something: Any) {
+    private fun broadcastDebugMsgWithObjectDetails(prefix: String, something: Any) {
         broadcastLogger.debug(
             "$prefix${something.javaClass.simpleName}@${something.hashCode()}"
         )
@@ -140,13 +127,13 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
     /// Action Queue ///
     ////////////////////
     private val actionQueueLock = Object()
-    private val actionQueue = mutableListOf<ServiceActionObject>()
+    private val actionQueue = mutableListOf<ServiceAction>()
 
-    private fun addActionToQueue(serviceActionObject: ServiceActionObject): Boolean =
+    private fun addActionToQueue(serviceAction: ServiceAction): Boolean =
         synchronized(actionQueueLock) {
-            return if (actionQueue.add(serviceActionObject)) {
-                broadcastDebugObjectDetailsMsg(
-                    "Added to queue: ServiceActionObject.", serviceActionObject
+            return if (actionQueue.add(serviceAction)) {
+                broadcastDebugMsgWithObjectDetails(
+                    "Added to queue: ServiceAction.", serviceAction
                 )
                 true
             } else {
@@ -154,17 +141,14 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
             }
         }
 
-    private fun removeActionFromQueue(serviceActionObject: ServiceActionObject) =
+    private fun removeActionFromQueue(serviceAction: ServiceAction) =
         synchronized(actionQueueLock) {
-            if (actionQueue.remove(serviceActionObject))
-                broadcastDebugObjectDetailsMsg(
-                    "Removed from queue: ServiceActionObject.", serviceActionObject
+            if (actionQueue.remove(serviceAction))
+                broadcastDebugMsgWithObjectDetails(
+                    "Removed from queue: ServiceAction.", serviceAction
                 )
         }
 
-    /**
-     * Clears the [actionQueue]
-     * */
     private fun clearActionQueue() =
         synchronized(actionQueueLock) {
             if (!actionQueue.isNullOrEmpty()) {
@@ -177,69 +161,60 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
     ////////////////////////
     /// Queue Processing ///
     ////////////////////////
-    private lateinit var processQueueJob: Job
+    private var processQueueJob: Job? = null
 
-    /**
-     * Processes the [actionQueue].
-     * */
     private fun launchProcessQueueJob() {
-        if (::processQueueJob.isInitialized && processQueueJob.isActive) return
+        if (processQueueJob?.isActive == true) return
         processQueueJob = torService.getScopeIO().launch {
-            broadcastDebugObjectDetailsMsg("Processing Queue: ", this)
+            broadcastDebugMsgWithObjectDetails("Processing Queue: ", this)
 
             while (actionQueue.isNotEmpty()) {
-                val actionObject = actionQueue.elementAtOrNull(0)
-                if (actionObject == null) {
+                val serviceAction = actionQueue.elementAtOrNull(0)
+                if (serviceAction == null) {
                     return@launch
                 } else {
-                    broadcastLogger.notice(actionObject.serviceAction)
-                    actionObject.commands.forEachIndexed { index, command ->
+                    broadcastLogger.notice(serviceAction.name)
+                    serviceAction.commands.forEachIndexed { index, command ->
 
                         // Check if the current actionObject being executed has been
                         // removed from the queue before executing it's next command.
-                        if (actionQueue.elementAtOrNull(0) != actionObject) {
-                            broadcastDebugObjectDetailsMsg(
-                                "Interrupting execution of: ServiceActionObject.", actionObject
+                        if (actionQueue.elementAtOrNull(0) != serviceAction) {
+                            broadcastDebugMsgWithObjectDetails(
+                                "Interrupting execution of: ServiceAction.", serviceAction
                             )
                             return@forEachIndexed
                         }
 
-                        var delayLength = 0L
-                        if (command == ActionCommand.DELAY)
-                            delayLength = actionObject.consumeDelayLength()
-                        processActionCommand(command, delayLength)
+                        when (command) {
+                            ServiceActionCommand.DELAY -> {
+                                val delayLength = serviceAction.consumeDelayLength()
+                                if (delayLength > 0L)
+                                    delay(delayLength)
+                            }
+                            ServiceActionCommand.NEW_ID -> {
+                                torService.signalNewNym()
+                            }
+                            ServiceActionCommand.START_TOR -> {
+                                if (!torService.hasControlConnection()) {
+                                    torService.startTor()
+                                    delay(300L)
+                                }
+                            }
+                            ServiceActionCommand.STOP_SERVICE -> {
+                                broadcastDebugMsgWithObjectDetails("Stopping: ", torService)
+                                torService.stopService()
+                            }
+                            ServiceActionCommand.STOP_TOR -> {
+                                if (torService.hasControlConnection()) {
+                                    torService.stopTor()
+                                    delay(300L)
+                                }
+                            }
+                        }
 
-                        if (index == actionObject.commands.lastIndex)
-                            removeActionFromQueue(actionObject)
+                        if (index == serviceAction.commands.lastIndex)
+                            removeActionFromQueue(serviceAction)
                     }
-                }
-            }
-        }
-    }
-
-    private suspend fun processActionCommand(@ActionCommand command: String, delayLength: Long) {
-        when (command) {
-            ActionCommand.DELAY -> {
-                if (delayLength > 0L)
-                    delay(delayLength)
-            }
-            ActionCommand.NEW_ID -> {
-                torService.signalNewNym()
-            }
-            ActionCommand.START_TOR -> {
-                if (!torService.hasControlConnection()) {
-                    torService.startTor()
-                    delay(300L)
-                }
-            }
-            ActionCommand.STOP_SERVICE -> {
-                broadcastDebugObjectDetailsMsg("Stopping: ", torService)
-                torService.stopService()
-            }
-            ActionCommand.STOP_TOR -> {
-                if (torService.hasControlConnection()) {
-                    torService.stopTor()
-                    delay(300L)
                 }
             }
         }
