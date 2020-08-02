@@ -111,13 +111,11 @@ internal sealed class ServiceActions {
          *
          * @return The 0th element within [delayLengthQueue], or 0L if empty
          * */
-        fun consumeDelayLength(): Long {
-            return if (delayLengthQueue.isNotEmpty()) {
+        fun consumeDelayLength(): Long =
+            if (delayLengthQueue.isNotEmpty())
                 delayLengthQueue.removeAt(0)
-            } else {
+            else
                 0L
-            }
-        }
     }
 
     class NewId: ServiceAction() {
