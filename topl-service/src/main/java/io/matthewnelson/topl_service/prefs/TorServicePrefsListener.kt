@@ -68,7 +68,7 @@ package io.matthewnelson.topl_service.prefs
 
 import android.content.SharedPreferences
 import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
+import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyBoolean
 

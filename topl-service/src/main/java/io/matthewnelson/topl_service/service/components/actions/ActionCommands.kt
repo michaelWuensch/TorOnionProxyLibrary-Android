@@ -64,7 +64,7 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.topl_service.service.components
+package io.matthewnelson.topl_service.service.components.actions
 
 import android.content.Intent
 import io.matthewnelson.topl_service.util.ServiceConsts.ActionCommand
@@ -164,16 +164,24 @@ internal sealed class ActionCommands {
         fun get(intent: Intent): ServiceActionObject {
             return when (val action = intent.action) {
                 ServiceAction.NEW_ID -> {
-                    NewId(action)
+                    NewId(
+                        action
+                    )
                 }
                 ServiceAction.RESTART_TOR -> {
-                    RestartTor(action)
+                    RestartTor(
+                        action
+                    )
                 }
                 ServiceAction.START -> {
-                    Start(action)
+                    Start(
+                        action
+                    )
                 }
                 ServiceAction.STOP -> {
-                    Stop(action)
+                    Stop(
+                        action
+                    )
                 }
                 else -> {
                     throw (IllegalArgumentException())

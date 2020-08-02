@@ -18,7 +18,7 @@ import io.matthewnelson.topl_service.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
+import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.TorServiceBinder
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
@@ -86,7 +86,11 @@ internal class TestTorService(
     //////////////////////////////
     /// ServiceActionProcessor ///
     //////////////////////////////
-    val serviceActionProcessor by lazy { ServiceActionProcessor(this) }
+    val serviceActionProcessor by lazy {
+        ServiceActionProcessor(
+            this
+        )
+    }
 
     override fun processIntent(serviceActionIntent: Intent) {
         serviceActionProcessor.processIntent(serviceActionIntent)
