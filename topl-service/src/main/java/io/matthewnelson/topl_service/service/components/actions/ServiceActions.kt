@@ -81,9 +81,13 @@ import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
  * */
 internal sealed class ServiceActions {
 
+    /**
+     * The template that all [ServiceActions] use.
+     * */
     abstract class ServiceAction: ServiceActions() {
 
-        abstract val serviceActionName: @ServiceActionName String
+        @ServiceActionName
+        abstract val serviceActionName: String
 
         /**
          * Individual [ActionCommand]'s to executed sequentially by
@@ -114,40 +118,56 @@ internal sealed class ServiceActions {
         }
     }
 
-    class NewId(override val serviceActionName: String) : ServiceAction() {
+    class NewId: ServiceAction() {
+
+        @ServiceActionName
+        override val serviceActionName: String = ServiceActionName.NEW_ID
+
         override val commands: Array<String>
             get() = arrayOf(
                 ActionCommand.NEW_ID
             )
     }
 
-    class RestartTor(override val serviceActionName: String) : ServiceAction() {
+    class RestartTor: ServiceAction() {
+
+        @ServiceActionName
+        override val serviceActionName: String = ServiceActionName.RESTART_TOR
+
         override val commands: Array<String>
             get() = arrayOf(
                 ActionCommand.STOP_TOR,
                 ActionCommand.DELAY,
                 ActionCommand.START_TOR
             )
-        override val delayLengthQueue =
-            mutableListOf(ServiceActionProcessor.restartTorDelayTime)
+
+        override val delayLengthQueue = mutableListOf(ServiceActionProcessor.restartTorDelayTime)
     }
 
-    class Start(override val serviceActionName: String) : ServiceAction() {
+    class Start: ServiceAction() {
+
+        @ServiceActionName
+        override val serviceActionName: String = ServiceActionName.START
+
         override val commands: Array<String>
             get() = arrayOf(
                 ActionCommand.START_TOR
             )
     }
 
-    class Stop(override val serviceActionName: String) : ServiceAction() {
+    class Stop: ServiceAction() {
+
+        @ServiceActionName
+        override val serviceActionName: String = ServiceActionName.STOP
+
         override val commands: Array<String>
             get() = arrayOf(
                 ActionCommand.STOP_TOR,
                 ActionCommand.DELAY,
                 ActionCommand.STOP_SERVICE
             )
-        override val delayLengthQueue =
-            mutableListOf(ServiceActionProcessor.stopServiceDelayTime)
+
+        override val delayLengthQueue = mutableListOf(ServiceActionProcessor.stopServiceDelayTime)
     }
 
     class ServiceActionObjectGetter {
@@ -162,18 +182,18 @@ internal sealed class ServiceActions {
          * */
         @Throws(IllegalArgumentException::class)
         fun get(intent: Intent): ServiceAction {
-            return when (val action = intent.action) {
+            return when (intent.action) {
                 ServiceActionName.NEW_ID -> {
-                    NewId(action)
+                    NewId()
                 }
                 ServiceActionName.RESTART_TOR -> {
-                    RestartTor(action)
+                    RestartTor()
                 }
                 ServiceActionName.START -> {
-                    Start(action)
+                    Start()
                 }
                 ServiceActionName.STOP -> {
-                    Stop(action)
+                    Stop()
                 }
                 else -> {
                     throw (IllegalArgumentException())
