@@ -236,9 +236,6 @@ class BackgroundManager internal constructor(
     internal companion object {
         private lateinit var backgroundManager: BackgroundManager
 
-        fun getPolicy(): @BackgroundPolicy String =
-            backgroundManager.policy
-
         // TODO: re-implement in BaseService as a monitor for Tor's state so it can automatically
         //  handle hiccups (such as network getting stuck b/c Android is sometimes unreliable,
         //  or Bootstrapping stalling).
@@ -259,7 +256,7 @@ class BackgroundManager internal constructor(
         // if the last _accepted_ ServiceAction to be issued by the Application was not to STOP
         // the service, then we want to put it back in the state it was in
         if (!BaseService.wasLastAcceptedServiceActionStop()) {
-            BaseServiceConnection.serviceBinder?.cancelExecuteBackgroundPolicyJob(policy)
+            BaseServiceConnection.serviceBinder?.cancelExecuteBackgroundPolicyJob()
             BaseService.startService(BaseService.getAppContext(), serviceClass, serviceConnection)
         }
     }

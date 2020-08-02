@@ -158,7 +158,7 @@ abstract class ServiceConsts: BaseConsts() {
     @Retention(AnnotationRetention.SOURCE)
     internal annotation class ServiceActionName {
         companion object {
-            const val ACTION_NAME = "Action_"
+            private const val ACTION_NAME = "Action_"
             const val NEW_ID = "${ACTION_NAME}NEW_ID"
             const val RESTART_TOR = "${ACTION_NAME}RESTART_TOR"
             const val START = "${ACTION_NAME}START"

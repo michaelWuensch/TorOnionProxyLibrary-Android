@@ -72,6 +72,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.TorService
+import io.matthewnelson.topl_service.service.components.actions.ServiceActions
 import io.matthewnelson.topl_service.service.components.binding.BaseServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import java.math.BigInteger
@@ -126,14 +127,25 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
             if (context.applicationInfo.dataDir != torService.context.applicationInfo.dataDir) return
 
             when (val serviceAction = intent.getStringExtra(SERVICE_INTENT_FILTER)) {
-                // Only accept these 3 ServiceActions.
-                ServiceActionName.NEW_ID, ServiceActionName.RESTART_TOR, ServiceActionName.STOP -> {
-                    BaseServiceConnection.serviceBinder?.submitServiceActionIntent(
-                        Intent(serviceAction)
+                ServiceActionName.NEW_ID -> {
+                    BaseServiceConnection.serviceBinder?.submitServiceAction(
+                        ServiceActions.NewId()
+                    )
+                }
+                ServiceActionName.RESTART_TOR -> {
+                    BaseServiceConnection.serviceBinder?.submitServiceAction(
+                        ServiceActions.RestartTor()
+                    )
+                }
+                ServiceActionName.STOP -> {
+                    BaseServiceConnection.serviceBinder?.submitServiceAction(
+                        ServiceActions.Stop()
                     )
                 }
                 else -> {
-                    broadcastLogger.warn("This class does not accept $serviceAction as an argument.")
+                    broadcastLogger.warn(
+                        "This class does not accept $serviceAction as an argument."
+                    )
                 }
             }
         }

@@ -80,8 +80,8 @@ import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorIns
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.service.components.receiver.TorServiceReceiver
-import io.matthewnelson.topl_service.lifecycle.BackgroundManager
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
+import io.matthewnelson.topl_service.service.components.actions.ServiceActions
 import io.matthewnelson.topl_service.service.components.actions.ServiceActions.ServiceAction
 import io.matthewnelson.topl_service.service.components.binding.TorServiceBinder
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
@@ -157,10 +157,6 @@ internal class TorService: BaseService() {
     //////////////////////////////
     private val serviceActionProcessor by lazy {
         ServiceActionProcessor(this)
-    }
-
-    override fun processIntent(serviceActionIntent: Intent) {
-        serviceActionProcessor.processIntent(serviceActionIntent)
     }
 
     override fun processServiceAction(serviceAction: ServiceAction) {
@@ -319,25 +315,13 @@ internal class TorService: BaseService() {
         supervisorJob.cancel()
     }
 
+    /**
+     * No matter what Intent comes in, it will update [BaseService.lastAcceptedServiceAction]
+     * with [ServiceActionName.START] and then start Tor.
+     * */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        intent?.action?.let {
-            if (it == ServiceActionName.START) {
-                updateLastAcceptedServiceAction(it)
-                processIntent(intent)
-            } else {
-                broadcastLogger.warn(
-                    "$it was used with startService. Use only ${ServiceActionName.START} to" +
-                            "ensure proper startup of Tor"
-                )
-                updateLastAcceptedServiceAction(ServiceActionName.START)
-                processIntent(Intent(ServiceActionName.START))
-
-                if (it.contains(ServiceActionName.ACTION_NAME)) {
-                    processIntent(intent)
-                    updateLastAcceptedServiceAction(it)
-                }
-            }
-        }
+        BaseService.updateLastAcceptedServiceAction(ServiceActionName.START)
+        processServiceAction(ServiceActions.Start())
         return START_NOT_STICKY
     }
 
@@ -348,11 +332,11 @@ internal class TorService: BaseService() {
         startForegroundService()
 
         // Cancel the BackgroundManager's coroutine if it's active so it doesn't execute
-        torServiceBinder.cancelExecuteBackgroundPolicyJob(BackgroundManager.getPolicy())
+        torServiceBinder.cancelExecuteBackgroundPolicyJob()
 
         broadcastLogger.debug("Task has been removed")
 
         // Shutdown Tor and stop the Service
-        processIntent(Intent(ServiceActionName.STOP))
+        processServiceAction(ServiceActions.Stop())
     }
 }

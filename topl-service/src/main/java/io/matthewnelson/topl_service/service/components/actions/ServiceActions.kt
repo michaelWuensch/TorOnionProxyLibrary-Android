@@ -66,7 +66,6 @@
 * */
 package io.matthewnelson.topl_service.service.components.actions
 
-import android.content.Intent
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionCommand
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 
@@ -168,37 +167,5 @@ internal sealed class ServiceActions {
             )
 
         override val delayLengthQueue = mutableListOf(ServiceActionProcessor.stopServiceDelayTime)
-    }
-
-    class ServiceActionObjectGetter {
-
-        /**
-         * Processes an Intent by it's contained action and returns a [ServiceAction]
-         * for the passed [ServiceActionName]
-         *
-         * @param [intent] The intent containing an appropriate [ServiceActionName]
-         * @return [ServiceAction] associated with the intent's action (a [ServiceActionName])
-         * @throws [IllegalArgumentException] if the intent's action isn't a [ServiceActionName]
-         * */
-        @Throws(IllegalArgumentException::class)
-        fun get(intent: Intent): ServiceAction {
-            return when (intent.action) {
-                ServiceActionName.NEW_ID -> {
-                    NewId()
-                }
-                ServiceActionName.RESTART_TOR -> {
-                    RestartTor()
-                }
-                ServiceActionName.START -> {
-                    Start()
-                }
-                ServiceActionName.STOP -> {
-                    Stop()
-                }
-                else -> {
-                    throw (IllegalArgumentException())
-                }
-            }
-        }
     }
 }

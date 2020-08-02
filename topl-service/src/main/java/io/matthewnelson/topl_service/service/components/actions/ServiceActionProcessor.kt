@@ -66,10 +66,8 @@
 * */
 package io.matthewnelson.topl_service.service.components.actions
 
-import android.content.Intent
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.components.actions.ServiceActions.ServiceAction
-import io.matthewnelson.topl_service.service.components.actions.ServiceActions.ServiceActionObjectGetter
 import io.matthewnelson.topl_service.util.ServiceConsts
 import kotlinx.coroutines.*
 
@@ -98,17 +96,6 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
     }
 
     private val broadcastLogger = torService.getBroadcastLogger(ServiceActionProcessor::class.java)
-    private val serviceActionObjectGetter = ServiceActionObjectGetter()
-
-    fun processIntent(intent: Intent) {
-        val actionObject = try {
-            serviceActionObjectGetter.get(intent)
-        } catch (e: IllegalArgumentException) {
-            broadcastLogger.exception(e)
-            return
-        }
-        processServiceAction(actionObject)
-    }
 
     fun processServiceAction(serviceAction: ServiceAction) {
         when (serviceAction) {

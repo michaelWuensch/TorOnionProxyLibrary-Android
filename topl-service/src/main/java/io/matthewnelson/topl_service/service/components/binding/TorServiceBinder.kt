@@ -66,12 +66,12 @@
 * */
 package io.matthewnelson.topl_service.service.components.binding
 
-import android.content.Intent
 import android.os.Binder
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
+import io.matthewnelson.topl_service.service.components.actions.ServiceActions
+import io.matthewnelson.topl_service.service.components.actions.ServiceActions.ServiceAction
 import io.matthewnelson.topl_service.util.ServiceConsts.BackgroundPolicy
-import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -80,24 +80,18 @@ import kotlinx.coroutines.launch
 
 internal class TorServiceBinder(private val torService: BaseService): Binder() {
 
-    private val broadcastLogger = torService.getBroadcastLogger(TorServiceBinder::class.java)
+    /**
+     * Accepts all [ServiceActions] except [ServiceActions.Start], which gets issued via
+     * [io.matthewnelson.topl_service.service.TorService.onStartCommand].
+     *
+     * To be used **only** by interactions coming from the User or Application so
+     * [BaseService.lastAcceptedServiceAction] stays in sync.
+     * */
+    fun submitServiceAction(serviceAction: ServiceAction) {
+        if (serviceAction is ServiceActions.Start) return
 
-    fun submitServiceActionIntent(serviceActionIntent: Intent) {
-        val action = serviceActionIntent.action
-        if (action != null && action.contains(ServiceActionName.ACTION_NAME)) {
-
-            when (action) {
-                ServiceActionName.START -> {
-                    // Do not accept the above ServiceActions through use of this method.
-                    // START = to start TorService
-                    broadcastLogger.warn("$action is not an accepted intent action for this class")
-                }
-                else -> {
-                    BaseService.updateLastAcceptedServiceAction(action)
-                    torService.processIntent(serviceActionIntent)
-                }
-            }
-        }
+        BaseService.updateLastAcceptedServiceAction(serviceAction.name)
+        torService.processServiceAction(serviceAction)
     }
 
 
@@ -117,7 +111,7 @@ internal class TorServiceBinder(private val torService: BaseService): Binder() {
      * @param [executionDelay] the time expressed in your [BackgroundManager.Builder.Policy]
      * */
     fun executeBackgroundPolicyJob(@BackgroundPolicy policy: String, executionDelay: Long) {
-        cancelExecuteBackgroundPolicyJob(policy)
+        cancelExecuteBackgroundPolicyJob()
         backgroundPolicyExecutionJob = torService.getScopeMain().launch {
             when (policy) {
                 BackgroundPolicy.KEEP_ALIVE -> {
@@ -133,7 +127,7 @@ internal class TorServiceBinder(private val torService: BaseService): Binder() {
                 BackgroundPolicy.RESPECT_RESOURCES -> {
                     delay(executionDelay)
                     bgMgrBroadcastLogger.debug("Executing background management policy")
-                    torService.processIntent(Intent(ServiceActionName.STOP))
+                    torService.processServiceAction(ServiceActions.Stop())
                 }
             }
         }
@@ -141,14 +135,12 @@ internal class TorServiceBinder(private val torService: BaseService): Binder() {
 
     /**
      * Cancels the coroutine executing the [BackgroundPolicy] if it is active.
-     *
-     * @param [policy] the [BackgroundPolicy] being cancelled
      * */
-    fun cancelExecuteBackgroundPolicyJob(@BackgroundPolicy policy: String) {
+    fun cancelExecuteBackgroundPolicyJob() {
         if (backgroundPolicyExecutionJob?.isActive == true) {
             backgroundPolicyExecutionJob?.let {
                 it.cancel()
-                bgMgrBroadcastLogger.debug("Execution of $policy has been cancelled")
+                bgMgrBroadcastLogger.debug("Execution has been cancelled")
             }
         }
     }
