@@ -328,32 +328,20 @@ class ServiceNotification internal constructor(
         }
 
         /**
-         * Initializes your notification customizations. This is called by
+         * Initializes your notification customizations and sets up the notification
+         * channel. This is called by
          * [io.matthewnelson.topl_service.TorServiceController.Builder.build]
          * */
-        internal fun build() {
-            initialize(serviceNotification)
+        internal fun build(context: Context) {
+            Companion.serviceNotification = this.serviceNotification
+            Companion.serviceNotification.setupNotificationChannel(context)
         }
 
     }
 
     internal companion object {
-        private lateinit var serviceNotification: ServiceNotification
-
-        fun initialize(serviceNotificay: ServiceNotification) {
-            if (!::serviceNotification.isInitialized)
-                serviceNotification = serviceNotificay
-        }
-
-        fun get(): ServiceNotification {
-            return if (::serviceNotification.isInitialized)
-                serviceNotification
-            else
-                throw UninitializedPropertyAccessException("A Notification must be setup " +
-                        "to properly shutdown Tor when your task is removed. If you wish to " +
-                        "not show a notification while your Application is running, elect the " +
-                        "showNotification(false) method when initializing the Builder")
-        }
+        lateinit var serviceNotification: ServiceNotification
+            private set
     }
 
 
