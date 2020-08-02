@@ -207,82 +207,96 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
 
     override fun broadcastNotice(msg: String) {
 
-        // BOOTSTRAPPED
-        // NOTICE|BaseEventListener|Bootstrapped 5% (conn): Connecting to a relay
-        if (msg.contains("Bootstrapped")) {
-            val msgSplit = msg.split(" ")
-            msgSplit.elementAtOrNull(2)?.let {
-                val bootstrapped = "${msgSplit[0]} ${msgSplit[1]}".split("|")[2]
-
-                if (bootstrapped != bootstrapProgress) {
-                    torService.updateNotificationContentText(bootstrapped)
-
-                    if (bootstrapped == "Bootstrapped 100%") {
-                        torService.updateNotificationIcon(NotificationImage.ENABLED)
-                        torService.updateNotificationProgress(true, 100)
-                        torService.updateNotificationProgress(false, null)
-                        torService.addNotificationActions()
-                    } else {
-                        val progress: Int? = try {
-                            bootstrapped.split(" ")[1].split("%")[0].toInt()
-                        } catch (e: Exception) {
-                            null
-                        }
-                        progress?.let {
-                            torService.updateNotificationProgress(true, progress)
-                        }
-                    }
-
-                    bootstrapProgress = bootstrapped
-                }
+        when {
+            // BOOTSTRAPPED
+            // NOTICE|BaseEventListener|Bootstrapped 5% (conn): Connecting to a relay
+            msg.contains("Bootstrapped") -> {
+                handleBootstrappedMsg(msg)
             }
-
-        // NEWNYM
-        } else if (msg.contains(TorControlCommands.SIGNAL_NEWNYM)) {
-            val msgToShow: String? =
-                when {
-                    msg.contains(OnionProxyManager.NEWNYM_SUCCESS_MESSAGE) -> {
-                        OnionProxyManager.NEWNYM_SUCCESS_MESSAGE
-                    }
-                    msg.contains(OnionProxyManager.NEWNYM_NO_NETWORK) -> {
-                        OnionProxyManager.NEWNYM_NO_NETWORK
-                    }
-                    else -> {
-                        val msgSplit = msg.split("|")
-                        msgSplit.elementAtOrNull(2)
-                    }
-                }
-
-            if (noticeMsgToContentTextJob?.isActive == true)
-                noticeMsgToContentTextJob?.cancel()
-
-            msgToShow?.let {
-                displayMessageToContentText(it, 3500L)
+            // NEWNYM
+            msg.contains(TorControlCommands.SIGNAL_NEWNYM) -> {
+                handleNewNymMsg(msg)
             }
-
-
-        } else if (msg.contains(ServiceActionProcessor::class.java.simpleName)) {
-            val msgSplit = msg.split("|")
-            val msgToShow: String? = msgSplit.elementAtOrNull(2)?.let {
-                when (it) {
-                    ServiceAction.RESTART_TOR -> {
-                        "Restarting Tor..."
-                    }
-                    ServiceAction.STOP -> {
-                        "Stopping Service..."
-                    }
-                    else -> {
-                        null
-                    }
-                }
-            }
-            msgToShow?.let {
-                torService.updateNotificationContentText(it)
+            // ServiceActionProcessor
+            msg.contains(ServiceActionProcessor::class.java.simpleName) -> {
+                handleServiceActionProcessorMsg(msg)
             }
         }
 
         TorServiceController.appEventBroadcaster?.let {
             scopeMain.launch { it.broadcastNotice(msg) }
+        }
+    }
+
+    private fun handleBootstrappedMsg(msg: String) {
+        val msgSplit = msg.split(" ")
+        msgSplit.elementAtOrNull(2)?.let {
+            val bootstrapped = "${msgSplit[0]} ${msgSplit[1]}".split("|")[2]
+
+            if (bootstrapped != bootstrapProgress) {
+                torService.updateNotificationContentText(bootstrapped)
+
+                if (bootstrapped == "Bootstrapped 100%") {
+                    torService.updateNotificationIcon(NotificationImage.ENABLED)
+                    torService.updateNotificationProgress(true, 100)
+                    torService.updateNotificationProgress(false, null)
+                    torService.addNotificationActions()
+                } else {
+                    val progress: Int? = try {
+                        bootstrapped.split(" ")[1].split("%")[0].toInt()
+                    } catch (e: Exception) {
+                        null
+                    }
+                    progress?.let {
+                        torService.updateNotificationProgress(true, progress)
+                    }
+                }
+
+                bootstrapProgress = bootstrapped
+            }
+        }
+    }
+
+    private fun handleNewNymMsg(msg: String) {
+        val msgToShow: String? =
+            when {
+                msg.contains(OnionProxyManager.NEWNYM_SUCCESS_MESSAGE) -> {
+                    OnionProxyManager.NEWNYM_SUCCESS_MESSAGE
+                }
+                msg.contains(OnionProxyManager.NEWNYM_NO_NETWORK) -> {
+                    OnionProxyManager.NEWNYM_NO_NETWORK
+                }
+                else -> {
+                    val msgSplit = msg.split("|")
+                    msgSplit.elementAtOrNull(2)
+                }
+            }
+
+        if (noticeMsgToContentTextJob?.isActive == true)
+            noticeMsgToContentTextJob?.cancel()
+
+        msgToShow?.let {
+            displayMessageToContentText(it, 3500L)
+        }
+    }
+
+    private fun handleServiceActionProcessorMsg(msg: String) {
+        val msgSplit = msg.split("|")
+        val msgToShow: String? = msgSplit.elementAtOrNull(2)?.let {
+            when (it) {
+                ServiceAction.RESTART_TOR -> {
+                    "Restarting Tor..."
+                }
+                ServiceAction.STOP -> {
+                    "Stopping Service..."
+                }
+                else -> {
+                    null
+                }
+            }
+        }
+        msgToShow?.let {
+            torService.updateNotificationContentText(it)
         }
     }
 
