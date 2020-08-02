@@ -84,7 +84,7 @@ internal class TorServiceBinder(private val torService: BaseService): Binder() {
 
     fun submitServiceActionIntent(serviceActionIntent: Intent) {
         val action = serviceActionIntent.action
-        if (action != null && action.contains(ServiceActionName.SERVICE_ACTION_NAME)) {
+        if (action != null && action.contains(ServiceActionName.ACTION_NAME)) {
 
             when (action) {
                 ServiceActionName.START -> {

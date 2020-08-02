@@ -332,7 +332,7 @@ internal class TorService: BaseService() {
                 updateLastAcceptedServiceAction(ServiceActionName.START)
                 processIntent(Intent(ServiceActionName.START))
 
-                if (it.contains(ServiceActionName.SERVICE_ACTION_NAME)) {
+                if (it.contains(ServiceActionName.ACTION_NAME)) {
                     processIntent(intent)
                     updateLastAcceptedServiceAction(it)
                 }
