@@ -10,5 +10,5 @@ as default [io.matthewnelson.topl_core_base.TorSettings](../../../topl-core-base
 the [io.matthewnelson.topl_service.TorServiceController.Builder](../../io.matthewnelson.topl_service/-tor-service-controller/-builder/index.md) can be updated. The
 values saved to [TorServicePrefs](index.md) are always preferred over the defaults declared.
 
-See [io.matthewnelson.topl_service.onionproxy.ServiceTorSettings](#)
+See [io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings](#)
 

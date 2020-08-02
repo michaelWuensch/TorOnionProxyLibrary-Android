@@ -11,15 +11,15 @@ import io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState
 import io.matthewnelson.topl_core_base.BaseConsts.TorState
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.notification.ServiceNotification
-import io.matthewnelson.topl_service.onionproxy.ServiceEventBroadcaster
-import io.matthewnelson.topl_service.onionproxy.ServiceEventListener
-import io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller
-import io.matthewnelson.topl_service.onionproxy.ServiceTorSettings
+import io.matthewnelson.topl_service.service.components.onionproxy.ServiceEventBroadcaster
+import io.matthewnelson.topl_service.service.components.onionproxy.ServiceEventListener
+import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorInstaller
+import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
-import io.matthewnelson.topl_service.receiver.TorServiceReceiver
+import io.matthewnelson.topl_service.service.components.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
-import io.matthewnelson.topl_service.service.components.TorServiceBinder
+import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
+import io.matthewnelson.topl_service.service.components.binding.TorServiceBinder
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import kotlinx.coroutines.*
@@ -38,7 +38,11 @@ internal class TestTorService(
     ///////////////
     /// Binding ///
     ///////////////
-    val torServiceBinder: TorServiceBinder by lazy { TorServiceBinder(this) }
+    val torServiceBinder: TorServiceBinder by lazy {
+        TorServiceBinder(
+            this
+        )
+    }
 
     @Volatile
     var serviceIsBound = false
@@ -56,7 +60,11 @@ internal class TestTorService(
     /////////////////////////
     /// BroadcastReceiver ///
     /////////////////////////
-    val torServiceReceiver by lazy { TorServiceReceiver(this) }
+    val torServiceReceiver by lazy {
+        TorServiceReceiver(
+            this
+        )
+    }
 
     override fun registerReceiver() {
         torServiceReceiver.register()
@@ -86,7 +94,11 @@ internal class TestTorService(
     //////////////////////////////
     /// ServiceActionProcessor ///
     //////////////////////////////
-    val serviceActionProcessor by lazy { ServiceActionProcessor(this) }
+    val serviceActionProcessor by lazy {
+        ServiceActionProcessor(
+            this
+        )
+    }
 
     override fun processIntent(serviceActionIntent: Intent) {
         serviceActionProcessor.processIntent(serviceActionIntent)

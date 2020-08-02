@@ -73,6 +73,97 @@ import io.matthewnelson.topl_core_base.BaseConsts
 abstract class ServiceConsts: BaseConsts() {
 
 
+    //////////////////////
+    /// ActionCommands ///
+    //////////////////////
+    @Target(AnnotationTarget.TYPE, AnnotationTarget.CLASS, AnnotationTarget.VALUE_PARAMETER)
+    @StringDef(
+        ActionCommand.DELAY,
+        ActionCommand.NEW_ID,
+        ActionCommand.START_TOR,
+        ActionCommand.STOP_SERVICE,
+        ActionCommand.STOP_TOR
+    )
+    @Retention(AnnotationRetention.SOURCE)
+    internal annotation class ActionCommand {
+        companion object {
+            private const val ACTION_COMMAND = "ActionCommand_"
+            const val DELAY = "${ACTION_COMMAND}DELAY"
+            const val NEW_ID = "${ACTION_COMMAND}NEW_ID"
+            const val START_TOR = "${ACTION_COMMAND}START_TOR"
+            const val STOP_SERVICE = "${ACTION_COMMAND}STOP_SERVICE"
+            const val STOP_TOR = "${ACTION_COMMAND}STOP_TOR"
+        }
+    }
+
+
+    ///////////////////////////////
+    /// BackgroundManagerPolicy ///
+    ///////////////////////////////
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.PROPERTY,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.TYPE
+    )
+    @StringDef(
+        BackgroundPolicy.KEEP_ALIVE,
+        BackgroundPolicy.RESPECT_RESOURCES
+    )
+    @Retention(AnnotationRetention.SOURCE)
+    internal annotation class BackgroundPolicy {
+        companion object {
+            private const val BACKGROUND_POLICY = "BackgroundPolicy_"
+            const val KEEP_ALIVE = "${BACKGROUND_POLICY}KEEP_ALIVE"
+            const val RESPECT_RESOURCES = "${BACKGROUND_POLICY}RESPECT_RESOURCES"
+        }
+    }
+
+
+    //////////////////////////
+    /// NotificationImages ///
+    //////////////////////////
+    @IntDef(
+        NotificationImage.ENABLED,
+        NotificationImage.DISABLED,
+        NotificationImage.DATA,
+        NotificationImage.ERROR
+    )
+    @Retention(AnnotationRetention.SOURCE)
+    internal annotation class NotificationImage {
+        companion object {
+            const val ENABLED = 0
+            const val DISABLED = 1
+            const val DATA = 2
+            const val ERROR = 3
+        }
+    }
+
+
+    //////////////////////
+    /// ServiceActions ///
+    //////////////////////
+    @Target(AnnotationTarget.CLASS, AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.TYPE,
+        AnnotationTarget.PROPERTY
+    )
+    @StringDef(
+        ServiceAction.NEW_ID,
+        ServiceAction.RESTART_TOR,
+        ServiceAction.START,
+        ServiceAction.STOP
+    )
+    @Retention(AnnotationRetention.SOURCE)
+    internal annotation class ServiceAction {
+        companion object {
+            const val SERVICE_ACTION = "ServiceAction_"
+            const val NEW_ID = "${SERVICE_ACTION}NEW_ID"
+            const val RESTART_TOR = "${SERVICE_ACTION}RESTART_TOR"
+            const val START = "${SERVICE_ACTION}START"
+            const val STOP = "${SERVICE_ACTION}STOP"
+        }
+    }
+
+
     ///////////////////////
     /// TorServicePrefs ///
     ///////////////////////
@@ -183,97 +274,6 @@ abstract class ServiceConsts: BaseConsts() {
             const val VIRTUAL_ADDRESS_NETWORK = "VIRTUAL_ADDRESS_NETWORK"
             const val HAS_CONNECTION_PADDING = "HAS_CONNECTION_PADDING"
             const val TRANS_PORT = "TRANS_PORT"
-        }
-    }
-
-
-    //////////////////////////
-    /// NotificationImages ///
-    //////////////////////////
-    @IntDef(
-        NotificationImage.ENABLED,
-        NotificationImage.DISABLED,
-        NotificationImage.DATA,
-        NotificationImage.ERROR
-    )
-    @Retention(AnnotationRetention.SOURCE)
-    internal annotation class NotificationImage {
-        companion object {
-            const val ENABLED = 0
-            const val DISABLED = 1
-            const val DATA = 2
-            const val ERROR = 3
-        }
-    }
-
-
-    //////////////////////
-    /// ServiceActions ///
-    //////////////////////
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.TYPE,
-        AnnotationTarget.PROPERTY
-    )
-    @StringDef(
-        ServiceAction.NEW_ID,
-        ServiceAction.RESTART_TOR,
-        ServiceAction.START,
-        ServiceAction.STOP
-    )
-    @Retention(AnnotationRetention.SOURCE)
-    internal annotation class ServiceAction {
-        companion object {
-            const val SERVICE_ACTION = "ServiceAction_"
-            const val NEW_ID = "${SERVICE_ACTION}NEW_ID"
-            const val RESTART_TOR = "${SERVICE_ACTION}RESTART_TOR"
-            const val START = "${SERVICE_ACTION}START"
-            const val STOP = "${SERVICE_ACTION}STOP"
-        }
-    }
-
-
-    //////////////////////
-    /// ActionCommands ///
-    //////////////////////
-    @Target(AnnotationTarget.TYPE, AnnotationTarget.CLASS, AnnotationTarget.VALUE_PARAMETER)
-    @StringDef(
-        ActionCommand.DELAY,
-        ActionCommand.NEW_ID,
-        ActionCommand.START_TOR,
-        ActionCommand.STOP_SERVICE,
-        ActionCommand.STOP_TOR
-    )
-    @Retention(AnnotationRetention.SOURCE)
-    internal annotation class ActionCommand {
-        companion object {
-            private const val ACTION_COMMAND = "ActionCommand_"
-            const val DELAY = "${ACTION_COMMAND}DELAY"
-            const val NEW_ID = "${ACTION_COMMAND}NEW_ID"
-            const val START_TOR = "${ACTION_COMMAND}START_TOR"
-            const val STOP_SERVICE = "${ACTION_COMMAND}STOP_SERVICE"
-            const val STOP_TOR = "${ACTION_COMMAND}STOP_TOR"
-        }
-    }
-
-
-    ///////////////////////////////
-    /// BackgroundManagerPolicy ///
-    ///////////////////////////////
-    @Target(
-        AnnotationTarget.CLASS,
-        AnnotationTarget.PROPERTY,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.TYPE
-    )
-    @StringDef(
-        BackgroundPolicy.KEEP_ALIVE,
-        BackgroundPolicy.RESPECT_RESOURCES
-    )
-    @Retention(AnnotationRetention.SOURCE)
-    internal annotation class BackgroundPolicy {
-        companion object {
-            private const val BACKGROUND_POLICY = "BackgroundPolicy_"
-            const val KEEP_ALIVE = "${BACKGROUND_POLICY}KEEP_ALIVE"
-            const val RESPECT_RESOURCES = "${BACKGROUND_POLICY}RESPECT_RESOURCES"
         }
     }
 }

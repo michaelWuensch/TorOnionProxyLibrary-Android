@@ -79,7 +79,7 @@ import androidx.core.app.NotificationCompat.NotificationVisibility
 import androidx.core.content.ContextCompat
 import io.matthewnelson.topl_service.R
 import io.matthewnelson.topl_service.service.TorService
-import io.matthewnelson.topl_service.receiver.TorServiceReceiver
+import io.matthewnelson.topl_service.service.components.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.util.ServiceConsts
 

@@ -68,15 +68,15 @@ package io.matthewnelson.topl_service.prefs
 
 import android.content.SharedPreferences
 import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyBoolean
 
 /**
  * Listens to [TorServicePrefs] for changes such that while Tor is running, it can
  * query [TorService.onionProxyManager] to have it updated immediately (if the setting doesn't
- * require a restart), as well as submit Actions to [ServiceActionProcessor] to be queued
- * for execution.
+ * require a restart), or submit [io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction]'s
+ * to [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor] to be
+ * queued for execution.
  *
  * @param [torService] To instantiate [TorServicePrefs]
  * */

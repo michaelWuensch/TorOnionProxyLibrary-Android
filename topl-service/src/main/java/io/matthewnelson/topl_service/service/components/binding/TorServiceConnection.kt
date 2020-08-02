@@ -64,82 +64,28 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.topl_service.receiver
+package io.matthewnelson.topl_service.service.components.binding
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import io.matthewnelson.topl_service.TorServiceController
-import io.matthewnelson.topl_service.TorServiceController.Builder
-import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
-import io.matthewnelson.topl_service.service.TorService
-import io.matthewnelson.topl_service.service.components.BackgroundManager
-import io.matthewnelson.topl_service.service.components.BaseServiceConnection
-import io.matthewnelson.topl_service.util.ServiceConsts
-import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
-import java.math.BigInteger
-import java.security.SecureRandom
+import android.content.ComponentName
+import android.os.IBinder
 
-/**
- * Is registered at startup of [TorService], and unregistered when it is stopped.
- * Sending an intent here to start [TorService] will do nothing as all intents are piped
- * to [ServiceActionProcessor] directly. To start the service (and Tor), call the
- * [io.matthewnelson.topl_service.TorServiceController.startTor] method.
- *
- * @param [torService]
- * */
-internal class TorServiceReceiver(private val torService: BaseService): BroadcastReceiver() {
+internal class TorServiceConnection: BaseServiceConnection() {
 
     companion object {
-        // Secures the intent filter at each application startup.
-        // Also serves as the key to string extras containing the ServiceAction to be executed.
-        val SERVICE_INTENT_FILTER: String = BigInteger(130, SecureRandom()).toString(32)
-
-        @Volatile
-        var isRegistered = false
-            private set
+        val torServiceConnection =
+            TorServiceConnection()
     }
 
-    private val broadcastLogger = torService.getBroadcastLogger(TorServiceReceiver::class.java)
-
-    fun register() {
-        torService.context.applicationContext
-            .registerReceiver(this, IntentFilter(SERVICE_INTENT_FILTER))
-        if (!isRegistered)
-            broadcastLogger.debug("Has been registered")
-        isRegistered = true
+    override fun onServiceDisconnected(name: ComponentName?) {
+        // TODO: Implement logic for detecting undesired calls to this method (which
+        //  is primarily when this gets fired off).
+        clearServiceBinderReference()
     }
 
-    fun unregister() {
-        if (isRegistered) {
-            try {
-                torService.context.applicationContext.unregisterReceiver(this)
-                isRegistered = false
-                broadcastLogger.debug("Has been unregistered")
-            } catch (e: IllegalArgumentException) {
-                broadcastLogger.exception(e)
-            }
-        }
-    }
-
-    override fun onReceive(context: Context?, intent: Intent?) {
-        if (context != null && intent != null) {
-            // Only accept Intents from this package.
-            if (context.applicationInfo.dataDir != torService.context.applicationInfo.dataDir) return
-
-            when (val serviceAction = intent.getStringExtra(SERVICE_INTENT_FILTER)) {
-                // Only accept these 3 ServiceActions.
-                ServiceAction.NEW_ID, ServiceAction.RESTART_TOR, ServiceAction.STOP -> {
-                    BaseServiceConnection.serviceBinder?.submitServiceActionIntent(
-                        Intent(serviceAction)
-                    )
-                }
-                else -> {
-                    broadcastLogger.warn("This class does not accept $serviceAction as an argument.")
-                }
-            }
-        }
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        if (service != null)
+            setServiceBinder(service as TorServiceBinder)
+        else
+            clearServiceBinderReference()
     }
 }

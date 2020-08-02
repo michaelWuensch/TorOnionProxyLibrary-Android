@@ -64,7 +64,7 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.topl_service.onionproxy
+package io.matthewnelson.topl_service.service.components.onionproxy
 
 import io.matthewnelson.topl_core.listener.BaseEventListener
 import net.freehaven.tor.control.TorControlCommands
@@ -78,7 +78,7 @@ internal class ServiceEventListener: BaseEventListener() {
 
     // broadcastLogger is available from BaseEventListener and is instantiated as soon as
     // OnionProxyManager gets initialized.
-//    private lateinit var broadcastLogger: BroadcastLogger
+//    var broadcastLogger: BroadcastLogger? = null
 
     override val CONTROL_COMMAND_EVENTS: Array<String>
         get() = arrayOf(

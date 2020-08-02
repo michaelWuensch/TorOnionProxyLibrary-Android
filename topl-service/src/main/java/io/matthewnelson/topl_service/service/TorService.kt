@@ -74,16 +74,16 @@ import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core.util.FileUtilities
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.TorServiceController
-import io.matthewnelson.topl_service.onionproxy.ServiceEventBroadcaster
-import io.matthewnelson.topl_service.onionproxy.ServiceEventListener
-import io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller
-import io.matthewnelson.topl_service.onionproxy.ServiceTorSettings
+import io.matthewnelson.topl_service.service.components.onionproxy.ServiceEventBroadcaster
+import io.matthewnelson.topl_service.service.components.onionproxy.ServiceEventListener
+import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorInstaller
+import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
-import io.matthewnelson.topl_service.receiver.TorServiceReceiver
-import io.matthewnelson.topl_service.service.components.BackgroundManager
-import io.matthewnelson.topl_service.service.components.ServiceActionProcessor
-import io.matthewnelson.topl_service.service.components.TorServiceBinder
-import io.matthewnelson.topl_service.service.components.TorServiceConnection
+import io.matthewnelson.topl_service.service.components.receiver.TorServiceReceiver
+import io.matthewnelson.topl_service.lifecycle.BackgroundManager
+import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
+import io.matthewnelson.topl_service.service.components.binding.TorServiceBinder
+import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 import kotlinx.coroutines.*
@@ -91,6 +91,11 @@ import java.io.File
 import java.io.IOException
 import java.lang.reflect.InvocationTargetException
 
+/**
+ * The glue for everything within the [io.matthewnelson.topl_service.service.components] package.
+ *
+ * @see [BaseService]
+ * */
 internal class TorService: BaseService() {
 
     override val context: Context
@@ -100,7 +105,9 @@ internal class TorService: BaseService() {
     ///////////////
     /// Binding ///
     ///////////////
-    private val torServiceBinder: TorServiceBinder by lazy { TorServiceBinder(this) }
+    private val torServiceBinder: TorServiceBinder by lazy {
+        TorServiceBinder(this)
+    }
 
     override fun unbindService() {
         try {
@@ -117,7 +124,9 @@ internal class TorService: BaseService() {
     /////////////////////////
     /// BroadcastReceiver ///
     /////////////////////////
-    private val torServiceReceiver by lazy { TorServiceReceiver(this) }
+    private val torServiceReceiver by lazy {
+        TorServiceReceiver(this)
+    }
 
     override fun registerReceiver() {
         torServiceReceiver.register()
@@ -145,7 +154,9 @@ internal class TorService: BaseService() {
     //////////////////////////////
     /// ServiceActionProcessor ///
     //////////////////////////////
-    private val serviceActionProcessor by lazy { ServiceActionProcessor(this) }
+    private val serviceActionProcessor by lazy {
+        ServiceActionProcessor(this)
+    }
 
     override fun processIntent(serviceActionIntent: Intent) {
         serviceActionProcessor.processIntent(serviceActionIntent)
@@ -229,7 +240,6 @@ internal class TorService: BaseService() {
     override fun refreshBroadcastLoggersHasDebugLogsVar() {
         onionProxyManager.refreshBroadcastLoggersHasDebugLogsVar()
     }
-
     @WorkerThread
     override fun signalControlConnection(torControlCommand: String): Boolean {
         return onionProxyManager.signalControlConnection(torControlCommand)
@@ -294,7 +304,7 @@ internal class TorService: BaseService() {
 
     override fun onCreate() {
         serviceNotification.buildNotification(this)
-        broadcastLogger.notice("BuildConfig.DEBUG set to: $buildConfigDebug")
+        broadcastLogger.notice("Created. BuildConfig.DEBUG set to: $buildConfigDebug")
         registerPrefsListener()
     }
 

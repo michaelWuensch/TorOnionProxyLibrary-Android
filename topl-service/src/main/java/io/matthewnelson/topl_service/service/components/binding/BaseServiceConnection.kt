@@ -1,4 +1,4 @@
-package io.matthewnelson.topl_service.service.components
+package io.matthewnelson.topl_service.service.components.binding
 
 import android.content.ServiceConnection
 

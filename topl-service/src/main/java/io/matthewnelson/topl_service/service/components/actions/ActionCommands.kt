@@ -64,7 +64,7 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.topl_service.service.components
+package io.matthewnelson.topl_service.service.components.actions
 
 import android.content.Intent
 import io.matthewnelson.topl_service.util.ServiceConsts.ActionCommand
@@ -72,10 +72,10 @@ import io.matthewnelson.topl_service.util.ServiceConsts.ServiceAction
 
 /**
  * Facilitates mapping of a [ServiceAction] to an object which allows for individual command
- * execution by [io.matthewnelson.topl_service.service.components.ServiceActionProcessor] in a
- * repeatable manner. This allows for structured execution depending on the [ServiceAction] passed
- * to [io.matthewnelson.topl_service.service.TorService] via Intent, while still maintaining an
- * easy way to interrupt coroutine command execution for quickly responding to user actions.
+ * execution by [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor]
+ * in a repeatable manner. This allows for structured execution depending on the [ServiceAction]
+ * passed to [io.matthewnelson.topl_service.service.TorService] via Intent, while still maintaining
+ * an easy way to interrupt coroutine command execution for quickly responding to user actions.
  *
  * Think, running machine code to grok.
  * */
@@ -87,7 +87,7 @@ internal sealed class ActionCommands {
 
         /**
          * Individual [ActionCommand]'s to executed sequentially by
-         * [io.matthewnelson.topl_service.service.components.ServiceActionProcessor].
+         * [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor].
          * */
         abstract val commands: Array<@ActionCommand String>
 
@@ -153,8 +153,8 @@ internal sealed class ActionCommands {
     class ServiceActionObjectGetter {
 
         /**
-         * Processes an Intent by it's contained action and returns a
-         * [ServiceActionObject] for the passed [ServiceAction]
+         * Processes an Intent by it's contained action and returns a [ServiceActionObject]
+         * for the passed [ServiceAction]
          *
          * @param [intent] The intent containing an appropriate [ServiceAction]
          * @return [ServiceActionObject] associated with the intent's action (a [ServiceAction])
