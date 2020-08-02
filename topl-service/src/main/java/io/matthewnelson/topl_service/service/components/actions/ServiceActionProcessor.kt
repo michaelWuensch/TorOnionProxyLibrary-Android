@@ -68,20 +68,20 @@ package io.matthewnelson.topl_service.service.components.actions
 
 import android.content.Intent
 import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.service.components.actions.ActionCommands.ServiceActionObject
-import io.matthewnelson.topl_service.service.components.actions.ActionCommands.ServiceActionObjectGetter
+import io.matthewnelson.topl_service.service.components.actions.ServiceActions.ServiceAction
+import io.matthewnelson.topl_service.service.components.actions.ServiceActions.ServiceActionObjectGetter
 import io.matthewnelson.topl_service.util.ServiceConsts
 import kotlinx.coroutines.*
 
 /**
- * [ServiceConsts.ServiceActionName]'s are translated to [ServiceActionObject]'s,
+ * [ServiceConsts.ServiceActionName]'s are translated to [ServiceAction]'s,
  * submitted to a queue, and then processed. This allows for sequential execution of
- * individual [ServiceConsts.ActionCommand]'s for each [ServiceActionObject]
+ * individual [ServiceConsts.ActionCommand]'s for each [ServiceAction]
  * and the ability to quickly interrupt execution for reacting to User actions (such as
  * stopping, or clearing the task).
  *
  * @param [torService] For accessing internally public values
- * @see [ActionCommands]
+ * @see [ServiceActions]
  * */
 internal class ServiceActionProcessor(private val torService: BaseService): ServiceConsts() {
 
@@ -110,22 +110,22 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
         processActionObject(actionObject)
     }
 
-    private fun processActionObject(serviceActionObject: ServiceActionObject) {
-        when (serviceActionObject) {
-            is ActionCommands.Stop -> {
+    private fun processActionObject(serviceAction: ServiceAction) {
+        when (serviceAction) {
+            is ServiceActions.Stop -> {
                 torService.unbindService()
                 torService.unregisterReceiver()
                 clearActionQueue()
-                broadcastLogger.notice(serviceActionObject.serviceActionName)
+                broadcastLogger.notice(serviceAction.serviceActionName)
             }
-            is ActionCommands.Start -> {
+            is ServiceActions.Start -> {
                 clearActionQueue()
                 torService.stopForegroundService()
                 torService.registerReceiver()
             }
         }
 
-        if (addActionToQueue(serviceActionObject))
+        if (addActionToQueue(serviceAction))
             launchProcessQueueJob()
     }
 
@@ -140,13 +140,13 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
     /// Action Queue ///
     ////////////////////
     private val actionQueueLock = Object()
-    private val actionQueue = mutableListOf<ServiceActionObject>()
+    private val actionQueue = mutableListOf<ServiceAction>()
 
-    private fun addActionToQueue(serviceActionObject: ServiceActionObject): Boolean =
+    private fun addActionToQueue(serviceAction: ServiceAction): Boolean =
         synchronized(actionQueueLock) {
-            return if (actionQueue.add(serviceActionObject)) {
+            return if (actionQueue.add(serviceAction)) {
                 broadcastDebugObjectDetailsMsg(
-                    "Added to queue: ServiceActionObject.", serviceActionObject
+                    "Added to queue: ServiceActionObject.", serviceAction
                 )
                 true
             } else {
@@ -154,11 +154,11 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
             }
         }
 
-    private fun removeActionFromQueue(serviceActionObject: ServiceActionObject) =
+    private fun removeActionFromQueue(serviceAction: ServiceAction) =
         synchronized(actionQueueLock) {
-            if (actionQueue.remove(serviceActionObject))
+            if (actionQueue.remove(serviceAction))
                 broadcastDebugObjectDetailsMsg(
-                    "Removed from queue: ServiceActionObject.", serviceActionObject
+                    "Removed from queue: ServiceActionObject.", serviceAction
                 )
         }
 

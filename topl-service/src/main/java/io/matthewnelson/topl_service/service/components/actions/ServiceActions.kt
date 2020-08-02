@@ -79,9 +79,9 @@ import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
  *
  * Think, running machine code to grok.
  * */
-internal sealed class ActionCommands {
+internal sealed class ServiceActions {
 
-    abstract class ServiceActionObject: ActionCommands() {
+    abstract class ServiceAction: ServiceActions() {
 
         abstract val serviceActionName: @ServiceActionName String
 
@@ -114,14 +114,14 @@ internal sealed class ActionCommands {
         }
     }
 
-    class NewId(override val serviceActionName: String) : ServiceActionObject() {
+    class NewId(override val serviceActionName: String) : ServiceAction() {
         override val commands: Array<String>
             get() = arrayOf(
                 ActionCommand.NEW_ID
             )
     }
 
-    class RestartTor(override val serviceActionName: String) : ServiceActionObject() {
+    class RestartTor(override val serviceActionName: String) : ServiceAction() {
         override val commands: Array<String>
             get() = arrayOf(
                 ActionCommand.STOP_TOR,
@@ -132,14 +132,14 @@ internal sealed class ActionCommands {
             mutableListOf(ServiceActionProcessor.restartTorDelayTime)
     }
 
-    class Start(override val serviceActionName: String) : ServiceActionObject() {
+    class Start(override val serviceActionName: String) : ServiceAction() {
         override val commands: Array<String>
             get() = arrayOf(
                 ActionCommand.START_TOR
             )
     }
 
-    class Stop(override val serviceActionName: String) : ServiceActionObject() {
+    class Stop(override val serviceActionName: String) : ServiceAction() {
         override val commands: Array<String>
             get() = arrayOf(
                 ActionCommand.STOP_TOR,
@@ -153,15 +153,15 @@ internal sealed class ActionCommands {
     class ServiceActionObjectGetter {
 
         /**
-         * Processes an Intent by it's contained action and returns a [ServiceActionObject]
+         * Processes an Intent by it's contained action and returns a [ServiceAction]
          * for the passed [ServiceActionName]
          *
          * @param [intent] The intent containing an appropriate [ServiceActionName]
-         * @return [ServiceActionObject] associated with the intent's action (a [ServiceActionName])
+         * @return [ServiceAction] associated with the intent's action (a [ServiceActionName])
          * @throws [IllegalArgumentException] if the intent's action isn't a [ServiceActionName]
          * */
         @Throws(IllegalArgumentException::class)
-        fun get(intent: Intent): ServiceActionObject {
+        fun get(intent: Intent): ServiceAction {
             return when (val action = intent.action) {
                 ServiceActionName.NEW_ID -> {
                     NewId(action)
