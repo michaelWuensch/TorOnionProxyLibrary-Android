@@ -75,15 +75,20 @@ import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.util.ServiceConsts
 
 /**
- * When your application is sent to the background (the Recent App's tray), the chosen
- * [BackgroundManager.Builder.Policy] will be executed after the number of seconds you've
+ * When your application is sent to the background (the Recent App's tray or lock screen), the
+ * chosen [BackgroundManager.Builder.Policy] will be executed after the number of seconds you've
  * declared.
  *
  * If brought back into the foreground by the user:
  *
- *   - Before Policy execution: Execution is canceled
- *   - After Policy execution: Will start [TorService] if [BaseService.lastAcceptedServiceAction]
- *   was **not** [ServiceConsts.ServiceAction.STOP].
+ *   - **Before Policy execution**: Execution is canceled. If [BaseService.lastAcceptedServiceAction]
+ *   was **not** [ServiceConsts.ServiceAction.STOP], a startService call is made to ensure it's
+ *   started.
+ *
+ *   - **After Policy execution**: If [BaseService.lastAcceptedServiceAction]
+ *   was **not** [ServiceConsts.ServiceAction.STOP], a startService call is made to ensure it's
+ *   started.
+ *
  *   - See [BaseService.updateLastAcceptedServiceAction] and [TorService.onTaskRemoved] for
  *   more information.
  *
@@ -91,11 +96,11 @@ import io.matthewnelson.topl_service.util.ServiceConsts
  * calling [io.matthewnelson.topl_service.TorServiceController.stopTor], or via the
  * [io.matthewnelson.topl_service.notification.ServiceNotification] Action (if enabled);
  * The OS will not kill a service started using `Context.startService` &
- * `Context.bindService` (how [TorService] is started).
+ * `Context.bindService` (how [TorService] is started) while in the foreground.
  *
- * When the user sends your application to the Recent App's tray though, the OS will kill
- * your app after being idle for a period of time (random AF... typically 0.75m to 1.25m)
- * to recoup resources. This is not an issue if the user removes the task before the OS
+ * When the user sends your application to the Recent App's tray though, to recoup resources
+ * the OS will kill your app after being idle for a period of time (random AF... typically
+ * 0.75m to 1.25m). This is not an issue if the user removes the task before the OS
  * kills the app, as Tor will be able to shutdown properly and the service will stop.
  *
  * This is where Services get sketchy (especially when trying to implement an always
@@ -103,12 +108,13 @@ import io.matthewnelson.topl_service.util.ServiceConsts
  *
  * This class starts your chosen [BackgroundManager.Builder.Policy] as soon as your
  * application is sent to the background, waits for the time you declared, and then executes.
- * See the [Builder] for more detail.
+ *
+ * See the [BackgroundManager.Builder] for more detail.
  *
  * @param [policy] The chosen [ServiceConsts.BackgroundPolicy] to be executed.
  * @param [executionDelay] Length of time before the policy gets executed *after* the application
  *   is sent to the background.
- * @param [clazz] The Service class being managed
+ * @param [serviceClass] The Service class being managed
  * @param [serviceConnection] The ServiceConnection being used to bind with
  * @see [TorServiceBinder.executeBackgroundPolicyJob]
  * @see [TorServiceBinder.cancelExecuteBackgroundPolicyJob]
@@ -116,15 +122,20 @@ import io.matthewnelson.topl_service.util.ServiceConsts
 class BackgroundManager internal constructor(
     @BackgroundPolicy private val policy: String,
     private val executionDelay: Long,
-    private val clazz: Class<*>,
+    private val serviceClass: Class<*>,
     private val serviceConnection: BaseServiceConnection
 ): ServiceConsts(), LifecycleObserver {
 
 
     /**
      * This [BackgroundManager.Builder] sets how you want the service to operate while your
-     * app is in the background (the Recent App's tray or lock screen present), such that we
-     * don't hog resources unnecessarily, and run reliably based off of your application's needs.
+     * app is in the background (the Recent App's tray or lock screen), such that things run
+     * reliably based off of your application's needs.
+     *
+     * When your application is brought back into the foreground your [Policy] is canceled
+     * and, if [BaseService.lastAcceptedServiceAction] was **not** to Stop the service, a
+     * startup command is issued to bring it back to the started state no matter if it is still
+     * running or not.
      *
      * @sample [io.matthewnelson.sampleapp.App.generateBackgroundManagerPolicy]
      * */
@@ -139,7 +150,7 @@ class BackgroundManager internal constructor(
         //  through Application.onCreate, but is holding onto references. (same problem when
         //  starting the service using Context.startForegroundService), which is bullshit.
         /**
-         * While your application is in the background (the Recent App's tray, or lock screen),
+         * While your application is in the background (the Recent App's tray or lock screen),
          * this [Policy] periodically switches [TorService] to the foreground then immediately
          * back the background. Doing do prevents your application from going idle and being
          * killed by the OS. It is much more resource intensive than choosing
@@ -158,9 +169,7 @@ class BackgroundManager internal constructor(
         }
 
         /**
-         * Stops [TorService], and then starts it up again if your application is brought back
-         * into the foreground between when the [Policy] is executed, and the application is
-         * killed by the OS.
+         * Stops [TorService] after being in the background for the declared [secondsFrom5To45].
          *
          * Your application won't go through it's normal `Application.onCreate` process unless
          * it was killed, but [TorService] may have been stopped when the policy gets executed.
@@ -170,7 +179,7 @@ class BackgroundManager internal constructor(
          * a proper shutdown of Tor prior to the service being stopped instead of it being
          * killed along with your application (which causes problems sometimes).
          *
-         * If killed by the OS then this class gets garbage collected such that in the event
+         * If killed by the OS then this gets garbage collected such that in the event
          * the user brings your application back into the foreground (after it had been killed),
          * this will be re-instantiated when going through `Application.onCreate` again, and
          * [TorService] started by however you have it implemented.
@@ -202,7 +211,7 @@ class BackgroundManager internal constructor(
              * test classes get initialized so they aren't overwritten by production classes.
              * */
             internal fun build(
-                clazz: Class<*>,
+                serviceClass: Class<*>,
                 serviceConnection: BaseServiceConnection
             ) {
 
@@ -214,7 +223,7 @@ class BackgroundManager internal constructor(
                     backgroundManager = BackgroundManager(
                         policyBuilder.chosenPolicy,
                         policyBuilder.executionDelay,
-                        clazz,
+                        serviceClass,
                         serviceConnection
                     )
                 }
@@ -249,7 +258,7 @@ class BackgroundManager internal constructor(
         // the service, then we want to put it back in the state it was in
         if (!BaseService.wasLastAcceptedServiceActionStop()) {
             BaseServiceConnection.serviceBinder?.cancelExecuteBackgroundPolicyJob(policy)
-            BaseService.startService(BaseService.getAppContext(), clazz, serviceConnection)
+            BaseService.startService(BaseService.getAppContext(), serviceClass, serviceConnection)
         }
     }
 

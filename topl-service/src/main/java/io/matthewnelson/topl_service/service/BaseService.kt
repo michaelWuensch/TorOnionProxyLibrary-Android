@@ -158,21 +158,29 @@ internal abstract class BaseService: Service() {
         /// ServiceStartup ///
         //////////////////////
 
-        fun startService(context: Context, clazz: Class<*>, serviceConn: BaseServiceConnection) {
-            val startServiceIntent = Intent(context.applicationContext, clazz)
+        fun startService(
+            context: Context,
+            serviceClass: Class<*>,
+            serviceConn: BaseServiceConnection
+        ) {
+            val startServiceIntent = Intent(context.applicationContext, serviceClass)
             startServiceIntent.action = ServiceAction.START
             context.applicationContext.startService(startServiceIntent)
-            bindService(context.applicationContext, serviceConn, clazz)
+            bindService(context.applicationContext, serviceClass, serviceConn)
         }
         /**
          * Binds to the provided [Service] class using the provided [BaseServiceConnection]
          *
          * @param [context] [Context]
+         * @param [serviceClass] The [Service]'s class you wish to unbind
          * @param [serviceConn] The [BaseServiceConnection] to bind
-         * @param [clazz] The [Service]'s class you wish to unbind
          * */
-        private fun bindService(context: Context, serviceConn: BaseServiceConnection, clazz: Class<*>) {
-            val bindingIntent = Intent(context.applicationContext, clazz)
+        private fun bindService(
+            context: Context,
+            serviceClass: Class<*>,
+            serviceConn: BaseServiceConnection
+        ) {
+            val bindingIntent = Intent(context.applicationContext, serviceClass)
             bindingIntent.action = ServiceAction.START
 
             context.applicationContext.bindService(
