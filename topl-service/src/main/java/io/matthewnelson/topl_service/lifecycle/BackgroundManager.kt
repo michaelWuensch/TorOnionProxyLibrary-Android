@@ -151,24 +151,24 @@ class BackgroundManager internal constructor(
         //  performing it's normal lifecycle after user swipes it away such that it's not going
         //  through Application.onCreate, but is holding onto references. (same problem when
         //  starting the service using Context.startForegroundService), which is bullshit.
-        /**
-         * While your application is in the background (the Recent App's tray or lock screen),
-         * this [Policy] periodically switches [TorService] to the foreground then immediately
-         * back the background. Doing do prevents your application from going idle and being
-         * killed by the OS. It is much more resource intensive than choosing
-         * [respectResourcesWhileInBackground].
-         *
-         * @param [secondsFrom20To40]? Seconds between the events of cycling from background to
-         * foreground to background. Sending null will use the default (30s)
-         * @return [BackgroundManager.Builder.Policy] To use when initializing
-         *   [io.matthewnelson.topl_service.TorServiceController.Builder]
-         * */
-        fun keepAliveWhileInBackground(secondsFrom20To40: Int? = null): Policy {
-            chosenPolicy = BackgroundPolicy.KEEP_ALIVE
-            if (secondsFrom20To40 != null && secondsFrom20To40 in 20..40)
-                executionDelay = (secondsFrom20To40 * 1000).toLong()
-            return Policy(this)
-        }
+//        /**
+//         * While your application is in the background (the Recent App's tray or lock screen),
+//         * this [Policy] periodically switches [TorService] to the foreground then immediately
+//         * back the background. Doing do prevents your application from going idle and being
+//         * killed by the OS. It is much more resource intensive than choosing
+//         * [respectResourcesWhileInBackground].
+//         *
+//         * @param [secondsFrom20To40]? Seconds between the events of cycling from background to
+//         * foreground to background. Sending null will use the default (30s)
+//         * @return [BackgroundManager.Builder.Policy] To use when initializing
+//         *   [io.matthewnelson.topl_service.TorServiceController.Builder]
+//         * */
+//        fun keepAliveWhileInBackground(secondsFrom20To40: Int? = null): Policy {
+//            chosenPolicy = BackgroundPolicy.KEEP_ALIVE
+//            if (secondsFrom20To40 != null && secondsFrom20To40 in 20..40)
+//                executionDelay = (secondsFrom20To40 * 1000).toLong()
+//            return Policy(this)
+//        }
 
         /**
          * Stops [TorService] after being in the background for the declared [secondsFrom5To45].
