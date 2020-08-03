@@ -115,6 +115,16 @@ internal sealed class ServiceActions {
                 delayLengthQueue.removeAt(0)
             else
                 0L
+
+        /**
+         * Boolean value for providing [ServiceAction]'s the capability of being issued to
+         * the [ServiceActionProcessor] and notifying that the submitter of the [ServiceAction]
+         * wants [ServiceActionProcessor.lastServiceAction] to be updated.
+         *
+         * @see [Start]
+         * @see [Stop]
+         * */
+        open val updateLastAction: Boolean = true
     }
 
     class NewId: ServiceAction() {
@@ -143,7 +153,7 @@ internal sealed class ServiceActions {
         override val delayLengthQueue = mutableListOf(ServiceActionProcessor.restartTorDelayTime)
     }
 
-    class Start: ServiceAction() {
+    class Start(private val updateLastServiceAction: Boolean = true): ServiceAction() {
 
         @ServiceActionName
         override val name: String = ServiceActionName.START
@@ -152,9 +162,12 @@ internal sealed class ServiceActions {
             get() = arrayOf(
                 ServiceActionCommand.START_TOR
             )
+
+        override val updateLastAction: Boolean
+            get() = updateLastServiceAction
     }
 
-    class Stop: ServiceAction() {
+    class Stop(private val updateLastServiceAction: Boolean = true): ServiceAction() {
 
         @ServiceActionName
         override val name: String = ServiceActionName.STOP
@@ -167,5 +180,8 @@ internal sealed class ServiceActions {
             )
 
         override val delayLengthQueue = mutableListOf(ServiceActionProcessor.stopServiceDelayTime)
+
+        override val updateLastAction: Boolean
+            get() = updateLastServiceAction
     }
 }
