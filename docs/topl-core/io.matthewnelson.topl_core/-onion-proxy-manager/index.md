@@ -2,7 +2,7 @@
 
 # OnionProxyManager
 
-`class OnionProxyManager : `[`CoreConsts`](../../io.matthewnelson.topl_core.util/-core-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/OnionProxyManager.kt#L91)
+`class OnionProxyManager : `[`CoreConsts`](../../io.matthewnelson.topl_core.util/-core-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/OnionProxyManager.kt#L136)
 
 This is where all the fun is, this is the class which acts as a gateway into the `topl-core`
 module, and ensures synchronicity is had.
@@ -14,23 +14,7 @@ implications of this.
 This class began life as TorPlugin from the Briar Project
 
 ``` kotlin
-val serviceTorInstaller = ServiceTorInstaller(
-    torService,
-    torConfigFiles,
-    buildConfigVersionCode,
-    buildConfigDebug ?: BuildConfig.DEBUG,
-    geoipAssetPath,
-    geoip6AssetPath
-)
-onionProxyManager = OnionProxyManager(
-    torService,
-    torConfigFiles,
-    serviceTorInstaller,
-    ServiceTorSettings(torSettings, torService),
-    ServiceEventListener(),
-    ServiceEventBroadcaster(torService),
-    buildConfigDebug
-)
+//Unresolved: io.matthewnelson.topl_service.service.TorService.initTOPLCore
 ```
 
 ### Parameters
@@ -61,7 +45,6 @@ broadcast to the provided [EventBroadcaster](../../../topl-core-base/io.matthewn
 
 | Name | Summary |
 |---|---|
-| [eventListener](event-listener.md) | [BaseEventListener](../../io.matthewnelson.topl_core.listener/-base-event-listener/index.md) For processing Tor OP messages.`val eventListener: `[`BaseEventListener`](../../io.matthewnelson.topl_core.listener/-base-event-listener/index.md) |
 | [hasControlConnection](has-control-connection.md) | `val hasControlConnection: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) |
 | [iPv4LocalHostSocksPort](i-pv4-local-host-socks-port.md) | Returns the socks port on the IPv4 localhost address that the Tor OP is listening on`val iPv4LocalHostSocksPort: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html) |
 | [isIPv4LocalHostSocksPortOpen](is-i-pv4-local-host-socks-port-open.md) | `val isIPv4LocalHostSocksPortOpen: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) |

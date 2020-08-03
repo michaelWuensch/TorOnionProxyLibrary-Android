@@ -2,7 +2,7 @@
 
 # Utilities
 
-`object Utilities` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/util/Utilities.kt#L54)
+`object Utilities` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/util/Utilities.kt#L99)
 
 ### Functions
 

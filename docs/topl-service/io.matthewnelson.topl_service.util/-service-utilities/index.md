@@ -2,7 +2,7 @@
 
 # ServiceUtilities
 
-`object ServiceUtilities` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/util/ServiceUtilities.kt#L22)
+`object ServiceUtilities` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/util/ServiceUtilities.kt#L73)
 
 ### Functions
 

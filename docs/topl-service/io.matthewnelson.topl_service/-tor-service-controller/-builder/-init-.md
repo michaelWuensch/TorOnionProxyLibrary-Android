@@ -2,7 +2,7 @@
 
 # &lt;init&gt;
 
-`Builder(application: `[`Application`](https://developer.android.com/reference/android/app/Application.html)`, buildConfigVersionCode: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`, torSettings: `[`TorSettings`](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md)`, geoipAssetPath: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`, geoip6AssetPath: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`)`
+`Builder(application: `[`Application`](https://developer.android.com/reference/android/app/Application.html)`, torServiceNotificationBuilder: Builder, backgroundManagerPolicy: Policy, buildConfigVersionCode: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`, torSettings: `[`TorSettings`](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md)`, geoipAssetPath: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`, geoip6AssetPath: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`)`
 
 The [TorServiceController.Builder](index.md) is where you get to customize how [TorService](#) works
 for your application. Call it in `Application.onCreate` and follow along.
@@ -25,69 +25,96 @@ immediately for the settings that don't require a restart, but a stable release 
 
 You can see how the [TorSettings](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) sent here are used in [TorService](#) by looking at
 [io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings](#) and
-[TorService.initTOPLCore](#).
+[TorService.onionProxyManager](#).
 
 ``` kotlin
-//        fun setupTorServices(
-//            application: Application,
-//            eventBroadcaster: EventBroadcaster,
-//            torConfigFiles: TorConfigFiles
-//        ) {
-
-            TorServiceController.Builder(
-                application = application,
-                buildConfigVersionCode = BuildConfig.VERSION_CODE,
-                torSettings = App.myTorSettings,
-
-                // These should live somewhere in your project application's assets directory
-                geoipAssetPath = "common/geoip",
-                geoip6AssetPath = "common/geoip6"
+//  private fun generateTorServiceNotificationBuilder(): ServiceNotification.Builder {
+        return ServiceNotification.Builder(
+            channelName = "TorService Channel",
+            channelDescription = "Tor Channel",
+            channelID = "My Sample Application",
+            notificationID = 615
+        )
+            .setActivityToBeOpenedOnTap(
+                clazz = MainActivity::class.java,
+                intentExtrasKey = null,
+                intentExtras = null,
+                intentRequestCode = null
             )
+            .setImageTorNetworkingEnabled(drawableRes = R.drawable.tor_stat_network_enabled)
+            .setImageTorNetworkingDisabled(drawableRes = R.drawable.tor_stat_network_disabled)
+            .setImageTorDataTransfer(drawableRes = R.drawable.tor_stat_network_dataxfer)
+            .setImageTorErrors(drawableRes = R.drawable.tor_stat_notifyerr)
+            .setCustomColor(colorRes = R.color.tor_service_white)
+            .setVisibility(visibility = NotificationCompat.VISIBILITY_PRIVATE)
+            .setCustomColor(colorRes = R.color.primaryColor)
+            .enableTorRestartButton(enable = true)
+            .enableTorStopButton(enable = true)
+            .showNotification(show = true)
+//  }
+```
 
-                .setBuildConfigDebug(BuildConfig.DEBUG)
-                .setEventBroadcaster(eventBroadcaster)
-                .useCustomTorConfigFiles(torConfigFiles)
+``` kotlin
+//  private fun generateBackgroundManagerPolicy(): BackgroundManager.Builder.Policy {
+        return BackgroundManager.Builder()
+            .respectResourcesWhileInBackground(secondsFrom5To45 = 20)
 
-                // Notification customization
-                .customizeNotification(
-                    channelName = "TorService Channel",
-                    channelDescription = "Tor Channel",
-                    channelID = "My Sample Application",
-                    notificationID = 615
-                )
-                .setActivityToBeOpenedOnTap(
-                    clazz = MainActivity::class.java,
-                    intentExtrasKey = null,
-                    intentExtras = null,
-                    intentRequestCode = null
-                )
-                .setImageTorNetworkingEnabled(R.drawable.tor_stat_network_enabled)
-                .setImageTorNetworkingDisabled(R.drawable.tor_stat_network_disabled)
-                .setImageTorDataTransfer(R.drawable.tor_stat_network_dataxfer)
-                .setImageTorErrors(R.drawable.tor_stat_notifyerr)
-                .setCustomColor(R.color.tor_service_white, colorizeBackground = true)
-                .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
-                .enableTorRestartButton(enable = true)
-                .enableTorStopButton(enable = true)
+//  }
+```
 
-                // Will return a Builder object to continue with non-notification related options
-                .applyNotificationSettings()
+``` kotlin
+//  private fun setupTorServices(application: Application, torConfigFiles: TorConfigFiles ) {
+        TorServiceController.Builder(
+            application = application,
+            torServiceNotificationBuilder = generateTorServiceNotificationBuilder(),
+            backgroundManagerPolicy = generateBackgroundManagerPolicy(),
+            buildConfigVersionCode = BuildConfig.VERSION_CODE,
 
-                .build()
-//        }
+            // Can instantiate directly here then access it from
+            // TorServiceController.Companion.getTorSettings() and cast what's returned
+            // as MyTorSettings
+            torSettings = MyTorSettings(),
+
+            // These should live somewhere in your module's assets directory,
+            // ex: my-project/my-application-module/src/main/assets/common/geoip
+            // ex: my-project/my-application-module/src/main/assets/common/geoip6
+            geoipAssetPath = "common/geoip",
+            geoip6AssetPath = "common/geoip6"
+        )
+            .addTimeToRestartTorDelay(milliseconds = 100L)
+            .addTimeToStopServiceDelay(milliseconds = 100L)
+            .setBuildConfigDebug(buildConfigDebug = BuildConfig.DEBUG)
+
+            // Can instantiate directly here then access it from
+            // TorServiceController.Companion?.appEventBroadcaster and cast what's returned
+            // as MyEventBroadcaster
+            .setEventBroadcaster(eventBroadcaster = MyEventBroadcaster())
+
+            // Only needed if you wish to customize the directories/files used by Tor if
+            // the defaults aren't to your liking.
+            .useCustomTorConfigFiles(torConfigFiles = torConfigFiles)
+
+            .build()
+//  }
 ```
 
 ### Parameters
 
-`application` - [Application](https://developer.android.com/reference/android/app/Application.html), for obtaining context.
+`application` - [Application](https://developer.android.com/reference/android/app/Application.html), for obtaining context
+
+`torServiceNotificationBuilder` - The [ServiceNotification.Builder](../../../io.matthewnelson.topl_service.notification/-service-notification/-builder/index.md) for
+customizing [TorService](#)'s notification
+
+`backgroundManagerPolicy` - The [BackgroundManager.Builder.Policy](../../../io.matthewnelson.topl_service.lifecycle/-background-manager/-builder/-policy/index.md) to be executed
+while your application is in the background (the Recent App's tray).
 
 `buildConfigVersionCode` - send [BuildConfig.VERSION_CODE](#). Mitigates copying of geoip
-files to app updates only.
+files to app updates only
 
-`torSettings` - [TorSettings](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) used to create your torrc file on start of Tor.
+`torSettings` - [TorSettings](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) used to create your torrc file on start of Tor
 
 `geoipAssetPath` - The path to where you have your geoip file located (ex: in
-assets/common directory, send this variable "common/geoip").
+assets/common directory, send this variable "common/geoip")
 
 `geoip6AssetPath` - The path to where you have your geoip6 file located (ex: in
-assets/common directory, send this variable "common/geoip6").
+assets/common directory, send this variable "common/geoip6")

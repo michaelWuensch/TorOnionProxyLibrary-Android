@@ -2,11 +2,11 @@
 
 # startTor
 
-`fun startTor(): `[`Unit`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L419)
+`fun startTor(): `[`Unit`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L341)
 
-Starts [TorService](#). Does nothing if called prior to:
+Starts [TorService](#) and then Tor. You can call this as much as you want. If
+the Tor [Process](https://docs.oracle.com/javase/6/docs/api/java/lang/Process.html) is already running, it will do nothing.
 
-* Initializing [TorServiceController.Builder](-builder/index.md) by calling [Builder.build](-builder/build.md)
+### Exceptions
 
-You can call this as much as you want. If Tor is already on, it will do nothing.
-
+`RuntimeException` - if called before [Builder.build](-builder/build.md)

@@ -2,7 +2,7 @@
 
 # BroadcastLogger
 
-`class BroadcastLogger : `[`CoreConsts`](../../io.matthewnelson.topl_core.util/-core-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/broadcaster/BroadcastLogger.kt#L48)
+`class BroadcastLogger : `[`CoreConsts`](../../io.matthewnelson.topl_core.util/-core-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/broadcaster/BroadcastLogger.kt#L93)
 
 This class is for standardizing broadcast messages across all classes for this Library.
 Debugging is important while hacking on TOPL-Android, but those Logcat messages

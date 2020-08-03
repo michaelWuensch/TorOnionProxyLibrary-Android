@@ -2,7 +2,7 @@
 
 # TorStateMachine
 
-`class TorStateMachine : `[`CoreConsts`](../../io.matthewnelson.topl_core.util/-core-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/broadcaster/TorStateMachine.kt#L52)
+`class TorStateMachine : `[`CoreConsts`](../../io.matthewnelson.topl_core.util/-core-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/broadcaster/TorStateMachine.kt#L97)
 
 Current State of Tor
 

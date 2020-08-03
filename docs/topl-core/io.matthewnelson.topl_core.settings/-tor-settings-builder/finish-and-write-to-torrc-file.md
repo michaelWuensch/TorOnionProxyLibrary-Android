@@ -2,7 +2,7 @@
 
 # finishAndWriteToTorrcFile
 
-`fun finishAndWriteToTorrcFile(): `[`Unit`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/settings/TorSettingsBuilder.kt#L105)
+`fun finishAndWriteToTorrcFile(): `[`Unit`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/settings/TorSettingsBuilder.kt#L157)
 
 A convenience method for after populating the [buffer](#) by calling
 [updateTorSettings](update-tor-settings.md). It will overwrite your current torrc file (or

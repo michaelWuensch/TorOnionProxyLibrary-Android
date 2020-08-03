@@ -2,7 +2,7 @@
 
 # TorSettingsBuilder
 
-`class TorSettingsBuilder : `[`CoreConsts`](../../io.matthewnelson.topl_core.util/-core-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/settings/TorSettingsBuilder.kt#L79)
+`class TorSettingsBuilder : `[`CoreConsts`](../../io.matthewnelson.topl_core.util/-core-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/settings/TorSettingsBuilder.kt#L125)
 
 Call [io.matthewnelson.topl_core.OnionProxyManager.getNewSettingsBuilder](../../io.matthewnelson.topl_core/-onion-proxy-manager/get-new-settings-builder.md) to obtain
 this class.

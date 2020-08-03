@@ -14,23 +14,7 @@ implications of this.
 This class began life as TorPlugin from the Briar Project
 
 ``` kotlin
-val serviceTorInstaller = ServiceTorInstaller(
-    torService,
-    torConfigFiles,
-    buildConfigVersionCode,
-    buildConfigDebug ?: BuildConfig.DEBUG,
-    geoipAssetPath,
-    geoip6AssetPath
-)
-onionProxyManager = OnionProxyManager(
-    torService,
-    torConfigFiles,
-    serviceTorInstaller,
-    ServiceTorSettings(torSettings, torService),
-    ServiceEventListener(),
-    ServiceEventBroadcaster(torService),
-    buildConfigDebug
-)
+//Unresolved: io.matthewnelson.topl_service.service.TorService.initTOPLCore
 ```
 
 ### Parameters

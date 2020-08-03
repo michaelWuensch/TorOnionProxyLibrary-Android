@@ -2,7 +2,7 @@
 
 # TorSettings
 
-`abstract class TorSettings : `[`BaseConsts`](../-base-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorSettings.kt#L61)
+`abstract class TorSettings : `[`BaseConsts`](../-base-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorSettings.kt#L106)
 
 This class is for defining default values for your torrc file. Extend this class and define
 your own settings.
@@ -46,7 +46,7 @@ Would **highly recommend** reading up on what's what in the manual:
 | [hasSafeSocks](has-safe-socks.md) | See [DEFAULT__HAS_SAFE_SOCKS](-d-e-f-a-u-l-t__-h-a-s_-s-a-f-e_-s-o-c-k-s.md)`abstract val hasSafeSocks: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) |
 | [hasStrictNodes](has-strict-nodes.md) | See [DEFAULT__HAS_STRICT_NODES](-d-e-f-a-u-l-t__-h-a-s_-s-t-r-i-c-t_-n-o-d-e-s.md)`abstract val hasStrictNodes: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) |
 | [hasTestSocks](has-test-socks.md) | See [DEFAULT__HAS_TEST_SOCKS](-d-e-f-a-u-l-t__-h-a-s_-t-e-s-t_-s-o-c-k-s.md)`abstract val hasTestSocks: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) |
-| [httpTunnelPort](http-tunnel-port.md) | TorBrowser and Orbot use "8218" by default. It may be wise to pick something that won't conflict if you're using this setting.`abstract val httpTunnelPort: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
+| [httpTunnelPort](http-tunnel-port.md) | Could be "auto" or a specific port, such as "8288".`abstract val httpTunnelPort: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
 | [isAutoMapHostsOnResolve](is-auto-map-hosts-on-resolve.md) | See [DEFAULT__IS_AUTO_MAP_HOSTS_ON_RESOLVE](-d-e-f-a-u-l-t__-i-s_-a-u-t-o_-m-a-p_-h-o-s-t-s_-o-n_-r-e-s-o-l-v-e.md)`abstract val isAutoMapHostsOnResolve: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) |
 | [isRelay](is-relay.md) | See [DEFAULT__IS_RELAY](-d-e-f-a-u-l-t__-i-s_-r-e-l-a-y.md)`abstract val isRelay: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) |
 | [listOfSupportedBridges](list-of-supported-bridges.md) | Must have the transport binaries for obfs4 and/or snowflake, depending on if you wish to include them in your bridges file to use.`abstract val listOfSupportedBridges: `[`List`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)`<`[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`>` |
@@ -61,7 +61,7 @@ Would **highly recommend** reading up on what's what in the manual:
 | [relayNickname](relay-nickname.md) | See [DEFAULT__RELAY_NICKNAME](-d-e-f-a-u-l-t__-r-e-l-a-y_-n-i-c-k-n-a-m-e.md)`abstract val relayNickname: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?` |
 | [relayPort](relay-port.md) | TorBrowser and Orbot use 9001 by default. It may be wise to pick something that won't conflict.`abstract val relayPort: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`?` |
 | [runAsDaemon](run-as-daemon.md) | See [DEFAULT__RUN_AS_DAEMON](-d-e-f-a-u-l-t__-r-u-n_-a-s_-d-a-e-m-o-n.md)`abstract val runAsDaemon: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) |
-| [socksPort](socks-port.md) | Could be "auto" or a specified port, such as "9051".`abstract val socksPort: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
+| [socksPort](socks-port.md) | Could be "auto" or a specific port, such as "9051".`abstract val socksPort: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
 | [transPort](trans-port.md) | Can be "auto", or a specified port such as "9141"`abstract val transPort: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
 | [useSocks5](use-socks5.md) | See [DEFAULT__USE_SOCKS5](-d-e-f-a-u-l-t__-u-s-e_-s-o-c-k-s5.md)`abstract val useSocks5: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) |
 | [virtualAddressNetwork](virtual-address-network.md) | TorBrowser and Orbot use "10.192.0.1/10", it may be wise to pick something that won't conflict if you are using this setting.`abstract val virtualAddressNetwork: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?` |

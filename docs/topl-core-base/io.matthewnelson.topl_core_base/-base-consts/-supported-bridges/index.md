@@ -2,7 +2,7 @@
 
 # SupportedBridges
 
-`@Target([AnnotationTarget.CLASS, AnnotationTarget.TYPE]) annotation class SupportedBridges` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/BaseConsts.kt#L112)
+`@Target([AnnotationTarget.CLASS, AnnotationTarget.TYPE]) annotation class SupportedBridges` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/BaseConsts.kt#L157)
 
 ### Constructors
 

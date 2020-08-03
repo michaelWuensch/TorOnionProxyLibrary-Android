@@ -2,4 +2,4 @@
 
 # HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL
 
-`const val HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/util/ServiceConsts.kt#L56)
+`const val HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/util/ServiceConsts.kt#L200)

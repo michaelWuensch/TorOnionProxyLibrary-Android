@@ -2,4 +2,4 @@
 
 # DEFAULT__HAS_DORMANT_CANCELED_BY_STARTUP
 
-`const val DEFAULT__HAS_DORMANT_CANCELED_BY_STARTUP: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorSettings.kt#L85)
+`const val DEFAULT__HAS_DORMANT_CANCELED_BY_STARTUP: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorSettings.kt#L130)

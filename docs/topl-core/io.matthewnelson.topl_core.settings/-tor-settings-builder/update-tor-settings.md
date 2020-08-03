@@ -2,7 +2,7 @@
 
 # updateTorSettings
 
-`fun updateTorSettings(): `[`TorSettingsBuilder`](index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/settings/TorSettingsBuilder.kt#L141)
+`fun updateTorSettings(): `[`TorSettingsBuilder`](index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/settings/TorSettingsBuilder.kt#L195)
 
 Updates the buffer for all methods annotated with [SettingsConfig](#). You still need
 to call [finishAndReturnString](finish-and-return-string.md) and then write the returned String to your

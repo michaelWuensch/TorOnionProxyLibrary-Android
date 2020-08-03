@@ -2,7 +2,7 @@
 
 # TorInstaller
 
-`abstract class TorInstaller : `[`CoreConsts`](../-core-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/util/TorInstaller.kt#L60)
+`abstract class TorInstaller : `[`CoreConsts`](../-core-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/util/TorInstaller.kt#L105)
 
 Extend this class and implement the need methods.
 

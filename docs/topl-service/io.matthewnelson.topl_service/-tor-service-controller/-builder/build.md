@@ -2,10 +2,10 @@
 
 # build
 
-`fun build(): `[`Unit`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L371)
+`fun build(): `[`Unit`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L272)
 
-Initializes [TorService](#) setup and enables the ability to call methods in the
-[Companion](#) object.
+Initializes [TorService](#) setup and enables the ability to call methods from the
+[Companion](#) object w/o throwing exceptions.
 
 See [Builder](index.md) for code samples.
 
