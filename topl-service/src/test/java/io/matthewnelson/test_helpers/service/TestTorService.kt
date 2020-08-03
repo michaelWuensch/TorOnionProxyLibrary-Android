@@ -83,7 +83,6 @@ import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorIns
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
-import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.service.components.receiver.TorServiceReceiver
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.TestCoroutineScope
@@ -104,17 +103,13 @@ internal class TestTorService(
     val testTorServiceBinder: TestTorServiceBinder by lazy {
             TestTorServiceBinder(this)
     }
-    var serviceIsBound = false
-        private set
 
     override fun unbindTorService() {
         try {
-            unbindService(context, TorServiceConnection.torServiceConnection)
-            serviceIsBound = false
+            unbindService(context)
         } catch (e: IllegalArgumentException) {}
     }
     override fun onBind(intent: Intent?): IBinder? {
-        serviceIsBound = true
         return testTorServiceBinder
     }
 
@@ -240,6 +235,11 @@ internal class TestTorService(
     override fun startTor() {
         simulateStart()
     }
+
+    val bandwidth1000 = "1000"
+    val bandwidth0 = "0"
+
+    // Add 6_000ms delay at start of each test to account for startup time.
     @ExperimentalCoroutinesApi
     private fun simulateStart() = getScopeIO().launch {
         try {
@@ -251,19 +251,29 @@ internal class TestTorService(
             serviceEventBroadcaster.broadcastTorState(TorState.ON, TorNetworkState.DISABLED)
             delay(1000)
             serviceEventBroadcaster.broadcastTorState(TorState.ON, TorNetworkState.ENABLED)
+            delay(1000)
+            serviceEventBroadcaster.broadcastNotice("NOTICE|BaseEventListener|Bootstrapped 95% (")
+            delay(1000)
+            serviceEventBroadcaster.broadcastNotice("NOTICE|BaseEventListener|Bootstrapped 100% (")
+            delay(1000)
+            serviceEventBroadcaster.broadcastBandwidth(bandwidth1000, bandwidth1000)
+            delay(1000)
+            serviceEventBroadcaster.broadcastBandwidth(bandwidth0, bandwidth0)
         } catch (e: Exception) {
             broadcastLogger.exception(e)
         }
     }
     @WorkerThread
     override fun stopTor() {
-        try {
-            serviceEventBroadcaster.broadcastTorState(TorState.STOPPING, TorNetworkState.ENABLED)
-            serviceEventBroadcaster.broadcastTorState(TorState.STOPPING, TorNetworkState.DISABLED)
-            serviceEventBroadcaster.broadcastTorState(TorState.OFF, TorNetworkState.DISABLED)
-        } catch (e: Exception) {
-            broadcastLogger.exception(e)
-        }
+        simulateStopTor()
+    }
+
+    private fun simulateStopTor() = getScopeIO().launch {
+        serviceEventBroadcaster.broadcastTorState(TorState.STOPPING, TorNetworkState.ENABLED)
+        delay(1000)
+        serviceEventBroadcaster.broadcastTorState(TorState.STOPPING, TorNetworkState.DISABLED)
+        delay(1000)
+        serviceEventBroadcaster.broadcastTorState(TorState.OFF, TorNetworkState.DISABLED)
     }
     @WorkerThread
     @Throws(
