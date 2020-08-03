@@ -64,83 +64,15 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.topl_service.service.components.binding
+package io.matthewnelson.test_helpers.service.components.binding
 
-import android.os.Binder
+import io.matthewnelson.test_helpers.service.TestTorService
 import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.lifecycle.BackgroundManager
-import io.matthewnelson.topl_service.service.components.actions.ServiceActions
-import io.matthewnelson.topl_service.service.components.actions.ServiceActions.ServiceAction
-import io.matthewnelson.topl_service.util.ServiceConsts.BackgroundPolicy
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import io.matthewnelson.topl_service.service.components.binding.BaseServiceBinder
 
+internal class TestTorServiceBinder(private val service: TestTorService): BaseServiceBinder(service) {
 
-internal abstract class BaseServiceBinder(private val torService: BaseService): Binder() {
-
-    abstract fun getTorService(): BaseService?
-
-    /**
-     * Accepts all [ServiceActions] except [ServiceActions.Start], which gets issued via
-     * [io.matthewnelson.topl_service.service.TorService.onStartCommand].
-     * */
-    fun submitServiceAction(serviceAction: ServiceAction) {
-        if (serviceAction is ServiceActions.Start) return
-        torService.processServiceAction(serviceAction)
-    }
-
-
-    //////////////////////////////////////////
-    /// BackgroundManager Policy Execution ///
-    //////////////////////////////////////////
-    private val bgMgrBroadcastLogger = torService.getBroadcastLogger(BackgroundManager::class.java)
-    private var backgroundPolicyExecutionJob: Job? = null
-
-    /**
-     * Execution of a [BackgroundPolicy] takes place here in order to stay within the lifecycle
-     * of [io.matthewnelson.topl_service.service.TorService] so that we prevent any potential
-     * leaks from occurring.
-     *
-     * @param [policy] The [BackgroundPolicy] to be executed
-     * @param [executionDelay] the time expressed in your [BackgroundManager.Builder.Policy]
-     * */
-    fun executeBackgroundPolicyJob(@BackgroundPolicy policy: String, executionDelay: Long) {
-        cancelExecuteBackgroundPolicyJob()
-        backgroundPolicyExecutionJob = torService.getScopeMain().launch {
-            when (policy) {
-                BackgroundPolicy.KEEP_ALIVE -> {
-                    while (isActive && TorServiceConnection.serviceBinder != null) {
-                        delay(executionDelay)
-                        if (isActive && TorServiceConnection.serviceBinder != null) {
-                            bgMgrBroadcastLogger.debug("Executing background management policy")
-                            torService.stopForegroundService()
-                            torService.startForegroundService()
-                            torService.stopForegroundService()
-                        }
-                    }
-                }
-                BackgroundPolicy.RESPECT_RESOURCES -> {
-                    delay(executionDelay)
-                    bgMgrBroadcastLogger.debug("Executing background management policy")
-                    torService.processServiceAction(
-                        ServiceActions.Stop(updateLastServiceAction = false)
-                    )
-                }
-            }
-        }
-    }
-
-    /**
-     * Cancels the coroutine executing the [BackgroundPolicy] if it is active.
-     * */
-    fun cancelExecuteBackgroundPolicyJob() {
-        if (backgroundPolicyExecutionJob?.isActive == true) {
-            backgroundPolicyExecutionJob?.let {
-                it.cancel()
-                bgMgrBroadcastLogger.debug("Execution has been cancelled")
-            }
-        }
+    override fun getTorService(): BaseService? {
+        return service
     }
 }
