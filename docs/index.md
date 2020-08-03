@@ -1,4 +1,5 @@
 # TorOnionProxyLibrary-Android
+                               
 An Android Library for embedding Tor as a service into your Application  
 
 **NOTE: This project exists independently of the Tor Project, & Guardian Project.**  
@@ -24,6 +25,9 @@ application, and customizing the notification to meet your liking.
 ## [Project Roadmap](roadmap.md)
 
 ## [Get started!](get_started.md)
+
+<a href="https://donate.matthewnelson.io" target="_blank"><img height=80 
+alt="Donate to Matthew Nelson" src="assets/bitcoindonate.png"/></a>
 
 ## Other Projects Using It
 <!-- Example (copy between the brackets [] below): -->
