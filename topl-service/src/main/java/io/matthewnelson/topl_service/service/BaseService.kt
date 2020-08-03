@@ -217,21 +217,7 @@ internal abstract class BaseService: Service() {
     ///////////////
     /// Binding ///
     ///////////////
-    private val torServiceBinder: TorServiceBinder by lazy {
-        TorServiceBinder(this)
-    }
-
-    open fun unbindTorService(): Boolean {
-        return try {
-            unbindService(context, TorServiceConnection.torServiceConnection)
-            true
-        } catch (e: IllegalArgumentException) {
-            false
-        }
-    }
-    override fun onBind(intent: Intent?): IBinder? {
-        return torServiceBinder
-    }
+    abstract fun unbindTorService()
 
 
     /////////////////////////
@@ -361,12 +347,12 @@ internal abstract class BaseService: Service() {
 
 
     override fun onTaskRemoved(rootIntent: Intent?) {
-        // Cancel the BackgroundManager's coroutine if it's active so it doesn't execute
-        torServiceBinder.cancelExecuteBackgroundPolicyJob()
-
         // Move to the foreground so we can properly shutdown w/o interrupting the
         // application's normal lifecycle (Context.startServiceForeground does... thus,
         // the complexity)
         startForegroundService()
+
+        // Shutdown Tor and stop the Service.
+        processServiceAction(ServiceActions.Stop(updateLastServiceAction = false))
     }
 }

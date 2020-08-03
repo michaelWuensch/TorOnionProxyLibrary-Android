@@ -17,6 +17,8 @@ import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSet
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.actions.ServiceActions
+import io.matthewnelson.topl_service.service.components.binding.TorServiceBinder
+import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.service.components.receiver.TorServiceReceiver
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.TestCoroutineScope
@@ -34,18 +36,21 @@ internal class TestTorService(
     ///////////////
     /// Binding ///
     ///////////////
+    val torServiceBinder: TorServiceBinder by lazy {
+            TorServiceBinder(this)
+    }
     var serviceIsBound = false
         private set
 
-    override fun unbindTorService(): Boolean {
-        val boolean = super.unbindTorService()
-        if (boolean)
+    override fun unbindTorService() {
+        try {
+            unbindService(context, TorServiceConnection.torServiceConnection)
             serviceIsBound = false
-        return boolean
+        } catch (e: IllegalArgumentException) {}
     }
     override fun onBind(intent: Intent?): IBinder? {
         serviceIsBound = true
-        return super.onBind(intent)
+        return torServiceBinder
     }
 
 
@@ -213,9 +218,8 @@ internal class TestTorService(
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
+        // Cancel the BackgroundManager's coroutine if it's active so it doesn't execute
+        torServiceBinder.cancelExecuteBackgroundPolicyJob()
         super.onTaskRemoved(rootIntent)
-
-        // Shutdown Tor and stop the Service
-        processServiceAction(ServiceActions.Stop(updateLastServiceAction = false))
     }
 }

@@ -74,6 +74,8 @@ import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core.util.FileUtilities
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.service.components.actions.ServiceActions
+import io.matthewnelson.topl_service.service.components.binding.TorServiceBinder
+import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceEventBroadcaster
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceEventListener
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorInstaller
@@ -98,15 +100,19 @@ internal class TorService: BaseService() {
     ///////////////
     /// Binding ///
     ///////////////
-    override fun unbindTorService(): Boolean {
-        val boolean = super.unbindTorService()
-        if (boolean)
+    private val torServiceBinder: TorServiceBinder by lazy {
+        TorServiceBinder(this)
+    }
+
+    override fun unbindTorService() {
+        try {
+            unbindService(context, TorServiceConnection.torServiceConnection)
             broadcastLogger.debug("Has been unbound")
-        return boolean
+        } catch (e: IllegalArgumentException) {}
     }
     override fun onBind(intent: Intent?): IBinder? {
         broadcastLogger.debug("Has been bound")
-        return super.onBind(intent)
+        return torServiceBinder
     }
 
 
@@ -259,10 +265,9 @@ internal class TorService: BaseService() {
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
-        super.onTaskRemoved(rootIntent)
+        // Cancel the BackgroundManager's coroutine if it's active so it doesn't execute
+        torServiceBinder.cancelExecuteBackgroundPolicyJob()
         broadcastLogger.debug("Task has been removed")
-
-        // Shutdown Tor and stop the Service.
-        processServiceAction(ServiceActions.Stop(updateLastServiceAction = false))
+        super.onTaskRemoved(rootIntent)
     }
 }
