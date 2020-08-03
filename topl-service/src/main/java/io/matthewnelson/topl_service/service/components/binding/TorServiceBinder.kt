@@ -109,9 +109,9 @@ internal class TorServiceBinder(private val torService: BaseService): Binder() {
         backgroundPolicyExecutionJob = torService.getScopeMain().launch {
             when (policy) {
                 BackgroundPolicy.KEEP_ALIVE -> {
-                    while (isActive && BaseServiceConnection.serviceBinder != null) {
+                    while (isActive && TorServiceConnection.serviceBinder != null) {
                         delay(executionDelay)
-                        if (isActive && BaseServiceConnection.serviceBinder != null) {
+                        if (isActive && TorServiceConnection.serviceBinder != null) {
                             bgMgrBroadcastLogger.debug("Executing background management policy")
                             torService.stopForegroundService()
                             torService.startForegroundService()

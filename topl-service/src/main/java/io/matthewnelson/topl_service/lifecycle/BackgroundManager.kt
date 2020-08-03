@@ -73,7 +73,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
-import io.matthewnelson.topl_service.service.components.binding.BaseServiceConnection
+import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts
 
 /**
@@ -125,7 +125,7 @@ class BackgroundManager internal constructor(
     @BackgroundPolicy private val policy: String,
     private val executionDelay: Long,
     private val serviceClass: Class<*>,
-    private val serviceConnection: BaseServiceConnection
+    private val serviceConnection: TorServiceConnection
 ): ServiceConsts(), LifecycleObserver {
 
 
@@ -214,7 +214,7 @@ class BackgroundManager internal constructor(
              * */
             internal fun build(
                 serviceClass: Class<*>,
-                serviceConnection: BaseServiceConnection
+                serviceConnection: TorServiceConnection
             ) {
 
                 // Only initialize it once. Reflection has issues here
@@ -257,7 +257,7 @@ class BackgroundManager internal constructor(
         // if the last _accepted_ ServiceAction to be issued by the Application was not to STOP
         // the service, then we want to put it back in the state it was in
         if (!ServiceActionProcessor.wasLastAcceptedServiceActionStop()) {
-            BaseServiceConnection.serviceBinder?.cancelExecuteBackgroundPolicyJob()
+            TorServiceConnection.serviceBinder?.cancelExecuteBackgroundPolicyJob()
             BaseService.startService(
                 BaseService.getAppContext(),
                 serviceClass,
@@ -270,6 +270,6 @@ class BackgroundManager internal constructor(
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     private fun applicationMovedToBackground() {
         if (!ServiceActionProcessor.wasLastAcceptedServiceActionStop())
-            BaseServiceConnection.serviceBinder?.executeBackgroundPolicyJob(policy, executionDelay)
+            TorServiceConnection.serviceBinder?.executeBackgroundPolicyJob(policy, executionDelay)
     }
 }

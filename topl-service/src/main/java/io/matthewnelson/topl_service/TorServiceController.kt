@@ -75,7 +75,6 @@ import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
-import io.matthewnelson.topl_service.service.components.binding.BaseServiceConnection
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.actions.ServiceActions
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
@@ -353,18 +352,18 @@ class TorServiceController private constructor(): ServiceConsts() {
          * Stops [TorService].
          * */
         fun stopTor() =
-            BaseServiceConnection.serviceBinder?.submitServiceAction(ServiceActions.Stop())
+            TorServiceConnection.serviceBinder?.submitServiceAction(ServiceActions.Stop())
 
         /**
          * Restarts Tor.
          * */
         fun restartTor() =
-            BaseServiceConnection.serviceBinder?.submitServiceAction(ServiceActions.RestartTor())
+            TorServiceConnection.serviceBinder?.submitServiceAction(ServiceActions.RestartTor())
 
         /**
          * Changes identities.
          * */
         fun newIdentity() =
-            BaseServiceConnection.serviceBinder?.submitServiceAction(ServiceActions.NewId())
+            TorServiceConnection.serviceBinder?.submitServiceAction(ServiceActions.NewId())
     }
 }

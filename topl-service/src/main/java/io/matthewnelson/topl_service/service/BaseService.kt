@@ -71,7 +71,6 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.os.IBinder
 import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core_base.TorConfigFiles
@@ -82,8 +81,6 @@ import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.actions.ServiceActions
 import io.matthewnelson.topl_service.service.components.actions.ServiceActions.ServiceAction
-import io.matthewnelson.topl_service.service.components.binding.BaseServiceConnection
-import io.matthewnelson.topl_service.service.components.binding.TorServiceBinder
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
@@ -176,14 +173,14 @@ internal abstract class BaseService: Service() {
          *
          * @param [context]
          * @param [serviceClass] The Service's class wanting to be started
-         * @param [serviceConn] The [BaseServiceConnection] to bind to
+         * @param [serviceConn] The [TorServiceConnection] to bind to
          * @param [includeIntentActionStart] Boolean for including [ServiceActionName.START] as
          *   the Intent's Action.
          * */
         fun startService(
             context: Context,
             serviceClass: Class<*>,
-            serviceConn: BaseServiceConnection,
+            serviceConn: TorServiceConnection,
             includeIntentActionStart: Boolean = true
         ) {
             val intent = Intent(context.applicationContext, serviceClass)
@@ -195,14 +192,14 @@ internal abstract class BaseService: Service() {
 
         /**
          * Unbinds [TorService] from the Application and clears the reference to
-         * [BaseServiceConnection.serviceBinder].
+         * [TorServiceConnection.serviceBinder].
          *
          * @param [context] [Context]
-         * @param [serviceConn] The [BaseServiceConnection] to unbind
+         * @param [serviceConn] The [TorServiceConnection] to unbind
          * @throws [IllegalArgumentException] If no binding exists for the provided [serviceConn]
          * */
         @Throws(IllegalArgumentException::class)
-        fun unbindService(context: Context, serviceConn: BaseServiceConnection) {
+        fun unbindService(context: Context, serviceConn: TorServiceConnection) {
             serviceConn.clearServiceBinderReference()
             context.applicationContext.unbindService(serviceConn)
         }
