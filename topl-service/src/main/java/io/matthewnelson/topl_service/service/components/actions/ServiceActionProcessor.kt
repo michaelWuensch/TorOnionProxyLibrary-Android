@@ -181,7 +181,7 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
         processQueueJob = torService.getScopeIO().launch {
             broadcastDebugMsgWithObjectDetails("Processing Queue: ", this)
 
-            while (actionQueue.isNotEmpty()) {
+            while (actionQueue.isNotEmpty() && isActive) {
                 val serviceAction = actionQueue.elementAtOrNull(0)
                 if (serviceAction == null) {
                     return@launch
