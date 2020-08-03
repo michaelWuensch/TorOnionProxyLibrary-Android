@@ -71,7 +71,6 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.os.IBinder
 import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core_base.TorConfigFiles
@@ -82,8 +81,6 @@ import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.actions.ServiceActions
 import io.matthewnelson.topl_service.service.components.actions.ServiceActions.ServiceAction
-import io.matthewnelson.topl_service.service.components.binding.BaseServiceConnection
-import io.matthewnelson.topl_service.service.components.binding.TorServiceBinder
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
@@ -151,7 +148,7 @@ internal abstract class BaseService: Service() {
          * Updates [lastAcceptedServiceAction] in several key places so that we can keep
          * [TorService]'s state in sync with the latest calls coming from the Application using
          * the Library. It is used in [TorService.onStartCommand] and
-         * [io.matthewnelson.topl_service.service.components.binding.TorServiceBinder.submitServiceAction]
+         * [io.matthewnelson.topl_service.service.components.binding.BaseServiceBinder.submitServiceAction]
          *
          * @param [serviceAction] The [ServiceActionName] to update [lastAcceptedServiceAction] to
          * */
@@ -176,35 +173,39 @@ internal abstract class BaseService: Service() {
          *
          * @param [context]
          * @param [serviceClass] The Service's class wanting to be started
-         * @param [serviceConn] The [BaseServiceConnection] to bind to
          * @param [includeIntentActionStart] Boolean for including [ServiceActionName.START] as
          *   the Intent's Action.
+         * @param [bindServiceFlag] The flag to use when binding to [TorService]
          * */
         fun startService(
             context: Context,
             serviceClass: Class<*>,
-            serviceConn: BaseServiceConnection,
-            includeIntentActionStart: Boolean = true
+            includeIntentActionStart: Boolean = true,
+            bindServiceFlag: Int = Context.BIND_AUTO_CREATE
         ) {
             val intent = Intent(context.applicationContext, serviceClass)
             if (includeIntentActionStart)
                 intent.action = ServiceActionName.START
             context.applicationContext.startService(intent)
-            context.applicationContext.bindService(intent, serviceConn, Context.BIND_AUTO_CREATE)
+            context.applicationContext.bindService(
+                intent,
+                TorServiceConnection.torServiceConnection,
+                bindServiceFlag
+            )
         }
 
         /**
          * Unbinds [TorService] from the Application and clears the reference to
-         * [BaseServiceConnection.serviceBinder].
+         * [TorServiceConnection.serviceBinder].
          *
          * @param [context] [Context]
-         * @param [serviceConn] The [BaseServiceConnection] to unbind
+         * @param [serviceConn] The [TorServiceConnection] to unbind
          * @throws [IllegalArgumentException] If no binding exists for the provided [serviceConn]
          * */
         @Throws(IllegalArgumentException::class)
-        fun unbindService(context: Context, serviceConn: BaseServiceConnection) {
-            serviceConn.clearServiceBinderReference()
-            context.applicationContext.unbindService(serviceConn)
+        fun unbindService(context: Context) {
+            TorServiceConnection.torServiceConnection.clearServiceBinderReference()
+            context.applicationContext.unbindService(TorServiceConnection.torServiceConnection)
         }
     }
 
@@ -217,21 +218,7 @@ internal abstract class BaseService: Service() {
     ///////////////
     /// Binding ///
     ///////////////
-    private val torServiceBinder: TorServiceBinder by lazy {
-        TorServiceBinder(this)
-    }
-
-    open fun unbindTorService(): Boolean {
-        return try {
-            unbindService(context, TorServiceConnection.torServiceConnection)
-            true
-        } catch (e: IllegalArgumentException) {
-            false
-        }
-    }
-    override fun onBind(intent: Intent?): IBinder? {
-        return torServiceBinder
-    }
+    abstract fun unbindTorService()
 
 
     /////////////////////////
@@ -361,12 +348,12 @@ internal abstract class BaseService: Service() {
 
 
     override fun onTaskRemoved(rootIntent: Intent?) {
-        // Cancel the BackgroundManager's coroutine if it's active so it doesn't execute
-        torServiceBinder.cancelExecuteBackgroundPolicyJob()
-
         // Move to the foreground so we can properly shutdown w/o interrupting the
         // application's normal lifecycle (Context.startServiceForeground does... thus,
         // the complexity)
         startForegroundService()
+
+        // Shutdown Tor and stop the Service.
+        processServiceAction(ServiceActions.Stop(updateLastServiceAction = false))
     }
 }

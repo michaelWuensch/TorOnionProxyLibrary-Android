@@ -63,38 +63,16 @@
 *     exception. If you modify "The Interfaces", this exception does not apply to your
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
- */
-package io.matthewnelson.test_helpers.application_provided_classes
+* */
+package io.matthewnelson.test_helpers.service.components.binding
 
-import io.matthewnelson.topl_service.service.components.onionproxy.TorServiceEventBroadcaster
+import io.matthewnelson.test_helpers.service.TestTorService
+import io.matthewnelson.topl_service.service.BaseService
+import io.matthewnelson.topl_service.service.components.binding.BaseServiceBinder
 
-class TestEventBroadcaster: TorServiceEventBroadcaster() {
+internal class TestTorServiceBinder(private val service: TestTorService): BaseServiceBinder(service) {
 
-    override fun broadcastControlPortAddress(controlPortAddress: String?) {}
-
-    override fun broadcastSocksPortAddress(socksPortAddress: String?) {}
-
-    override fun broadcastHttpPortAddress(httpPortAddress: String?) {}
-
-    override fun broadcastBandwidth(bytesRead: String, bytesWritten: String) {}
-
-    override fun broadcastDebug(msg: String) {}
-
-    override fun broadcastException(msg: String?, e: Exception) {}
-
-    override fun broadcastLogMessage(logMessage: String?) {}
-
-    override fun broadcastNotice(msg: String) {}
-
-    @Volatile
-    var torState = TorState.OFF
-        private set
-
-    @Volatile
-    var torNetworkState = TorNetworkState.DISABLED
-        private set
-    override fun broadcastTorState(state: String, networkState: String) {
-        torState = state
-        torNetworkState = networkState
+    override fun getTorService(): BaseService? {
+        return service
     }
 }

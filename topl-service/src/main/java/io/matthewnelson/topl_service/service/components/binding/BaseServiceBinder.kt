@@ -63,38 +63,87 @@
 *     exception. If you modify "The Interfaces", this exception does not apply to your
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
- */
-package io.matthewnelson.test_helpers.application_provided_classes
+* */
+package io.matthewnelson.topl_service.service.components.binding
 
-import io.matthewnelson.topl_service.service.components.onionproxy.TorServiceEventBroadcaster
+import android.os.Binder
+import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
+import io.matthewnelson.topl_service.service.BaseService
+import io.matthewnelson.topl_service.lifecycle.BackgroundManager
+import io.matthewnelson.topl_service.service.components.actions.ServiceActions
+import io.matthewnelson.topl_service.service.components.actions.ServiceActions.ServiceAction
+import io.matthewnelson.topl_service.util.ServiceConsts.BackgroundPolicy
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
-class TestEventBroadcaster: TorServiceEventBroadcaster() {
 
-    override fun broadcastControlPortAddress(controlPortAddress: String?) {}
+internal abstract class BaseServiceBinder(private val torService: BaseService): Binder() {
 
-    override fun broadcastSocksPortAddress(socksPortAddress: String?) {}
+    abstract fun getTorService(): BaseService?
 
-    override fun broadcastHttpPortAddress(httpPortAddress: String?) {}
+    /**
+     * Accepts all [ServiceActions] except [ServiceActions.Start], which gets issued via
+     * [io.matthewnelson.topl_service.service.TorService.onStartCommand].
+     * */
+    fun submitServiceAction(serviceAction: ServiceAction) {
+        if (serviceAction is ServiceActions.Start) return
+        torService.processServiceAction(serviceAction)
+    }
 
-    override fun broadcastBandwidth(bytesRead: String, bytesWritten: String) {}
 
-    override fun broadcastDebug(msg: String) {}
+    //////////////////////////////////////////
+    /// BackgroundManager Policy Execution ///
+    //////////////////////////////////////////
+    private val bgMgrBroadcastLogger: BroadcastLogger by lazy {
+        torService.getBroadcastLogger(BackgroundManager::class.java)
+    }
+    private var backgroundPolicyExecutionJob: Job? = null
 
-    override fun broadcastException(msg: String?, e: Exception) {}
+    /**
+     * Execution of a [BackgroundPolicy] takes place here in order to stay within the lifecycle
+     * of [io.matthewnelson.topl_service.service.TorService] so that we prevent any potential
+     * leaks from occurring.
+     *
+     * @param [policy] The [BackgroundPolicy] to be executed
+     * @param [executionDelay] the time expressed in your [BackgroundManager.Builder.Policy]
+     * */
+    fun executeBackgroundPolicyJob(@BackgroundPolicy policy: String, executionDelay: Long) {
+        cancelExecuteBackgroundPolicyJob()
+        backgroundPolicyExecutionJob = torService.getScopeMain().launch {
+            when (policy) {
+                BackgroundPolicy.KEEP_ALIVE -> {
+                    while (isActive && TorServiceConnection.serviceBinder != null) {
+                        delay(executionDelay)
+                        if (isActive && TorServiceConnection.serviceBinder != null) {
+                            bgMgrBroadcastLogger.debug("Executing background management policy")
+                            torService.stopForegroundService()
+                            torService.startForegroundService()
+                            torService.stopForegroundService()
+                        }
+                    }
+                }
+                BackgroundPolicy.RESPECT_RESOURCES -> {
+                    delay(executionDelay)
+                    bgMgrBroadcastLogger.debug("Executing background management policy")
+                    torService.processServiceAction(
+                        ServiceActions.Stop(updateLastServiceAction = false)
+                    )
+                }
+            }
+        }
+    }
 
-    override fun broadcastLogMessage(logMessage: String?) {}
-
-    override fun broadcastNotice(msg: String) {}
-
-    @Volatile
-    var torState = TorState.OFF
-        private set
-
-    @Volatile
-    var torNetworkState = TorNetworkState.DISABLED
-        private set
-    override fun broadcastTorState(state: String, networkState: String) {
-        torState = state
-        torNetworkState = networkState
+    /**
+     * Cancels the coroutine executing the [BackgroundPolicy] if it is active.
+     * */
+    fun cancelExecuteBackgroundPolicyJob() {
+        if (backgroundPolicyExecutionJob?.isActive == true) {
+            backgroundPolicyExecutionJob?.let {
+                it.cancel()
+                bgMgrBroadcastLogger.debug("Execution has been cancelled")
+            }
+        }
     }
 }

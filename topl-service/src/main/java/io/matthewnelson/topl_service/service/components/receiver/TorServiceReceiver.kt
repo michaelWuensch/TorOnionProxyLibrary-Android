@@ -73,16 +73,14 @@ import android.content.IntentFilter
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.service.components.actions.ServiceActions
-import io.matthewnelson.topl_service.service.components.binding.BaseServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import java.math.BigInteger
 import java.security.SecureRandom
 
 /**
  * Is registered at startup of [TorService], and unregistered when it is stopped.
- * Sending an intent here to start [TorService] will do nothing as all intents are piped
- * to [BaseServiceConnection.serviceBinder]. To start the service (and Tor), call the
- * [io.matthewnelson.topl_service.TorServiceController.startTor] method.
+ * Sending an intent here to start [TorService] will do nothing. To start the service (and Tor),
+ * call the [io.matthewnelson.topl_service.TorServiceController.startTor] method.
  *
  * @param [torService]
  * */
