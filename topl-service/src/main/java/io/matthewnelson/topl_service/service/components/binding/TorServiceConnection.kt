@@ -76,12 +76,12 @@ internal class TorServiceConnection: ServiceConnection {
         val torServiceConnection = TorServiceConnection()
 
         @Volatile
-        var serviceBinder: TorServiceBinder? = null
+        var serviceBinder: BaseServiceBinder? = null
             private set
     }
 
     /**
-     * Sets the reference to [TorServiceBinder] to `null` because
+     * Sets the reference to [BaseServiceBinder] to `null` because
      * [onServiceDisconnected] is not always called on disconnect, as the name
      * suggests.
      * */
@@ -97,7 +97,7 @@ internal class TorServiceConnection: ServiceConnection {
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         if (service != null)
-            serviceBinder = service as TorServiceBinder
+            serviceBinder = service as BaseServiceBinder
         else
             clearServiceBinderReference()
     }

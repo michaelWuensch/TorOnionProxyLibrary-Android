@@ -118,8 +118,8 @@ import io.matthewnelson.topl_service.util.ServiceConsts
  *   is sent to the background.
  * @param [serviceClass] The Service class being managed
  * @param [serviceConnection] The ServiceConnection being used to bind with
- * @see [io.matthewnelson.topl_service.service.components.binding.TorServiceBinder.executeBackgroundPolicyJob]
- * @see [io.matthewnelson.topl_service.service.components.binding.TorServiceBinder.cancelExecuteBackgroundPolicyJob]
+ * @see [io.matthewnelson.topl_service.service.components.binding.BaseServiceBinder.executeBackgroundPolicyJob]
+ * @see [io.matthewnelson.topl_service.service.components.binding.BaseServiceBinder.cancelExecuteBackgroundPolicyJob]
  * */
 class BackgroundManager internal constructor(
     @BackgroundPolicy private val policy: String,

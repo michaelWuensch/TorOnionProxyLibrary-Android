@@ -78,7 +78,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 
-internal class TorServiceBinder(private val torService: BaseService): Binder() {
+internal class BaseServiceBinder(private val torService: BaseService): Binder() {
 
     /**
      * Accepts all [ServiceActions] except [ServiceActions.Start], which gets issued via

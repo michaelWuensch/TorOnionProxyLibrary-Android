@@ -148,7 +148,7 @@ internal abstract class BaseService: Service() {
          * Updates [lastAcceptedServiceAction] in several key places so that we can keep
          * [TorService]'s state in sync with the latest calls coming from the Application using
          * the Library. It is used in [TorService.onStartCommand] and
-         * [io.matthewnelson.topl_service.service.components.binding.TorServiceBinder.submitServiceAction]
+         * [io.matthewnelson.topl_service.service.components.binding.BaseServiceBinder.submitServiceAction]
          *
          * @param [serviceAction] The [ServiceActionName] to update [lastAcceptedServiceAction] to
          * */

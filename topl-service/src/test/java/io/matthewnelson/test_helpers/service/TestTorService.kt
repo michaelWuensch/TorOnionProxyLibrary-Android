@@ -16,8 +16,7 @@ import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorIns
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
-import io.matthewnelson.topl_service.service.components.actions.ServiceActions
-import io.matthewnelson.topl_service.service.components.binding.TorServiceBinder
+import io.matthewnelson.topl_service.service.components.binding.BaseServiceBinder
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.service.components.receiver.TorServiceReceiver
 import kotlinx.coroutines.*
@@ -36,8 +35,8 @@ internal class TestTorService(
     ///////////////
     /// Binding ///
     ///////////////
-    val torServiceBinder: TorServiceBinder by lazy {
-            TorServiceBinder(this)
+    val torServiceBinder: BaseServiceBinder by lazy {
+            BaseServiceBinder(this)
     }
     var serviceIsBound = false
         private set
