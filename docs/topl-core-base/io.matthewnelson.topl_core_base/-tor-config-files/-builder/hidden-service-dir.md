@@ -2,7 +2,7 @@
 
 # hiddenServiceDir
 
-`fun hiddenServiceDir(directory: `[`File`](https://docs.oracle.com/javase/6/docs/api/java/io/File.html)`): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorConfigFiles.kt#L221)
+`fun hiddenServiceDir(directory: `[`File`](https://docs.oracle.com/javase/6/docs/api/java/io/File.html)`): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorConfigFiles.kt#L284)
 
 Store data files for a hidden service in DIRECTORY. Every hidden service must
 have a separate directory. You may use this option multiple times to specify

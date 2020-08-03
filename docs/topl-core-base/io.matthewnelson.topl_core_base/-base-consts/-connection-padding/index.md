@@ -2,7 +2,7 @@
 
 # ConnectionPadding
 
-`@Target([AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.VALUE_PARAMETER]) annotation class ConnectionPadding` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/BaseConsts.kt#L127)
+`@Target([AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.VALUE_PARAMETER]) annotation class ConnectionPadding` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/BaseConsts.kt#L172)
 
 ### Constructors
 

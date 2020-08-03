@@ -2,7 +2,7 @@
 
 # PrefKeyString
 
-`annotation class PrefKeyString` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/util/ServiceConsts.kt#L116)
+`annotation class PrefKeyString` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/util/ServiceConsts.kt#L260)
 
 ### Constructors
 

@@ -2,4 +2,4 @@
 
 # torInstaller
 
-`val torInstaller: `[`TorInstaller`](../../io.matthewnelson.topl_core.util/-tor-installer/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/OnionProxyManager.kt#L106)
+`val torInstaller: `[`TorInstaller`](../../io.matthewnelson.topl_core.util/-tor-installer/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/OnionProxyManager.kt#L152)

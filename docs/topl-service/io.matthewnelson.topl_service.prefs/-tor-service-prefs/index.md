@@ -2,7 +2,7 @@
 
 # TorServicePrefs
 
-`class TorServicePrefs : `[`ServiceConsts`](../../io.matthewnelson.topl_service.util/-service-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/prefs/TorServicePrefs.kt#L32)
+`class TorServicePrefs : `[`ServiceConsts`](../../io.matthewnelson.topl_service.util/-service-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/prefs/TorServicePrefs.kt#L82)
 
 This class provides a standardized way for library users to change settings used
 by [io.matthewnelson.topl_service.service.TorService](#) such that the values expressed

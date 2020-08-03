@@ -16,6 +16,11 @@
 Service for sending event logs to the system.
 
 
+| (extensions in package io.matthewnelson.topl_core_base)
+
+##### [java.io.File](../io.matthewnelson.topl_core_base/java.io.-file/index.md)
+
+
 |
 
 ##### [io.matthewnelson.topl_core_base.TorConfigFiles](../io.matthewnelson.topl_core_base/-tor-config-files/index.md)

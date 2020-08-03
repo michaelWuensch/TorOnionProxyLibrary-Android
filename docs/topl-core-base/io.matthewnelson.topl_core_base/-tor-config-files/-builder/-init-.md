@@ -9,30 +9,30 @@ Builder for TorConfig.
 See also [Companion.createConfig](../create-config.md) for convenience methods.
 
 ``` kotlin
-//        fun customTorConfigFilesSetup(context: Context): TorConfigFiles {
+//  fun customTorConfigFilesSetup(context: Context): TorConfigFiles {
 
-            // This is modifying the directory hierarchy from TorService's
-            // default setup. For example, if you are using binaries for Tor that
-            // are named differently that that expressed in TorConfigFiles.createConfig()
+        // This is modifying the directory hierarchy from TorService's
+        // default setup. For example, if you are using binaries for Tor that
+        // are named differently that that expressed in TorConfigFiles.createConfig()
 
-            // Post Android API 28 requires that executable files be contained in your
-            // application's data/app directory, as they can no longer execute from data/data.
-            val installDir = File(context.applicationInfo.nativeLibraryDir)
+        // Post Android API 28 requires that executable files be contained in your
+        // application's data/app directory, as they can no longer execute from data/data.
+        val installDir = File(context.applicationInfo.nativeLibraryDir)
 
-            // Will create a directory within your application's data/data dir
-            val configDir = context.getDir("torservice", Context.MODE_PRIVATE)
+        // Will create a directory within your application's data/data dir
+        val configDir = context.getDir("torservice", Context.MODE_PRIVATE)
 
-            val builder = TorConfigFiles.Builder(installDir, configDir)
+        val builder = TorConfigFiles.Builder(installDir, configDir)
 
-            // Customize the tor executable file name. Requires that the executable file
-            // be in your project's src/main/jniLibs directory. If you are getting your
-            // executable files via a dependency, be sure to consult that Libraries documentation.
-            builder.torExecutable(File(installDir, "libtor.so"))
+        // Customize the tor executable file name. Requires that the executable file
+        // be in your module's src/main/jniLibs directory. If you are getting your
+        // executable files via a dependency be sure to consult that Library's documentation.
+        builder.torExecutable(File(installDir, "libtor.so"))
 
-            // customize further via the builder methods...
+        // customize further via the builder methods...
 
-            return builder.build()
-//        }
+        return builder.build()
+//  }
 ```
 
 ### Parameters

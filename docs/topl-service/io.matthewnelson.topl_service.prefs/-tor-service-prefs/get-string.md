@@ -2,7 +2,7 @@
 
 # getString
 
-`fun getString(stringKey: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`, defValue: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?): `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/prefs/TorServicePrefs.kt#L137)
+`fun getString(stringKey: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`, defValue: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?): `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/prefs/TorServicePrefs.kt#L187)
 
 Returns a String value for the provided [ServiceConsts.PrefKeyString](../../io.matthewnelson.topl_service.util/-service-consts/-pref-key-string/index.md). If no
 value is stored in the SharedPreference, [defValue](get-string.md#io.matthewnelson.topl_service.prefs.TorServicePrefs$getString(kotlin.String, kotlin.String)/defValue) will be returned.
