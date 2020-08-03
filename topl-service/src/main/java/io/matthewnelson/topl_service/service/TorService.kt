@@ -262,7 +262,7 @@ internal class TorService: BaseService() {
         super.onTaskRemoved(rootIntent)
         broadcastLogger.debug("Task has been removed")
 
-        // Shutdown Tor and stop the Service
-        processServiceAction(ServiceActions.Stop())
+        // Shutdown Tor and stop the Service.
+        processServiceAction(ServiceActions.Stop(updateLastServiceAction = false))
     }
 }
