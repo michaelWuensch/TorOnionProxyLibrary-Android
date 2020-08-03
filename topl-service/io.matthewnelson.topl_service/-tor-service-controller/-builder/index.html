@@ -516,9 +516,9 @@ immediately for the settings that don&rsquo;t require a restart, but a stable re
 
 <h3 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h3>
 <p><code>application</code> - <a href="https://developer.android.com/reference/android/app/Application.html">Application</a>, for obtaining context</p>
-<p><code>torServiceNotificationBuilder</code> - The <a href="../../../io.matthewnelson.topl_service.notification/-service-notification/-builder/index.md">ServiceNotification.Builder</a> for
+<p><code>torServiceNotificationBuilder</code> - The <a href="../../../io.matthewnelson.topl_service.notification/-service-notification/-builder/">ServiceNotification.Builder</a> for
 customizing <a href="#">TorService</a>&lsquo;s notification</p>
-<p><code>backgroundManagerPolicy</code> - The <a href="../../../io.matthewnelson.topl_service.lifecycle/-background-manager/-builder/-policy/index.md">BackgroundManager.Builder.Policy</a> to be executed
+<p><code>backgroundManagerPolicy</code> - The <a href="../../../io.matthewnelson.topl_service.lifecycle/-background-manager/-builder/-policy/">BackgroundManager.Builder.Policy</a> to be executed
 while your application is in the background (the Recent App&rsquo;s tray).</p>
 <p><code>buildConfigVersionCode</code> - send <a href="#">BuildConfig.VERSION_CODE</a>. Mitigates copying of geoip
 files to app updates only</p>
@@ -552,11 +552,11 @@ assets/common directory, send this variable &ldquo;common/geoip6&rdquo;)</p>
 </thead>
 <tbody>
 <tr>
-<td><a href="add-time-to-restart-tor-delay.md">addTimeToRestartTorDelay</a></td>
+<td><a href="add-time-to-restart-tor-delay/">addTimeToRestartTorDelay</a></td>
 <td>Default is set to 500ms, (what this method adds time to).<code>fun addTimeToRestartTorDelay(milliseconds:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html"><code>Long</code></a><code>): Builder</code></td>
 </tr>
 <tr>
-<td><a href="add-time-to-stop-service-delay.md">addTimeToStopServiceDelay</a></td>
+<td><a href="add-time-to-stop-service-delay/">addTimeToStopServiceDelay</a></td>
 <td>Default is set to 100ms (what this method adds time to).<code>fun addTimeToStopServiceDelay(milliseconds:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html"><code>Long</code></a><code>): Builder</code></td>
 </tr>
 <tr>
@@ -569,7 +569,7 @@ assets/common directory, send this variable &ldquo;common/geoip6&rdquo;)</p>
 </tr>
 <tr>
 <td><a href="set-event-broadcaster/">setEventBroadcaster</a></td>
-<td>Get broadcasts piped to your Application to do with them what you desire. What you send this will live at <a href="../app-event-broadcaster/">Companion.appEventBroadcaster</a> for the remainder of your application&rsquo;s lifecycle to refer to elsewhere in your App.<code>fun setEventBroadcaster(eventBroadcaster:</code><a href="../../../io.matthewnelson.topl_service.service.components.onionproxy/-tor-service-event-broadcaster/index.md"><code>TorServiceEventBroadcaster</code></a><code>): Builder</code></td>
+<td>Get broadcasts piped to your Application to do with them what you desire. What you send this will live at <a href="../app-event-broadcaster/">Companion.appEventBroadcaster</a> for the remainder of your application&rsquo;s lifecycle to refer to elsewhere in your App.<code>fun setEventBroadcaster(eventBroadcaster:</code><a href="../../../io.matthewnelson.topl_service.service.components.onionproxy/-tor-service-event-broadcaster/"><code>TorServiceEventBroadcaster</code></a><code>): Builder</code></td>
 </tr>
 <tr>
 <td><a href="use-custom-tor-config-files/">useCustomTorConfigFiles</a></td>
