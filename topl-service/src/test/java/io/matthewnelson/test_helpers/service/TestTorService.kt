@@ -10,21 +10,14 @@ import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState
 import io.matthewnelson.topl_core_base.BaseConsts.TorState
 import io.matthewnelson.topl_service.TorServiceController
-import io.matthewnelson.topl_service.lifecycle.BackgroundManager
-import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceEventBroadcaster
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceEventListener
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorInstaller
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
-import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
-import io.matthewnelson.topl_service.service.components.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.actions.ServiceActions
-import io.matthewnelson.topl_service.service.components.actions.ServiceActions.ServiceAction
-import io.matthewnelson.topl_service.service.components.binding.TorServiceBinder
-import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
-import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
+import io.matthewnelson.topl_service.service.components.receiver.TorServiceReceiver
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.TestCoroutineScope
 import net.freehaven.tor.control.TorControlCommands
@@ -41,22 +34,18 @@ internal class TestTorService(
     ///////////////
     /// Binding ///
     ///////////////
-    val torServiceBinder: TorServiceBinder by lazy {
-        TorServiceBinder(
-            this
-        )
-    }
-
-    @Volatile
     var serviceIsBound = false
         private set
 
-    override fun unbindService() {
-        serviceIsBound = false
+    override fun unbindTorService(): Boolean {
+        val boolean = super.unbindTorService()
+        if (boolean)
+            serviceIsBound = false
+        return boolean
     }
     override fun onBind(intent: Intent?): IBinder? {
         serviceIsBound = true
-        return torServiceBinder
+        return super.onBind(intent)
     }
 
 
@@ -64,11 +53,8 @@ internal class TestTorService(
     /// BroadcastReceiver ///
     /////////////////////////
     val torServiceReceiver by lazy {
-        TorServiceReceiver(
-            this
-        )
+        TorServiceReceiver(this)
     }
-
     override fun registerReceiver() {
         torServiceReceiver.register()
     }
@@ -97,17 +83,6 @@ internal class TestTorService(
     //////////////////////////////
     /// ServiceActionProcessor ///
     //////////////////////////////
-    val serviceActionProcessor by lazy {
-        ServiceActionProcessor(
-            this
-        )
-    }
-
-    override fun processServiceAction(serviceAction: ServiceAction) {
-        serviceActionProcessor.processServiceAction(serviceAction)
-    }
-
-    @Volatile
     var stopSelfCalled = false
         private set
 
@@ -121,40 +96,6 @@ internal class TestTorService(
     override fun stopService() {
         stopSelfCalled = true
         getScopeMain().launch { onDestroy() }
-    }
-
-
-    ///////////////////////////
-    /// ServiceNotification ///
-    ///////////////////////////
-    val serviceNotification = ServiceNotification.get()
-
-    override fun addNotificationActions() {
-        serviceNotification.addActions(this)
-    }
-    override fun removeNotification() {
-        serviceNotification.remove()
-    }
-    override fun removeNotificationActions() {
-        serviceNotification.removeActions(this)
-    }
-    override fun startForegroundService(): ServiceNotification {
-        return serviceNotification.startForeground(this)
-    }
-    override fun stopForegroundService(): ServiceNotification {
-        return serviceNotification.stopForeground(this)
-    }
-    override fun updateNotificationContentText(string: String) {
-        serviceNotification.updateContentText(string)
-    }
-    override fun updateNotificationContentTitle(title: String) {
-        serviceNotification.updateContentTitle(title)
-    }
-    override fun updateNotificationIcon(@NotificationImage notificationImage: Int) {
-        serviceNotification.updateIcon(this, notificationImage)
-    }
-    override fun updateNotificationProgress(show: Boolean, progress: Int?) {
-        serviceNotification.updateProgress(show, progress)
     }
 
 
@@ -216,8 +157,6 @@ internal class TestTorService(
         onionProxyManager.refreshBroadcastLoggersHasDebugLogsVar()
         refreshBroadcastLoggerWasCalled = true
     }
-
-
     override suspend fun signalNewNym() {
         serviceEventBroadcaster.broadcastNotice(
             "${TorControlCommands.SIGNAL_NEWNYM}: ${OnionProxyManager.NEWNYM_SUCCESS_MESSAGE}"
@@ -273,55 +212,8 @@ internal class TestTorService(
             .finishAndWriteToTorrcFile()
     }
 
-
-    ///////////////////////////////
-    /// TorServicePrefsListener ///
-    ///////////////////////////////
-    var torServicePrefsListener: TorServicePrefsListener? = null
-        private set
-
-    @Volatile
-    var torServicePrefsListenerIsRegistered = false
-        private set
-
-    override fun registerPrefsListener() {
-        torServicePrefsListener?.unregister()
-        torServicePrefsListener = TorServicePrefsListener(this)
-        torServicePrefsListenerIsRegistered = true
-    }
-    override fun unregisterPrefsListener() {
-        torServicePrefsListener?.unregister()
-        torServicePrefsListener = null
-        torServicePrefsListenerIsRegistered = false
-    }
-
-
-    override fun onCreate() {
-        serviceNotification.buildNotification(this)
-        broadcastLogger.notice("BuildConfig.DEBUG set to: $buildConfigDebug")
-        registerPrefsListener()
-    }
-
-    override fun onDestroy() {
-//        processIntent(Intent(ServiceAction.DESTROY))
-    }
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        BaseService.updateLastAcceptedServiceAction(ServiceActionName.START)
-        processServiceAction(ServiceActions.Start())
-        return START_STICKY
-    }
-
     override fun onTaskRemoved(rootIntent: Intent?) {
-        // Move to the foreground so we can properly shutdown w/o interrupting the
-        // application's normal lifecycle (Context.startServiceForeground does... thus,
-        // the complexity)
-        startForegroundService()
-
-        // Cancel the BackgroundManager's coroutine if it's active so it doesn't execute
-        torServiceBinder.cancelExecuteBackgroundPolicyJob()
-
-        broadcastLogger.debug("Task has been removed")
+        super.onTaskRemoved(rootIntent)
 
         // Shutdown Tor and stop the Service
         processServiceAction(ServiceActions.Stop())

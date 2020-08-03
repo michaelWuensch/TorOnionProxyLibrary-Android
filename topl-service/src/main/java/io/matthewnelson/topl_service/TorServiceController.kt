@@ -293,8 +293,7 @@ class TorServiceController private constructor(): ServiceConsts() {
 
             Companion.appEventBroadcaster = this.appEventBroadcaster
 
-            torServiceNotificationBuilder.build()
-            ServiceNotification.get().setupNotificationChannel(application.applicationContext)
+            torServiceNotificationBuilder.build(application.applicationContext)
 
             backgroundManagerPolicy.build(
                 TorService::class.java,

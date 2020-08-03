@@ -71,14 +71,20 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.IBinder
 import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.BuildConfig
 import io.matthewnelson.topl_service.notification.ServiceNotification
+import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
+import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
+import io.matthewnelson.topl_service.service.components.actions.ServiceActions
 import io.matthewnelson.topl_service.service.components.actions.ServiceActions.ServiceAction
 import io.matthewnelson.topl_service.service.components.binding.BaseServiceConnection
+import io.matthewnelson.topl_service.service.components.binding.TorServiceBinder
+import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import kotlinx.coroutines.CoroutineScope
@@ -194,7 +200,21 @@ internal abstract class BaseService: Service() {
     ///////////////
     /// Binding ///
     ///////////////
-    abstract fun unbindService()
+    private val torServiceBinder: TorServiceBinder by lazy {
+        TorServiceBinder(this)
+    }
+
+    open fun unbindTorService(): Boolean {
+        return try {
+            unbindService(context, TorServiceConnection.torServiceConnection)
+            true
+        } catch (e: IllegalArgumentException) {
+            false
+        }
+    }
+    override fun onBind(intent: Intent?): IBinder? {
+        return torServiceBinder
+    }
 
 
     /////////////////////////
@@ -214,22 +234,48 @@ internal abstract class BaseService: Service() {
     //////////////////////////////
     /// ServiceActionProcessor ///
     //////////////////////////////
-    abstract fun processServiceAction(serviceAction: ServiceAction)
-    abstract fun stopService()
+    private val serviceActionProcessor by lazy {
+        ServiceActionProcessor(this)
+    }
+
+    fun processServiceAction(serviceAction: ServiceAction) {
+        serviceActionProcessor.processServiceAction(serviceAction)
+    }
+    open fun stopService() {
+        stopSelf()
+    }
 
 
     ///////////////////////////
     /// ServiceNotification ///
     ///////////////////////////
-    abstract fun addNotificationActions()
-    abstract fun removeNotification()
-    abstract fun removeNotificationActions()
-    abstract fun startForegroundService(): ServiceNotification
-    abstract fun stopForegroundService(): ServiceNotification
-    abstract fun updateNotificationContentText(string: String)
-    abstract fun updateNotificationContentTitle(title: String)
-    abstract fun updateNotificationIcon(@NotificationImage notificationImage: Int)
-    abstract fun updateNotificationProgress(show: Boolean, progress: Int?)
+    private val serviceNotification: ServiceNotification
+        get() = ServiceNotification.serviceNotification
+
+    fun addNotificationActions() {
+        serviceNotification.addActions(this)
+    }
+    fun removeNotificationActions() {
+        serviceNotification.removeActions(this)
+    }
+    fun startForegroundService(): ServiceNotification {
+        return serviceNotification.startForeground(this)
+    }
+    fun stopForegroundService(): ServiceNotification {
+        return serviceNotification.stopForeground(this)
+    }
+    fun updateNotificationContentText(string: String) {
+        serviceNotification.updateContentText(string)
+    }
+    fun updateNotificationContentTitle(title: String) {
+        serviceNotification.updateContentTitle(title)
+    }
+    fun updateNotificationIcon(@NotificationImage notificationImage: Int) {
+        serviceNotification.updateIcon(this, notificationImage)
+    }
+    fun updateNotificationProgress(show: Boolean, progress: Int?) {
+        serviceNotification.updateProgress(show, progress)
+    }
 
 
     /////////////////
@@ -255,6 +301,50 @@ internal abstract class BaseService: Service() {
     ///////////////////////////////
     /// TorServicePrefsListener ///
     ///////////////////////////////
-    abstract fun registerPrefsListener()
-    abstract fun unregisterPrefsListener()
+    private var torServicePrefsListener: TorServicePrefsListener? = null
+
+    // TODO: register and unregister based on background/foreground state using
+    //  Background manager
+    private fun registerPrefsListener() {
+        torServicePrefsListener?.unregister()
+        torServicePrefsListener = TorServicePrefsListener(this)
+    }
+    private fun unregisterPrefsListener() {
+        torServicePrefsListener?.unregister()
+        torServicePrefsListener = null
+    }
+
+
+
+
+    override fun onCreate() {
+        serviceNotification.buildNotification(this)
+        registerPrefsListener()
+    }
+
+    override fun onDestroy() {
+        unregisterPrefsListener()
+        serviceNotification.remove()
+    }
+
+    /**
+     * No matter what Intent comes in, it will update [BaseService.lastAcceptedServiceAction]
+     * with [ServiceActionName.START] and then start Tor.
+     * */
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        updateLastAcceptedServiceAction(ServiceActionName.START)
+        processServiceAction(ServiceActions.Start())
+        return START_NOT_STICKY
+    }
+
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        // Cancel the BackgroundManager's coroutine if it's active so it doesn't execute
+        torServiceBinder.cancelExecuteBackgroundPolicyJob()
+
+        // Move to the foreground so we can properly shutdown w/o interrupting the
+        // application's normal lifecycle (Context.startServiceForeground does... thus,
+        // the complexity)
+        startForegroundService()
+    }
 }

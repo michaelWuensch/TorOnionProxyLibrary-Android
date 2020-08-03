@@ -100,7 +100,7 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
     fun processServiceAction(serviceAction: ServiceAction) {
         when (serviceAction) {
             is ServiceActions.Stop -> {
-                torService.unbindService()
+                torService.unbindTorService()
                 torService.unregisterReceiver()
                 clearActionQueue()
                 broadcastLogger.notice(serviceAction.name)

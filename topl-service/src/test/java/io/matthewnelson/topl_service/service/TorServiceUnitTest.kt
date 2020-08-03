@@ -60,7 +60,7 @@ internal class TorServiceUnitTest {
     private val serviceEventBroadcaster: ServiceEventBroadcaster
         get() = testTorService.serviceEventBroadcaster
     private val serviceNotification: ServiceNotification
-        get() = testTorService.serviceNotification
+        get() = ServiceNotification.serviceNotification
 
     @ExperimentalCoroutinesApi
     private val testDispatcher = TestCoroutineDispatcher()
@@ -190,7 +190,6 @@ internal class TorServiceUnitTest {
         }
 
         // Test TorServicePrefsListener is working (will refresh Loggers if tor is _not_ off)
-        assertEquals(true, testTorService.torServicePrefsListenerIsRegistered)
         val currentHasDebugLogsValue = testTorService.serviceTorSettings.hasDebugLogs
         val prefs = TorServicePrefs(app.applicationContext)
         assertTrue(!testTorService.refreshBroadcastLoggerWasCalled)
