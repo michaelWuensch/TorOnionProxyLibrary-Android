@@ -1,6 +1,9 @@
 TorOnionProxyLibrary-Android
 ===
-https://topl-android.matthewnelson.io
+## https://topl-android.matthewnelson.io
+
+<a href="https://donate.matthewnelson.io" target="_blank"><img height=80 
+alt="Donate to Matthew Nelson" src="docs/assets/bitcoindonate.png"/></a>
 
 ## License
 
