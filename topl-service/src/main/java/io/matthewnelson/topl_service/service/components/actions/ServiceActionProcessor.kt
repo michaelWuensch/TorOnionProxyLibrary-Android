@@ -72,11 +72,11 @@ import io.matthewnelson.topl_service.util.ServiceConsts
 import kotlinx.coroutines.*
 
 /**
- * [ServiceConsts.ServiceActionName]'s are translated to [ServiceAction]'s,
- * submitted to a queue, and then processed. This allows for sequential execution of
- * individual [ServiceConsts.ServiceActionCommand]'s for each [ServiceAction]
- * and the ability to quickly interrupt execution for reacting to User actions (such as
- * stopping, or clearing the task).
+ * This class allows for sequential execution of individual [ServiceConsts.ServiceActionCommand]'s
+ * for each [ServiceAction] and the ability to quickly interrupt execution for reacting to User
+ * actions (such as stopping, or clearing the task). Because there are various ways to interact
+ * with a Service (via Binding, BroadcastReceiver, or startService), this class acts as the funnel
+ * to standardize things.
  *
  * @param [torService] [BaseService] for interacting with other components of the Service
  * @see [ServiceActions]
@@ -93,6 +93,16 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
             restartTorDelayTime = restartMilliseconds
             stopServiceDelayTime = stopServiceMilliseconds
         }
+
+        //////////////////////////
+        /// Last ServiceAction ///
+        //////////////////////////
+        @Volatile
+        @ServiceActionName
+        private var lastServiceAction: String = ServiceActionName.STOP
+
+        fun wasLastAcceptedServiceActionStop(): Boolean =
+            lastServiceAction == ServiceActionName.STOP
     }
 
     private val broadcastLogger = torService.getBroadcastLogger(ServiceActionProcessor::class.java)
@@ -111,6 +121,9 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
                 torService.registerReceiver()
             }
         }
+
+        if (serviceAction.updateLastAction)
+            lastServiceAction = serviceAction.name
 
         if (addActionToQueue(serviceAction))
             launchProcessQueueJob()
