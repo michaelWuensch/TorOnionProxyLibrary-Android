@@ -262,7 +262,6 @@ class BackgroundManager internal constructor(
             BaseService.startService(
                 BaseService.getAppContext(),
                 serviceClass,
-                TorServiceConnection.torServiceConnection,
                 includeIntentActionStart = false,
                 bindServiceFlag = bindServiceFlag
             )

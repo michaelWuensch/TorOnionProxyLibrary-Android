@@ -173,7 +173,6 @@ internal abstract class BaseService: Service() {
          *
          * @param [context]
          * @param [serviceClass] The Service's class wanting to be started
-         * @param [serviceConn] The [TorServiceConnection] to bind to
          * @param [includeIntentActionStart] Boolean for including [ServiceActionName.START] as
          *   the Intent's Action.
          * @param [bindServiceFlag] The flag to use when binding to [TorService]
@@ -181,7 +180,6 @@ internal abstract class BaseService: Service() {
         fun startService(
             context: Context,
             serviceClass: Class<*>,
-            serviceConn: TorServiceConnection,
             includeIntentActionStart: Boolean = true,
             bindServiceFlag: Int = Context.BIND_AUTO_CREATE
         ) {
@@ -189,7 +187,11 @@ internal abstract class BaseService: Service() {
             if (includeIntentActionStart)
                 intent.action = ServiceActionName.START
             context.applicationContext.startService(intent)
-            context.applicationContext.bindService(intent, serviceConn, bindServiceFlag)
+            context.applicationContext.bindService(
+                intent,
+                TorServiceConnection.torServiceConnection,
+                bindServiceFlag
+            )
         }
 
         /**
@@ -201,9 +203,9 @@ internal abstract class BaseService: Service() {
          * @throws [IllegalArgumentException] If no binding exists for the provided [serviceConn]
          * */
         @Throws(IllegalArgumentException::class)
-        fun unbindService(context: Context, serviceConn: TorServiceConnection) {
-            serviceConn.clearServiceBinderReference()
-            context.applicationContext.unbindService(serviceConn)
+        fun unbindService(context: Context) {
+            TorServiceConnection.torServiceConnection.clearServiceBinderReference()
+            context.applicationContext.unbindService(TorServiceConnection.torServiceConnection)
         }
     }
 

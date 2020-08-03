@@ -339,11 +339,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * */
         @Throws(RuntimeException::class)
         fun startTor() =
-            BaseService.startService(
-                BaseService.getAppContext(),
-                TorService::class.java,
-                TorServiceConnection.torServiceConnection
-            )
+            BaseService.startService(BaseService.getAppContext(), TorService::class.java)
 
         /**
          * Stops [TorService].

@@ -105,7 +105,7 @@ internal class TorService: BaseService() {
 
     override fun unbindTorService() {
         try {
-            unbindService(context, TorServiceConnection.torServiceConnection)
+            unbindService(context)
             broadcastLogger.debug("Has been unbound")
         } catch (e: IllegalArgumentException) {}
     }
