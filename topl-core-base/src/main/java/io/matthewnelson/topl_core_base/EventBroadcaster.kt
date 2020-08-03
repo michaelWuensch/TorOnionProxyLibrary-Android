@@ -96,6 +96,7 @@ package io.matthewnelson.topl_core_base
  * allows for easier separation of messages based on the type, process or class.
  *
  * See [BaseConsts.BroadcastType]s
+ * @sample [io.matthewnelson.topl_service.service.components.onionproxy.ServiceEventBroadcaster]
  */
 abstract class EventBroadcaster: BaseConsts() {
 
