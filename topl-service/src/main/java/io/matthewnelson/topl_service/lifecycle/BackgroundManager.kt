@@ -72,6 +72,7 @@ import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.TorService
+import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.binding.BaseServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts
 
@@ -255,15 +256,20 @@ class BackgroundManager internal constructor(
     private fun applicationMovedToForeground() {
         // if the last _accepted_ ServiceAction to be issued by the Application was not to STOP
         // the service, then we want to put it back in the state it was in
-        if (!BaseService.wasLastAcceptedServiceActionStop()) {
+        if (!ServiceActionProcessor.wasLastAcceptedServiceActionStop()) {
             BaseServiceConnection.serviceBinder?.cancelExecuteBackgroundPolicyJob()
-            BaseService.startService(BaseService.getAppContext(), serviceClass, serviceConnection)
+            BaseService.startService(
+                BaseService.getAppContext(),
+                serviceClass,
+                serviceConnection,
+                includeIntentActionStart = false
+            )
         }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     private fun applicationMovedToBackground() {
-        if (!BaseService.wasLastAcceptedServiceActionStop())
+        if (!ServiceActionProcessor.wasLastAcceptedServiceActionStop())
             BaseServiceConnection.serviceBinder?.executeBackgroundPolicyJob(policy, executionDelay)
     }
 }

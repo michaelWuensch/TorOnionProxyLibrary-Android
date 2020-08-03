@@ -216,6 +216,6 @@ internal class TestTorService(
         super.onTaskRemoved(rootIntent)
 
         // Shutdown Tor and stop the Service
-        processServiceAction(ServiceActions.Stop())
+        processServiceAction(ServiceActions.Stop(updateLastServiceAction = false))
     }
 }

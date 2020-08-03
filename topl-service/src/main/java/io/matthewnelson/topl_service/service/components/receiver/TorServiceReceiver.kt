@@ -128,19 +128,13 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
 
             when (val serviceAction = intent.getStringExtra(SERVICE_INTENT_FILTER)) {
                 ServiceActionName.NEW_ID -> {
-                    BaseServiceConnection.serviceBinder?.submitServiceAction(
-                        ServiceActions.NewId()
-                    )
+                    torService.processServiceAction(ServiceActions.NewId())
                 }
                 ServiceActionName.RESTART_TOR -> {
-                    BaseServiceConnection.serviceBinder?.submitServiceAction(
-                        ServiceActions.RestartTor()
-                    )
+                    torService.processServiceAction(ServiceActions.RestartTor())
                 }
                 ServiceActionName.STOP -> {
-                    BaseServiceConnection.serviceBinder?.submitServiceAction(
-                        ServiceActions.Stop()
-                    )
+                    torService.processServiceAction(ServiceActions.Stop())
                 }
                 else -> {
                     broadcastLogger.warn(
