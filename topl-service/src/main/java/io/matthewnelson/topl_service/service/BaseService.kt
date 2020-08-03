@@ -340,15 +340,12 @@ internal abstract class BaseService: Service() {
 
 
     override fun onTaskRemoved(rootIntent: Intent?) {
+        // Cancel the BackgroundManager's coroutine if it's active so it doesn't execute
+        torServiceBinder.cancelExecuteBackgroundPolicyJob()
+
         // Move to the foreground so we can properly shutdown w/o interrupting the
         // application's normal lifecycle (Context.startServiceForeground does... thus,
         // the complexity)
         startForegroundService()
-
-        // Cancel the BackgroundManager's coroutine if it's active so it doesn't execute
-        torServiceBinder.cancelExecuteBackgroundPolicyJob()
-
-        // Shutdown Tor and stop the Service
-        processServiceAction(ServiceActions.Stop())
     }
 }

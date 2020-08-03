@@ -16,6 +16,7 @@ import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorIns
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
+import io.matthewnelson.topl_service.service.components.actions.ServiceActions
 import io.matthewnelson.topl_service.service.components.receiver.TorServiceReceiver
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.TestCoroutineScope
@@ -209,5 +210,12 @@ internal class TestTorService(
             .updateTorSettings()
 //            .setGeoIpFiles()
             .finishAndWriteToTorrcFile()
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+
+        // Shutdown Tor and stop the Service
+        processServiceAction(ServiceActions.Stop())
     }
 }

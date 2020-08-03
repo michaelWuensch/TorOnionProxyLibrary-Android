@@ -118,6 +118,7 @@ internal class TorServiceBinder(private val torService: BaseService): Binder() {
                         delay(executionDelay)
                         if (isActive && BaseServiceConnection.serviceBinder != null) {
                             bgMgrBroadcastLogger.debug("Executing background management policy")
+                            torService.stopForegroundService()
                             torService.startForegroundService()
                             torService.stopForegroundService()
                         }

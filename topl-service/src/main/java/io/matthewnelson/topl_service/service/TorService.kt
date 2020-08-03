@@ -73,6 +73,7 @@ import io.matthewnelson.topl_core.OnionProxyManager
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core.util.FileUtilities
 import io.matthewnelson.topl_service.TorServiceController
+import io.matthewnelson.topl_service.service.components.actions.ServiceActions
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceEventBroadcaster
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceEventListener
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorInstaller
@@ -234,7 +235,10 @@ internal class TorService: BaseService() {
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
-        broadcastLogger.debug("Task has been removed")
         super.onTaskRemoved(rootIntent)
+        broadcastLogger.debug("Task has been removed")
+
+        // Shutdown Tor and stop the Service
+        processServiceAction(ServiceActions.Stop())
     }
 }
