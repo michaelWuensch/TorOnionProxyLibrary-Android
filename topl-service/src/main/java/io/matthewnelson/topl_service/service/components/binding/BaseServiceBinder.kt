@@ -67,6 +67,7 @@
 package io.matthewnelson.topl_service.service.components.binding
 
 import android.os.Binder
+import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
 import io.matthewnelson.topl_service.service.components.actions.ServiceActions
@@ -95,7 +96,9 @@ internal abstract class BaseServiceBinder(private val torService: BaseService): 
     //////////////////////////////////////////
     /// BackgroundManager Policy Execution ///
     //////////////////////////////////////////
-    private val bgMgrBroadcastLogger = torService.getBroadcastLogger(BackgroundManager::class.java)
+    private val bgMgrBroadcastLogger: BroadcastLogger by lazy {
+        torService.getBroadcastLogger(BackgroundManager::class.java)
+    }
     private var backgroundPolicyExecutionJob: Job? = null
 
     /**
