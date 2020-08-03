@@ -83,14 +83,9 @@ internal class TorServiceBinder(private val torService: BaseService): Binder() {
     /**
      * Accepts all [ServiceActions] except [ServiceActions.Start], which gets issued via
      * [io.matthewnelson.topl_service.service.TorService.onStartCommand].
-     *
-     * To be used **only** by interactions coming from the User or Application so
-     * [BaseService.lastAcceptedServiceAction] stays in sync.
      * */
     fun submitServiceAction(serviceAction: ServiceAction) {
         if (serviceAction is ServiceActions.Start) return
-
-        BaseService.updateLastAcceptedServiceAction(serviceAction.name)
         torService.processServiceAction(serviceAction)
     }
 
@@ -127,7 +122,9 @@ internal class TorServiceBinder(private val torService: BaseService): Binder() {
                 BackgroundPolicy.RESPECT_RESOURCES -> {
                     delay(executionDelay)
                     bgMgrBroadcastLogger.debug("Executing background management policy")
-                    torService.processServiceAction(ServiceActions.Stop())
+                    torService.processServiceAction(
+                        ServiceActions.Stop(updateLastServiceAction = false)
+                    )
                 }
             }
         }
