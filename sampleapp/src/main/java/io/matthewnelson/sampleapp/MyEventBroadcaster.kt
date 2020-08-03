@@ -74,6 +74,8 @@ import io.matthewnelson.topl_service.util.ServiceUtilities
 
 /**
  * @suppress
+ * @see [TorServiceEventBroadcaster]
+ * @see [io.matthewnelson.topl_core_base.EventBroadcaster]
  * */
 class MyEventBroadcaster: TorServiceEventBroadcaster() {
 
