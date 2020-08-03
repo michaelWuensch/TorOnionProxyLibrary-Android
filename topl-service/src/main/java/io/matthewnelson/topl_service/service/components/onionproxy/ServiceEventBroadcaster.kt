@@ -67,6 +67,7 @@
 package io.matthewnelson.topl_service.service.components.onionproxy
 
 import io.matthewnelson.topl_core.OnionProxyManager
+import io.matthewnelson.topl_core.listener.BaseEventListener
 import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.service.BaseService
@@ -205,21 +206,39 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
     private fun isBootstrappingComplete(): Boolean =
         bootstrapProgress == "Bootstrapped 100%"
 
+    @Volatile
+    private var controlPort: String? = null
+    @Volatile
+    private var httpTunnelPort: String? = null
+    @Volatile
+    private var socksPort: String? = null
+
     override fun broadcastNotice(msg: String) {
 
         when {
+            // ServiceActionProcessor
+            msg.contains(ServiceActionProcessor::class.java.simpleName) -> {
+                handleServiceActionProcessorMsg(msg)
+            }
             // BOOTSTRAPPED
-            // NOTICE|BaseEventListener|Bootstrapped 5% (conn): Connecting to a relay
             msg.contains("Bootstrapped") -> {
                 handleBootstrappedMsg(msg)
+            }
+            // Control Port
+            msg.contains("Successfully connected to Control Port:") -> {
+                handleControlPortMsg(msg)
+            }
+            // Http Tunnel Port
+            msg.contains("Opened HTTP tunnel listener on ") -> {
+                handleHttpTunnelPortMsg(msg)
+            }
+            // Socks Port
+            msg.contains("Opened Socks listener on ") -> {
+                handleSocksPortMsg(msg)
             }
             // NEWNYM
             msg.contains(TorControlCommands.SIGNAL_NEWNYM) -> {
                 handleNewNymMsg(msg)
-            }
-            // ServiceActionProcessor
-            msg.contains(ServiceActionProcessor::class.java.simpleName) -> {
-                handleServiceActionProcessorMsg(msg)
             }
         }
 
@@ -228,6 +247,7 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
         }
     }
 
+    // NOTICE|BaseEventListener|Bootstrapped 5% (conn): Connecting to a relay
     private fun handleBootstrappedMsg(msg: String) {
         val msgSplit = msg.split(" ")
         msgSplit.elementAtOrNull(2)?.let {
@@ -237,6 +257,7 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
                 torService.updateNotificationContentText(bootstrapped)
 
                 if (bootstrapped == "Bootstrapped 100%") {
+                    updateAppEventBroadcasterWithPortInfo()
                     torService.updateNotificationIcon(NotificationImage.ENABLED)
                     torService.updateNotificationProgress(true, 100)
                     torService.updateNotificationProgress(false, null)
@@ -255,6 +276,24 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
                 bootstrapProgress = bootstrapped
             }
         }
+    }
+
+    // NOTICE|OnionProxyManager|Successfully connected to Control Port: 44201
+    private fun handleControlPortMsg(msg: String) {
+        val port = msg.split(":")[1].trim()
+        controlPort = "127.0.0.1:$port"
+    }
+
+    // NOTICE|BaseEventListener|Opened HTTP tunnel listener on 127.0.0.1:37397
+    private fun handleHttpTunnelPortMsg(msg: String) {
+        val port = msg.split(":")[1].trim()
+        httpTunnelPort = "127.0.0.1:$port"
+    }
+
+    // NOTICE|BaseEventListener|Opened Socks listener on 127.0.0.1:9051
+    private fun handleSocksPortMsg(msg: String) {
+        val port = msg.split(":")[1].trim()
+        socksPort = "127.0.0.1:$port"
     }
 
     private fun handleNewNymMsg(msg: String) {
@@ -300,6 +339,16 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
         }
     }
 
+    private fun updateAppEventBroadcasterWithPortInfo() {
+        TorServiceController.appEventBroadcaster?.let {
+            scopeMain.launch {
+                it.broadcastControlPortAddress(controlPort)
+                it.broadcastHttpPortAddress(httpTunnelPort)
+                it.broadcastSocksPortAddress(socksPort)
+            }
+        }
+    }
+
     /**
      * Display a message in the notification's ContentText space for the defined
      * [delayMilliSeconds], after which (if Tor is connected), publish to the Notification's
@@ -335,6 +384,10 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
     override fun broadcastTorState(@TorState state: String, @TorNetworkState networkState: String) {
         if (torState == TorState.ON && state != torState) {
             bootstrapProgress = ""
+            controlPort = null
+            httpTunnelPort = null
+            socksPort = null
+            updateAppEventBroadcasterWithPortInfo()
             torService.removeNotificationActions()
         }
 

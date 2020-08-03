@@ -68,13 +68,61 @@ package io.matthewnelson.sampleapp
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import io.matthewnelson.topl_core_base.EventBroadcaster
+import io.matthewnelson.topl_core_base.BaseConsts
+import io.matthewnelson.topl_service.service.components.onionproxy.TorServiceEventBroadcaster
 import io.matthewnelson.topl_service.util.ServiceUtilities
 
 /**
  * @suppress
+ * @see [TorServiceEventBroadcaster]
+ * @see [io.matthewnelson.topl_core_base.EventBroadcaster]
  * */
-class MyEventBroadcaster: EventBroadcaster() {
+class MyEventBroadcaster: TorServiceEventBroadcaster() {
+
+
+    //////////////////////////
+    /// ControlPortAddress ///
+    //////////////////////////
+
+    // Make Volatile so that if referencing on a different thread, we get
+    // the update immediately
+    @Volatile
+    var controlPortAddress: String? = null
+        private set
+
+    override fun broadcastControlPortAddress(controlPortAddress: String?) {
+        this.controlPortAddress = controlPortAddress
+    }
+
+
+    ////////////////////////
+    /// SocksPortAddress ///
+    ////////////////////////
+
+    // Make Volatile so that if referencing on a different thread, we get
+    // the update immediately
+    @Volatile
+    var socksPortAddress: String? = null
+        private set
+
+    override fun broadcastSocksPortAddress(socksPortAddress: String?) {
+        this.socksPortAddress = socksPortAddress
+    }
+
+
+    ///////////////////////
+    /// HttpPortAddress ///
+    ///////////////////////
+
+    // Make Volatile so that if referencing on a different thread, we get
+    // the update immediately
+    @Volatile
+    var httpPortAddress: String? = null
+        private set
+
+    override fun broadcastHttpPortAddress(httpPortAddress: String?) {
+        this.httpPortAddress = httpPortAddress
+    }
 
 
     /////////////////
@@ -137,15 +185,15 @@ class MyEventBroadcaster: EventBroadcaster() {
     ///////////////////
     inner class TorStateData(val state: String, val networkState: String)
 
-    private var lastState = TorState.OFF
-    private var lastNetworkState = TorNetworkState.DISABLED
+    private var lastState = BaseConsts.TorState.OFF
+    private var lastNetworkState = BaseConsts.TorNetworkState.DISABLED
 
     private val _liveTorState = MutableLiveData<TorStateData>(
         TorStateData(lastState, lastNetworkState)
     )
     val liveTorState: LiveData<TorStateData> = _liveTorState
 
-    override fun broadcastTorState(@TorState state: String, @TorNetworkState networkState: String) {
+    override fun broadcastTorState(@BaseConsts.TorState state: String, @BaseConsts.TorNetworkState networkState: String) {
         if (state == lastState && networkState == lastNetworkState) return
 
         lastState = state

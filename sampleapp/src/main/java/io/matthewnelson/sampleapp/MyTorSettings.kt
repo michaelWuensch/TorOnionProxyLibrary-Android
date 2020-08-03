@@ -69,8 +69,8 @@ package io.matthewnelson.sampleapp
 import io.matthewnelson.topl_core_base.TorSettings
 
 /**
- * See [TorSettings] for comments on what is what.
  * @suppress
+ * @see [TorSettings]
  * */
 class MyTorSettings: TorSettings() {
 
@@ -93,7 +93,7 @@ class MyTorSettings: TorSettings() {
         get() = DEFAULT__EXIT_NODES
 
     override val httpTunnelPort: String
-        get() = DEFAULT__HTTP_TUNNEL_PORT
+        get() = "auto"
 
     override val listOfSupportedBridges: List<@SupportedBridges String>
         get() = arrayListOf(SupportedBridges.MEEK, SupportedBridges.OBFS4)
@@ -129,7 +129,7 @@ class MyTorSettings: TorSettings() {
         get() = null
 
     override val socksPort: String
-        get() = "9051"
+        get() = "auto"
 
     override val virtualAddressNetwork: String?
         get() = "10.192.0.2/10"

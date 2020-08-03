@@ -63,75 +63,56 @@
 *     exception. If you modify "The Interfaces", this exception does not apply to your
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
-*
-* `===========================================================================`
-* `+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++`
-* `===========================================================================`
-*
-* The original code, prior to commit hash 74407114cbfa8ea6f2ac51417dda8be98d8aba86,
-* was:
-*
-*     Copyright (c) Microsoft Open Technologies, Inc.
-*     All Rights Reserved
-*
-*     Licensed under the Apache License, Version 2.0 (the "License");
-*     you may not use this file except in compliance with the License.
-*     You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
-*
-*
-*     THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR
-*     CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
-*     WITHOUT LIMITATION ANY IMPLIED WARRANTIES OR CONDITIONS OF TITLE,
-*     FITNESS FOR A PARTICULAR PURPOSE, MERCHANTABLITY OR NON-INFRINGEMENT.
-*
-*     See the Apache 2 License for the specific language governing permissions and
-*     limitations under the License.
 * */
-package io.matthewnelson.topl_core_base
+package io.matthewnelson.topl_service.service.components.onionproxy
+
+import io.matthewnelson.topl_core_base.EventBroadcaster
 
 /**
- * Service for sending event logs to the system.
+ * Adds broadcasting methods to the [EventBroadcaster] to update you with information about
+ * what addresses Tor is operating on. Very helpful when choosing "auto" in your
+ * [io.matthewnelson.topl_core_base.TorSettings] to easily identifying what addresses to
+ * use for making network calls, as well as being notified when Tor is ready to be used.
  *
- * Both `topl-core` and `topl-service` utilize this class to broadcast messages. This
- * allows for easier separation of messages based on the type, process or class.
+ * The addresses will be broadcast to you after Tor has been fully Bootstrapped. If Tor is
+ * stopped (ie. it's [io.matthewnelson.topl_core_base.BaseConsts.TorState] changes from **ON**
+ * to **OFF**), `null` will be broadcast.
  *
- * See [BaseConsts.BroadcastType]s
- * @sample [io.matthewnelson.topl_service.service.components.onionproxy.ServiceEventBroadcaster]
- */
-abstract class EventBroadcaster: BaseConsts() {
+ * All broadcasts to your implementation to this class will occur on the Main thread.
+ *
+ * @sample [io.matthewnelson.sampleapp.MyEventBroadcaster]
+ * */
+abstract class TorServiceEventBroadcaster: EventBroadcaster() {
 
     /**
-     * [bytesRead] = bytes downloaded
-     * [bytesWritten] = bytes uploaded
+     * Override this method to implement receiving of the control port address that Tor
+     * is operating on.
+     *
+     * Example of what will be broadcast:
+     *
+     *   - "127.0.0.1:33432"
      * */
-    abstract fun broadcastBandwidth(bytesRead: String, bytesWritten: String)
+    abstract fun broadcastControlPortAddress(controlPortAddress: String?)
 
     /**
-     * ("DEBUG|ClassName|msg")
+     * Override this method to implement receiving of the Socks port address that Tor
+     * is operating on (if you've specified a
+     * [io.matthewnelson.topl_core_base.TorSettings.socksPort]).
+     *
+     * Example of what will be broadcast:
+     *
+     *   - "127.0.0.1:9051"
      * */
-    abstract fun broadcastDebug(msg: String)
+    abstract fun broadcastSocksPortAddress(socksPortAddress: String?)
 
     /**
-     * ("EXCEPTION|ClassName|msg", e)
+     * Override this method to implement receiving of the http port address that Tor
+     * is operating on (if you've specified a
+     * [io.matthewnelson.topl_core_base.TorSettings.httpTunnelPort]).
+     *
+     * Example of what will be broadcast:
+     *
+     *   - "127.0.0.1:33432"
      * */
-    abstract fun broadcastException(msg: String?, e: Exception)
-
-    /**
-     * Not yet implemented in either module.
-     * */
-    abstract fun broadcastLogMessage(logMessage: String?)
-
-    /**
-     * Will be one of:
-     *  - ("ERROR|ClassName|msg")
-     *  - ("NOTICE|ClassName|msg")
-     *  - ("WARN|ClassName|msg")
-     * */
-    abstract fun broadcastNotice(msg: String)
-
-    /**
-     * See [BaseConsts.TorState] and [BaseConsts.TorNetworkState]
-     * */
-    abstract fun broadcastTorState(@TorState state: String, @TorNetworkState networkState: String)
-
+    abstract fun broadcastHttpPortAddress(httpPortAddress: String?)
 }

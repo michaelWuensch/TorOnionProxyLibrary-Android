@@ -176,12 +176,14 @@ abstract class TorSettings: BaseConsts() {
     abstract val exitNodes: String?
 
     /**
+     * Could be "auto" or a specific port, such as "8288".
+     *
      * TorBrowser and Orbot use "8218" by default. It may be wise to pick something
      * that won't conflict if you're using this setting.
      *
      * Docs: https://2019.www.torproject.org/docs/tor-manual.html.en#HTTPTunnelPort
      *
-     * See [DEFAULT__HTTP_TUNNEL_PORT]
+     * See [DEFAULT__HTTP_TUNNEL_PORT] ("0", to disable it)
      *
      * TODO: Change to List<String> and update TorSettingsBuilder method for
      *  multi-port support.
@@ -262,7 +264,7 @@ abstract class TorSettings: BaseConsts() {
     abstract val relayPort: Int?
 
     /**
-     * Could be "auto" or a specified port, such as "9051".
+     * Could be "auto" or a specific port, such as "9051".
      *
      * TorBrowser uses "9150", and Orbot uses "9050" by default. It may be wise
      * to pick something that won't conflict.
