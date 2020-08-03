@@ -166,12 +166,29 @@ internal abstract class BaseService: Service() {
         /// ServiceStartup ///
         //////////////////////
 
+        /**
+         * Starts the Service. Setting [includeIntentActionStart] to `false`, will not include
+         * [ServiceActionName.START] in the Intent as an action so that [onStartCommand] knows
+         * to set the [ServiceActions.Start.updateLastAction] to false. This allows for
+         * distinguishing what is coming from the application (either by user input, or how
+         * the application has the library implemented), and what is coming from this library.
+         * It makes keeping the state of the service in sync with the application's desires.
+         *
+         * @param [context]
+         * @param [serviceClass] The Service's class wanting to be started
+         * @param [serviceConn] The [BaseServiceConnection] to bind to
+         * @param [includeIntentActionStart] Boolean for including [ServiceActionName.START] as
+         *   the Intent's Action.
+         * */
         fun startService(
             context: Context,
             serviceClass: Class<*>,
-            serviceConn: BaseServiceConnection
+            serviceConn: BaseServiceConnection,
+            includeIntentActionStart: Boolean = true
         ) {
             val intent = Intent(context.applicationContext, serviceClass)
+            if (includeIntentActionStart)
+                intent.action = ServiceActionName.START
             context.applicationContext.startService(intent)
             context.applicationContext.bindService(intent, serviceConn, Context.BIND_AUTO_CREATE)
         }
@@ -328,12 +345,17 @@ internal abstract class BaseService: Service() {
     }
 
     /**
-     * No matter what Intent comes in, it will update [BaseService.lastAcceptedServiceAction]
-     * with [ServiceActionName.START] and then start Tor.
+     * No matter what Intent comes in, it starts Tor. If the Intent comes with no Action,
+     * it will not update [ServiceActionProcessor.lastServiceAction].
+     *
+     * @see [Companion.startService]
      * */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        updateLastAcceptedServiceAction(ServiceActionName.START)
-        processServiceAction(ServiceActions.Start())
+        if (intent?.action == ServiceActionName.START)
+            processServiceAction(ServiceActions.Start())
+        else
+            processServiceAction(ServiceActions.Start(updateLastServiceAction = false))
+
         return START_NOT_STICKY
     }
 
