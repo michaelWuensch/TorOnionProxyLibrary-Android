@@ -259,10 +259,6 @@ internal class TorService: BaseService() {
         supervisorJob.cancel()
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        return super.onStartCommand(intent, flags, startId)
-    }
-
     override fun onTaskRemoved(rootIntent: Intent?) {
         // Cancel the BackgroundManager's coroutine if it's active so it doesn't execute
         torServiceBinder.cancelExecuteBackgroundPolicyJob()
