@@ -176,18 +176,20 @@ internal abstract class BaseService: Service() {
          * @param [serviceConn] The [TorServiceConnection] to bind to
          * @param [includeIntentActionStart] Boolean for including [ServiceActionName.START] as
          *   the Intent's Action.
+         * @param [bindServiceFlag] The flag to use when binding to [TorService]
          * */
         fun startService(
             context: Context,
             serviceClass: Class<*>,
             serviceConn: TorServiceConnection,
-            includeIntentActionStart: Boolean = true
+            includeIntentActionStart: Boolean = true,
+            bindServiceFlag: Int = Context.BIND_AUTO_CREATE
         ) {
             val intent = Intent(context.applicationContext, serviceClass)
             if (includeIntentActionStart)
                 intent.action = ServiceActionName.START
             context.applicationContext.startService(intent)
-            context.applicationContext.bindService(intent, serviceConn, Context.BIND_AUTO_CREATE)
+            context.applicationContext.bindService(intent, serviceConn, bindServiceFlag)
         }
 
         /**
