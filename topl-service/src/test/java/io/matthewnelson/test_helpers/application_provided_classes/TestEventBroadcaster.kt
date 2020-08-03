@@ -66,29 +66,25 @@
  */
 package io.matthewnelson.test_helpers.application_provided_classes
 
-import io.matthewnelson.topl_core_base.EventBroadcaster
+import io.matthewnelson.topl_service.service.components.onionproxy.TorServiceEventBroadcaster
 
-class TestEventBroadcaster: EventBroadcaster() {
+class TestEventBroadcaster: TorServiceEventBroadcaster() {
 
-    override fun broadcastBandwidth(bytesRead: String, bytesWritten: String) {
+    override fun broadcastControlPortAddress(controlPortAddress: String?) {}
 
-    }
+    override fun broadcastSocksPortAddress(socksPortAddress: String?) {}
 
-    override fun broadcastDebug(msg: String) {
+    override fun broadcastHttpPortAddress(httpPortAddress: String?) {}
 
-    }
+    override fun broadcastBandwidth(bytesRead: String, bytesWritten: String) {}
 
-    override fun broadcastException(msg: String?, e: Exception) {
+    override fun broadcastDebug(msg: String) {}
 
-    }
+    override fun broadcastException(msg: String?, e: Exception) {}
 
-    override fun broadcastLogMessage(logMessage: String?) {
+    override fun broadcastLogMessage(logMessage: String?) {}
 
-    }
-
-    override fun broadcastNotice(msg: String) {
-
-    }
+    override fun broadcastNotice(msg: String) {}
 
     @Volatile
     var torState = TorState.OFF
