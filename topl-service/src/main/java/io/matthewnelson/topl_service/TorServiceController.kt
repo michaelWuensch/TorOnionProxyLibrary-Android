@@ -295,10 +295,7 @@ class TorServiceController private constructor(): ServiceConsts() {
 
             torServiceNotificationBuilder.build(application.applicationContext)
 
-            backgroundManagerPolicy.build(
-                TorService::class.java,
-                TorServiceConnection.torServiceConnection
-            )
+            backgroundManagerPolicy.build()
         }
     }
 

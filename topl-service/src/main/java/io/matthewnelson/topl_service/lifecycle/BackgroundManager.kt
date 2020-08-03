@@ -66,6 +66,7 @@
 * */
 package io.matthewnelson.topl_service.lifecycle
 
+import android.content.Context
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -117,7 +118,7 @@ import io.matthewnelson.topl_service.util.ServiceConsts
  * @param [executionDelay] Length of time before the policy gets executed *after* the application
  *   is sent to the background.
  * @param [serviceClass] The Service class being managed
- * @param [serviceConnection] The ServiceConnection being used to bind with
+ * @param [bindServiceFlag] The flag to be used when binding to the service
  * @see [io.matthewnelson.topl_service.service.components.binding.BaseServiceBinder.executeBackgroundPolicyJob]
  * @see [io.matthewnelson.topl_service.service.components.binding.BaseServiceBinder.cancelExecuteBackgroundPolicyJob]
  * */
@@ -125,7 +126,7 @@ class BackgroundManager internal constructor(
     @BackgroundPolicy private val policy: String,
     private val executionDelay: Long,
     private val serviceClass: Class<*>,
-    private val serviceConnection: TorServiceConnection
+    private val bindServiceFlag: Int
 ): ServiceConsts(), LifecycleObserver {
 
 
@@ -213,8 +214,8 @@ class BackgroundManager internal constructor(
              * test classes get initialized so they aren't overwritten by production classes.
              * */
             internal fun build(
-                serviceClass: Class<*>,
-                serviceConnection: TorServiceConnection
+                serviceClass: Class<*> = TorService::class.java,
+                bindServiceFlag: Int = Context.BIND_AUTO_CREATE
             ) {
 
                 // Only initialize it once. Reflection has issues here
@@ -227,7 +228,7 @@ class BackgroundManager internal constructor(
                             policyBuilder.chosenPolicy,
                             policyBuilder.executionDelay,
                             serviceClass,
-                            serviceConnection
+                            bindServiceFlag
                         )
                 }
             }
@@ -261,8 +262,9 @@ class BackgroundManager internal constructor(
             BaseService.startService(
                 BaseService.getAppContext(),
                 serviceClass,
-                serviceConnection,
-                includeIntentActionStart = false
+                TorServiceConnection.torServiceConnection,
+                includeIntentActionStart = false,
+                bindServiceFlag = bindServiceFlag
             )
         }
     }
