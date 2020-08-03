@@ -139,6 +139,20 @@ internal class TorService: BaseService() {
     }
 
 
+    //////////////////////////////
+    /// ServiceActionProcessor ///
+    //////////////////////////////
+
+    // See BaseService
+
+
+    ///////////////////////////
+    /// ServiceNotification ///
+    ///////////////////////////
+
+    // See BaseService
+
+
     /////////////////
     /// TOPL-Core ///
     /////////////////
@@ -223,6 +237,12 @@ internal class TorService: BaseService() {
     }
 
 
+    ///////////////////////////////
+    /// TorServicePrefsListener ///
+    ///////////////////////////////
+
+    // See BaseService
+
 
     override fun onCreate() {
         broadcastLogger.notice("Created. BuildConfig.DEBUG set to: $buildConfigDebug")
@@ -232,6 +252,10 @@ internal class TorService: BaseService() {
     override fun onDestroy() {
         super.onDestroy()
         supervisorJob.cancel()
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {

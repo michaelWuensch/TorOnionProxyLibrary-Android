@@ -85,7 +85,6 @@ import io.matthewnelson.topl_service.service.components.actions.ServiceActions.S
 import io.matthewnelson.topl_service.service.components.binding.BaseServiceConnection
 import io.matthewnelson.topl_service.service.components.binding.TorServiceBinder
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
-import io.matthewnelson.topl_service.service.components.receiver.TorServiceReceiver
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import kotlinx.coroutines.CoroutineScope
