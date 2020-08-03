@@ -113,6 +113,7 @@ git push
         - `pipenv shell`
         - `mkdocs serve` to check locally
         - `mkdocs gh-deploy` to deploy
+        - Check settings in GitHub that it did not revert the url back to use `github.io`
         - Ensure docs are served <a href="https://topl-android.matthewnelson.io" target="_blank">Here</a>
         - `exit`
     - Sign SampleApp release apks:
