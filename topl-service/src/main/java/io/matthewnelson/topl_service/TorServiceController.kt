@@ -79,6 +79,7 @@ import io.matthewnelson.topl_service.service.components.binding.BaseServiceConne
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.actions.ServiceActions
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
+import io.matthewnelson.topl_service.service.components.onionproxy.TorServiceEventBroadcaster
 import io.matthewnelson.topl_service.util.ServiceConsts
 
 class TorServiceController private constructor(): ServiceConsts() {
@@ -134,7 +135,7 @@ class TorServiceController private constructor(): ServiceConsts() {
         private val geoip6AssetPath: String
     ) {
 
-        private var appEventBroadcaster: EventBroadcaster? = Companion.appEventBroadcaster
+        private var appEventBroadcaster: TorServiceEventBroadcaster? = Companion.appEventBroadcaster
 //        private var heartbeatTime = BackgroundManager.heartbeatTime
         private var restartTorDelayTime = ServiceActionProcessor.restartTorDelayTime
         private var stopServiceDelayTime = ServiceActionProcessor.stopServiceDelayTime
@@ -240,7 +241,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * NOTE: You will, ofc, have to cast [Companion.appEventBroadcaster] as whatever your
          * class actually is.
          * */
-        fun setEventBroadcaster(eventBroadcaster: EventBroadcaster): Builder {
+        fun setEventBroadcaster(eventBroadcaster: TorServiceEventBroadcaster): Builder {
             this.appEventBroadcaster = eventBroadcaster
             return this
         }
@@ -306,7 +307,7 @@ class TorServiceController private constructor(): ServiceConsts() {
      * Where everything needed to interact with [TorService] resides.
      * */
     companion object {
-        var appEventBroadcaster: EventBroadcaster? = null
+        var appEventBroadcaster: TorServiceEventBroadcaster? = null
             private set
 
         /**
