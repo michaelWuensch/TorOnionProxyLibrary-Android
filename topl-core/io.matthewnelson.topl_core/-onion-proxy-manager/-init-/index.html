@@ -421,23 +421,7 @@ module, and ensures synchronicity is had.</p>
 with &lsquo;synchronized&rsquo;. Given the way this class is used there shouldn&rsquo;t be any performance
 implications of this.</p>
 <p>This class began life as TorPlugin from the Briar Project</p>
-<div class="highlight"><pre><span></span><code><span class="k">val</span> <span class="py">serviceTorInstaller</span> <span class="p">=</span> <span class="n">ServiceTorInstaller</span><span class="p">(</span>
-    <span class="n">torService</span><span class="p">,</span>
-    <span class="n">torConfigFiles</span><span class="p">,</span>
-    <span class="n">buildConfigVersionCode</span><span class="p">,</span>
-    <span class="n">buildConfigDebug</span> <span class="o">?:</span> <span class="n">BuildConfig</span><span class="p">.</span><span class="n">DEBUG</span><span class="p">,</span>
-    <span class="n">geoipAssetPath</span><span class="p">,</span>
-    <span class="n">geoip6AssetPath</span>
-<span class="p">)</span>
-<span class="n">onionProxyManager</span> <span class="p">=</span> <span class="n">OnionProxyManager</span><span class="p">(</span>
-    <span class="n">torService</span><span class="p">,</span>
-    <span class="n">torConfigFiles</span><span class="p">,</span>
-    <span class="n">serviceTorInstaller</span><span class="p">,</span>
-    <span class="n">ServiceTorSettings</span><span class="p">(</span><span class="n">torSettings</span><span class="p">,</span> <span class="n">torService</span><span class="p">),</span>
-    <span class="n">ServiceEventListener</span><span class="p">(),</span>
-    <span class="n">ServiceEventBroadcaster</span><span class="p">(</span><span class="n">torService</span><span class="p">),</span>
-    <span class="n">buildConfigDebug</span>
-<span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="c1">//Unresolved: io.matthewnelson.topl_service.service.TorService.initTOPLCore</span>
 </code></pre></div>
 
 <h3 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h3>

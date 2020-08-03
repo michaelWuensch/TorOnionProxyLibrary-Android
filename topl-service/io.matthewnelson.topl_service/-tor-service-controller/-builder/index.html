@@ -393,13 +393,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#types" class="md-nav__link">
-    Types
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#constructors" class="md-nav__link">
     Constructors
   </a>
@@ -435,7 +428,7 @@
                 
                 <p><a href="../../../">topl-service</a> / <a href="../../">io.matthewnelson.topl_service</a> / <a href="../">TorServiceController</a> / <a href="./">Builder</a></p>
 <h1 id="builder">Builder<a class="headerlink" href="#builder" title="Permanent link">&para;</a></h1>
-<p><code>class Builder</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L70">(source)</a></p>
+<p><code>class Builder</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L127">(source)</a></p>
 <p>The <a href="./">TorServiceController.Builder</a> is where you get to customize how <a href="#">TorService</a> works
 for your application. Call it in <code>Application.onCreate</code> and follow along.</p>
 <p>A note about the <a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md">TorSettings</a> you send this. Those are the default settings which
@@ -451,81 +444,89 @@ restart Tor (for now&hellip; ;-D).</p>
 <a href="https://developer.android.com/reference/android/content/SharedPreferences/OnSharedPreferenceChangeListener.html">android.content.SharedPreferences.OnSharedPreferenceChangeListener</a> that will do this
 immediately for the settings that don&rsquo;t require a restart, but a stable release comes first).</p>
 <p>You can see how the <a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md">TorSettings</a> sent here are used in <a href="#">TorService</a> by looking at
-<a href="#">io.matthewnelson.topl_service.onionproxy.ServiceTorSettings</a> and
-<a href="#">TorService.initTOPLCore</a>.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">//        fun setupTorServices(</span>
-<span class="c1">//            application: Application,</span>
-<span class="c1">//            eventBroadcaster: EventBroadcaster,</span>
-<span class="c1">//            torConfigFiles: TorConfigFiles</span>
-<span class="c1">//        ) {</span>
-
-            <span class="n">TorServiceController</span><span class="p">.</span><span class="n">Builder</span><span class="p">(</span>
-                <span class="n">application</span> <span class="p">=</span> <span class="n">application</span><span class="p">,</span>
-                <span class="n">buildConfigVersionCode</span> <span class="p">=</span> <span class="n">BuildConfig</span><span class="p">.</span><span class="n">VERSION_CODE</span><span class="p">,</span>
-                <span class="n">torSettings</span> <span class="p">=</span> <span class="n">App</span><span class="p">.</span><span class="n">myTorSettings</span><span class="p">,</span>
-
-                <span class="c1">// These should live somewhere in your project application&#39;s assets directory</span>
-                <span class="n">geoipAssetPath</span> <span class="p">=</span> <span class="s">&quot;common/geoip&quot;</span><span class="p">,</span>
-                <span class="n">geoip6AssetPath</span> <span class="p">=</span> <span class="s">&quot;common/geoip6&quot;</span>
+<a href="#">io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings</a> and
+<a href="#">TorService.onionProxyManager</a>.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">//  private fun generateTorServiceNotificationBuilder(): ServiceNotification.Builder {</span>
+        <span class="k">return</span> <span class="n">ServiceNotification</span><span class="p">.</span><span class="n">Builder</span><span class="p">(</span>
+            <span class="n">channelName</span> <span class="p">=</span> <span class="s">&quot;TorService Channel&quot;</span><span class="p">,</span>
+            <span class="n">channelDescription</span> <span class="p">=</span> <span class="s">&quot;Tor Channel&quot;</span><span class="p">,</span>
+            <span class="n">channelID</span> <span class="p">=</span> <span class="s">&quot;My Sample Application&quot;</span><span class="p">,</span>
+            <span class="n">notificationID</span> <span class="p">=</span> <span class="m">615</span>
+        <span class="p">)</span>
+            <span class="p">.</span><span class="n">setActivityToBeOpenedOnTap</span><span class="p">(</span>
+                <span class="n">clazz</span> <span class="p">=</span> <span class="n">MainActivity</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">,</span>
+                <span class="n">intentExtrasKey</span> <span class="p">=</span> <span class="k">null</span><span class="p">,</span>
+                <span class="n">intentExtras</span> <span class="p">=</span> <span class="k">null</span><span class="p">,</span>
+                <span class="n">intentRequestCode</span> <span class="p">=</span> <span class="k">null</span>
             <span class="p">)</span>
+            <span class="p">.</span><span class="n">setImageTorNetworkingEnabled</span><span class="p">(</span><span class="n">drawableRes</span> <span class="p">=</span> <span class="n">R</span><span class="p">.</span><span class="n">drawable</span><span class="p">.</span><span class="n">tor_stat_network_enabled</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">setImageTorNetworkingDisabled</span><span class="p">(</span><span class="n">drawableRes</span> <span class="p">=</span> <span class="n">R</span><span class="p">.</span><span class="n">drawable</span><span class="p">.</span><span class="n">tor_stat_network_disabled</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">setImageTorDataTransfer</span><span class="p">(</span><span class="n">drawableRes</span> <span class="p">=</span> <span class="n">R</span><span class="p">.</span><span class="n">drawable</span><span class="p">.</span><span class="n">tor_stat_network_dataxfer</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">setImageTorErrors</span><span class="p">(</span><span class="n">drawableRes</span> <span class="p">=</span> <span class="n">R</span><span class="p">.</span><span class="n">drawable</span><span class="p">.</span><span class="n">tor_stat_notifyerr</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">setCustomColor</span><span class="p">(</span><span class="n">colorRes</span> <span class="p">=</span> <span class="n">R</span><span class="p">.</span><span class="n">color</span><span class="p">.</span><span class="n">tor_service_white</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">setVisibility</span><span class="p">(</span><span class="n">visibility</span> <span class="p">=</span> <span class="n">NotificationCompat</span><span class="p">.</span><span class="n">VISIBILITY_PRIVATE</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">setCustomColor</span><span class="p">(</span><span class="n">colorRes</span> <span class="p">=</span> <span class="n">R</span><span class="p">.</span><span class="n">color</span><span class="p">.</span><span class="n">primaryColor</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">enableTorRestartButton</span><span class="p">(</span><span class="n">enable</span> <span class="p">=</span> <span class="k">true</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">enableTorStopButton</span><span class="p">(</span><span class="n">enable</span> <span class="p">=</span> <span class="k">true</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">showNotification</span><span class="p">(</span><span class="n">show</span> <span class="p">=</span> <span class="k">true</span><span class="p">)</span>
+<span class="c1">//  }</span>
+</code></pre></div>
 
-                <span class="p">.</span><span class="n">setBuildConfigDebug</span><span class="p">(</span><span class="n">BuildConfig</span><span class="p">.</span><span class="n">DEBUG</span><span class="p">)</span>
-                <span class="p">.</span><span class="n">setEventBroadcaster</span><span class="p">(</span><span class="n">eventBroadcaster</span><span class="p">)</span>
-                <span class="p">.</span><span class="n">useCustomTorConfigFiles</span><span class="p">(</span><span class="n">torConfigFiles</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="c1">//  private fun generateBackgroundManagerPolicy(): BackgroundManager.Builder.Policy {</span>
+        <span class="k">return</span> <span class="n">BackgroundManager</span><span class="p">.</span><span class="n">Builder</span><span class="p">()</span>
+            <span class="p">.</span><span class="n">respectResourcesWhileInBackground</span><span class="p">(</span><span class="n">secondsFrom5To45</span> <span class="p">=</span> <span class="m">20</span><span class="p">)</span>
 
-                <span class="c1">// Notification customization</span>
-                <span class="p">.</span><span class="n">customizeNotification</span><span class="p">(</span>
-                    <span class="n">channelName</span> <span class="p">=</span> <span class="s">&quot;TorService Channel&quot;</span><span class="p">,</span>
-                    <span class="n">channelDescription</span> <span class="p">=</span> <span class="s">&quot;Tor Channel&quot;</span><span class="p">,</span>
-                    <span class="n">channelID</span> <span class="p">=</span> <span class="s">&quot;My Sample Application&quot;</span><span class="p">,</span>
-                    <span class="n">notificationID</span> <span class="p">=</span> <span class="m">615</span>
-                <span class="p">)</span>
-                <span class="p">.</span><span class="n">setActivityToBeOpenedOnTap</span><span class="p">(</span>
-                    <span class="n">clazz</span> <span class="p">=</span> <span class="n">MainActivity</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">,</span>
-                    <span class="n">intentExtrasKey</span> <span class="p">=</span> <span class="k">null</span><span class="p">,</span>
-                    <span class="n">intentExtras</span> <span class="p">=</span> <span class="k">null</span><span class="p">,</span>
-                    <span class="n">intentRequestCode</span> <span class="p">=</span> <span class="k">null</span>
-                <span class="p">)</span>
-                <span class="p">.</span><span class="n">setImageTorNetworkingEnabled</span><span class="p">(</span><span class="n">R</span><span class="p">.</span><span class="n">drawable</span><span class="p">.</span><span class="n">tor_stat_network_enabled</span><span class="p">)</span>
-                <span class="p">.</span><span class="n">setImageTorNetworkingDisabled</span><span class="p">(</span><span class="n">R</span><span class="p">.</span><span class="n">drawable</span><span class="p">.</span><span class="n">tor_stat_network_disabled</span><span class="p">)</span>
-                <span class="p">.</span><span class="n">setImageTorDataTransfer</span><span class="p">(</span><span class="n">R</span><span class="p">.</span><span class="n">drawable</span><span class="p">.</span><span class="n">tor_stat_network_dataxfer</span><span class="p">)</span>
-                <span class="p">.</span><span class="n">setImageTorErrors</span><span class="p">(</span><span class="n">R</span><span class="p">.</span><span class="n">drawable</span><span class="p">.</span><span class="n">tor_stat_notifyerr</span><span class="p">)</span>
-                <span class="p">.</span><span class="n">setCustomColor</span><span class="p">(</span><span class="n">R</span><span class="p">.</span><span class="n">color</span><span class="p">.</span><span class="n">tor_service_white</span><span class="p">,</span> <span class="n">colorizeBackground</span> <span class="p">=</span> <span class="k">true</span><span class="p">)</span>
-                <span class="p">.</span><span class="n">setVisibility</span><span class="p">(</span><span class="n">NotificationCompat</span><span class="p">.</span><span class="n">VISIBILITY_PRIVATE</span><span class="p">)</span>
-                <span class="p">.</span><span class="n">enableTorRestartButton</span><span class="p">(</span><span class="n">enable</span> <span class="p">=</span> <span class="k">true</span><span class="p">)</span>
-                <span class="p">.</span><span class="n">enableTorStopButton</span><span class="p">(</span><span class="n">enable</span> <span class="p">=</span> <span class="k">true</span><span class="p">)</span>
+<span class="c1">//  }</span>
+</code></pre></div>
 
-                <span class="c1">// Will return a Builder object to continue with non-notification related options</span>
-                <span class="p">.</span><span class="n">applyNotificationSettings</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><code><span class="c1">//  private fun setupTorServices(application: Application, torConfigFiles: TorConfigFiles ) {</span>
+        <span class="n">TorServiceController</span><span class="p">.</span><span class="n">Builder</span><span class="p">(</span>
+            <span class="n">application</span> <span class="p">=</span> <span class="n">application</span><span class="p">,</span>
+            <span class="n">torServiceNotificationBuilder</span> <span class="p">=</span> <span class="n">generateTorServiceNotificationBuilder</span><span class="p">(),</span>
+            <span class="n">backgroundManagerPolicy</span> <span class="p">=</span> <span class="n">generateBackgroundManagerPolicy</span><span class="p">(),</span>
+            <span class="n">buildConfigVersionCode</span> <span class="p">=</span> <span class="n">BuildConfig</span><span class="p">.</span><span class="n">VERSION_CODE</span><span class="p">,</span>
 
-                <span class="p">.</span><span class="n">build</span><span class="p">()</span>
-<span class="c1">//        }</span>
+            <span class="c1">// Can instantiate directly here then access it from</span>
+            <span class="c1">// TorServiceController.Companion.getTorSettings() and cast what&#39;s returned</span>
+            <span class="c1">// as MyTorSettings</span>
+            <span class="n">torSettings</span> <span class="p">=</span> <span class="n">MyTorSettings</span><span class="p">(),</span>
+
+            <span class="c1">// These should live somewhere in your module&#39;s assets directory,</span>
+            <span class="c1">// ex: my-project/my-application-module/src/main/assets/common/geoip</span>
+            <span class="c1">// ex: my-project/my-application-module/src/main/assets/common/geoip6</span>
+            <span class="n">geoipAssetPath</span> <span class="p">=</span> <span class="s">&quot;common/geoip&quot;</span><span class="p">,</span>
+            <span class="n">geoip6AssetPath</span> <span class="p">=</span> <span class="s">&quot;common/geoip6&quot;</span>
+        <span class="p">)</span>
+            <span class="p">.</span><span class="n">addTimeToRestartTorDelay</span><span class="p">(</span><span class="n">milliseconds</span> <span class="p">=</span> <span class="m">100L</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">addTimeToStopServiceDelay</span><span class="p">(</span><span class="n">milliseconds</span> <span class="p">=</span> <span class="m">100L</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">setBuildConfigDebug</span><span class="p">(</span><span class="n">buildConfigDebug</span> <span class="p">=</span> <span class="n">BuildConfig</span><span class="p">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+            <span class="c1">// Can instantiate directly here then access it from</span>
+            <span class="c1">// TorServiceController.Companion?.appEventBroadcaster and cast what&#39;s returned</span>
+            <span class="c1">// as MyEventBroadcaster</span>
+            <span class="p">.</span><span class="n">setEventBroadcaster</span><span class="p">(</span><span class="n">eventBroadcaster</span> <span class="p">=</span> <span class="n">MyEventBroadcaster</span><span class="p">())</span>
+
+            <span class="c1">// Only needed if you wish to customize the directories/files used by Tor if</span>
+            <span class="c1">// the defaults aren&#39;t to your liking.</span>
+            <span class="p">.</span><span class="n">useCustomTorConfigFiles</span><span class="p">(</span><span class="n">torConfigFiles</span> <span class="p">=</span> <span class="n">torConfigFiles</span><span class="p">)</span>
+
+            <span class="p">.</span><span class="n">build</span><span class="p">()</span>
+<span class="c1">//  }</span>
 </code></pre></div>
 
 <h3 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h3>
-<p><code>application</code> - <a href="https://developer.android.com/reference/android/app/Application.html">Application</a>, for obtaining context.</p>
+<p><code>application</code> - <a href="https://developer.android.com/reference/android/app/Application.html">Application</a>, for obtaining context</p>
+<p><code>torServiceNotificationBuilder</code> - The <a href="../../../io.matthewnelson.topl_service.notification/-service-notification/-builder/index.md">ServiceNotification.Builder</a> for
+customizing <a href="#">TorService</a>&lsquo;s notification</p>
+<p><code>backgroundManagerPolicy</code> - The <a href="../../../io.matthewnelson.topl_service.lifecycle/-background-manager/-builder/-policy/index.md">BackgroundManager.Builder.Policy</a> to be executed
+while your application is in the background (the Recent App&rsquo;s tray).</p>
 <p><code>buildConfigVersionCode</code> - send <a href="#">BuildConfig.VERSION_CODE</a>. Mitigates copying of geoip
-files to app updates only.</p>
-<p><code>torSettings</code> - <a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md">TorSettings</a> used to create your torrc file on start of Tor.</p>
+files to app updates only</p>
+<p><code>torSettings</code> - <a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md">TorSettings</a> used to create your torrc file on start of Tor</p>
 <p><code>geoipAssetPath</code> - The path to where you have your geoip file located (ex: in
-assets/common directory, send this variable &ldquo;common/geoip&rdquo;).</p>
+assets/common directory, send this variable &ldquo;common/geoip&rdquo;)</p>
 <p><code>geoip6AssetPath</code> - The path to where you have your geoip6 file located (ex: in
-assets/common directory, send this variable &ldquo;common/geoip6&rdquo;).</p>
-<h3 id="types">Types<a class="headerlink" href="#types" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Summary</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="-notification-builder/">NotificationBuilder</a></td>
-<td>Where you get to customize how your foreground notification will look/function. Calling <a href="customize-notification/">customizeNotification</a> will return this class to you which provides methods specific to customization of notifications. Call <a href="-notification-builder/apply-notification-settings/">applyNotificationSettings</a> when done to return to <a href="./">Builder</a> to continue with it&rsquo;s methods for customization.<code>class NotificationBuilder</code></td>
-</tr>
-</tbody>
-</table>
+assets/common directory, send this variable &ldquo;common/geoip6&rdquo;)</p>
 <h3 id="constructors">Constructors<a class="headerlink" href="#constructors" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -537,7 +538,7 @@ assets/common directory, send this variable &ldquo;common/geoip6&rdquo;).</p>
 <tbody>
 <tr>
 <td><a href="-init-/">&lt;init&gt;</a></td>
-<td>The <a href="./">TorServiceController.Builder</a> is where you get to customize how <a href="#">TorService</a> works for your application. Call it in <code>Application.onCreate</code> and follow along.<code>Builder(application:</code><a href="https://developer.android.com/reference/android/app/Application.html"><code>Application</code></a><code>, buildConfigVersionCode:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>, torSettings:</code><a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md"><code>TorSettings</code></a><code>, geoipAssetPath:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>, geoip6AssetPath:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>)</code></td>
+<td>The <a href="./">TorServiceController.Builder</a> is where you get to customize how <a href="#">TorService</a> works for your application. Call it in <code>Application.onCreate</code> and follow along.<code>Builder(application:</code><a href="https://developer.android.com/reference/android/app/Application.html"><code>Application</code></a><code>, torServiceNotificationBuilder: Builder, backgroundManagerPolicy: Policy, buildConfigVersionCode:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>, torSettings:</code><a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md"><code>TorSettings</code></a><code>, geoipAssetPath:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>, geoip6AssetPath:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>)</code></td>
 </tr>
 </tbody>
 </table>
@@ -551,12 +552,16 @@ assets/common directory, send this variable &ldquo;common/geoip6&rdquo;).</p>
 </thead>
 <tbody>
 <tr>
-<td><a href="build/">build</a></td>
-<td>Initializes <a href="#">TorService</a> setup and enables the ability to call methods in the <a href="#">Companion</a> object.<code>fun build():</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><code>Unit</code></a></td>
+<td><a href="add-time-to-restart-tor-delay.md">addTimeToRestartTorDelay</a></td>
+<td>Default is set to 500ms, (what this method adds time to).<code>fun addTimeToRestartTorDelay(milliseconds:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html"><code>Long</code></a><code>): Builder</code></td>
 </tr>
 <tr>
-<td><a href="customize-notification/">customizeNotification</a></td>
-<td>Customize the service notification to your application.<code>fun customizeNotification(channelName:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>, channelID:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>, channelDescription:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>, notificationID:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-short/index.html"><code>Short</code></a><code>): NotificationBuilder</code></td>
+<td><a href="add-time-to-stop-service-delay.md">addTimeToStopServiceDelay</a></td>
+<td>Default is set to 100ms (what this method adds time to).<code>fun addTimeToStopServiceDelay(milliseconds:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html"><code>Long</code></a><code>): Builder</code></td>
+</tr>
+<tr>
+<td><a href="build/">build</a></td>
+<td>Initializes <a href="#">TorService</a> setup and enables the ability to call methods from the <a href="#">Companion</a> object w/o throwing exceptions.<code>fun build():</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><code>Unit</code></a></td>
 </tr>
 <tr>
 <td><a href="set-build-config-debug/">setBuildConfigDebug</a></td>
@@ -564,7 +569,7 @@ assets/common directory, send this variable &ldquo;common/geoip6&rdquo;).</p>
 </tr>
 <tr>
 <td><a href="set-event-broadcaster/">setEventBroadcaster</a></td>
-<td>Get broadcasts piped to your Application to do with them what you desire. What you send this will live at <a href="../app-event-broadcaster/">Companion.appEventBroadcaster</a> for the remainder of your application&rsquo;s lifecycle to refer to elsewhere in your App.<code>fun setEventBroadcaster(eventBroadcaster:</code><a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md"><code>EventBroadcaster</code></a><code>): Builder</code></td>
+<td>Get broadcasts piped to your Application to do with them what you desire. What you send this will live at <a href="../app-event-broadcaster/">Companion.appEventBroadcaster</a> for the remainder of your application&rsquo;s lifecycle to refer to elsewhere in your App.<code>fun setEventBroadcaster(eventBroadcaster:</code><a href="../../../io.matthewnelson.topl_service.service.components.onionproxy/-tor-service-event-broadcaster/index.md"><code>TorServiceEventBroadcaster</code></a><code>): Builder</code></td>
 </tr>
 <tr>
 <td><a href="use-custom-tor-config-files/">useCustomTorConfigFiles</a></td>

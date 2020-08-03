@@ -377,6 +377,23 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#exceptions" class="md-nav__link">
+    Exceptions
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -397,12 +414,11 @@
                 
                 <p><a href="../../../">topl-service</a> / <a href="../../">io.matthewnelson.topl_service</a> / <a href="../">TorServiceController</a> / <a href="./">startTor</a></p>
 <h1 id="starttor">startTor<a class="headerlink" href="#starttor" title="Permanent link">&para;</a></h1>
-<p><code>fun startTor():</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><code>Unit</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L419">(source)</a></p>
-<p>Starts <a href="#">TorService</a>. Does nothing if called prior to:</p>
-<ul>
-<li>Initializing <a href="../-builder/">TorServiceController.Builder</a> by calling <a href="../-builder/build/">Builder.build</a></li>
-</ul>
-<p>You can call this as much as you want. If Tor is already on, it will do nothing.</p>
+<p><code>fun startTor():</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><code>Unit</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L341">(source)</a></p>
+<p>Starts <a href="#">TorService</a> and then Tor. You can call this as much as you want. If
+the Tor <a href="https://docs.oracle.com/javase/6/docs/api/java/lang/Process.html">Process</a> is already running, it will do nothing.</p>
+<h3 id="exceptions">Exceptions<a class="headerlink" href="#exceptions" title="Permanent link">&para;</a></h3>
+<p><code>RuntimeException</code> - if called before <a href="../-builder/build/">Builder.build</a></p>
                 
               
               

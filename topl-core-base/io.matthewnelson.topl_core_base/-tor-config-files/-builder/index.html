@@ -428,33 +428,33 @@
                 
                 <p><a href="../../../">topl-core-base</a> / <a href="../../">io.matthewnelson.topl_core_base</a> / <a href="../">TorConfigFiles</a> / <a href="./">Builder</a></p>
 <h1 id="builder">Builder<a class="headerlink" href="#builder" title="Permanent link">&para;</a></h1>
-<p><code>class Builder</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorConfigFiles.kt#L186">(source)</a></p>
+<p><code>class Builder</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorConfigFiles.kt#L249">(source)</a></p>
 <p>Builder for TorConfig.</p>
 <p>See also <a href="../create-config/">Companion.createConfig</a> for convenience methods.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">//        fun customTorConfigFilesSetup(context: Context): TorConfigFiles {</span>
+<div class="highlight"><pre><span></span><code><span class="c1">//  fun customTorConfigFilesSetup(context: Context): TorConfigFiles {</span>
 
-            <span class="c1">// This is modifying the directory hierarchy from TorService&#39;s</span>
-            <span class="c1">// default setup. For example, if you are using binaries for Tor that</span>
-            <span class="c1">// are named differently that that expressed in TorConfigFiles.createConfig()</span>
+        <span class="c1">// This is modifying the directory hierarchy from TorService&#39;s</span>
+        <span class="c1">// default setup. For example, if you are using binaries for Tor that</span>
+        <span class="c1">// are named differently that that expressed in TorConfigFiles.createConfig()</span>
 
-            <span class="c1">// Post Android API 28 requires that executable files be contained in your</span>
-            <span class="c1">// application&#39;s data/app directory, as they can no longer execute from data/data.</span>
-            <span class="k">val</span> <span class="py">installDir</span> <span class="p">=</span> <span class="n">File</span><span class="p">(</span><span class="n">context</span><span class="p">.</span><span class="n">applicationInfo</span><span class="p">.</span><span class="n">nativeLibraryDir</span><span class="p">)</span>
+        <span class="c1">// Post Android API 28 requires that executable files be contained in your</span>
+        <span class="c1">// application&#39;s data/app directory, as they can no longer execute from data/data.</span>
+        <span class="k">val</span> <span class="py">installDir</span> <span class="p">=</span> <span class="n">File</span><span class="p">(</span><span class="n">context</span><span class="p">.</span><span class="n">applicationInfo</span><span class="p">.</span><span class="n">nativeLibraryDir</span><span class="p">)</span>
 
-            <span class="c1">// Will create a directory within your application&#39;s data/data dir</span>
-            <span class="k">val</span> <span class="py">configDir</span> <span class="p">=</span> <span class="n">context</span><span class="p">.</span><span class="n">getDir</span><span class="p">(</span><span class="s">&quot;torservice&quot;</span><span class="p">,</span> <span class="n">Context</span><span class="p">.</span><span class="n">MODE_PRIVATE</span><span class="p">)</span>
+        <span class="c1">// Will create a directory within your application&#39;s data/data dir</span>
+        <span class="k">val</span> <span class="py">configDir</span> <span class="p">=</span> <span class="n">context</span><span class="p">.</span><span class="n">getDir</span><span class="p">(</span><span class="s">&quot;torservice&quot;</span><span class="p">,</span> <span class="n">Context</span><span class="p">.</span><span class="n">MODE_PRIVATE</span><span class="p">)</span>
 
-            <span class="k">val</span> <span class="py">builder</span> <span class="p">=</span> <span class="n">TorConfigFiles</span><span class="p">.</span><span class="n">Builder</span><span class="p">(</span><span class="n">installDir</span><span class="p">,</span> <span class="n">configDir</span><span class="p">)</span>
+        <span class="k">val</span> <span class="py">builder</span> <span class="p">=</span> <span class="n">TorConfigFiles</span><span class="p">.</span><span class="n">Builder</span><span class="p">(</span><span class="n">installDir</span><span class="p">,</span> <span class="n">configDir</span><span class="p">)</span>
 
-            <span class="c1">// Customize the tor executable file name. Requires that the executable file</span>
-            <span class="c1">// be in your project&#39;s src/main/jniLibs directory. If you are getting your</span>
-            <span class="c1">// executable files via a dependency, be sure to consult that Libraries documentation.</span>
-            <span class="n">builder</span><span class="p">.</span><span class="n">torExecutable</span><span class="p">(</span><span class="n">File</span><span class="p">(</span><span class="n">installDir</span><span class="p">,</span> <span class="s">&quot;libtor.so&quot;</span><span class="p">))</span>
+        <span class="c1">// Customize the tor executable file name. Requires that the executable file</span>
+        <span class="c1">// be in your module&#39;s src/main/jniLibs directory. If you are getting your</span>
+        <span class="c1">// executable files via a dependency be sure to consult that Library&#39;s documentation.</span>
+        <span class="n">builder</span><span class="p">.</span><span class="n">torExecutable</span><span class="p">(</span><span class="n">File</span><span class="p">(</span><span class="n">installDir</span><span class="p">,</span> <span class="s">&quot;libtor.so&quot;</span><span class="p">))</span>
 
-            <span class="c1">// customize further via the builder methods...</span>
+        <span class="c1">// customize further via the builder methods...</span>
 
-            <span class="k">return</span> <span class="n">builder</span><span class="p">.</span><span class="n">build</span><span class="p">()</span>
-<span class="c1">//        }</span>
+        <span class="k">return</span> <span class="n">builder</span><span class="p">.</span><span class="n">build</span><span class="p">()</span>
+<span class="c1">//  }</span>
 </code></pre></div>
 
 <h3 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h3>

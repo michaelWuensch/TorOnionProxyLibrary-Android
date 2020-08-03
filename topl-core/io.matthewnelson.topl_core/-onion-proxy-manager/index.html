@@ -442,30 +442,14 @@
                 
                 <p><a href="../../">topl-core</a> / <a href="../">io.matthewnelson.topl_core</a> / <a href="./">OnionProxyManager</a></p>
 <h1 id="onionproxymanager">OnionProxyManager<a class="headerlink" href="#onionproxymanager" title="Permanent link">&para;</a></h1>
-<p><code>class OnionProxyManager :</code><a href="../../io.matthewnelson.topl_core.util/-core-consts/"><code>CoreConsts</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/OnionProxyManager.kt#L91">(source)</a></p>
+<p><code>class OnionProxyManager :</code><a href="../../io.matthewnelson.topl_core.util/-core-consts/"><code>CoreConsts</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/OnionProxyManager.kt#L136">(source)</a></p>
 <p>This is where all the fun is, this is the class which acts as a gateway into the <code>topl-core</code>
 module, and ensures synchronicity is had.</p>
 <p>This class is thread safe but that&rsquo;s mostly because we hit everything over the head
 with &lsquo;synchronized&rsquo;. Given the way this class is used there shouldn&rsquo;t be any performance
 implications of this.</p>
 <p>This class began life as TorPlugin from the Briar Project</p>
-<div class="highlight"><pre><span></span><code><span class="k">val</span> <span class="py">serviceTorInstaller</span> <span class="p">=</span> <span class="n">ServiceTorInstaller</span><span class="p">(</span>
-    <span class="n">torService</span><span class="p">,</span>
-    <span class="n">torConfigFiles</span><span class="p">,</span>
-    <span class="n">buildConfigVersionCode</span><span class="p">,</span>
-    <span class="n">buildConfigDebug</span> <span class="o">?:</span> <span class="n">BuildConfig</span><span class="p">.</span><span class="n">DEBUG</span><span class="p">,</span>
-    <span class="n">geoipAssetPath</span><span class="p">,</span>
-    <span class="n">geoip6AssetPath</span>
-<span class="p">)</span>
-<span class="n">onionProxyManager</span> <span class="p">=</span> <span class="n">OnionProxyManager</span><span class="p">(</span>
-    <span class="n">torService</span><span class="p">,</span>
-    <span class="n">torConfigFiles</span><span class="p">,</span>
-    <span class="n">serviceTorInstaller</span><span class="p">,</span>
-    <span class="n">ServiceTorSettings</span><span class="p">(</span><span class="n">torSettings</span><span class="p">,</span> <span class="n">torService</span><span class="p">),</span>
-    <span class="n">ServiceEventListener</span><span class="p">(),</span>
-    <span class="n">ServiceEventBroadcaster</span><span class="p">(</span><span class="n">torService</span><span class="p">),</span>
-    <span class="n">buildConfigDebug</span>
-<span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="c1">//Unresolved: io.matthewnelson.topl_service.service.TorService.initTOPLCore</span>
 </code></pre></div>
 
 <h3 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h3>
@@ -502,10 +486,6 @@ broadcast to the provided <a href="../../../topl-core-base/io.matthewnelson.topl
 </tr>
 </thead>
 <tbody>
-<tr>
-<td><a href="event-listener/">eventListener</a></td>
-<td><a href="../../io.matthewnelson.topl_core.listener/-base-event-listener/">BaseEventListener</a> For processing Tor OP messages.<code>val eventListener:</code><a href="../../io.matthewnelson.topl_core.listener/-base-event-listener/"><code>BaseEventListener</code></a></td>
-</tr>
 <tr>
 <td><a href="has-control-connection/">hasControlConnection</a></td>
 <td><code>val hasControlConnection:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>

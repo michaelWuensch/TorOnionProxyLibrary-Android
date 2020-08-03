@@ -397,11 +397,12 @@
                 
                 <p><a href="../../../">topl-core-base</a> / <a href="../../">io.matthewnelson.topl_core_base</a> / <a href="../">TorSettings</a> / <a href="./">httpTunnelPort</a></p>
 <h1 id="httptunnelport">httpTunnelPort<a class="headerlink" href="#httptunnelport" title="Permanent link">&para;</a></h1>
-<p><code>abstract val httpTunnelPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorSettings.kt#L144">(source)</a></p>
+<p><code>abstract val httpTunnelPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorSettings.kt#L191">(source)</a></p>
+<p>Could be &ldquo;auto&rdquo; or a specific port, such as &ldquo;8288&rdquo;.</p>
 <p>TorBrowser and Orbot use &ldquo;8218&rdquo; by default. It may be wise to pick something
 that won&rsquo;t conflict if you&rsquo;re using this setting.</p>
 <p>Docs: <a href="https://2019.www.torproject.org/docs/tor-manual.html.en#HTTPTunnelPort">https://2019.www.torproject.org/docs/tor-manual.html.en#HTTPTunnelPort</a></p>
-<p>See <a href="../-d-e-f-a-u-l-t__-h-t-t-p_-t-u-n-n-e-l_-p-o-r-t/">DEFAULT__HTTP_TUNNEL_PORT</a></p>
+<p>See <a href="../-d-e-f-a-u-l-t__-h-t-t-p_-t-u-n-n-e-l_-p-o-r-t/">DEFAULT__HTTP_TUNNEL_PORT</a> (&ldquo;0&rdquo;, to disable it)</p>
 <p>TODO: Change to List and update TorSettingsBuilder method for
 multi-port support.</p>
                 

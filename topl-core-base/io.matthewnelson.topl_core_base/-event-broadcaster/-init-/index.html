@@ -402,6 +402,341 @@
 <p>Both <code>topl-core</code> and <code>topl-service</code> utilize this class to broadcast messages. This
 allows for easier separation of messages based on the type, process or class.</p>
 <p>See <a href="../../-base-consts/-broadcast-type/">BaseConsts.BroadcastType</a>s</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/**</span>
+<span class="cm"> * [io.matthewnelson.topl_core.OnionProxyManager] utilizes this customized class for</span>
+<span class="cm"> * broadcasting things while it is operating (such as Tor&#39;s State, operation errors,</span>
+<span class="cm"> * debugging, etc).</span>
+<span class="cm"> *</span>
+<span class="cm"> * [ServiceEventListener] utilizes this class by sending it what Tor is spitting out</span>
+<span class="cm"> * (selectively curated, ofc).</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param [torService] [BaseService] for context.</span>
+<span class="cm"> * */</span>
+<span class="k">internal</span> <span class="k">class</span> <span class="nc">ServiceEventBroadcaster</span><span class="p">(</span><span class="k">private</span> <span class="k">val</span> <span class="py">torService</span><span class="p">:</span> <span class="n">BaseService</span><span class="p">):</span> <span class="n">EventBroadcaster</span><span class="p">()</span> <span class="p">{</span>
+
+    <span class="k">private</span> <span class="k">val</span> <span class="py">scopeMain</span><span class="p">:</span> <span class="n">CoroutineScope</span>
+        <span class="k">get</span><span class="p">()</span> <span class="p">=</span> <span class="n">torService</span><span class="p">.</span><span class="n">getScopeMain</span><span class="p">()</span>
+
+    <span class="c1">/////////////////</span>
+    <span class="c1">/// Bandwidth ///</span>
+    <span class="c1">/////////////////</span>
+    <span class="n">@Volatile</span>
+    <span class="k">private</span> <span class="k">var</span> <span class="py">bytesRead</span> <span class="p">=</span> <span class="m">0L</span>
+    <span class="n">@Volatile</span>
+    <span class="k">private</span> <span class="k">var</span> <span class="py">bytesWritten</span> <span class="p">=</span> <span class="m">0L</span>
+
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">broadcastBandwidth</span><span class="p">(</span><span class="n">bytesRead</span><span class="p">:</span> <span class="n">String</span><span class="p">,</span> <span class="n">bytesWritten</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">val</span> <span class="py">read</span> <span class="p">=</span>
+            <span class="k">try</span> <span class="p">{</span>
+                <span class="n">bytesRead</span><span class="p">.</span><span class="n">toLong</span><span class="p">()</span>
+            <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="n">NumberFormatException</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="n">bytesRead</span>
+            <span class="p">}</span>
+        <span class="k">val</span> <span class="py">written</span> <span class="p">=</span>
+            <span class="k">try</span> <span class="p">{</span>
+                <span class="n">bytesWritten</span><span class="p">.</span><span class="n">toLong</span><span class="p">()</span>
+            <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="n">NumberFormatException</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="n">bytesWritten</span>
+            <span class="p">}</span>
+
+        <span class="c1">// Only update the notification if proper State is had &amp; we&#39;re bootstrapped.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">torState</span> <span class="p">==</span> <span class="n">TorState</span><span class="p">.</span><span class="n">ON</span> <span class="p">&amp;&amp;</span>
+            <span class="n">torNetworkState</span> <span class="p">==</span> <span class="n">TorNetworkState</span><span class="p">.</span><span class="n">ENABLED</span> <span class="p">&amp;&amp;</span>
+            <span class="n">isBootstrappingComplete</span><span class="p">()</span>
+        <span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">read</span> <span class="p">!=</span> <span class="k">this</span><span class="p">.</span><span class="n">bytesRead</span> <span class="p">||</span> <span class="n">written</span> <span class="p">!=</span> <span class="k">this</span><span class="p">.</span><span class="n">bytesWritten</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="n">bytesRead</span> <span class="p">=</span> <span class="n">read</span>
+                <span class="k">this</span><span class="p">.</span><span class="n">bytesWritten</span> <span class="p">=</span> <span class="n">written</span>
+
+                <span class="n">updateBandwidth</span><span class="p">(</span><span class="n">read</span><span class="p">,</span> <span class="n">written</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="p">(</span><span class="n">read</span> <span class="p">==</span> <span class="m">0L</span> <span class="p">&amp;&amp;</span> <span class="n">written</span> <span class="p">==</span> <span class="m">0L</span><span class="p">)</span>
+                    <span class="n">torService</span><span class="p">.</span><span class="n">updateNotificationIcon</span><span class="p">(</span><span class="n">NotificationImage</span><span class="p">.</span><span class="n">ENABLED</span><span class="p">)</span>
+                <span class="k">else</span>
+                    <span class="n">torService</span><span class="p">.</span><span class="n">updateNotificationIcon</span><span class="p">(</span><span class="n">NotificationImage</span><span class="p">.</span><span class="n">DATA</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="n">TorServiceController</span><span class="p">.</span><span class="n">appEventBroadcaster</span><span class="o">?.</span><span class="n">let</span> <span class="p">{</span>
+            <span class="n">scopeMain</span><span class="p">.</span><span class="n">launch</span> <span class="p">{</span> <span class="n">it</span><span class="p">.</span><span class="n">broadcastBandwidth</span><span class="p">(</span><span class="n">bytesRead</span><span class="p">,</span> <span class="n">bytesWritten</span><span class="p">)</span> <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * Do a check for if a message is being displayed in the contentText of the</span>
+<span class="cm">     * notification, allowing it to remain there unabated until the coroutine</span>
+<span class="cm">     * finishes.</span>
+<span class="cm">     * */</span>
+    <span class="k">private</span> <span class="k">fun</span> <span class="nf">updateBandwidth</span><span class="p">(</span><span class="n">download</span><span class="p">:</span> <span class="n">Long</span><span class="p">,</span> <span class="n">upload</span><span class="p">:</span> <span class="n">Long</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">noticeMsgToContentTextJob</span><span class="o">?.</span><span class="n">isActive</span> <span class="p">==</span> <span class="k">true</span><span class="p">)</span> <span class="k">return</span>
+        <span class="n">torService</span><span class="p">.</span><span class="n">updateNotificationContentText</span><span class="p">(</span>
+            <span class="n">ServiceUtilities</span><span class="p">.</span><span class="n">getFormattedBandwidthString</span><span class="p">(</span><span class="n">download</span><span class="p">,</span> <span class="n">upload</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">}</span>
+
+
+    <span class="c1">/////////////</span>
+    <span class="c1">/// Debug ///</span>
+    <span class="c1">/////////////</span>
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">broadcastDebug</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">TorServiceController</span><span class="p">.</span><span class="n">appEventBroadcaster</span><span class="o">?.</span><span class="n">let</span> <span class="p">{</span>
+            <span class="n">scopeMain</span><span class="p">.</span><span class="n">launch</span> <span class="p">{</span> <span class="n">it</span><span class="p">.</span><span class="n">broadcastDebug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+
+    <span class="c1">//////////////////</span>
+    <span class="c1">/// Exceptions ///</span>
+    <span class="c1">//////////////////</span>
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">broadcastException</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="n">String</span><span class="p">?,</span> <span class="n">e</span><span class="p">:</span> <span class="n">Exception</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(!</span><span class="n">msg</span><span class="p">.</span><span class="n">isNullOrEmpty</span><span class="p">())</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="n">TorService</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">.</span><span class="n">simpleName</span><span class="p">))</span> <span class="p">{</span>
+                <span class="n">torService</span><span class="p">.</span><span class="n">updateNotificationIcon</span><span class="p">(</span><span class="n">NotificationImage</span><span class="p">.</span><span class="n">ERROR</span><span class="p">)</span>
+                <span class="k">val</span> <span class="py">msgSplit</span> <span class="p">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;|&quot;</span><span class="p">)</span>
+                <span class="n">msgSplit</span><span class="p">.</span><span class="n">elementAtOrNull</span><span class="p">(</span><span class="m">2</span><span class="p">)</span><span class="o">?.</span><span class="n">let</span> <span class="p">{</span>
+                    <span class="n">torService</span><span class="p">.</span><span class="n">updateNotificationContentText</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+                    <span class="n">torService</span><span class="p">.</span><span class="n">updateNotificationProgress</span><span class="p">(</span><span class="k">false</span><span class="p">,</span> <span class="k">null</span><span class="p">)</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="n">TorServiceController</span><span class="p">.</span><span class="n">appEventBroadcaster</span><span class="o">?.</span><span class="n">let</span> <span class="p">{</span>
+            <span class="n">scopeMain</span><span class="p">.</span><span class="n">launch</span> <span class="p">{</span> <span class="n">it</span><span class="p">.</span><span class="n">broadcastException</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+
+    <span class="c1">///////////////////</span>
+    <span class="c1">/// LogMessages ///</span>
+    <span class="c1">///////////////////</span>
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">broadcastLogMessage</span><span class="p">(</span><span class="n">logMessage</span><span class="p">:</span> <span class="n">String</span><span class="p">?)</span> <span class="p">{</span>
+        <span class="n">TorServiceController</span><span class="p">.</span><span class="n">appEventBroadcaster</span><span class="o">?.</span><span class="n">let</span> <span class="p">{</span>
+            <span class="n">scopeMain</span><span class="p">.</span><span class="n">launch</span> <span class="p">{</span> <span class="n">it</span><span class="p">.</span><span class="n">broadcastLogMessage</span><span class="p">(</span><span class="n">logMessage</span><span class="p">)</span> <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+
+    <span class="c1">///////////////</span>
+    <span class="c1">/// Notices ///</span>
+    <span class="c1">///////////////</span>
+    <span class="k">private</span> <span class="k">var</span> <span class="py">noticeMsgToContentTextJob</span><span class="p">:</span> <span class="n">Job</span><span class="p">?</span> <span class="p">=</span> <span class="k">null</span>
+
+    <span class="n">@Volatile</span>
+    <span class="k">private</span> <span class="k">var</span> <span class="py">bootstrapProgress</span> <span class="p">=</span> <span class="s">&quot;&quot;</span>
+    <span class="k">private</span> <span class="k">fun</span> <span class="nf">isBootstrappingComplete</span><span class="p">():</span> <span class="n">Boolean</span> <span class="p">=</span>
+        <span class="n">bootstrapProgress</span> <span class="p">==</span> <span class="s">&quot;Bootstrapped 100%&quot;</span>
+
+    <span class="n">@Volatile</span>
+    <span class="k">private</span> <span class="k">var</span> <span class="py">controlPort</span><span class="p">:</span> <span class="n">String</span><span class="p">?</span> <span class="p">=</span> <span class="k">null</span>
+    <span class="n">@Volatile</span>
+    <span class="k">private</span> <span class="k">var</span> <span class="py">httpTunnelPort</span><span class="p">:</span> <span class="n">String</span><span class="p">?</span> <span class="p">=</span> <span class="k">null</span>
+    <span class="n">@Volatile</span>
+    <span class="k">private</span> <span class="k">var</span> <span class="py">socksPort</span><span class="p">:</span> <span class="n">String</span><span class="p">?</span> <span class="p">=</span> <span class="k">null</span>
+
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">broadcastNotice</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
+
+        <span class="k">when</span> <span class="p">{</span>
+            <span class="c1">// ServiceActionProcessor</span>
+            <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="n">ServiceActionProcessor</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">.</span><span class="n">simpleName</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
+                <span class="n">handleServiceActionProcessorMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="p">}</span>
+            <span class="c1">// BOOTSTRAPPED</span>
+            <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&quot;Bootstrapped&quot;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
+                <span class="n">handleBootstrappedMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="p">}</span>
+            <span class="c1">// Control Port</span>
+            <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&quot;Successfully connected to Control Port:&quot;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
+                <span class="n">handleControlPortMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="p">}</span>
+            <span class="c1">// Http Tunnel Port</span>
+            <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&quot;Opened HTTP tunnel listener on &quot;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
+                <span class="n">handleHttpTunnelPortMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="p">}</span>
+            <span class="c1">// Socks Port</span>
+            <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&quot;Opened Socks listener on &quot;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
+                <span class="n">handleSocksPortMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="p">}</span>
+            <span class="c1">// NEWNYM</span>
+            <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="n">TorControlCommands</span><span class="p">.</span><span class="n">SIGNAL_NEWNYM</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
+                <span class="n">handleNewNymMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="n">TorServiceController</span><span class="p">.</span><span class="n">appEventBroadcaster</span><span class="o">?.</span><span class="n">let</span> <span class="p">{</span>
+            <span class="n">scopeMain</span><span class="p">.</span><span class="n">launch</span> <span class="p">{</span> <span class="n">it</span><span class="p">.</span><span class="n">broadcastNotice</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="c1">// NOTICE|BaseEventListener|Bootstrapped 5% (conn): Connecting to a relay</span>
+    <span class="k">private</span> <span class="k">fun</span> <span class="nf">handleBootstrappedMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">val</span> <span class="py">msgSplit</span> <span class="p">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">)</span>
+        <span class="n">msgSplit</span><span class="p">.</span><span class="n">elementAtOrNull</span><span class="p">(</span><span class="m">2</span><span class="p">)</span><span class="o">?.</span><span class="n">let</span> <span class="p">{</span>
+            <span class="k">val</span> <span class="py">bootstrapped</span> <span class="p">=</span> <span class="s">&quot;${msgSplit[0]} ${msgSplit[1]}&quot;</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;|&quot;</span><span class="p">)[</span><span class="m">2</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">bootstrapped</span> <span class="p">!=</span> <span class="n">bootstrapProgress</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">torService</span><span class="p">.</span><span class="n">updateNotificationContentText</span><span class="p">(</span><span class="n">bootstrapped</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="p">(</span><span class="n">bootstrapped</span> <span class="p">==</span> <span class="s">&quot;Bootstrapped 100%&quot;</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="n">updateAppEventBroadcasterWithPortInfo</span><span class="p">()</span>
+                    <span class="n">torService</span><span class="p">.</span><span class="n">updateNotificationIcon</span><span class="p">(</span><span class="n">NotificationImage</span><span class="p">.</span><span class="n">ENABLED</span><span class="p">)</span>
+                    <span class="n">torService</span><span class="p">.</span><span class="n">updateNotificationProgress</span><span class="p">(</span><span class="k">true</span><span class="p">,</span> <span class="m">100</span><span class="p">)</span>
+                    <span class="n">torService</span><span class="p">.</span><span class="n">updateNotificationProgress</span><span class="p">(</span><span class="k">false</span><span class="p">,</span> <span class="k">null</span><span class="p">)</span>
+                    <span class="n">torService</span><span class="p">.</span><span class="n">addNotificationActions</span><span class="p">()</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                    <span class="k">val</span> <span class="py">progress</span><span class="p">:</span> <span class="n">Int</span><span class="p">?</span> <span class="p">=</span> <span class="k">try</span> <span class="p">{</span>
+                        <span class="n">bootstrapped</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">)[</span><span class="m">1</span><span class="p">].</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;%&quot;</span><span class="p">)[</span><span class="m">0</span><span class="p">].</span><span class="n">toInt</span><span class="p">()</span>
+                    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="n">Exception</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="k">null</span>
+                    <span class="p">}</span>
+                    <span class="n">progress</span><span class="o">?.</span><span class="n">let</span> <span class="p">{</span>
+                        <span class="n">torService</span><span class="p">.</span><span class="n">updateNotificationProgress</span><span class="p">(</span><span class="k">true</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+
+                <span class="n">bootstrapProgress</span> <span class="p">=</span> <span class="n">bootstrapped</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="c1">// NOTICE|OnionProxyManager|Successfully connected to Control Port: 44201</span>
+    <span class="k">private</span> <span class="k">fun</span> <span class="nf">handleControlPortMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">val</span> <span class="py">port</span> <span class="p">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;:&quot;</span><span class="p">)[</span><span class="m">1</span><span class="p">].</span><span class="n">trim</span><span class="p">()</span>
+        <span class="n">controlPort</span> <span class="p">=</span> <span class="s">&quot;127.0.0.1:$port&quot;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// NOTICE|BaseEventListener|Opened HTTP tunnel listener on 127.0.0.1:37397</span>
+    <span class="k">private</span> <span class="k">fun</span> <span class="nf">handleHttpTunnelPortMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">val</span> <span class="py">port</span> <span class="p">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;:&quot;</span><span class="p">)[</span><span class="m">1</span><span class="p">].</span><span class="n">trim</span><span class="p">()</span>
+        <span class="n">httpTunnelPort</span> <span class="p">=</span> <span class="s">&quot;127.0.0.1:$port&quot;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// NOTICE|BaseEventListener|Opened Socks listener on 127.0.0.1:9051</span>
+    <span class="k">private</span> <span class="k">fun</span> <span class="nf">handleSocksPortMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">val</span> <span class="py">port</span> <span class="p">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;:&quot;</span><span class="p">)[</span><span class="m">1</span><span class="p">].</span><span class="n">trim</span><span class="p">()</span>
+        <span class="n">socksPort</span> <span class="p">=</span> <span class="s">&quot;127.0.0.1:$port&quot;</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">fun</span> <span class="nf">handleNewNymMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">val</span> <span class="py">msgToShow</span><span class="p">:</span> <span class="n">String</span><span class="p">?</span> <span class="p">=</span>
+            <span class="k">when</span> <span class="p">{</span>
+                <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="n">OnionProxyManager</span><span class="p">.</span><span class="n">NEWNYM_SUCCESS_MESSAGE</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
+                    <span class="n">OnionProxyManager</span><span class="p">.</span><span class="n">NEWNYM_SUCCESS_MESSAGE</span>
+                <span class="p">}</span>
+                <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="n">OnionProxyManager</span><span class="p">.</span><span class="n">NEWNYM_NO_NETWORK</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
+                    <span class="n">OnionProxyManager</span><span class="p">.</span><span class="n">NEWNYM_NO_NETWORK</span>
+                <span class="p">}</span>
+                <span class="k">else</span> <span class="p">-&gt;</span> <span class="p">{</span>
+                    <span class="k">val</span> <span class="py">msgSplit</span> <span class="p">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;|&quot;</span><span class="p">)</span>
+                    <span class="n">msgSplit</span><span class="p">.</span><span class="n">elementAtOrNull</span><span class="p">(</span><span class="m">2</span><span class="p">)</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">noticeMsgToContentTextJob</span><span class="o">?.</span><span class="n">isActive</span> <span class="p">==</span> <span class="k">true</span><span class="p">)</span>
+            <span class="n">noticeMsgToContentTextJob</span><span class="o">?.</span><span class="n">cancel</span><span class="p">()</span>
+
+        <span class="n">msgToShow</span><span class="o">?.</span><span class="n">let</span> <span class="p">{</span>
+            <span class="n">displayMessageToContentText</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="m">3500L</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">fun</span> <span class="nf">handleServiceActionProcessorMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">val</span> <span class="py">msgSplit</span> <span class="p">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;|&quot;</span><span class="p">)</span>
+        <span class="k">val</span> <span class="py">msgToShow</span><span class="p">:</span> <span class="n">String</span><span class="p">?</span> <span class="p">=</span> <span class="n">msgSplit</span><span class="p">.</span><span class="n">elementAtOrNull</span><span class="p">(</span><span class="m">2</span><span class="p">)</span><span class="o">?.</span><span class="n">let</span> <span class="p">{</span>
+            <span class="k">when</span> <span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">ServiceActionName</span><span class="p">.</span><span class="n">RESTART_TOR</span> <span class="p">-&gt;</span> <span class="p">{</span>
+                    <span class="s">&quot;Restarting Tor...&quot;</span>
+                <span class="p">}</span>
+                <span class="n">ServiceActionName</span><span class="p">.</span><span class="n">STOP</span> <span class="p">-&gt;</span> <span class="p">{</span>
+                    <span class="s">&quot;Stopping Service...&quot;</span>
+                <span class="p">}</span>
+                <span class="k">else</span> <span class="p">-&gt;</span> <span class="p">{</span>
+                    <span class="k">null</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="n">msgToShow</span><span class="o">?.</span><span class="n">let</span> <span class="p">{</span>
+            <span class="n">torService</span><span class="p">.</span><span class="n">updateNotificationContentText</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">fun</span> <span class="nf">updateAppEventBroadcasterWithPortInfo</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">TorServiceController</span><span class="p">.</span><span class="n">appEventBroadcaster</span><span class="o">?.</span><span class="n">let</span> <span class="p">{</span>
+            <span class="n">scopeMain</span><span class="p">.</span><span class="n">launch</span> <span class="p">{</span>
+                <span class="n">it</span><span class="p">.</span><span class="n">broadcastControlPortAddress</span><span class="p">(</span><span class="n">controlPort</span><span class="p">)</span>
+                <span class="n">it</span><span class="p">.</span><span class="n">broadcastHttpPortAddress</span><span class="p">(</span><span class="n">httpTunnelPort</span><span class="p">)</span>
+                <span class="n">it</span><span class="p">.</span><span class="n">broadcastSocksPortAddress</span><span class="p">(</span><span class="n">socksPort</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * Display a message in the notification&#39;s ContentText space for the defined</span>
+<span class="cm">     * [delayMilliSeconds], after which (if Tor is connected), publish to the Notification&#39;s</span>
+<span class="cm">     * ContentText the most recently broadcast bandwidth via [bytesRead] &amp;&amp; [bytesWritten].</span>
+<span class="cm">     * */</span>
+    <span class="k">private</span> <span class="k">fun</span> <span class="nf">displayMessageToContentText</span><span class="p">(</span><span class="n">message</span><span class="p">:</span> <span class="n">String</span><span class="p">,</span> <span class="n">delayMilliSeconds</span><span class="p">:</span> <span class="n">Long</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">noticeMsgToContentTextJob</span> <span class="p">=</span> <span class="n">scopeMain</span><span class="p">.</span><span class="n">launch</span> <span class="p">{</span>
+            <span class="n">torService</span><span class="p">.</span><span class="n">updateNotificationContentText</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+            <span class="n">delay</span><span class="p">(</span><span class="n">delayMilliSeconds</span><span class="p">)</span>
+
+            <span class="c1">// Publish the last bandwidth broadcast to overwrite the message.</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">torNetworkState</span> <span class="p">==</span> <span class="n">TorNetworkState</span><span class="p">.</span><span class="n">ENABLED</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">torService</span><span class="p">.</span><span class="n">updateNotificationContentText</span><span class="p">(</span>
+                    <span class="n">ServiceUtilities</span><span class="p">.</span><span class="n">getFormattedBandwidthString</span><span class="p">(</span><span class="n">bytesRead</span><span class="p">,</span> <span class="n">bytesWritten</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">isBootstrappingComplete</span><span class="p">()){</span>
+                <span class="n">torService</span><span class="p">.</span><span class="n">updateNotificationContentText</span><span class="p">(</span>
+                    <span class="n">ServiceUtilities</span><span class="p">.</span><span class="n">getFormattedBandwidthString</span><span class="p">(</span><span class="m">0L</span><span class="p">,</span> <span class="m">0L</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+
+    <span class="c1">////////////////</span>
+    <span class="c1">/// TorState ///</span>
+    <span class="c1">////////////////</span>
+    <span class="n">@Volatile</span>
+    <span class="k">private</span> <span class="k">var</span> <span class="py">torState</span> <span class="p">=</span> <span class="n">TorState</span><span class="p">.</span><span class="n">OFF</span>
+    <span class="n">@Volatile</span>
+    <span class="k">private</span> <span class="k">var</span> <span class="py">torNetworkState</span> <span class="p">=</span> <span class="n">TorNetworkState</span><span class="p">.</span><span class="n">DISABLED</span>
+
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">broadcastTorState</span><span class="p">(</span><span class="n">@TorState</span> <span class="n">state</span><span class="p">:</span> <span class="n">String</span><span class="p">,</span> <span class="n">@TorNetworkState</span> <span class="n">networkState</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">torState</span> <span class="p">==</span> <span class="n">TorState</span><span class="p">.</span><span class="n">ON</span> <span class="p">&amp;&amp;</span> <span class="n">state</span> <span class="p">!=</span> <span class="n">torState</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">bootstrapProgress</span> <span class="p">=</span> <span class="s">&quot;&quot;</span>
+            <span class="n">controlPort</span> <span class="p">=</span> <span class="k">null</span>
+            <span class="n">httpTunnelPort</span> <span class="p">=</span> <span class="k">null</span>
+            <span class="n">socksPort</span> <span class="p">=</span> <span class="k">null</span>
+            <span class="n">updateAppEventBroadcasterWithPortInfo</span><span class="p">()</span>
+            <span class="n">torService</span><span class="p">.</span><span class="n">removeNotificationActions</span><span class="p">()</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">state</span> <span class="p">!=</span> <span class="n">TorState</span><span class="p">.</span><span class="n">ON</span><span class="p">)</span>
+            <span class="n">torService</span><span class="p">.</span><span class="n">updateNotificationProgress</span><span class="p">(</span><span class="k">true</span><span class="p">,</span> <span class="k">null</span><span class="p">)</span>
+
+        <span class="n">torService</span><span class="p">.</span><span class="n">updateNotificationContentTitle</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+        <span class="n">torState</span> <span class="p">=</span> <span class="n">state</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">networkState</span> <span class="p">==</span> <span class="n">TorNetworkState</span><span class="p">.</span><span class="n">DISABLED</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// Update torNetworkState _before_ setting the icon to `disabled` so bandwidth won&#39;t</span>
+            <span class="c1">// overwrite the icon with an update</span>
+            <span class="n">torNetworkState</span> <span class="p">=</span> <span class="n">networkState</span>
+            <span class="n">torService</span><span class="p">.</span><span class="n">updateNotificationIcon</span><span class="p">(</span><span class="n">NotificationImage</span><span class="p">.</span><span class="n">DISABLED</span><span class="p">)</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">isBootstrappingComplete</span><span class="p">())</span>
+                <span class="n">torService</span><span class="p">.</span><span class="n">updateNotificationIcon</span><span class="p">(</span><span class="n">NotificationImage</span><span class="p">.</span><span class="n">ENABLED</span><span class="p">)</span>
+
+            <span class="c1">// Update torNetworkState _after_ setting the icon to `enabled` so bandwidth changes</span>
+            <span class="c1">// occur afterwards and this won&#39;t overwrite ImageState.DATA</span>
+            <span class="n">torNetworkState</span> <span class="p">=</span> <span class="n">networkState</span>
+        <span class="p">}</span>
+
+        <span class="n">TorServiceController</span><span class="p">.</span><span class="n">appEventBroadcaster</span><span class="o">?.</span><span class="n">let</span> <span class="p">{</span>
+            <span class="n">scopeMain</span><span class="p">.</span><span class="n">launch</span> <span class="p">{</span> <span class="n">it</span><span class="p">.</span><span class="n">broadcastTorState</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">networkState</span><span class="p">)</span> <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
                 
               
               
