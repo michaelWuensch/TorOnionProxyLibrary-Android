@@ -259,6 +259,9 @@ internal abstract class BaseService: Service() {
     fun addNotificationActions() {
         serviceNotification.addActions(this)
     }
+    fun removeNotification() {
+        serviceNotification.remove()
+    }
     fun removeNotificationActions() {
         serviceNotification.removeActions(this)
     }
@@ -328,7 +331,6 @@ internal abstract class BaseService: Service() {
 
     override fun onDestroy() {
         unregisterPrefsListener()
-        serviceNotification.remove()
     }
 
     /**

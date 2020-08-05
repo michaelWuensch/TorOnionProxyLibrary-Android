@@ -257,6 +257,10 @@ internal class TorService: BaseService() {
     override fun onDestroy() {
         super.onDestroy()
         supervisorJob.cancel()
+
+        // Use _after_ cancelling supervisor job to inhibit any potential broadcasts
+        // that may update the notification after shutting down.
+        removeNotification()
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
