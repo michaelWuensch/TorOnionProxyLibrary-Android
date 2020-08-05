@@ -300,17 +300,18 @@ internal class OnionProxyContext(
      * @throws [SecurityException] Unauthorized access to file/directory.
      */
     @Throws(RuntimeException::class, SecurityException::class)
-    fun deleteDataDirExceptHiddenService() =
+    fun deleteDataDirExceptHiddenService() {
         synchronized(dataDirLock) {
             val listFiles = torConfigFiles.dataDir.listFiles() ?: return
             for (file in listFiles)
                 if (file.isDirectory)
                     if (file.absolutePath != torConfigFiles.hiddenServiceDir.absolutePath)
                         FileUtilities.recursiveFileDelete(file)
-                else
-                    if (!file.delete())
-                        throw RuntimeException("Could not delete file ${file.absolutePath}")
+                    else
+                        if (!file.delete())
+                            throw RuntimeException("Could not delete file ${file.absolutePath}")
         }
+    }
 
     ////////////////////
     /// HostnameFile ///

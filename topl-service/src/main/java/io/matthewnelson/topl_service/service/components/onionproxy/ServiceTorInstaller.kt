@@ -128,21 +128,23 @@ internal class ServiceTorInstaller(private val torService: BaseService): TorInst
         }
     }
 
-    private fun copyGeoIpAsset() =
+    private fun copyGeoIpAsset() {
         synchronized(torConfigFiles.geoIpFileLock) {
             torService.copyAsset(BaseService.geoipAssetPath, torConfigFiles.geoIpFile)
             broadcastLogger?.debug(
                 "Asset copied from ${BaseService.geoipAssetPath} -> ${torConfigFiles.geoIpFile}"
             )
         }
+    }
 
-    private fun copyGeoIpv6Asset() =
+    private fun copyGeoIpv6Asset() {
         synchronized(torConfigFiles.geoIpv6FileLock) {
             torService.copyAsset(BaseService.geoip6AssetPath, torConfigFiles.geoIpv6File)
             broadcastLogger?.debug(
                 "Asset copied from ${BaseService.geoip6AssetPath} -> ${torConfigFiles.geoIpv6File}"
             )
         }
+    }
 
     @Throws(IOException::class, TimeoutException::class)
     override fun updateTorConfigCustom(content: String?) {

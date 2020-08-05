@@ -154,21 +154,23 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
             }
         }
 
-    private fun removeActionFromQueue(serviceAction: ServiceAction) =
+    private fun removeActionFromQueue(serviceAction: ServiceAction) {
         synchronized(actionQueueLock) {
             if (actionQueue.remove(serviceAction))
                 broadcastDebugMsgWithObjectDetails(
                     "Removed from queue: ServiceAction.", serviceAction
                 )
         }
+    }
 
-    private fun clearActionQueue() =
+    private fun clearActionQueue() {
         synchronized(actionQueueLock) {
             if (!actionQueue.isNullOrEmpty()) {
                 actionQueue.clear()
                 broadcastLogger.debug("Queue cleared")
             }
         }
+    }
 
 
     ////////////////////////

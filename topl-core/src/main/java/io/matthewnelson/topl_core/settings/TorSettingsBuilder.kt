@@ -154,10 +154,11 @@ class TorSettingsBuilder internal constructor(
      * TODO: Devise a more elegant solution using a diff to simply update it if
      *       need be.
      * */
-    fun finishAndWriteToTorrcFile() =
+    fun finishAndWriteToTorrcFile() {
         synchronized(torConfigFiles.torrcFileLock) {
             torConfigFiles.torrcFile.writeText(finishAndReturnString())
         }
+    }
 
     /**
      * Add a new line to the [buffer] if a setting here is not available.

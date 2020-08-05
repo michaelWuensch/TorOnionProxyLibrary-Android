@@ -338,25 +338,29 @@ class TorServiceController private constructor(): ServiceConsts() {
          * @throws [RuntimeException] if called before [Builder.build]
          * */
         @Throws(RuntimeException::class)
-        fun startTor() =
+        fun startTor() {
             BaseService.startService(BaseService.getAppContext(), TorService::class.java)
+        }
 
         /**
          * Stops [TorService].
          * */
-        fun stopTor() =
+        fun stopTor() {
             TorServiceConnection.serviceBinder?.submitServiceAction(ServiceActions.Stop())
+        }
 
         /**
          * Restarts Tor.
          * */
-        fun restartTor() =
+        fun restartTor() {
             TorServiceConnection.serviceBinder?.submitServiceAction(ServiceActions.RestartTor())
+        }
 
         /**
          * Changes identities.
          * */
-        fun newIdentity() =
+        fun newIdentity() {
             TorServiceConnection.serviceBinder?.submitServiceAction(ServiceActions.NewId())
+        }
     }
 }

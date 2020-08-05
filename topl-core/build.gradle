@@ -44,7 +44,7 @@ dokka {
         skipEmptyPackages = true
         samples = [
                 "$rootDir/topl-service/src/main/java/io/matthewnelson/topl_service/service/TorService.kt".toString(),
-                "$rootDir/topl-service/src/main/java/io/matthewnelson/topl_service/onionproxy/ServiceTorInstaller.kt".toString()
+                "$rootDir/topl-service/src/main/java/io/matthewnelson/topl_service/service/components/onionproxy/ServiceTorInstaller.kt".toString()
         ]
         sourceLink {
             url = "https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/"

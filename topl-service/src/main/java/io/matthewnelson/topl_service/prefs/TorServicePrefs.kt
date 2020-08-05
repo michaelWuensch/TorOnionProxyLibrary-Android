@@ -98,14 +98,17 @@ class TorServicePrefs(context: Context): ServiceConsts() {
      * Registers a [SharedPreferences.OnSharedPreferenceChangeListener] for the
      * associated SharedPreference
      * */
-    fun registerListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) =
+    fun registerListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
         prefs.registerOnSharedPreferenceChangeListener(listener)
+    }
+
     /**
      * Unregisters a [SharedPreferences.OnSharedPreferenceChangeListener] for the
      * associated SharedPreference
      * */
-    fun unregisterListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) =
+    fun unregisterListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
         prefs.unregisterOnSharedPreferenceChangeListener(listener)
+    }
 
 
     /////////////
@@ -135,9 +138,8 @@ class TorServicePrefs(context: Context): ServiceConsts() {
      *  associated with the [booleanKey].
      * @return The Boolean value associated with the [booleanKey], otherwise [defValue]
      * */
-    fun getBoolean(@PrefKeyBoolean booleanKey: String, defValue: Boolean): Boolean {
-        return prefs.getBoolean(booleanKey, defValue)
-    }
+    fun getBoolean(@PrefKeyBoolean booleanKey: String, defValue: Boolean): Boolean =
+        prefs.getBoolean(booleanKey, defValue)
 
     /**
      * Returns an Int value for the provided [ServiceConsts.PrefKeyInt]. If no

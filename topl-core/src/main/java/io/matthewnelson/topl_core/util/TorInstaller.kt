@@ -120,7 +120,7 @@ abstract class TorInstaller: CoreConsts() {
      * the system this does not need to be invoked.
      *
      * @return true if tor installation is successful, otherwise false.
-     * @sample [io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller.setup]
+     * @sample [io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorInstaller.setup]
      */
     @Throws(IOException::class)
     abstract fun setup()
@@ -143,7 +143,7 @@ abstract class TorInstaller: CoreConsts() {
      *
      * The second form is used for custom bridges from the user.
      *
-     * @sample [io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller.openBridgesStream]
+     * @sample [io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorInstaller.openBridgesStream]
      */
     @Throws(IOException::class)
     abstract fun openBridgesStream(): InputStream?
