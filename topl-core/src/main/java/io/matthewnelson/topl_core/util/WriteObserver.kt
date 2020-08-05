@@ -115,8 +115,9 @@ class WriteObserver(file: File) : FileObserver(file.absolutePath, CLOSE_WRITE) {
     }
 
     @Throws(IllegalArgumentException::class, SecurityException::class)
-    private fun checkExists(file: File) =
+    private fun checkExists(file: File) {
         require(file.exists()) { "FileObserver doesn't work properly on files that don't already exist." }
+    }
 
     init {
         checkExists(file)

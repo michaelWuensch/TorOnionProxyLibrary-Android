@@ -164,8 +164,9 @@ class OnionProxyManager(
     /**
      * See [BroadcastLoggerHelper.refreshBroadcastLoggersHasDebugLogsVar]
      * */
-    fun refreshBroadcastLoggersHasDebugLogsVar() =
+    fun refreshBroadcastLoggersHasDebugLogsVar() {
         logHelper.refreshBroadcastLoggersHasDebugLogsVar()
+    }
 
     /**
      * See [BroadcastLoggerHelper.getBroadcastLogger]
@@ -204,7 +205,9 @@ class OnionProxyManager(
      * the system this does not need to be invoked.
      */
     @Throws(IOException::class)
-    fun setup() = torInstaller.setup()
+    fun setup() {
+        torInstaller.setup()
+    }
 
     fun getNewSettingsBuilder(): TorSettingsBuilder {
         broadcastLogger.debug("Generating a new SettingsBuilder")
@@ -214,8 +217,9 @@ class OnionProxyManager(
         )
     }
 
-    private fun warnControlConnectionNotResponding(methodCall: String) =
+    private fun warnControlConnectionNotResponding(methodCall: String) {
         broadcastLogger.warn("TorControlConnection is not responding properly to $methodCall")
+    }
 
     @Volatile
     private var networkStateReceiver: NetworkStateReceiver? = null
@@ -984,10 +988,14 @@ class OnionProxyManager(
     }
 
     @Throws(Exception::class)
-    fun restartTorProcess() = killTorProcess(-1)
+    fun restartTorProcess() {
+        killTorProcess(-1)
+    }
 
     @Throws(Exception::class)
-    fun killTorProcess() = killTorProcess(-9)
+    fun killTorProcess() {
+        killTorProcess(-9)
+    }
 
     @Throws(Exception::class)
     private fun killTorProcess(signal: Int) {

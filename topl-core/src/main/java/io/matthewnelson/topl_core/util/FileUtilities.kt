@@ -172,10 +172,11 @@ object FileUtilities {
      * @throws java.io.IOException - If close on input or output fails
      */
     @Throws(IOException::class)
-    fun copy(`in`: InputStream, out: OutputStream) =
+    fun copy(`in`: InputStream, out: OutputStream) {
         `in`.use { inputStream ->
             copyDoNotCloseInput(inputStream, out)
         }
+    }
 
     /**
      * Won't close the input stream when it's done, needed to handle ZipInputStreams
@@ -184,7 +185,7 @@ object FileUtilities {
      * @throws java.io.IOException If close on output fails
      */
     @Throws(IOException::class)
-    fun copyDoNotCloseInput(`in`: InputStream, out: OutputStream) =
+    fun copyDoNotCloseInput(`in`: InputStream, out: OutputStream) {
         out.use { outputStream ->
             val buf = ByteArray(4096)
             while (true) {
@@ -193,6 +194,7 @@ object FileUtilities {
                 outputStream.write(buf, 0, read)
             }
         }
+    }
 
     @Throws(SecurityException::class)
     fun listFilesToLog(f: File) {
