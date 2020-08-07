@@ -270,7 +270,7 @@ internal abstract class BaseService: Service() {
         serviceNotification.addActions(this)
     }
     fun removeNotification() {
-        serviceNotification.remove(this)
+        serviceNotification.remove()
     }
     fun removeNotificationActions() {
         serviceNotification.removeActions(this)

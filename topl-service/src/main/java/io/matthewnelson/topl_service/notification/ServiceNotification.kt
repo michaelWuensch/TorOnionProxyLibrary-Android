@@ -438,14 +438,8 @@ class ServiceNotification internal constructor(
     }
 
     @Synchronized
-    internal fun remove(torService: BaseService) {
-        val nm: NotificationManager? = torService.context.applicationContext
-            .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
-
-        nm?.let {
-            it.cancel(notificationID)
-            notificationShowing = false
-        }
+    internal fun remove() {
+        notificationManager?.cancel(notificationID)
     }
 
     /**
@@ -478,9 +472,6 @@ class ServiceNotification internal constructor(
     @Volatile
     internal var inForeground = false
         private set
-    @Volatile
-    internal var notificationShowing = false
-        private set
 
     @Synchronized
     internal fun startForeground(torService: BaseService): ServiceNotification {
@@ -488,18 +479,16 @@ class ServiceNotification internal constructor(
             notificationBuilder?.let {
                 torService.startForeground(notificationID, it.build())
                 inForeground = true
-                notificationShowing = true
             }
         }
         return serviceNotification
     }
 
     @Synchronized
-    internal fun stopForeground(torService: BaseService, removeNotification: Boolean = false): ServiceNotification {
+    internal fun stopForeground(torService: BaseService): ServiceNotification {
         if (inForeground) {
-            torService.stopForeground(if (removeNotification) true else !showNotification)
+            torService.stopForeground(!showNotification)
             inForeground = false
-            notificationShowing = if (removeNotification) true else showNotification
         }
         return serviceNotification
     }
@@ -566,7 +555,7 @@ class ServiceNotification internal constructor(
     /// Content Text ///
     ////////////////////
     @Volatile
-    internal var currentContentText = "Waiting..."
+    internal var currentContentText = "Starting Tor..."
         private set
 
     @Synchronized

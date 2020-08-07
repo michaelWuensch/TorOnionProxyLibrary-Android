@@ -263,11 +263,13 @@ internal class TestTorService(
             broadcastLogger.exception(e)
         }
     }
+    @ExperimentalCoroutinesApi
     @WorkerThread
     override fun stopTor() {
         simulateStopTor()
     }
 
+    @ExperimentalCoroutinesApi
     private fun simulateStopTor() = getScopeIO().launch {
         serviceEventBroadcaster.broadcastTorState(TorState.STOPPING, TorNetworkState.ENABLED)
         delay(1000)
@@ -295,9 +297,6 @@ internal class TestTorService(
     override fun onDestroy() {
         super.onDestroy()
         supervisorJob.cancel()
-
-        // Use _after_ cancelling supervisor job to inhibit any potential broadcasts
-        // that may update the notification after shutting down.
         removeNotification()
     }
 
