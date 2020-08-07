@@ -176,22 +176,33 @@ internal abstract class BaseService: Service() {
          * @param [includeIntentActionStart] Boolean for including [ServiceActionName.START] as
          *   the Intent's Action.
          * @param [bindServiceFlag] The flag to use when binding to [TorService]
+         * @return true if startService didn't throw an exception, false if it did.
          * */
         fun startService(
             context: Context,
             serviceClass: Class<*>,
             includeIntentActionStart: Boolean = true,
             bindServiceFlag: Int = Context.BIND_AUTO_CREATE
-        ) {
+        ): Boolean {
             val intent = Intent(context.applicationContext, serviceClass)
             if (includeIntentActionStart)
                 intent.action = ServiceActionName.START
-            context.applicationContext.startService(intent)
-            context.applicationContext.bindService(
-                intent,
-                TorServiceConnection.torServiceConnection,
-                bindServiceFlag
-            )
+
+            // A RuntimeException is thrown if Context.startService is called while
+            // the application is in the background. In that case, we do not want to
+            // start/bind the service b/c we are most likely getting a restart from
+            // the system via START_STICKY
+            return try {
+                context.applicationContext.startService(intent)
+                context.applicationContext.bindService(
+                    intent,
+                    TorServiceConnection.torServiceConnection,
+                    bindServiceFlag
+                )
+                true
+            } catch (e: RuntimeException) {
+                false
+            }
         }
 
         /**
@@ -199,8 +210,7 @@ internal abstract class BaseService: Service() {
          * [TorServiceConnection.serviceBinder].
          *
          * @param [context] [Context]
-         * @param [serviceConn] The [TorServiceConnection] to unbind
-         * @throws [IllegalArgumentException] If no binding exists for the provided [serviceConn]
+         * @throws [IllegalArgumentException] If no binding exists
          * */
         @Throws(IllegalArgumentException::class)
         fun unbindService(context: Context) {
@@ -260,7 +270,7 @@ internal abstract class BaseService: Service() {
         serviceNotification.addActions(this)
     }
     fun removeNotification() {
-        serviceNotification.remove()
+        serviceNotification.remove(this)
     }
     fun removeNotificationActions() {
         serviceNotification.removeActions(this)
@@ -272,16 +282,16 @@ internal abstract class BaseService: Service() {
         return serviceNotification.stopForeground(this)
     }
     fun updateNotificationContentText(string: String) {
-        serviceNotification.updateContentText(string)
+        serviceNotification.updateContentText(this, string)
     }
     fun updateNotificationContentTitle(title: String) {
-        serviceNotification.updateContentTitle(title)
+        serviceNotification.updateContentTitle(this, title)
     }
     fun updateNotificationIcon(@NotificationImage notificationImage: Int) {
         serviceNotification.updateIcon(this, notificationImage)
     }
     fun updateNotificationProgress(show: Boolean, progress: Int?) {
-        serviceNotification.updateProgress(show, progress)
+        serviceNotification.updateProgress(this, show, progress)
     }
 
 
