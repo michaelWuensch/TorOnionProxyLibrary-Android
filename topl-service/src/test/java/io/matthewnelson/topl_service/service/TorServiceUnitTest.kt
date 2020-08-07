@@ -142,7 +142,11 @@ internal class TorServiceUnitTest {
                 .torExecutable(File(installDir, "tor"))
                 .build()
         val notificationBuilder = getNewServiceNotificationBuilder()
-            .showNotification(true)
+
+            // must be false, otherwise test will just loop due to the
+            // refresh recursion coroutine happening on the same dispatcher.
+            .showNotification(false)
+
             .enableTorRestartButton(true)
             .enableTorStopButton(true)
 

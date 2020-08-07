@@ -296,7 +296,7 @@ internal class TestTorService(
 
     override fun onDestroy() {
         super.onDestroy()
-        supervisorJob.cancel()
+//        supervisorJob.cancel()
         removeNotification()
     }
 
