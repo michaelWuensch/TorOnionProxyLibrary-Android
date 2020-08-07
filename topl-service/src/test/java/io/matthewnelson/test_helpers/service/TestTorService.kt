@@ -263,11 +263,13 @@ internal class TestTorService(
             broadcastLogger.exception(e)
         }
     }
+    @ExperimentalCoroutinesApi
     @WorkerThread
     override fun stopTor() {
         simulateStopTor()
     }
 
+    @ExperimentalCoroutinesApi
     private fun simulateStopTor() = getScopeIO().launch {
         serviceEventBroadcaster.broadcastTorState(TorState.STOPPING, TorNetworkState.ENABLED)
         delay(1000)
@@ -290,6 +292,12 @@ internal class TestTorService(
             .updateTorSettings()
 //            .setGeoIpFiles()
             .finishAndWriteToTorrcFile()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        supervisorJob.cancel()
+        removeNotification()
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {

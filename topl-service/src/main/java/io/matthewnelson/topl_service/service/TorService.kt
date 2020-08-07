@@ -257,6 +257,7 @@ internal class TorService: BaseService() {
     override fun onDestroy() {
         super.onDestroy()
         supervisorJob.cancel()
+        removeNotification()
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {

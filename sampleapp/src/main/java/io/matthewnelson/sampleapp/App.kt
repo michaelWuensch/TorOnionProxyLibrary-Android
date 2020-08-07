@@ -110,7 +110,6 @@ class App: Application() {
             .setImageTorNetworkingDisabled(drawableRes = R.drawable.tor_stat_network_disabled)
             .setImageTorDataTransfer(drawableRes = R.drawable.tor_stat_network_dataxfer)
             .setImageTorErrors(drawableRes = R.drawable.tor_stat_notifyerr)
-            .setCustomColor(colorRes = R.color.tor_service_white)
             .setVisibility(visibility = NotificationCompat.VISIBILITY_PRIVATE)
             .setCustomColor(colorRes = R.color.primaryColor)
             .enableTorRestartButton(enable = true)

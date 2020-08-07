@@ -326,6 +326,15 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
                 ServiceActionName.RESTART_TOR -> {
                     "Restarting Tor..."
                 }
+                ServiceActionName.START -> {
+                    // Need to check here if Tor is already on, as startTor can be called
+                    // anytime which would overwrite the contentText already showing and
+                    // then stay there until something else updates it.
+                    if (torState != TorState.ON)
+                        "Starting Tor..."
+                    else
+                        null
+                }
                 ServiceActionName.STOP -> {
                     "Stopping Service..."
                 }
