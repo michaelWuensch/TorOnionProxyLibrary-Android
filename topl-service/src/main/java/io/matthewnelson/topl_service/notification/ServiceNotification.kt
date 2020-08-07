@@ -83,6 +83,7 @@ import io.matthewnelson.topl_service.service.components.receiver.TorServiceRecei
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.util.ServiceConsts
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -352,9 +353,10 @@ class ServiceNotification internal constructor(
     /////////////
     private var notificationBuilder: NotificationCompat.Builder? = null
     private var notificationManager: NotificationManager? = null
+    private val timeoutLength = 3_000L
 
     internal fun buildNotification(torService: BaseService): NotificationCompat.Builder {
-        val builder = NotificationCompat.Builder(torService.context, channelID)
+        val builder = NotificationCompat.Builder(torService.context.applicationContext, channelID)
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
             .setContentText(currentContentText)
             .setContentTitle(currentContentTitle)
@@ -365,6 +367,7 @@ class ServiceNotification internal constructor(
             .setOnlyAlertOnce(true)
             .setSmallIcon(currentIcon)
             .setSound(null)
+            .setTimeoutAfter(timeoutLength)
             .setVisibility(visibility)
 
         currentColor?.let {
@@ -404,7 +407,33 @@ class ServiceNotification internal constructor(
     private fun notify(torService: BaseService, builder: NotificationCompat.Builder) {
         notificationBuilder = builder
         if (showNotification || inForeground) {
+            launchRefreshNotificationJob(torService)
             notificationManager?.notify(notificationID, builder.build())
+        }
+    }
+
+    private var notificationRefreshJob: Job? = null
+
+    /**
+     * The only way to keep the service out of the Foreground as to not interrupt the
+     * Application's lifecycle (b/c of horrible APIs for the Service class), is to make the
+     * notification timeout after a certain number of milliseconds. This coroutine paired
+     * with [notify] is recursive in nature such that it will be canceled then re-launched
+     * every time [notify] is called as to keep the `setTimeoutAfter` value from actually
+     * timing out. This is necessary, as if the service is killed by the OS the notification
+     * will simply cancel itself b/c this coroutine will not be active to keep it refreshed. When
+     * [TorService] is destroyed, the supervisorJob is cancelled which cancels this
+     * coroutine as well, ending the recursion.
+     * */
+    private fun launchRefreshNotificationJob(torService: BaseService) {
+        if (notificationRefreshJob?.isActive == true)
+            notificationRefreshJob?.cancel()
+
+        notificationRefreshJob = torService.getScopeMain().launch {
+            delay(timeoutLength - 250L)
+            notificationBuilder?.let {
+                notify(torService, it)
+            }
         }
     }
 
@@ -466,11 +495,11 @@ class ServiceNotification internal constructor(
     }
 
     @Synchronized
-    internal fun stopForeground(torService: BaseService): ServiceNotification {
+    internal fun stopForeground(torService: BaseService, removeNotification: Boolean = false): ServiceNotification {
         if (inForeground) {
-            torService.stopForeground(!showNotification)
+            torService.stopForeground(if (removeNotification) true else !showNotification)
             inForeground = false
-            notificationShowing = showNotification
+            notificationShowing = if (removeNotification) true else showNotification
         }
         return serviceNotification
     }
