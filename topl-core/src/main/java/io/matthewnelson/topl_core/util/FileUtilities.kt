@@ -144,6 +144,7 @@ object FileUtilities {
 
     // TODO: search commit history to see why this method name does not
     //  properly represent what it is doing.
+    @JvmStatic
     fun setToReadOnlyPermissions(file: File): Boolean {
         return file.setReadable(false, false) &&
                 file.setWritable(false, false) &&
@@ -158,6 +159,7 @@ object FileUtilities {
      *
      * @param file the file to set the permissions on
      */
+    @JvmStatic
     fun setPerms(file: File) {
         file.setReadable(true)
         file.setExecutable(true)
@@ -171,6 +173,7 @@ object FileUtilities {
      * @param out Stream to write to
      * @throws java.io.IOException - If close on input or output fails
      */
+    @JvmStatic
     @Throws(IOException::class)
     fun copy(`in`: InputStream, out: OutputStream) {
         `in`.use { inputStream ->
@@ -184,6 +187,7 @@ object FileUtilities {
      * @param out Will be closed
      * @throws java.io.IOException If close on output fails
      */
+    @JvmStatic
     @Throws(IOException::class)
     fun copyDoNotCloseInput(`in`: InputStream, out: OutputStream) {
         out.use { outputStream ->
@@ -196,6 +200,7 @@ object FileUtilities {
         }
     }
 
+    @JvmStatic
     @Throws(SecurityException::class)
     fun listFilesToLog(f: File) {
         if (f.isDirectory) {
@@ -212,6 +217,7 @@ object FileUtilities {
      *
      * @throws java.io.IOException - If any of the file operations fail
      */
+    @JvmStatic
     @Throws(IOException::class, SecurityException::class)
     fun cleanInstallOneFile(readFrom: InputStream, fileToWriteTo: File) {
         if (fileToWriteTo.exists() && !fileToWriteTo.delete())
@@ -221,6 +227,7 @@ object FileUtilities {
         copy(readFrom, out)
     }
 
+    @JvmStatic
     @Throws(SecurityException::class)
     fun recursiveFileDelete(fileOrDirectory: File) {
         if (fileOrDirectory.isDirectory) {
@@ -239,6 +246,7 @@ object FileUtilities {
      * @param zipFileInputStream Stream to unzip
      * @throws java.io.IOException - If there are any file errors
      */
+    @JvmStatic
     @Throws(IOException::class, RuntimeException::class)
     fun extractContentFromZip(destinationDirectory: File, zipFileInputStream: InputStream) {
         val zipInputStream: ZipInputStream

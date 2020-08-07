@@ -290,6 +290,7 @@ class ServiceNotification internal constructor(
          *   for implementor to query SharedPreferences for user's settings (if desired)
          * @return [Builder] To continue customizing
          * */
+        @JvmOverloads
         fun enableTorRestartButton(enable: Boolean = true): Builder {
             serviceNotification.enableRestartButton = enable
             return this
@@ -306,6 +307,7 @@ class ServiceNotification internal constructor(
          *   for implementor to query SharedPreferences for user's settings (if desired)
          * @return [Builder] To continue customizing
          * */
+        @JvmOverloads
         fun enableTorStopButton(enable: Boolean = true): Builder {
             serviceNotification.enableStopButton = enable
             return this
@@ -325,6 +327,7 @@ class ServiceNotification internal constructor(
          *   implementor to query SharedPreferences for user's settings (if desired)
          * @return [Builder] To continue customizing
          * */
+        @JvmOverloads
         fun showNotification(show: Boolean = false): Builder {
             serviceNotification.showNotification = show
             return this

@@ -303,6 +303,8 @@ class TorServiceController private constructor(): ServiceConsts() {
      * Where everything needed to interact with [TorService] resides.
      * */
     companion object {
+
+        @JvmStatic
         var appEventBroadcaster: TorServiceEventBroadcaster? = null
             private set
 
@@ -312,6 +314,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * @return Instance of [TorConfigFiles] that are being used throughout TOPL-Android
          * @throws [RuntimeException] if called before [Builder.build]
          * */
+        @JvmStatic
         @Throws(RuntimeException::class)
         fun getTorConfigFiles(): TorConfigFiles {
             BaseService.getAppContext()
@@ -325,6 +328,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * @return Instance of [TorSettings] that are being used throughout TOPL-Android
          * @throws [RuntimeException] if called before [Builder.build]
          * */
+        @JvmStatic
         @Throws(RuntimeException::class)
         fun getTorSettings(): TorSettings {
             BaseService.getAppContext()
@@ -337,6 +341,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          *
          * @throws [RuntimeException] if called before [Builder.build]
          * */
+        @JvmStatic
         @Throws(RuntimeException::class)
         fun startTor() {
             BaseService.startService(BaseService.getAppContext(), TorService::class.java)
@@ -345,6 +350,7 @@ class TorServiceController private constructor(): ServiceConsts() {
         /**
          * Stops [TorService].
          * */
+        @JvmStatic
         fun stopTor() {
             TorServiceConnection.serviceBinder?.submitServiceAction(ServiceActions.Stop())
         }
@@ -352,6 +358,7 @@ class TorServiceController private constructor(): ServiceConsts() {
         /**
          * Restarts Tor.
          * */
+        @JvmStatic
         fun restartTor() {
             TorServiceConnection.serviceBinder?.submitServiceAction(ServiceActions.RestartTor())
         }
@@ -359,6 +366,7 @@ class TorServiceController private constructor(): ServiceConsts() {
         /**
          * Changes identities.
          * */
+        @JvmStatic
         fun newIdentity() {
             TorServiceConnection.serviceBinder?.submitServiceAction(ServiceActions.NewId())
         }

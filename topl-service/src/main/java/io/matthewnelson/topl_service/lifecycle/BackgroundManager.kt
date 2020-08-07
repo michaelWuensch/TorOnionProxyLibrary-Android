@@ -192,6 +192,7 @@ class BackgroundManager internal constructor(
          * @return [BackgroundManager.Builder.Policy] To use when initializing
          *   [io.matthewnelson.topl_service.TorServiceController.Builder]
          * */
+        @JvmOverloads
         fun respectResourcesWhileInBackground(secondsFrom5To45: Int? = null): Policy {
             chosenPolicy = BackgroundPolicy.RESPECT_RESOURCES
             if (secondsFrom5To45 != null && secondsFrom5To45 in 5..45)

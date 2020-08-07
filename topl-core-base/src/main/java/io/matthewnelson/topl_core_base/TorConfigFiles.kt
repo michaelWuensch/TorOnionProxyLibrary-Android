@@ -157,6 +157,8 @@ class TorConfigFiles private constructor(
          * @param [configDir] context.getDir("dir_name_here", Context.MODE_PRIVATE)
          * @param [dataDir] if you wish it in a different location than lib/tor
          * */
+        @JvmOverloads
+        @JvmStatic
         fun createConfig(context: Context, configDir: File, dataDir: File? = null): TorConfigFiles {
             val installDir = File(context.applicationInfo.nativeLibraryDir)
             val builder = Builder(installDir, configDir)
@@ -171,6 +173,7 @@ class TorConfigFiles private constructor(
          *
          * @param context Context
          * */
+        @JvmStatic
         fun createConfig(context: Context): TorConfigFiles =
             createConfig(context, context.getDir("torservice", Context.MODE_PRIVATE))
     }
