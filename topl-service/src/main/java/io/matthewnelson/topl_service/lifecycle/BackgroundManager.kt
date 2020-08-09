@@ -103,8 +103,9 @@ import io.matthewnelson.topl_service.util.ServiceConsts
  *
  * When the user sends your application to the Recent App's tray though, to recoup resources
  * the OS will kill your app after being idle for a period of time (random AF... typically
- * 0.75m to 1.25m). This is not an issue if the user removes the task before the OS
- * kills the app, as Tor will be able to shutdown properly and the service will stop.
+ * 0.75m to 1.25m if the device's memory is being used heavily). This is not an issue if
+ * the user removes the task before the OS kills the app, as Tor will be able to shutdown
+ * properly and the service will stop.
  *
  * This is where Services get sketchy (especially when trying to implement an always
  * running service for networking), and is the purpose of the [BackgroundManager] class.
@@ -197,6 +198,19 @@ class BackgroundManager internal constructor(
             chosenPolicy = BackgroundPolicy.RESPECT_RESOURCES
             if (secondsFrom5To45 != null && secondsFrom5To45 in 5..45)
                 executionDelay = (secondsFrom5To45 * 1000).toLong()
+            return Policy(this)
+        }
+
+        /**
+         * Electing this option will simply run [TorService] while your application is
+         * in the background, until the OS kills it along with your application. As long
+         * as your application has not been killed, the service will keep running. Upon
+         * being killed, the notification (if enabled) will simply timeout and cancel itself.
+         * All processes and threads will stop, and a cold start called on your application
+         * the next time the user opens it.
+         * */
+        fun runUntilKilled(): Policy {
+            chosenPolicy = BackgroundPolicy.RUN_UNTIL_KILLED
             return Policy(this)
         }
 

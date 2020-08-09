@@ -121,8 +121,10 @@ class App: Application() {
     private fun generateBackgroundManagerPolicy(): BackgroundManager.Builder.Policy {
 //  private fun generateBackgroundManagerPolicy(): BackgroundManager.Builder.Policy {
         return BackgroundManager.Builder()
-            .respectResourcesWhileInBackground(secondsFrom5To45 = 20)
 
+            // All available options present. Only 1 is able to be chosen.
+            //.respectResourcesWhileInBackground(secondsFrom5To45 = 20)
+            .runUntilKilled()
 //  }
     }
 
