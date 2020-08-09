@@ -108,7 +108,6 @@ import java.io.File
 /**
  * Tests the components that make [TorService] work.
  * */
-@InternalCoroutinesApi
 @Config(minSdk = 16, maxSdk = 28)
 @RunWith(RobolectricTestRunner::class)
 internal class TorServiceUnitTest {
@@ -128,10 +127,8 @@ internal class TorServiceUnitTest {
     private val serviceNotification: ServiceNotification
         get() = ServiceNotification.serviceNotification
 
-    @ExperimentalCoroutinesApi
     private val testDispatcher = TestCoroutineDispatcher()
 
-    @ExperimentalCoroutinesApi
     @Before
     fun setup() {
         testDirectory.create()
@@ -212,7 +209,6 @@ internal class TorServiceUnitTest {
             .useCustomTorConfigFiles(torConfigFiles)
     }
 
-    @ExperimentalCoroutinesApi
     @After
     fun tearDown() {
         testDirectory.delete()
@@ -220,7 +216,6 @@ internal class TorServiceUnitTest {
         testDispatcher.cleanupTestCoroutines()
     }
 
-    @ExperimentalCoroutinesApi
     @Test
     fun `validate startup state`() = runBlockingTest(testDispatcher) {
         // Check EventBroadcasters are working and notification is being updated
@@ -285,7 +280,6 @@ internal class TorServiceUnitTest {
         testTorService.refreshBroadcastLoggerWasCalled = false
     }
 
-    @ExperimentalCoroutinesApi
     @Test
     fun `calling stopTor cleans up`() = runBlockingTest(testDispatcher){
         delay(6000) // testTorService.simulateStart() takes 6000ms

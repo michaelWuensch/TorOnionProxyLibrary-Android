@@ -105,6 +105,7 @@ internal class TorServiceControllerUnitTest {
             "Test Channel Description",
             615615
         )
+            .showNotification(false)
     }
     private val torSettings: TestTorSettings by lazy { TestTorSettings() }
     private lateinit var installDir: File
