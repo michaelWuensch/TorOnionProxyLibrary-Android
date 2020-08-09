@@ -83,15 +83,15 @@ abstract class ServiceConsts: BaseConsts() {
         AnnotationTarget.TYPE
     )
     @StringDef(
-        BackgroundPolicy.KEEP_ALIVE,
-        BackgroundPolicy.RESPECT_RESOURCES
+        BackgroundPolicy.RESPECT_RESOURCES,
+        BackgroundPolicy.RUN_UNTIL_KILLED
     )
     @Retention(AnnotationRetention.SOURCE)
     internal annotation class BackgroundPolicy {
         companion object {
             private const val BACKGROUND_POLICY = "BackgroundPolicy_"
-            const val KEEP_ALIVE = "${BACKGROUND_POLICY}KEEP_ALIVE"
             const val RESPECT_RESOURCES = "${BACKGROUND_POLICY}RESPECT_RESOURCES"
+            const val RUN_UNTIL_KILLED = "${BACKGROUND_POLICY}RUN_UNTIL_KILLED"
         }
     }
 
