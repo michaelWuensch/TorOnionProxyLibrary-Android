@@ -432,7 +432,7 @@ class ServiceNotification internal constructor(
         if (notificationRefreshJob?.isActive == true)
             notificationRefreshJob?.cancel()
 
-        notificationRefreshJob = torService.getScopeMain().launch {
+        notificationRefreshJob = torService.getScopeIO().launch {
             delay(timeoutLength - 250L)
             notificationBuilder?.let {
                 notify(torService, it)
