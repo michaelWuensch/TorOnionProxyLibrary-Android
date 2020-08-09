@@ -132,14 +132,11 @@ internal class TestTorService(
     /// Coroutines ///
     //////////////////
     val supervisorJob = SupervisorJob()
-    @ExperimentalCoroutinesApi
     val testCoroutineScope = TestCoroutineScope(dispatcher + supervisorJob)
 
-    @ExperimentalCoroutinesApi
     override fun getScopeIO(): CoroutineScope {
         return testCoroutineScope
     }
-    @ExperimentalCoroutinesApi
     override fun getScopeMain(): CoroutineScope {
         return testCoroutineScope
     }
@@ -157,7 +154,6 @@ internal class TestTorService(
      * is simulated properly in that it will stop processing the queue and the Coroutine
      * Job will move to `complete`.
      * */
-    @ExperimentalCoroutinesApi
     override fun stopService() {
         stopSelfCalled = true
         getScopeMain().launch { onDestroy() }
@@ -240,7 +236,6 @@ internal class TestTorService(
     val bandwidth0 = "0"
 
     // Add 6_000ms delay at start of each test to account for startup time.
-    @ExperimentalCoroutinesApi
     private fun simulateStart() = getScopeIO().launch {
         try {
             onionProxyManager.setup()
@@ -263,13 +258,11 @@ internal class TestTorService(
             broadcastLogger.exception(e)
         }
     }
-    @ExperimentalCoroutinesApi
     @WorkerThread
     override fun stopTor() {
         simulateStopTor()
     }
 
-    @ExperimentalCoroutinesApi
     private fun simulateStopTor() = getScopeIO().launch {
         serviceEventBroadcaster.broadcastTorState(TorState.STOPPING, TorNetworkState.ENABLED)
         delay(1000)

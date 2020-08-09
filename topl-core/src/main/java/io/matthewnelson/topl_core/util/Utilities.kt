@@ -112,6 +112,7 @@ object Utilities {
      * destination host.
      * @throws IOException Networking issues
      */
+    @JvmStatic
     @Throws(IOException::class)
     fun socks4aSocketConnection(
         networkHost: String,
