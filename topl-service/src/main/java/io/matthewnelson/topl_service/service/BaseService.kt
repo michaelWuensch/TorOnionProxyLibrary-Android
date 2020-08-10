@@ -194,16 +194,33 @@ internal abstract class BaseService: Service() {
             // the system via START_STICKY
             return try {
                 context.applicationContext.startService(intent)
-                context.applicationContext.bindService(
-                    intent,
-                    TorServiceConnection.torServiceConnection,
-                    bindServiceFlag
-                )
+                bindService(context, serviceClass, bindServiceFlag)
                 true
             } catch (e: RuntimeException) {
                 false
             }
         }
+
+        /**
+         * Binds the Service.
+         *
+         * @param [context]
+         * @param [serviceClass] The Service's class wanting to be started
+         * @param [bindServiceFlag] The flag to use when binding to [TorService]
+         * @return true if startService didn't throw an exception, false if it did.
+         * */
+        fun bindService(
+            context: Context,
+            serviceClass: Class<*>,
+            bindServiceFlag: Int = Context.BIND_AUTO_CREATE
+        ) {
+            context.applicationContext.bindService(
+                Intent(context.applicationContext, serviceClass),
+                TorServiceConnection.torServiceConnection,
+                bindServiceFlag
+            )
+        }
+
 
         /**
          * Unbinds [TorService] from the Application and clears the reference to

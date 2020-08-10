@@ -124,7 +124,7 @@ class App: Application() {
 
             // All available options present. Only 1 is able to be chosen.
             //.respectResourcesWhileInBackground(secondsFrom5To45 = 20)
-            .runUntilKilled()
+            .runServiceInForeground(secondsFrom0To45 = 0)
 //  }
     }
 

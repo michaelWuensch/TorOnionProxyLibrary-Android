@@ -209,8 +209,11 @@ class BackgroundManager internal constructor(
          * All processes and threads will stop, and a cold start called on your application
          * the next time the user opens it.
          * */
-        fun runUntilKilled(): Policy {
-            chosenPolicy = BackgroundPolicy.RUN_UNTIL_KILLED
+        @JvmOverloads
+        fun runServiceInForeground(secondsFrom0To45: Int? = null): Policy {
+            chosenPolicy = BackgroundPolicy.RUN_IN_FOREGROUND
+            if (secondsFrom0To45 != null && secondsFrom0To45 in 0..45)
+                executionDelay = (secondsFrom0To45 * 1000).toLong()
             return Policy(this)
         }
 
@@ -285,7 +288,15 @@ class BackgroundManager internal constructor(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     private fun applicationMovedToBackground() {
-        if (!ServiceActionProcessor.wasLastAcceptedServiceActionStop())
+        if (!ServiceActionProcessor.wasLastAcceptedServiceActionStop()) {
+            // System automatically unbinds when app is sent to the background. This prevents
+            // it so that we maintain a started, bound service.
+            BaseService.bindService(
+                BaseService.getAppContext(),
+                serviceClass,
+                bindServiceFlag = bindServiceFlag
+            )
             TorServiceConnection.serviceBinder?.executeBackgroundPolicyJob(policy, executionDelay)
+        }
     }
 }

@@ -480,6 +480,7 @@ class ServiceNotification internal constructor(
     internal fun startForeground(torService: BaseService): ServiceNotification {
         if (!inForeground) {
             notificationBuilder?.let {
+                launchRefreshNotificationJob(torService)
                 torService.startForeground(notificationID, it.build())
                 inForeground = true
             }
