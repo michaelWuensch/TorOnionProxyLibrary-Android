@@ -138,6 +138,7 @@ class TorServiceController private constructor(): ServiceConsts() {
 //        private var heartbeatTime = BackgroundManager.heartbeatTime
         private var restartTorDelayTime = ServiceActionProcessor.restartTorDelayTime
         private var stopServiceDelayTime = ServiceActionProcessor.stopServiceDelayTime
+        private var stopServiceOnTaskRemoved = true
         private var torConfigFiles: TorConfigFiles? = null
 
         // On published releases of this Library, this value will **always** be `false`.
@@ -187,6 +188,31 @@ class TorServiceController private constructor(): ServiceConsts() {
         fun addTimeToStopServiceDelay(milliseconds: Long): Builder {
             if (milliseconds > 0L)
                 this.stopServiceDelayTime += milliseconds
+            return this
+        }
+
+        /**
+         * When your task is removed from the Recent App's tray, [TorService.onTaskRemoved] is
+         * triggered. Default behaviour is to stop Tor, and then [TorService]. Electing this
+         * option will inhibit the default behaviour from being carried out.
+         *
+         * @throws [IllegalArgumentException] If your selected [BackgroundManager.Builder.Policy]
+         *   is *not* [ServiceConsts.BackgroundPolicy.RUN_IN_FOREGROUND], or if
+         *   [BackgroundManager.Builder.killAppIfTaskIsRemoved] is *not* `true`
+         * */
+        @JvmOverloads
+        @Throws(IllegalArgumentException::class)
+        fun disableStopServiceOnTaskRemoved(disable: Boolean = true): Builder {
+            if (disable) {
+                val policy = backgroundManagerPolicy.policyBuilder.chosenPolicy
+                val killApp = backgroundManagerPolicy.policyBuilder.killAppIfTaskIsRemoved
+                require(policy == BackgroundPolicy.RUN_IN_FOREGROUND && killApp) {
+                    "BackgroundManager's selected Policy must be " +
+                            "${BackgroundPolicy.RUN_IN_FOREGROUND}, and killAppIfTaskIsRemoved must " +
+                            "be set to true."
+                }
+                stopServiceOnTaskRemoved = !disable
+            }
             return this
         }
 
@@ -285,7 +311,8 @@ class TorServiceController private constructor(): ServiceConsts() {
                 geoipAssetPath,
                 geoip6AssetPath,
                 torConfigFiles ?: TorConfigFiles.createConfig(application.applicationContext),
-                torSettings
+                torSettings,
+                stopServiceOnTaskRemoved
             )
 
 //            BackgroundManager.initialize(heartbeatTime)

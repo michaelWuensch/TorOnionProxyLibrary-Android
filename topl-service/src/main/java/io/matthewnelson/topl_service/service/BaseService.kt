@@ -108,6 +108,8 @@ internal abstract class BaseService: Service() {
             private set
         lateinit var torConfigFiles: TorConfigFiles
         lateinit var torSettings: TorSettings
+        var stopServiceOnTaskRemoved: Boolean = true
+            private set
 
         fun initialize(
             application: Application,
@@ -116,7 +118,8 @@ internal abstract class BaseService: Service() {
             geoipAssetPath: String,
             geoip6AssetPath: String,
             torConfigFiles: TorConfigFiles,
-            torSettings: TorSettings
+            torSettings: TorSettings,
+            stopServiceOnTaskRemoved: Boolean
         ) {
             this.application = application
             this.buildConfigVersionCode = buildConfigVersionCode
@@ -125,6 +128,7 @@ internal abstract class BaseService: Service() {
             this.geoip6AssetPath = geoip6AssetPath
             this.torConfigFiles = torConfigFiles
             this.torSettings = torSettings
+            this.stopServiceOnTaskRemoved = stopServiceOnTaskRemoved
         }
 
         @Throws(RuntimeException::class)
@@ -385,6 +389,7 @@ internal abstract class BaseService: Service() {
         startForegroundService()
 
         // Shutdown Tor and stop the Service.
-        processServiceAction(ServiceActions.Stop(updateLastServiceAction = false))
+        if (stopServiceOnTaskRemoved)
+            processServiceAction(ServiceActions.Stop(updateLastServiceAction = false))
     }
 }

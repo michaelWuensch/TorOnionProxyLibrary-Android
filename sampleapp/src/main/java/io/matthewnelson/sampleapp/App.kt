@@ -123,8 +123,8 @@ class App: Application() {
         return BackgroundManager.Builder()
 
             // All available options present. Only 1 is able to be chosen.
-            //.respectResourcesWhileInBackground(secondsFrom5To45 = 20)
-            .runServiceInForeground(killAppIfTaskIsRemoved = true)
+            .respectResourcesWhileInBackground(secondsFrom5To45 = 20)
+            //.runServiceInForeground(killAppIfTaskIsRemoved = true)
 //  }
     }
 
@@ -149,6 +149,7 @@ class App: Application() {
         )
             .addTimeToRestartTorDelay(milliseconds = 100L)
             .addTimeToStopServiceDelay(milliseconds = 100L)
+            .disableStopServiceOnTaskRemoved(disable = false)
             .setBuildConfigDebug(buildConfigDebug = BuildConfig.DEBUG)
 
             // Can instantiate directly here then access it from
