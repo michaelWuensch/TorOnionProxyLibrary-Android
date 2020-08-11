@@ -496,7 +496,9 @@ class ServiceNotification internal constructor(
         if (inForeground) {
             torService.stopForeground(!showNotification)
             inForeground = false
-            launchRefreshNotificationJob(torService)
+            notificationBuilder?.let {
+                notify(torService, it)
+            }
         }
         return serviceNotification
     }
