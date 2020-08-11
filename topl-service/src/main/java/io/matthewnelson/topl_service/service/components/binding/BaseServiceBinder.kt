@@ -66,7 +66,10 @@
 * */
 package io.matthewnelson.topl_service.service.components.binding
 
+import android.app.Activity
+import android.app.Application
 import android.os.Binder
+import android.os.Bundle
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
@@ -77,6 +80,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import net.freehaven.tor.control.TorControlCommands
 
 
 internal abstract class BaseServiceBinder(private val torService: BaseService): Binder() {
@@ -113,16 +117,9 @@ internal abstract class BaseServiceBinder(private val torService: BaseService): 
         cancelExecuteBackgroundPolicyJob()
         backgroundPolicyExecutionJob = torService.getScopeMain().launch {
             when (policy) {
-                BackgroundPolicy.KEEP_ALIVE -> {
-                    while (isActive && TorServiceConnection.serviceBinder != null) {
-                        delay(executionDelay)
-                        if (isActive && TorServiceConnection.serviceBinder != null) {
-                            bgMgrBroadcastLogger.debug("Executing background management policy")
-                            torService.stopForegroundService()
-                            torService.startForegroundService()
-                            torService.stopForegroundService()
-                        }
-                    }
+                BackgroundPolicy.RUN_IN_FOREGROUND -> {
+                    bgMgrBroadcastLogger.debug("Executing background management policy")
+                    torService.startForegroundService()
                 }
                 BackgroundPolicy.RESPECT_RESOURCES -> {
                     delay(executionDelay)
