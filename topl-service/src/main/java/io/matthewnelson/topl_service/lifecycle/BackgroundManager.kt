@@ -151,9 +151,9 @@ class BackgroundManager internal constructor(
     class Builder {
 
         @BackgroundPolicy
-        private lateinit var chosenPolicy: String
+        internal lateinit var chosenPolicy: String
         private var executionDelay: Long = 30_000L
-        private var killAppIfTaskIsRemoved = false
+        internal var killAppIfTaskIsRemoved = false
 
         /**
          * Stops [TorService] after being in the background for the declared [secondsFrom5To45].
@@ -221,7 +221,7 @@ class BackgroundManager internal constructor(
          *
          * @param [policyBuilder] The [BackgroundManager.Builder] to be built during initialization
          * */
-        class Policy(private val policyBuilder: Builder) {
+        class Policy(internal val policyBuilder: Builder) {
 
             /**
              * Only available internally, so this is where we intercept for integration testing.
