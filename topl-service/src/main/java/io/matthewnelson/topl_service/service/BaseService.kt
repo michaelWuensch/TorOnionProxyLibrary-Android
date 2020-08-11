@@ -76,6 +76,7 @@ import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.BuildConfig
+import io.matthewnelson.topl_service.lifecycle.BackgroundManager
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
@@ -377,6 +378,7 @@ internal abstract class BaseService: Service() {
 
 
     override fun onTaskRemoved(rootIntent: Intent?) {
+        BackgroundManager.taskIsRemovedFromRecentApps(true)
         // Move to the foreground so we can properly shutdown w/o interrupting the
         // application's normal lifecycle (Context.startServiceForeground does... thus,
         // the complexity)

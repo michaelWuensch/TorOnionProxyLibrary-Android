@@ -67,6 +67,7 @@
 package io.matthewnelson.topl_service.lifecycle
 
 import android.content.Context
+import android.os.Process
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -79,8 +80,10 @@ import io.matthewnelson.topl_service.util.ServiceConsts
 
 /**
  * When your application is sent to the background (the Recent App's tray or lock screen), the
- * chosen [BackgroundManager.Builder.Policy] will be executed after the number of seconds you've
- * declared.
+ * chosen [BackgroundManager.Builder.Policy] will be triggered.
+ *
+ * Additionally, there are 2 values for you to query if needed to give you context surrounding
+ * your application's background state; [taskIsInForeground] and [taskIsRemovedFromRecentApps].
  *
  * If brought back into the foreground by the user:
  *
@@ -88,11 +91,11 @@ import io.matthewnelson.topl_service.util.ServiceConsts
  *   was **not** [ServiceConsts.ServiceActionName.STOP], a startService call is made to ensure it's
  *   started.
  *
- *   - **After Policy execution**: If [BaseService.lastAcceptedServiceAction]
- *   was **not** [ServiceConsts.ServiceActionName.STOP], a startService call is made to ensure it's
- *   started.
+ *   - **After Policy execution**: If [BaseService.lastAcceptedServiceAction] was **not**
+ *   [ServiceConsts.ServiceActionName.STOP], a startService call is made to ensure it's started.
  *
- *   - See [BaseService.updateLastAcceptedServiceAction] and [TorService.onTaskRemoved] for
+ *   - See [io.matthewnelson.topl_service.service.components.binding.BaseServiceBinder],
+ *   [BaseService.updateLastAcceptedServiceAction], and [TorService.onTaskRemoved] for
  *   more information.
  *
  * While your application is in the foreground the only way to stop the service is by
@@ -103,15 +106,16 @@ import io.matthewnelson.topl_service.util.ServiceConsts
  *
  * When the user sends your application to the Recent App's tray though, to recoup resources
  * the OS will kill your app after being idle for a period of time (random AF... typically
- * 0.75m to 1.25m if the device's memory is being used heavily). This is not an issue if
- * the user removes the task before the OS kills the app, as Tor will be able to shutdown
- * properly and the service will stop.
+ * 0.75m to 1.25m if the device's memory is being used heavily) if the service is not moved to
+ * the Foreground to inhibit this. This is not an issue if the user removes the task before the
+ * OS kills the app, as Tor will be able to shutdown properly and the service will stop.
  *
  * This is where Services get sketchy (especially when trying to implement an always
  * running service for networking), and is the purpose of the [BackgroundManager] class.
  *
  * This class starts your chosen [BackgroundManager.Builder.Policy] as soon as your
- * application is sent to the background, waits for the time you declared, and then executes.
+ * application is sent to the background. It facilitates a more declarative, flexible
+ * operation to fit Library users' needs.
  *
  * See the [BackgroundManager.Builder] for more detail.
  *
@@ -127,7 +131,8 @@ class BackgroundManager internal constructor(
     @BackgroundPolicy private val policy: String,
     private val executionDelay: Long,
     private val serviceClass: Class<*>,
-    private val bindServiceFlag: Int
+    private val bindServiceFlag: Int,
+    private val killAppIfTaskIsRemoved: Boolean
 ): ServiceConsts(), LifecycleObserver {
 
 
@@ -148,29 +153,7 @@ class BackgroundManager internal constructor(
         @BackgroundPolicy
         private lateinit var chosenPolicy: String
         private var executionDelay: Long = 30_000L
-
-        // TODO: Needs more work... running in the foreground is inhibiting the Application from
-        //  performing it's normal lifecycle after user swipes it away such that it's not going
-        //  through Application.onCreate, but is holding onto references. (same problem when
-        //  starting the service using Context.startForegroundService), which is bullshit.
-//        /**
-//         * While your application is in the background (the Recent App's tray or lock screen),
-//         * this [Policy] periodically switches [TorService] to the foreground then immediately
-//         * back the background. Doing do prevents your application from going idle and being
-//         * killed by the OS. It is much more resource intensive than choosing
-//         * [respectResourcesWhileInBackground].
-//         *
-//         * @param [secondsFrom20To40]? Seconds between the events of cycling from background to
-//         * foreground to background. Sending null will use the default (30s)
-//         * @return [BackgroundManager.Builder.Policy] To use when initializing
-//         *   [io.matthewnelson.topl_service.TorServiceController.Builder]
-//         * */
-//        fun keepAliveWhileInBackground(secondsFrom20To40: Int? = null): Policy {
-//            chosenPolicy = BackgroundPolicy.KEEP_ALIVE
-//            if (secondsFrom20To40 != null && secondsFrom20To40 in 20..40)
-//                executionDelay = (secondsFrom20To40 * 1000).toLong()
-//            return Policy(this)
-//        }
+        private var killAppIfTaskIsRemoved = false
 
         /**
          * Stops [TorService] after being in the background for the declared [secondsFrom5To45].
@@ -202,18 +185,33 @@ class BackgroundManager internal constructor(
         }
 
         /**
-         * Electing this option will simply run [TorService] while your application is
-         * in the background, until the OS kills it along with your application. As long
-         * as your application has not been killed, the service will keep running. Upon
-         * being killed, the notification (if enabled) will simply timeout and cancel itself.
-         * All processes and threads will stop, and a cold start called on your application
-         * the next time the user opens it.
+         * Electing this option will, when your application is sent to the background, immediately
+         * move [TorService] to the Foreground. If the user returns to your application,
+         * [TorService] will then be backgrounded.
+         *
+         * Some things to note about your application's behaviour with this option:
+         *
+         *   - If the user sends your app to the recent App's tray and then swipes it away,
+         *   [TorService.onTaskRemoved] will stop Tor, and then [TorService].
+         *   - Because of how shitty the Service APIs are, your application will _not_ be
+         *   killed like one would expect, thus not going through `Application.onCreate` if the
+         *   user re-launches your application.
+         *   - In the event of being re-launched in the aforementioned state,
+         *   [applicationMovedToForeground] is called and Tor will be started again to match the
+         *   Service's State for which it was left, prior to "terminating" your application.
+         *   - Even while the Service has been properly stopped and everything cleaned up, your
+         *   application will continue running and not be killed (Again, Service APIs...).
+         *   - If [TorService] is stopped, and *then* your application is cleared from the
+         *   recent apps tray, your application will be killed.
+         *
+         * @param [killAppIfTaskIsRemoved] If set to `true`, your Application's Process will be
+         *   killed in [TorService.onDestroy] if the user removed the task from the recent app's
+         *   tray and has not returned to the application before [killAppProcess] is called.
          * */
         @JvmOverloads
-        fun runServiceInForeground(secondsFrom0To45: Int? = null): Policy {
+        fun runServiceInForeground(killAppIfTaskIsRemoved: Boolean = false): Policy {
             chosenPolicy = BackgroundPolicy.RUN_IN_FOREGROUND
-            if (secondsFrom0To45 != null && secondsFrom0To45 in 0..45)
-                executionDelay = (secondsFrom0To45 * 1000).toLong()
+            this.killAppIfTaskIsRemoved = killAppIfTaskIsRemoved
             return Policy(this)
         }
 
@@ -246,25 +244,46 @@ class BackgroundManager internal constructor(
                             policyBuilder.chosenPolicy,
                             policyBuilder.executionDelay,
                             serviceClass,
-                            bindServiceFlag
+                            bindServiceFlag,
+                            policyBuilder.killAppIfTaskIsRemoved
                         )
                 }
             }
         }
     }
 
-    internal companion object {
+    companion object {
         private lateinit var backgroundManager: BackgroundManager
 
-        // TODO: re-implement in BaseService as a monitor for Tor's state so it can automatically
-        //  handle hiccups (such as network getting stuck b/c Android is sometimes unreliable,
-        //  or Bootstrapping stalling).
-//        var heartbeatTime = 30_000L
-//            private set
-//
-//        fun initialize(milliseconds: Long) {
-//            heartbeatTime = milliseconds
-//        }
+        @JvmStatic
+        @Volatile
+        var taskIsInForeground = true
+            private set
+
+        @JvmStatic
+        @Volatile
+        var taskIsRemovedFromRecentApps = false
+            private set
+
+        internal fun taskIsRemovedFromRecentApps(isRemoved: Boolean) {
+            taskIsRemovedFromRecentApps = isRemoved
+        }
+
+        /**
+         * Called from [TorService.onDestroy].
+         *
+         * Will only kill the application process if [taskIsRemovedFromRecentApps] is `true`.
+         * [taskIsRemovedFromRecentApps] will turn back to `false` when
+         * [applicationMovedToForeground] is fired off, as to not kill the application in the
+         * event the user quickly re-launches the application between the time
+         * [TorService.onTaskRemoved] gets a callback, and this method is called from
+         * [TorService.onDestroy].
+         * */
+        internal fun killAppProcess() {
+            if (backgroundManager.killAppIfTaskIsRemoved && taskIsRemovedFromRecentApps) {
+                Process.killProcess(Process.myPid())
+            }
+        }
     }
 
     init {
@@ -273,6 +292,8 @@ class BackgroundManager internal constructor(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     private fun applicationMovedToForeground() {
+        taskIsRemovedFromRecentApps(false)
+        taskIsInForeground = true
         // if the last _accepted_ ServiceAction to be issued by the Application was not to STOP
         // the service, then we want to put it back in the state it was in
         if (!ServiceActionProcessor.wasLastAcceptedServiceActionStop()) {
@@ -288,6 +309,7 @@ class BackgroundManager internal constructor(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     private fun applicationMovedToBackground() {
+        taskIsInForeground = false
         if (!ServiceActionProcessor.wasLastAcceptedServiceActionStop()) {
             // System automatically unbinds when app is sent to the background. This prevents
             // it so that we maintain a started, bound service.
