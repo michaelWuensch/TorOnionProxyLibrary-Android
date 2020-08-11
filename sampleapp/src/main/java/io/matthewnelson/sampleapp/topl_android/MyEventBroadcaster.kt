@@ -64,7 +64,7 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.sampleapp
+package io.matthewnelson.sampleapp.topl_android
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

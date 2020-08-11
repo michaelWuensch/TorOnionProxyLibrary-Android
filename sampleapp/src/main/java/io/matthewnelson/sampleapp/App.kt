@@ -70,6 +70,8 @@ import android.app.Application
 import android.content.Context
 import android.os.Process
 import androidx.core.app.NotificationCompat
+import io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster
+import io.matthewnelson.sampleapp.topl_android.MyTorSettings
 import io.matthewnelson.sampleapp.ui.MainActivity
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_service.TorServiceController

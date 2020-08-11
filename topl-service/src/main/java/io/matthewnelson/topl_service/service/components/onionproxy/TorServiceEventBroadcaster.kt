@@ -80,7 +80,7 @@ import io.matthewnelson.topl_core_base.EventBroadcaster
  *
  * All broadcasts to your implementation to this class will occur on the Main thread.
  *
- * @sample [io.matthewnelson.sampleapp.MyEventBroadcaster]
+ * @sample [io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster]
  * */
 abstract class TorServiceEventBroadcaster: EventBroadcaster() {
 

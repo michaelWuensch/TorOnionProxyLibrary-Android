@@ -71,7 +71,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.lifecycle.Observer
-import io.matthewnelson.sampleapp.MyEventBroadcaster
+import io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster
 import io.matthewnelson.sampleapp.R
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyBoolean
