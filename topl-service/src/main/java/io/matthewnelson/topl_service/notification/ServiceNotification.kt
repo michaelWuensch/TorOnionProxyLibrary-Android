@@ -490,20 +490,29 @@ class ServiceNotification internal constructor(
     internal var inForeground = false
         private set
 
+    /**
+     * Sends [TorService] to the Foreground.
+     *
+     * @return `true` if sent to Foreground, `false` if no action taken
+     * */
     @Synchronized
     internal fun startForeground(torService: BaseService): Boolean {
         return if (!inForeground) {
             notificationBuilder?.let {
                 torService.startForeground(notificationID, it.build())
                 inForeground = true
-                return true
             }
-            false
+            inForeground
         } else {
             false
         }
     }
 
+    /**
+     * Sends [TorService] to the Background.
+     *
+     * @return `true` if sent to Background, `false` if no action taken
+     * */
     @Synchronized
     internal fun stopForeground(torService: BaseService): Boolean {
         return if (inForeground) {
