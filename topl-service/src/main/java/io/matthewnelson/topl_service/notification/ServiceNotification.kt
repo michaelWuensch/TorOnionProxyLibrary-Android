@@ -357,8 +357,12 @@ class ServiceNotification internal constructor(
     private var notificationBuilder: NotificationCompat.Builder? = null
     private var notificationManager: NotificationManager? = null
     private val timeoutLength = 3_000L
+    private var startTime: Long? = null
 
-    internal fun buildNotification(torService: BaseService): NotificationCompat.Builder {
+    internal fun buildNotification(
+        torService: BaseService,
+        setStartTime: Boolean = false
+    ): NotificationCompat.Builder {
         val builder = NotificationCompat.Builder(torService.context.applicationContext, channelID)
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
             .setContentText(currentContentText)
@@ -373,17 +377,23 @@ class ServiceNotification internal constructor(
             .setTimeoutAfter(timeoutLength)
             .setVisibility(visibility)
 
+        if (startTime == null || setStartTime)
+            startTime = System.currentTimeMillis()
+
+        startTime?.let {
+            builder.setWhen(it)
+        }
+
         currentColor?.let {
             builder.color = it
         }
 
         if (progressBarShown) {
             val progress = progressValue
-            if (progress != null) {
+            if (progress != null)
                 builder.setProgress(100, progress, false)
-            } else {
+            else
                 builder.setProgress(100, 0, true)
-            }
         }
 
         if (activityWhenTapped != null)
@@ -480,27 +490,42 @@ class ServiceNotification internal constructor(
     internal var inForeground = false
         private set
 
+    /**
+     * Sends [TorService] to the Foreground.
+     *
+     * @return `true` if sent to Foreground, `false` if no action taken
+     * */
     @Synchronized
-    internal fun startForeground(torService: BaseService): ServiceNotification {
-        if (!inForeground) {
+    internal fun startForeground(torService: BaseService): Boolean {
+        return if (!inForeground) {
             notificationBuilder?.let {
                 torService.startForeground(notificationID, it.build())
                 inForeground = true
+                return true
             }
+            false
+        } else {
+            false
         }
-        return serviceNotification
     }
 
+    /**
+     * Sends [TorService] to the Background.
+     *
+     * @return `true` if sent to Background, `false` if no action taken
+     * */
     @Synchronized
-    internal fun stopForeground(torService: BaseService): ServiceNotification {
-        if (inForeground) {
+    internal fun stopForeground(torService: BaseService): Boolean {
+        return if (inForeground) {
             torService.stopForeground(!showNotification)
             inForeground = false
             notificationBuilder?.let {
                 notify(torService, it)
             }
+            true
+        } else {
+            false
         }
-        return serviceNotification
     }
 
 
@@ -514,26 +539,27 @@ class ServiceNotification internal constructor(
     @Synchronized
     internal fun addActions(torService: BaseService) {
         val builder = notificationBuilder ?: return
+        actionsPresent = true
+
         builder.addAction(
             imageNetworkEnabled,
             "New Identity",
             getActionPendingIntent(torService, ServiceActionName.NEW_ID, 1)
         )
 
-        if (enableRestartButton)
+        if (enableRestartButton && TorServiceReceiver.deviceIsLocked != true)
             builder.addAction(
                 imageNetworkEnabled,
                 "Restart Tor",
                 getActionPendingIntent(torService, ServiceActionName.RESTART_TOR, 2)
             )
 
-        if (enableStopButton)
+        if (enableStopButton && TorServiceReceiver.deviceIsLocked != true)
             builder.addAction(
                 imageNetworkEnabled,
                 "Stop Tor",
                 getActionPendingIntent(torService, ServiceActionName.STOP, 3)
             )
-        actionsPresent = true
         notify(torService, builder)
     }
 
@@ -552,6 +578,24 @@ class ServiceNotification internal constructor(
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT
         )
+    }
+
+    /**
+     * Refreshes the notification Actions.
+     *
+     * @return `true` if actions were present to be refreshed, `false` if actions weren't
+     *   present, thus not needing a refresh
+     * @see [TorServiceReceiver.deviceIsLocked]
+     * */
+    @Synchronized
+    internal fun refreshActions(torService: BaseService): Boolean {
+        return if (actionsPresent) {
+            removeActions(torService)
+            addActions(torService)
+            true
+        } else {
+            false
+        }
     }
 
     @Synchronized

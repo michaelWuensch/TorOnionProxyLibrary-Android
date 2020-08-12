@@ -66,6 +66,7 @@
 * */
 package io.matthewnelson.topl_service.service.components.receiver
 
+import android.app.KeyguardManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -94,17 +95,33 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
         @Volatile
         var isRegistered = false
             private set
+
+        @Volatile
+        var deviceIsLocked: Boolean? = null
+            private set
     }
 
     private val broadcastLogger = torService.getBroadcastLogger(TorServiceReceiver::class.java)
 
     fun register() {
-        torService.context.applicationContext.registerReceiver(
-            this, IntentFilter(SERVICE_INTENT_FILTER)
-        )
+        val filter = IntentFilter(SERVICE_INTENT_FILTER)
+        if (torService.doesReceiverNeedToListenForLockScreen()) {
+            filter.addAction(Intent.ACTION_SCREEN_OFF)
+            filter.addAction(Intent.ACTION_SCREEN_ON)
+            filter.addAction(Intent.ACTION_USER_PRESENT)
+        }
+        torService.context.applicationContext.registerReceiver(this, filter)
         if (!isRegistered)
             broadcastLogger.debug("Has been registered")
         isRegistered = true
+    }
+
+    /**
+     * Sets [deviceIsLocked] to the value sent. If [value] is null, it will check
+     * KeyguardManager.
+     * */
+    fun setDeviceIsLocked(value: Boolean? = null) {
+        deviceIsLocked = value ?: checkIfDeviceIsLocked()
     }
 
     fun unregister() {
@@ -112,6 +129,7 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
             try {
                 torService.context.applicationContext.unregisterReceiver(this)
                 isRegistered = false
+                setDeviceIsLocked()
                 broadcastLogger.debug("Has been unregistered")
             } catch (e: IllegalArgumentException) {
                 broadcastLogger.exception(e)
@@ -119,11 +137,14 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
         }
     }
 
+    private fun checkIfDeviceIsLocked(): Boolean? {
+        val keyguardManager = torService.context.applicationContext
+            .getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager?
+        return keyguardManager?.isKeyguardLocked
+    }
+
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context != null && intent != null) {
-            // Only accept Intents from this package.
-            if (context.applicationInfo.dataDir != torService.context.applicationInfo.dataDir) return
-
             when (val serviceAction = intent.getStringExtra(SERVICE_INTENT_FILTER)) {
                 ServiceActionName.NEW_ID -> {
                     torService.processServiceAction(ServiceActions.NewId())
@@ -135,9 +156,25 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
                     torService.processServiceAction(ServiceActions.Stop())
                 }
                 else -> {
-                    broadcastLogger.warn(
-                        "This class does not accept $serviceAction as an argument."
-                    )
+
+                    when (intent.action) {
+                        Intent.ACTION_SCREEN_OFF,
+                        Intent.ACTION_SCREEN_ON,
+                        Intent.ACTION_USER_PRESENT -> {
+                            val locked = checkIfDeviceIsLocked()
+                            if (locked != deviceIsLocked) {
+                                setDeviceIsLocked(locked)
+                                broadcastLogger.debug("Device is locked: $deviceIsLocked")
+                                torService.refreshNotificationActions()
+                            }
+                        }
+                        else -> {
+                            broadcastLogger.warn(
+                                "This class does not accept $serviceAction as an argument."
+                            )
+                        }
+                    }
+
                 }
             }
         }

@@ -123,6 +123,9 @@ internal class TestTorService(
     override fun registerReceiver() {
         torServiceReceiver.register()
     }
+    override fun setIsDeviceLocked() {
+        torServiceReceiver.setDeviceIsLocked()
+    }
     override fun unregisterReceiver() {
         torServiceReceiver.unregister()
     }

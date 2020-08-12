@@ -72,6 +72,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import androidx.annotation.WorkerThread
+import androidx.core.app.NotificationCompat
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
@@ -257,6 +258,7 @@ internal abstract class BaseService: Service() {
     /// BroadcastReceiver ///
     /////////////////////////
     abstract fun registerReceiver()
+    abstract fun setIsDeviceLocked()
     abstract fun unregisterReceiver()
 
 
@@ -291,16 +293,32 @@ internal abstract class BaseService: Service() {
     fun addNotificationActions() {
         serviceNotification.addActions(this)
     }
+    fun doesReceiverNeedToListenForLockScreen(): Boolean {
+        return when {
+            serviceNotification.visibility == NotificationCompat.VISIBILITY_SECRET -> {
+                false
+            }
+            serviceNotification.enableRestartButton || serviceNotification.enableStopButton -> {
+                true
+            }
+            else -> {
+                false
+            }
+        }
+    }
+    open fun refreshNotificationActions(): Boolean {
+        return serviceNotification.refreshActions(this)
+    }
     fun removeNotification() {
         serviceNotification.remove()
     }
     fun removeNotificationActions() {
         serviceNotification.removeActions(this)
     }
-    fun startForegroundService(): ServiceNotification {
+    open fun startForegroundService(): Boolean {
         return serviceNotification.startForeground(this)
     }
-    fun stopForegroundService(): ServiceNotification {
+    open fun stopForegroundService(): Boolean {
         return serviceNotification.stopForeground(this)
     }
     fun updateNotificationContentText(string: String) {
@@ -357,8 +375,9 @@ internal abstract class BaseService: Service() {
 
 
     override fun onCreate() {
-        serviceNotification.buildNotification(this)
+        serviceNotification.buildNotification(this, setStartTime = true)
         registerPrefsListener()
+        setIsDeviceLocked()
     }
 
     override fun onDestroy() {
