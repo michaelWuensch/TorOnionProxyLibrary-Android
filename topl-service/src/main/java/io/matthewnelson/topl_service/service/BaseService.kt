@@ -72,6 +72,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import androidx.annotation.WorkerThread
+import androidx.core.app.NotificationCompat
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
@@ -257,6 +258,7 @@ internal abstract class BaseService: Service() {
     /// BroadcastReceiver ///
     /////////////////////////
     abstract fun registerReceiver()
+    abstract fun setIsDeviceLocked()
     abstract fun unregisterReceiver()
 
 
@@ -290,6 +292,22 @@ internal abstract class BaseService: Service() {
 
     fun addNotificationActions() {
         serviceNotification.addActions(this)
+    }
+    fun doesReceiverNeedToListenForLockScreen(): Boolean {
+        return when {
+            serviceNotification.visibility == NotificationCompat.VISIBILITY_SECRET -> {
+                false
+            }
+            serviceNotification.enableRestartButton || serviceNotification.enableStopButton -> {
+                true
+            }
+            else -> {
+                false
+            }
+        }
+    }
+    fun refreshNotificationActions() {
+        serviceNotification.refreshActions(this)
     }
     fun removeNotification() {
         serviceNotification.remove()
@@ -359,6 +377,7 @@ internal abstract class BaseService: Service() {
     override fun onCreate() {
         serviceNotification.buildNotification(this)
         registerPrefsListener()
+        setIsDeviceLocked()
     }
 
     override fun onDestroy() {

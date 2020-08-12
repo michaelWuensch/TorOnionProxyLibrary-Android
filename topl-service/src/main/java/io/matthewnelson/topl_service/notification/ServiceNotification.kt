@@ -514,26 +514,27 @@ class ServiceNotification internal constructor(
     @Synchronized
     internal fun addActions(torService: BaseService) {
         val builder = notificationBuilder ?: return
+        actionsPresent = true
+
         builder.addAction(
             imageNetworkEnabled,
             "New Identity",
             getActionPendingIntent(torService, ServiceActionName.NEW_ID, 1)
         )
 
-        if (enableRestartButton)
+        if (enableRestartButton && TorServiceReceiver.deviceIsLocked != true)
             builder.addAction(
                 imageNetworkEnabled,
                 "Restart Tor",
                 getActionPendingIntent(torService, ServiceActionName.RESTART_TOR, 2)
             )
 
-        if (enableStopButton)
+        if (enableStopButton && TorServiceReceiver.deviceIsLocked != true)
             builder.addAction(
                 imageNetworkEnabled,
                 "Stop Tor",
                 getActionPendingIntent(torService, ServiceActionName.STOP, 3)
             )
-        actionsPresent = true
         notify(torService, builder)
     }
 
@@ -552,6 +553,13 @@ class ServiceNotification internal constructor(
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT
         )
+    }
+
+    @Synchronized
+    internal fun refreshActions(torService: BaseService) {
+        if (!actionsPresent) return
+        removeActions(torService)
+        addActions(torService)
     }
 
     @Synchronized
