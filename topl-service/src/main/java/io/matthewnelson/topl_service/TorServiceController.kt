@@ -120,9 +120,9 @@ class TorServiceController private constructor(): ServiceConsts() {
      * @param [geoip6AssetPath] The path to where you have your geoip6 file located (ex: in
      *   assets/common directory, send this variable "common/geoip6")
      *
-     * @sample [io.matthewnelson.sampleapp.App.generateTorServiceNotificationBuilder]
-     * @sample [io.matthewnelson.sampleapp.App.generateBackgroundManagerPolicy]
-     * @sample [io.matthewnelson.sampleapp.App.setupTorServices]
+     * @sample [io.matthewnelson.sampleapp.topl_android.CodeSamples.generateTorServiceNotificationBuilder]
+     * @sample [io.matthewnelson.sampleapp.topl_android.CodeSamples.generateBackgroundManagerPolicy]
+     * @sample [io.matthewnelson.sampleapp.topl_android.CodeSamples.setupTorServices]
      * */
     class Builder(
         private val application: Application,

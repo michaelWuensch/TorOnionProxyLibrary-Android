@@ -103,6 +103,7 @@ dependencies {
     implementation deps.kotlin.stdlib
 
     implementation 'io.matthewnelson.topl-android:tor-binary:0.4.3.5a'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     testImplementation deps.junit
 

@@ -146,7 +146,7 @@ class BackgroundManager internal constructor(
      * startup command is issued to bring it back to the started state no matter if it is still
      * running or not.
      *
-     * @sample [io.matthewnelson.sampleapp.App.generateBackgroundManagerPolicy]
+     * @sample [io.matthewnelson.sampleapp.topl_android.CodeSamples.generateBackgroundManagerPolicy]
      * */
     class Builder {
 

@@ -133,7 +133,7 @@ class ServiceNotification internal constructor(
      * @param [channelID] Your notification channel's ID (Cannot be Empty).
      * @param [channelDescription] Your notification channel's description (Cannot be Empty).
      * @param [notificationID] Your foreground notification's ID.
-     * @sample [io.matthewnelson.sampleapp.App.generateTorServiceNotificationBuilder]
+     * @sample [io.matthewnelson.sampleapp.topl_android.CodeSamples.generateTorServiceNotificationBuilder]
      * @throws [IllegalArgumentException] If String fields are empty.
      * */
     class Builder(
