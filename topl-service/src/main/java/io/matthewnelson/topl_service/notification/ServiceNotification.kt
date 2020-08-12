@@ -357,8 +357,12 @@ class ServiceNotification internal constructor(
     private var notificationBuilder: NotificationCompat.Builder? = null
     private var notificationManager: NotificationManager? = null
     private val timeoutLength = 3_000L
+    private var startTime: Long? = null
 
-    internal fun buildNotification(torService: BaseService): NotificationCompat.Builder {
+    internal fun buildNotification(
+        torService: BaseService,
+        setStartTime: Boolean = false
+    ): NotificationCompat.Builder {
         val builder = NotificationCompat.Builder(torService.context.applicationContext, channelID)
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
             .setContentText(currentContentText)
@@ -373,17 +377,23 @@ class ServiceNotification internal constructor(
             .setTimeoutAfter(timeoutLength)
             .setVisibility(visibility)
 
+        if (startTime == null || setStartTime)
+            startTime = System.currentTimeMillis()
+
+        startTime?.let {
+            builder.setWhen(it)
+        }
+
         currentColor?.let {
             builder.color = it
         }
 
         if (progressBarShown) {
             val progress = progressValue
-            if (progress != null) {
+            if (progress != null)
                 builder.setProgress(100, progress, false)
-            } else {
+            else
                 builder.setProgress(100, 0, true)
-            }
         }
 
         if (activityWhenTapped != null)

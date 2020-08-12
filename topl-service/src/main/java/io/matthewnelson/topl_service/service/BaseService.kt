@@ -375,7 +375,7 @@ internal abstract class BaseService: Service() {
 
 
     override fun onCreate() {
-        serviceNotification.buildNotification(this)
+        serviceNotification.buildNotification(this, setStartTime = true)
         registerPrefsListener()
         setIsDeviceLocked()
     }
