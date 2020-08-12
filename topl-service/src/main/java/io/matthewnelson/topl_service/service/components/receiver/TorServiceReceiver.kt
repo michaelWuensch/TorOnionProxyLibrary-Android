@@ -165,7 +165,6 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
                             if (locked != deviceIsLocked) {
                                 setDeviceIsLocked(locked)
                                 broadcastLogger.debug("Device is locked: $deviceIsLocked")
-                                broadcastLogger.debug("Refreshing Notification Actions")
                                 torService.refreshNotificationActions()
                             }
                         }

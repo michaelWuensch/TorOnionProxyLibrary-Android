@@ -501,8 +501,9 @@ class ServiceNotification internal constructor(
             notificationBuilder?.let {
                 torService.startForeground(notificationID, it.build())
                 inForeground = true
+                return true
             }
-            inForeground
+            false
         } else {
             false
         }
@@ -579,11 +580,22 @@ class ServiceNotification internal constructor(
         )
     }
 
+    /**
+     * Refreshes the notification Actions.
+     *
+     * @return `true` if actions were present to be refreshed, `false` if actions weren't
+     *   present, thus not needing a refresh
+     * @see [TorServiceReceiver.deviceIsLocked]
+     * */
     @Synchronized
-    internal fun refreshActions(torService: BaseService) {
-        if (!actionsPresent) return
-        removeActions(torService)
-        addActions(torService)
+    internal fun refreshActions(torService: BaseService): Boolean {
+        return if (actionsPresent) {
+            removeActions(torService)
+            addActions(torService)
+            true
+        } else {
+            false
+        }
     }
 
     @Synchronized

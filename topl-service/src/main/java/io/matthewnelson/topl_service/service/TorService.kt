@@ -161,6 +161,17 @@ internal class TorService: BaseService() {
 
     // See BaseService
 
+    override fun refreshNotificationActions(): Boolean {
+        val wasRefreshed = super.refreshNotificationActions()
+        if (wasRefreshed) {
+            val debugMsg = if (TorServiceReceiver.deviceIsLocked == true)
+                "Removed Notification Actions"
+            else
+                "Added Notification Actions"
+            broadcastLogger.debug(debugMsg)
+        }
+        return wasRefreshed
+    }
     override fun startForegroundService(): Boolean {
         val wasStarted = super.startForegroundService()
         if (wasStarted)

@@ -306,8 +306,8 @@ internal abstract class BaseService: Service() {
             }
         }
     }
-    fun refreshNotificationActions() {
-        serviceNotification.refreshActions(this)
+    open fun refreshNotificationActions(): Boolean {
+        return serviceNotification.refreshActions(this)
     }
     fun removeNotification() {
         serviceNotification.remove()
