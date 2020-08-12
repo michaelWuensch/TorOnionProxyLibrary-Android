@@ -161,6 +161,19 @@ internal class TorService: BaseService() {
 
     // See BaseService
 
+    override fun startForegroundService(): Boolean {
+        val wasStarted = super.startForegroundService()
+        if (wasStarted)
+            broadcastLogger.debug("Service sent to Foreground")
+        return wasStarted
+    }
+    override fun stopForegroundService(): Boolean {
+        val wasStopped = super.stopForegroundService()
+        if (wasStopped)
+            broadcastLogger.debug("Service sent to Background")
+        return wasStopped
+    }
+
 
     /////////////////
     /// TOPL-Core ///

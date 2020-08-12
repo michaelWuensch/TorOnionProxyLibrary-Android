@@ -491,26 +491,31 @@ class ServiceNotification internal constructor(
         private set
 
     @Synchronized
-    internal fun startForeground(torService: BaseService): ServiceNotification {
-        if (!inForeground) {
+    internal fun startForeground(torService: BaseService): Boolean {
+        return if (!inForeground) {
             notificationBuilder?.let {
                 torService.startForeground(notificationID, it.build())
                 inForeground = true
+                return true
             }
+            false
+        } else {
+            false
         }
-        return serviceNotification
     }
 
     @Synchronized
-    internal fun stopForeground(torService: BaseService): ServiceNotification {
-        if (inForeground) {
+    internal fun stopForeground(torService: BaseService): Boolean {
+        return if (inForeground) {
             torService.stopForeground(!showNotification)
             inForeground = false
             notificationBuilder?.let {
                 notify(torService, it)
             }
+            true
+        } else {
+            false
         }
-        return serviceNotification
     }
 
 

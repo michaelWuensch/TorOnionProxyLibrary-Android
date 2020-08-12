@@ -315,10 +315,10 @@ internal abstract class BaseService: Service() {
     fun removeNotificationActions() {
         serviceNotification.removeActions(this)
     }
-    fun startForegroundService(): ServiceNotification {
+    open fun startForegroundService(): Boolean {
         return serviceNotification.startForeground(this)
     }
-    fun stopForegroundService(): ServiceNotification {
+    open fun stopForegroundService(): Boolean {
         return serviceNotification.stopForeground(this)
     }
     fun updateNotificationContentText(string: String) {
