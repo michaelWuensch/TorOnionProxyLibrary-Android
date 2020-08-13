@@ -68,6 +68,10 @@ package io.matthewnelson.sampleapp.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import io.matthewnelson.sampleapp.R
 
 /**
@@ -75,8 +79,34 @@ import io.matthewnelson.sampleapp.R
  * */
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var navController: NavController
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        navController = findNavController(R.id.nav_host_fragment)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.action_bar_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_settings_main -> {
+
+                when (navController.currentDestination?.id) {
+                    R.id.navigation_home -> {
+                        navController.navigate(R.id.navigation_settings_main)
+                    }
+                    R.id.navigation_settings_main -> {
+                        navController.popBackStack()
+                    }
+                }
+
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

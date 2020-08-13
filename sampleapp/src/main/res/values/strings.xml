@@ -12,6 +12,9 @@
     <string name="home_button_start">Start</string>
     <string name="home_button_stop">Stop</string>
 
+    <!-- Menu -->
+    <string name="menu_settings_main">Settings</string>
+
     <!-- SettingsMainFragment -->
     <string name="settings_main_button_app">Application Settings</string>
     <string name="settings_main_button_library">Library Settings</string>
@@ -22,6 +25,5 @@
         allowing you to see customization features to suite various needs.</string>
     <string name="settings_main_text_view_tor">These are settings specific to Tor,
         and is an example of how the TorServicePrefs Class allows for customization of the
-        torrc file outside of the defaults expressed upon initialization of TOPL-Android
-        via extension of the TorSettings Class</string>
+        torrc file outside of the static defaults expressed in the TorSettings Class</string>
 </resources>
