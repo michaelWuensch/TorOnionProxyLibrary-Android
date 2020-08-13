@@ -68,12 +68,11 @@ package io.matthewnelson.sampleapp
 
 import android.app.Application
 import android.os.Process
-import androidx.core.app.NotificationCompat
 import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster
 import io.matthewnelson.sampleapp.topl_android.MyTorSettings
 import io.matthewnelson.sampleapp.ui.MainActivity
-import io.matthewnelson.sampleapp.util.PrefKeys
+import io.matthewnelson.sampleapp.ui.fragments.settings.SettingsLibraryFragment
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
@@ -88,6 +87,9 @@ class App: Application() {
     companion object {
         lateinit var prefs: Prefs
     }
+
+    private val librarySettings: SettingsLibraryFragment.Companion
+        get() = SettingsLibraryFragment.Companion
 
     override fun onCreate() {
         super.onCreate()
@@ -120,11 +122,11 @@ class App: Application() {
                 intentRequestCode = null
             )
 
-            .setVisibility(prefs.read(PrefKeys.NOTIFICATION_VISIBILITY, NotificationCompat.VISIBILITY_PRIVATE))
-            .setCustomColor(prefs.read(PrefKeys.NOTIFICATION_COLOR_RESOURCE, R.color.primaryColor))
-            .enableTorRestartButton(prefs.read(PrefKeys.NOTIFICATION_ENABLE_RESTART, true))
-            .enableTorStopButton(prefs.read(PrefKeys.NOTIFICATION_ENABLE_STOP, true))
-            .showNotification(prefs.read(PrefKeys.NOTIFICATION_SHOW, true))
+            .setVisibility(librarySettings.getNotificationVisibilitySetting())
+            .setCustomColor(librarySettings.getNotificationColorSetting())
+            .enableTorRestartButton(librarySettings.getNotificationRestartEnableSetting())
+            .enableTorStopButton(librarySettings.getNotificationStopEnableSetting())
+            .showNotification(librarySettings.getNotificationShowSetting())
     }
 
     /**
@@ -133,14 +135,16 @@ class App: Application() {
      * */
     private fun generateBackgroundManagerPolicy(): BackgroundManager.Builder.Policy {
         val builder = BackgroundManager.Builder()
-        return when (prefs.read(PrefKeys.BACKGROUND_MANAGER_POLICY, Prefs.INVALID_STRING)) {
-            PrefKeys.BACKGROUND_MANAGER_POLICY_FOREGROUND -> {
-                val killApp = prefs.read(PrefKeys.BACKGROUND_MANAGER_KILL_APP, true)
-                builder.runServiceInForeground(killApp)
+        return when (librarySettings.getBackgroundManagerPolicySetting()) {
+            librarySettings.BACKGROUND_MANAGER_POLICY_FOREGROUND -> {
+                builder.runServiceInForeground(
+                    librarySettings.getBackgroundManagerKillAppSetting()
+                )
             }
-            PrefKeys.BACKGROUND_MANAGER_POLICY_RESPECT -> {
-                val executionDelay = prefs.read(PrefKeys.BACKGROUND_MANAGER_EXECUTE_DELAY, 20)
-                builder.respectResourcesWhileInBackground(executionDelay)
+            librarySettings.BACKGROUND_MANAGER_POLICY_RESPECT -> {
+                builder.respectResourcesWhileInBackground(
+                    librarySettings.getBackgroundManagerExecuteDelaySetting()
+                )
             }
             else -> {
                 builder.respectResourcesWhileInBackground(20)
@@ -163,10 +167,10 @@ class App: Application() {
             geoipAssetPath = "common/geoip",
             geoip6AssetPath = "common/geoip6"
         )
-            .addTimeToRestartTorDelay(prefs.read(PrefKeys.CONTROLLER_RESTART_DELAY, 100L))
-            .addTimeToStopServiceDelay(prefs.read(PrefKeys.CONTROLLER_STOP_DELAY, 100L))
-            .disableStopServiceOnTaskRemoved(prefs.read(PrefKeys.CONTROLLER_DISABLE_STOP_SERVICE_TASK_REMOVED, false))
-            .setBuildConfigDebug(prefs.read(PrefKeys.CONTROLLER_BUILD_CONFIG_DEBUG, BuildConfig.DEBUG))
+            .addTimeToRestartTorDelay(librarySettings.getControllerRestartDelaySetting())
+            .addTimeToStopServiceDelay(librarySettings.getControllerStopDelaySetting())
+            .disableStopServiceOnTaskRemoved(librarySettings.getControllerStopServiceOnTaskRemovedSetting())
+            .setBuildConfigDebug(librarySettings.getControllerBuildConfigDebugSetting())
             .setEventBroadcaster(eventBroadcaster = MyEventBroadcaster())
             .build()
     }

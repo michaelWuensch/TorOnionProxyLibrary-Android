@@ -71,9 +71,76 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.NotificationCompat
+import io.matthewnelson.encrypted_storage.Prefs
+import io.matthewnelson.sampleapp.App
+import io.matthewnelson.sampleapp.BuildConfig
 import io.matthewnelson.sampleapp.R
 
 class SettingsLibraryFragment : Fragment() {
+
+    companion object {
+        private val prefs: Prefs
+            get() = App.prefs
+
+        // Notification Keys
+        private const val NOTIFICATION_VISIBILITY = "NOTIFICATION_VISIBILITY"
+        private const val NOTIFICATION_COLOR_RESOURCE = "NOTIFICATION_COLOR_RESOURCE"
+        private const val NOTIFICATION_ENABLE_RESTART = "NOTIFICATION_ENABLE_RESTART"
+        private const val NOTIFICATION_ENABLE_STOP = "NOTIFICATION_ENABLE_STOP"
+        private const val NOTIFICATION_SHOW = "NOTIFICATION_SHOW"
+
+        fun getNotificationVisibilitySetting(): Int =
+            prefs.read(NOTIFICATION_VISIBILITY, NotificationCompat.VISIBILITY_PRIVATE)
+
+        fun getNotificationColorSetting(): Int =
+            prefs.read(NOTIFICATION_COLOR_RESOURCE, R.color.primaryColor)
+
+        fun getNotificationRestartEnableSetting(): Boolean =
+            prefs.read(NOTIFICATION_ENABLE_RESTART, true)
+
+        fun getNotificationStopEnableSetting(): Boolean =
+            prefs.read(NOTIFICATION_ENABLE_STOP, true)
+
+        fun getNotificationShowSetting(): Boolean =
+            prefs.read(NOTIFICATION_SHOW, true)
+
+        // BackgroundManager Keys
+        private const val BACKGROUND_MANAGER_POLICY = "BACKGROUND_MANAGER_POLICY"
+        private const val BACKGROUND_MANAGER_EXECUTE_DELAY = "BACKGROUND_MANAGER_EXECUTE_DELAY"
+        private const val BACKGROUND_MANAGER_KILL_APP = "BACKGROUND_MANAGER_KILL_APP"
+
+        // values
+        const val BACKGROUND_MANAGER_POLICY_RESPECT = "BACKGROUND_MANAGER_POLICY_RESPECT"
+        const val BACKGROUND_MANAGER_POLICY_FOREGROUND = "BACKGROUND_MANAGER_POLICY_FOREGROUND"
+
+        fun getBackgroundManagerPolicySetting(): String? =
+            prefs.read(BACKGROUND_MANAGER_POLICY, Prefs.INVALID_STRING)
+
+        fun getBackgroundManagerExecuteDelaySetting(): Int =
+            prefs.read(BACKGROUND_MANAGER_EXECUTE_DELAY, 20)
+
+        fun getBackgroundManagerKillAppSetting(): Boolean =
+            prefs.read(BACKGROUND_MANAGER_KILL_APP, true)
+
+        // Controller Keys
+        private const val CONTROLLER_BUILD_CONFIG_DEBUG = "CONTROLLER_BUILD_CONFIG_DEBUG"
+        private const val CONTROLLER_RESTART_DELAY = "CONTROLLER_RESTART_DELAY"
+        private const val CONTROLLER_STOP_DELAY = "CONTROLLER_STOP_DELAY"
+        private const val CONTROLLER_DISABLE_STOP_SERVICE_TASK_REMOVED = "CONTROLLER_DISABLE_STOP_SERVICE_TASK_REMOVED"
+
+        fun getControllerRestartDelaySetting(): Long =
+            prefs.read(CONTROLLER_RESTART_DELAY, 100L)
+
+        fun getControllerStopDelaySetting(): Long =
+            prefs.read(CONTROLLER_STOP_DELAY, 100L)
+
+        fun getControllerStopServiceOnTaskRemovedSetting(): Boolean =
+            prefs.read(CONTROLLER_DISABLE_STOP_SERVICE_TASK_REMOVED, false)
+
+        fun getControllerBuildConfigDebugSetting(): Boolean =
+            prefs.read(CONTROLLER_BUILD_CONFIG_DEBUG, BuildConfig.DEBUG)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
