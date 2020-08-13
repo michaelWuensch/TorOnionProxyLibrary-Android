@@ -68,10 +68,16 @@
 * */
 -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="io.matthewnelson.sampleapp.ui.fragments.home.HomeFragment">
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_home">
 
-</FrameLayout>
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="io.matthewnelson.sampleapp.ui.fragments.home.HomeFragment"
+        android:label="@string/navigation_label"
+        tools:layout="@layout/fragment_home" />
+
+</navigation>
