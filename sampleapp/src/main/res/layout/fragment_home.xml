@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
 * TorOnionProxyLibrary-Android (a.k.a. topl-android) is a derivation of
 * work from the Tor_Onion_Proxy_Library project that started at commit
@@ -76,87 +75,26 @@
     tools:context="io.matthewnelson.sampleapp.ui.fragments.home.HomeFragment">
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/home_guide_center_left"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent=".33" />
-
-    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/home_guide_center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent=".5" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/home_guide_center_right"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent=".66" />
-
-    <TextView
-        android:id="@+id/home_text_view_tor_state"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:background="@color/primaryLightColor"
-        android:gravity="center_horizontal"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        android:singleLine="true"
-        android:textColor="@color/primaryTextColor"
-        app:layout_constraintEnd_toEndOf="@id/home_guide_center_left"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/home_text_view_bandwidth"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="@color/primaryLightColor"
-        android:gravity="center_horizontal"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        android:singleLine="true"
-        android:textColor="@color/primaryTextColor"
-        app:layout_constraintEnd_toStartOf="@+id/home_guide_center_right"
-        app:layout_constraintStart_toEndOf="@+id/home_guide_center_left"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/home_text_view_tor_network_state"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:background="@color/primaryLightColor"
-        android:gravity="center_horizontal"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        android:singleLine="true"
-        android:textColor="@color/primaryTextColor"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/home_guide_center_right"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_log_messages"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="4dp"
         android:layout_marginBottom="4dp"
-        android:scrollbars="vertical"
         android:fadeScrollbars="false"
+        android:scrollbars="vertical"
         app:layout_constraintBottom_toTopOf="@+id/home_button_debug"
-        app:layout_constraintEnd_toEndOf="@id/home_text_view_tor_network_state"
-        app:layout_constraintStart_toStartOf="@id/home_text_view_tor_state"
-        app:layout_constraintTop_toBottomOf="@+id/home_text_view_tor_state" />
+        app:layout_constraintEnd_toEndOf="@id/home_button_debug"
+        app:layout_constraintStart_toStartOf="@id/home_button_debug"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/home_button_debug"

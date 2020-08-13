@@ -66,22 +66,14 @@
 * */
 package io.matthewnelson.sampleapp.ui.fragments.home
 
-import android.app.Activity
-import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.TextView
-import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import io.matthewnelson.sampleapp.R
-import io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster
 import io.matthewnelson.sampleapp.ui.LogMessageAdapter
-import io.matthewnelson.sampleapp.ui.MainActivity
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.prefs.TorServicePrefs
 import io.matthewnelson.topl_service.util.ServiceConsts
@@ -97,10 +89,6 @@ class HomeFragment : Fragment() {
     private lateinit var buttonRestart: Button
     private lateinit var buttonStart: Button
     private lateinit var buttonStop: Button
-
-    private lateinit var textViewBandwidth: TextView
-    private lateinit var textViewNetworkState: TextView
-    private lateinit var textViewState: TextView
 
     private lateinit var torServicePrefs: TorServicePrefs
 
@@ -121,7 +109,6 @@ class HomeFragment : Fragment() {
         findViews(view)
         initButtons()
         LogMessageAdapter(this, view)
-        initObservers(viewLifecycleOwner)
     }
 
     override fun onDestroyView() {
@@ -134,9 +121,6 @@ class HomeFragment : Fragment() {
         buttonRestart = view.findViewById(R.id.home_button_restart)
         buttonStart = view.findViewById(R.id.home_button_start)
         buttonStop = view.findViewById(R.id.home_button_stop)
-        textViewBandwidth = view.findViewById(R.id.home_text_view_bandwidth)
-        textViewNetworkState = view.findViewById(R.id.home_text_view_tor_network_state)
-        textViewState = view.findViewById(R.id.home_text_view_tor_state)
     }
 
     private fun initButtons() {
@@ -168,22 +152,6 @@ class HomeFragment : Fragment() {
             getString(R.string.button_debugging_disable)
         } else {
             getString(R.string.button_debugging_enable)
-        }
-    }
-
-    private fun initObservers(owner: LifecycleOwner) {
-        TorServiceController.appEventBroadcaster?.let {
-            (it as MyEventBroadcaster).liveBandwidth.observe(owner, Observer { string ->
-                if (string.isNullOrEmpty()) return@Observer
-                textViewBandwidth.text = string
-            })
-        }
-        TorServiceController.appEventBroadcaster?.let {
-            (it as MyEventBroadcaster).liveTorState.observe(owner, Observer { data ->
-                if (data == null) return@Observer
-                textViewState.text = data.state
-                textViewNetworkState.text = data.networkState
-            })
         }
     }
 }
