@@ -152,7 +152,6 @@ class App: Application() {
         }
     }
 
-
     /**
      * See [io.matthewnelson.sampleapp.topl_android.CodeSamples.setupTorServices]
      * for a cleaner sample
@@ -169,7 +168,7 @@ class App: Application() {
         )
             .addTimeToRestartTorDelay(librarySettings.getControllerRestartDelaySetting())
             .addTimeToStopServiceDelay(librarySettings.getControllerStopDelaySetting())
-            .disableStopServiceOnTaskRemoved(librarySettings.getControllerStopServiceOnTaskRemovedSetting())
+            .disableStopServiceOnTaskRemoved(librarySettings.getControllerDisableStopServiceOnTaskRemovedSetting())
             .setBuildConfigDebug(librarySettings.getControllerBuildConfigDebugSetting())
             .setEventBroadcaster(eventBroadcaster = MyEventBroadcaster())
             .build()
