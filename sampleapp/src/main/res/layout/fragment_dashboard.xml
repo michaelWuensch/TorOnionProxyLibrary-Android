@@ -97,51 +97,51 @@
 
     <TextView
         android:id="@+id/dash_text_view_tor_state"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        style="@style/DashboardTextView"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="16dp"
-        android:background="@color/primaryLightColor"
-        android:gravity="center_horizontal"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        android:singleLine="true"
-        android:textColor="@color/primaryTextColor"
-        app:layout_constraintEnd_toEndOf="@id/dash_guide_center_left"
+        app:layout_constraintEnd_toEndOf="@+id/dash_guide_center_left"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/dash_text_view_bandwidth"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        style="@style/DashboardTextView"
         android:layout_marginTop="16dp"
-        android:background="@color/primaryLightColor"
-        android:gravity="center_horizontal"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        android:singleLine="true"
-        android:textColor="@color/primaryTextColor"
         app:layout_constraintEnd_toStartOf="@+id/dash_guide_center_right"
         app:layout_constraintStart_toEndOf="@+id/dash_guide_center_left"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/dash_text_view_tor_network_state"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        style="@style/DashboardTextView"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
-        android:background="@color/primaryLightColor"
-        android:gravity="center_horizontal"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        android:singleLine="true"
-        android:textColor="@color/primaryTextColor"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/dash_guide_center_right"
+        app:layout_constraintStart_toStartOf="@+id/dash_guide_center_right"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/dash_text_view_port_control"
+        style="@style/DashboardTextView"
+        app:layout_constraintEnd_toEndOf="@+id/dash_text_view_tor_state"
+        app:layout_constraintStart_toStartOf="@+id/dash_text_view_tor_state"
+        app:layout_constraintTop_toBottomOf="@+id/dash_text_view_tor_state" />
+
+    <TextView
+        android:id="@+id/dash_text_view_port_socks"
+        style="@style/DashboardTextView"
+        app:layout_constraintStart_toStartOf="@+id/dash_text_view_bandwidth"
+        app:layout_constraintTop_toBottomOf="@+id/dash_text_view_bandwidth"
+        app:layout_constraintEnd_toEndOf="@+id/dash_text_view_bandwidth"/>
+
+    <TextView
+        android:id="@+id/dash_text_view_port_http"
+        style="@style/DashboardTextView"
+        app:layout_constraintEnd_toEndOf="@+id/dash_text_view_tor_network_state"
+        app:layout_constraintStart_toStartOf="@+id/dash_text_view_tor_network_state"
+        app:layout_constraintTop_toBottomOf="@+id/dash_text_view_tor_network_state" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

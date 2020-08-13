@@ -14,9 +14,15 @@ import io.matthewnelson.topl_service.TorServiceController
 
 class DashboardFragment : Fragment() {
 
+    // Top row
     private lateinit var textViewBandwidth: TextView
     private lateinit var textViewNetworkState: TextView
     private lateinit var textViewState: TextView
+
+    // Bottom row
+    private lateinit var textViewControlPort: TextView
+    private lateinit var textViewSocksPort: TextView
+    private lateinit var textViewHttpPort: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,6 +46,9 @@ class DashboardFragment : Fragment() {
         textViewBandwidth = view.findViewById(R.id.dash_text_view_bandwidth)
         textViewNetworkState = view.findViewById(R.id.dash_text_view_tor_network_state)
         textViewState = view.findViewById(R.id.dash_text_view_tor_state)
+        textViewControlPort = view.findViewById(R.id.dash_text_view_port_control)
+        textViewSocksPort = view.findViewById(R.id.dash_text_view_port_socks)
+        textViewHttpPort = view.findViewById(R.id.dash_text_view_port_http)
     }
 
     private fun initObservers(owner: LifecycleOwner) {
