@@ -72,6 +72,7 @@ import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster
 import io.matthewnelson.sampleapp.topl_android.MyTorSettings
 import io.matthewnelson.sampleapp.ui.MainActivity
+import io.matthewnelson.sampleapp.ui.fragments.settings.library.LibraryPrefs
 import io.matthewnelson.sampleapp.ui.fragments.settings.library.SettingsLibraryFragment
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.notification.ServiceNotification
@@ -87,9 +88,6 @@ class App: Application() {
     companion object {
         lateinit var prefs: Prefs
     }
-
-    private val librarySettings: SettingsLibraryFragment.Companion
-        get() = SettingsLibraryFragment.Companion
 
     override fun onCreate() {
         super.onCreate()
@@ -122,11 +120,11 @@ class App: Application() {
                 intentRequestCode = null
             )
 
-            .setVisibility(librarySettings.getNotificationVisibilitySetting())
-            .setCustomColor(librarySettings.getNotificationColorSetting())
-            .enableTorRestartButton(librarySettings.getNotificationRestartEnableSetting())
-            .enableTorStopButton(librarySettings.getNotificationStopEnableSetting())
-            .showNotification(librarySettings.getNotificationShowSetting())
+            .setVisibility(LibraryPrefs.getNotificationVisibilitySetting())
+            .setCustomColor(LibraryPrefs.getNotificationColorSetting())
+            .enableTorRestartButton(LibraryPrefs.getNotificationRestartEnableSetting())
+            .enableTorStopButton(LibraryPrefs.getNotificationStopEnableSetting())
+            .showNotification(LibraryPrefs.getNotificationShowSetting())
     }
 
     /**
@@ -135,15 +133,15 @@ class App: Application() {
      * */
     private fun generateBackgroundManagerPolicy(): BackgroundManager.Builder.Policy {
         val builder = BackgroundManager.Builder()
-        return when (librarySettings.getBackgroundManagerPolicySetting()) {
-            librarySettings.BACKGROUND_MANAGER_POLICY_FOREGROUND -> {
+        return when (LibraryPrefs.getBackgroundManagerPolicySetting()) {
+            LibraryPrefs.BACKGROUND_MANAGER_POLICY_FOREGROUND -> {
                 builder.runServiceInForeground(
-                    librarySettings.getBackgroundManagerKillAppSetting()
+                    LibraryPrefs.getBackgroundManagerKillAppSetting()
                 )
             }
-            librarySettings.BACKGROUND_MANAGER_POLICY_RESPECT -> {
+            LibraryPrefs.BACKGROUND_MANAGER_POLICY_RESPECT -> {
                 builder.respectResourcesWhileInBackground(
-                    librarySettings.getBackgroundManagerExecuteDelaySetting()
+                    LibraryPrefs.getBackgroundManagerExecuteDelaySetting()
                 )
             }
             else -> {
@@ -166,10 +164,10 @@ class App: Application() {
             geoipAssetPath = "common/geoip",
             geoip6AssetPath = "common/geoip6"
         )
-            .addTimeToRestartTorDelay(librarySettings.getControllerRestartDelaySetting())
-            .addTimeToStopServiceDelay(librarySettings.getControllerStopDelaySetting())
-            .disableStopServiceOnTaskRemoved(librarySettings.getControllerDisableStopServiceOnTaskRemovedSetting())
-            .setBuildConfigDebug(librarySettings.getControllerBuildConfigDebugSetting())
+            .addTimeToRestartTorDelay(LibraryPrefs.getControllerRestartDelaySetting())
+            .addTimeToStopServiceDelay(LibraryPrefs.getControllerStopDelaySetting())
+            .disableStopServiceOnTaskRemoved(LibraryPrefs.getControllerDisableStopServiceOnTaskRemovedSetting())
+            .setBuildConfigDebug(LibraryPrefs.getControllerBuildConfigDebugSetting())
             .setEventBroadcaster(eventBroadcaster = MyEventBroadcaster())
             .build()
     }

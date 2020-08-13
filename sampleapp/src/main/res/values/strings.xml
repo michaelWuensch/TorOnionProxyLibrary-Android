@@ -41,6 +41,8 @@
     <string name="settings_library_text_view_notification_option_visibility">Lock Visibility:</string>
     <string name="settings_library_text_view_notification_option_icon_color">Icon Color:</string>
     <string name="settings_library_text_view_notification_option_restart_button">Restart Button:</string>
+    <string name="settings_library_text_view_notification_option_stop_button">Stop Button:</string>
+    <string name="settings_library_text_view_notification_option_show_notification">Notification:</string>
 
 
     <string name="settings_library_text_view_background_manager_header">BackgroundManager</string>
