@@ -20,10 +20,11 @@
     <string name="settings_main_button_library">Library Settings</string>
     <string name="settings_main_button_tor">Tor Settings</string>
     <string name="settings_main_text_view_app">These are settings specific to the Sample App,
-        and are not a part of TOPL-Android</string>
-    <string name="settings_main_text_view_library">These are settings specific to TOPL-Android,
-        allowing you to see customization features to suite various needs.</string>
-    <string name="settings_main_text_view_tor">These are settings specific to Tor,
-        and is an example of how the TorServicePrefs Class allows for customization of the
-        torrc file outside of the static defaults expressed in the TorSettings Class</string>
+        and are not a part of the TOPL-Android Library</string>
+    <string name="settings_main_text_view_library">These are settings specific to TOPL-Android\'s,
+        Service Module, allowing you to see customization features to suit your Application\'s
+        needs.</string>
+    <string name="settings_main_text_view_tor">These are settings specific to Tor, and is an
+        example of how the Service Module\'s TorServicePrefs Class allows for customization of
+        the torrc file outside of the static defaults expressed in the TorSettings Class</string>
 </resources>
