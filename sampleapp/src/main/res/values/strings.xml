@@ -22,12 +22,30 @@
     <string name="settings_main_button_app">Application Settings</string>
     <string name="settings_main_button_library">Library Settings</string>
     <string name="settings_main_button_tor">Tor Settings</string>
-    <string name="settings_main_text_view_app">These are settings specific to the Sample App,
-        and are not a part of the TOPL-Android Library</string>
-    <string name="settings_main_text_view_library">These are settings specific to TOPL-Android\'s,
+    <string name="settings_main_text_view_app">These are settings specific to the Sample App
+        and are not a part of the TOPL-Android Library.</string>
+    <string name="settings_main_text_view_library">These are settings specific to TOPL-Android\'s
         Service Module, allowing you to see customization features to suit your Application\'s
         needs.</string>
-    <string name="settings_main_text_view_tor">These are settings specific to Tor, and is an
-        example of how the Service Module\'s TorServicePrefs Class enables user
-        customization</string>
+    <string name="settings_main_text_view_tor">These are settings specific to Tor and is an
+        example of how the Service Module\'s TorServicePrefs Class enables End User
+        customization.</string>
+
+    <!-- SettingsAppFragment -->
+
+    <!-- SettingsLibraryFragment -->
+    <string name="settings_library_text_view_notification_header">Notification</string>
+    <string name="settings_library_text_view_notification_preamble">There are some settings that
+        can\'t be modified here, but you can when implementing the Library into your own
+        application (channel information, notification icons, etc.).</string>
+    <string name="settings_library_text_view_background_manager_header">BackgroundManager</string>
+    <string name="settings_library_text_view_background_manager_preamble">Customize how the Service
+        operates while your application is in the background (sent to the recent apps tray or lock
+        screen)</string>
+    <string name="settings_library_text_view_service_controller_header">ServiceController</string>
+    <string name="settings_library_text_view_service_controller_preamble">Customize how the Service
+        operates. There are some settings that can\'t be modified here, but you can when
+        implementing the Library into your own application</string>
+
+    <!-- SettingsTorFragment -->
 </resources>
