@@ -90,6 +90,7 @@ class HomeFragment : Fragment() {
     private lateinit var buttonStop: Button
 
     private lateinit var torServicePrefs: TorServicePrefs
+    private lateinit var logMessageAdapter: LogMessageAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -107,10 +108,12 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         findViews(view)
         initButtons()
-        LogMessageAdapter(
-            this,
-            view
-        )
+        logMessageAdapter = LogMessageAdapter(this, view)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        logMessageAdapter.notifyDataSetChanged()
     }
 
     override fun onDestroyView() {
