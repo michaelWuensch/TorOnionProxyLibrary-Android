@@ -105,10 +105,140 @@
                 android:text="@string/settings_library_text_view_notification_preamble"
                 android:textSize="16sp" />
 
-            <TextView
-                android:layout_marginTop="24dp"
+            <!-- Notification Options -->
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/settings_library_notification_guide_left"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent=".33" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_notification_visibility"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:singleLine="true"
+                    android:text="@string/settings_library_text_view_notification_option_visibility"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_notification_visibility"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_notification_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_spinner_notification_visibility" />
+
+                <Spinner
+                    android:id="@+id/settings_library_spinner_notification_visibility"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/primaryLightColor"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_notification_guide_left"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:listitem="@layout/spinner_list_item" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_notification_icon_color"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:singleLine="true"
+                    android:text="@string/settings_library_text_view_notification_option_icon_color"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_notification_icon_color"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_notification_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_spinner_notification_icon_color" />
+
+                <Spinner
+                    android:id="@+id/settings_library_spinner_notification_icon_color"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/primaryLightColor"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_notification_guide_left"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_library_spinner_notification_visibility"
+                    tools:listitem="@layout/spinner_list_item" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_notification_restart_button"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:singleLine="true"
+                    android:text="@string/settings_library_text_view_notification_option_restart_button"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_notification_restart_button"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_notification_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_spinner_notification_restart_button" />
+
+                <Spinner
+                    android:id="@+id/settings_library_spinner_notification_restart_button"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/primaryLightColor"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_notification_guide_left"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_library_spinner_notification_icon_color"
+                    tools:listitem="@layout/spinner_list_item" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_notification_stop_button"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:singleLine="true"
+                    android:text="@string/settings_library_text_view_notification_option_restart_button"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_notification_stop_button"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_notification_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_spinner_notification_stop_button" />
+
+                <Spinner
+                    android:id="@+id/settings_library_spinner_notification_stop_button"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/primaryLightColor"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_notification_guide_left"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_library_spinner_notification_restart_button"
+                    tools:listitem="@layout/spinner_list_item" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_notification_show"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:singleLine="true"
+                    android:text="@string/settings_library_text_view_notification_option_restart_button"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_notification_show"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_notification_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_spinner_notification_show" />
+
+                <Spinner
+                    android:id="@+id/settings_library_spinner_notification_show"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/primaryLightColor"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_notification_guide_left"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_library_spinner_notification_stop_button"
+                    tools:listitem="@layout/spinner_list_item" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
                 android:gravity="center_horizontal"
                 android:text="@string/settings_library_text_view_background_manager_header"
                 android:textSize="24sp" />
@@ -120,10 +250,12 @@
                 android:text="@string/settings_library_text_view_background_manager_preamble"
                 android:textSize="16sp" />
 
+            <!-- BackgroundManager Options -->
+
             <TextView
-                android:layout_marginTop="24dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
                 android:gravity="center_horizontal"
                 android:text="@string/settings_library_text_view_service_controller_header"
                 android:textSize="24sp" />
@@ -134,6 +266,8 @@
                 android:layout_gravity="center_horizontal"
                 android:text="@string/settings_library_text_view_service_controller_preamble"
                 android:textSize="16sp" />
+
+            <!-- Controller Options -->
 
         </LinearLayout>
 

@@ -38,6 +38,11 @@
     <string name="settings_library_text_view_notification_preamble">There are some settings that
         can\'t be modified here, but you can when implementing the Library into your own
         application (channel information, notification icons, etc.).</string>
+    <string name="settings_library_text_view_notification_option_visibility">Lock Visibility:</string>
+    <string name="settings_library_text_view_notification_option_icon_color">Icon Color:</string>
+    <string name="settings_library_text_view_notification_option_restart_button">Restart Button:</string>
+
+
     <string name="settings_library_text_view_background_manager_header">BackgroundManager</string>
     <string name="settings_library_text_view_background_manager_preamble">Customize how the Service
         operates while your application is in the background (sent to the recent apps tray or lock

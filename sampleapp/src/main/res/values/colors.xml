@@ -4,4 +4,8 @@
     <color name="primaryLightColor">#8b5a96</color>
     <color name="primaryDarkColor">#31043d</color>
     <color name="primaryTextColor">#ffffff</color>
+
+    <color name="yellow">#CDDC39</color>
+    <color name="green">#4CAF50</color>
+    <color name="blue">#3F51B5</color>
 </resources>
