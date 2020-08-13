@@ -109,7 +109,7 @@ class MainActivity : AppCompatActivity() {
 
                 when (navController.currentDestination?.id) {
                     R.id.navigation_home -> {
-                        navController.navigate(R.id.navigation_settings_main)
+                        navController.navigate(R.id.action_navigation_home_to_navigation_settings_main)
                     }
                 }
 

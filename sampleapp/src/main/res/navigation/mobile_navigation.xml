@@ -77,7 +77,15 @@
         android:id="@+id/navigation_home"
         android:name="io.matthewnelson.sampleapp.ui.fragments.home.HomeFragment"
         android:label="@string/navigation_label"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_navigation_home_to_navigation_settings_main"
+            app:destination="@id/navigation_settings_main"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_settings_main"
