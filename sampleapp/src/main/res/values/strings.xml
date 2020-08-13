@@ -3,6 +3,9 @@
     <string name="navigation_label">TOPL-Android Demo</string>
 
     <!-- DashboardFragment -->
+    <string name="dashboard_text_view_control_port">Control Port:</string>
+    <string name="dashboard_text_view_socks_port">Socks Port:</string>
+    <string name="dashboard_text_view_http_port">Http Port:</string>
 
     <!-- HomeFragment -->
     <string name="home_button_debugging_enable">Enable Debugging</string>
@@ -25,6 +28,6 @@
         Service Module, allowing you to see customization features to suit your Application\'s
         needs.</string>
     <string name="settings_main_text_view_tor">These are settings specific to Tor, and is an
-        example of how the Service Module\'s TorServicePrefs Class allows for customization of
-        the torrc file outside of the static defaults expressed in the TorSettings Class</string>
+        example of how the Service Module\'s TorServicePrefs Class enables user
+        customization</string>
 </resources>
