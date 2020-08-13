@@ -87,9 +87,9 @@ class CodeSamples {
     private fun generateTorServiceNotificationBuilder(): ServiceNotification.Builder {
 //  private fun generateTorServiceNotificationBuilder(): ServiceNotification.Builder {
         return ServiceNotification.Builder(
-            channelName = "TOPL-Android Channel",
-            channelDescription = "TorOnionProxyLibrary-Android",
-            channelID = "TOPL-Android Sample Application",
+            channelName = "TOPL-Android Demo",
+            channelDescription = "TorOnionProxyLibrary-Android Demo",
+            channelID = "TOPL-Android Demo",
             notificationID = 615
         )
             .setActivityToBeOpenedOnTap(
@@ -116,7 +116,7 @@ class CodeSamples {
 
             // All available options present. Only 1 is able to be chosen.
             .respectResourcesWhileInBackground(secondsFrom5To45 = 20)
-        //.runServiceInForeground(killAppIfTaskIsRemoved = true)
+            //.runServiceInForeground(killAppIfTaskIsRemoved = true)
 //  }
     }
 
