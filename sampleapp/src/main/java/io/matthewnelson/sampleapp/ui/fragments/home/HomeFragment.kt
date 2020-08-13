@@ -73,7 +73,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import io.matthewnelson.sampleapp.R
-import io.matthewnelson.sampleapp.ui.LogMessageAdapter
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.prefs.TorServicePrefs
 import io.matthewnelson.topl_service.util.ServiceConsts
@@ -108,7 +107,10 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         findViews(view)
         initButtons()
-        LogMessageAdapter(this, view)
+        LogMessageAdapter(
+            this,
+            view
+        )
     }
 
     override fun onDestroyView() {

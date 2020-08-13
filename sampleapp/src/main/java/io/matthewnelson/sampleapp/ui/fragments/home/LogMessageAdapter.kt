@@ -64,7 +64,7 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.sampleapp.ui
+package io.matthewnelson.sampleapp.ui.fragments.home
 
 import android.view.LayoutInflater
 import android.view.View
@@ -76,7 +76,6 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.matthewnelson.sampleapp.R
-import io.matthewnelson.sampleapp.ui.fragments.home.HomeFragment
 
 /**
  * @suppress
