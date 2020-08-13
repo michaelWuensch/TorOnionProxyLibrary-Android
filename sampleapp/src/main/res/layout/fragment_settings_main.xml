@@ -67,22 +67,86 @@
 * */
 -->
 
-<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="io.matthewnelson.sampleapp.ui.fragments.settings.SettingsMainFragment">
 
-    <fragment
-        android:id="@+id/navigation_home"
-        android:name="io.matthewnelson.sampleapp.ui.fragments.home.HomeFragment"
-        android:label="@string/navigation_label"
-        tools:layout="@layout/fragment_home" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="4dp"
+        android:gravity="center_horizontal"
+        android:text="@string/settings_main_text_view_app"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/settings_main_button_app"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <fragment
-        android:id="@+id/navigation_settings_main"
-        android:name="io.matthewnelson.sampleapp.ui.fragments.settings.SettingsMainFragment"
-        android:label="@string/navigation_label"
-        tools:layout="@layout/fragment_settings_main" />
+    <Button
+        android:id="@+id/settings_main_button_library"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:text="@string/settings_main_button_library"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-</navigation>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="4dp"
+        android:gravity="center_horizontal"
+        android:text="@string/settings_main_text_view_library"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/settings_main_button_library"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/settings_main_button_app"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:text="@string/settings_main_button_app"
+        app:layout_constraintBottom_toTopOf="@id/settings_main_button_library"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="4dp"
+        android:gravity="center_horizontal"
+        android:text="@string/settings_main_text_view_tor"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/settings_main_button_tor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/settings_main_button_tor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:text="@string/settings_main_button_tor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/settings_main_button_library" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

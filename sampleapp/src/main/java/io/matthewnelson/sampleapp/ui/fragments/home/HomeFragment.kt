@@ -151,9 +151,9 @@ class HomeFragment : Fragment() {
 
     private fun setButtonDebugText() {
         buttonDebug.text = if (hasDebugLogs) {
-            getString(R.string.button_debugging_disable)
+            getString(R.string.home_button_debugging_disable)
         } else {
-            getString(R.string.button_debugging_enable)
+            getString(R.string.home_button_debugging_enable)
         }
     }
 }

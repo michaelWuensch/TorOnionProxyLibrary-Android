@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?><!--
 /*
 * TorOnionProxyLibrary-Android (a.k.a. topl-android) is a derivation of
 * work from the Tor_Onion_Proxy_Library project that started at commit
@@ -65,24 +64,56 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
--->
+package io.matthewnelson.sampleapp.ui.fragments.settings
 
-<navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+import android.os.Bundle
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
+import io.matthewnelson.sampleapp.R
 
-    <fragment
-        android:id="@+id/navigation_home"
-        android:name="io.matthewnelson.sampleapp.ui.fragments.home.HomeFragment"
-        android:label="@string/navigation_label"
-        tools:layout="@layout/fragment_home" />
+class SettingsMainFragment : Fragment() {
 
-    <fragment
-        android:id="@+id/navigation_settings_main"
-        android:name="io.matthewnelson.sampleapp.ui.fragments.settings.SettingsMainFragment"
-        android:label="@string/navigation_label"
-        tools:layout="@layout/fragment_settings_main" />
+    private lateinit var buttonAppSettings: Button
+    private lateinit var buttonLibrarySettings: Button
+    private lateinit var buttonTorSettings: Button
 
-</navigation>
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_settings_main, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        findViews(view)
+        initButtons()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+    }
+
+    private fun findViews(view: View) {
+        buttonAppSettings = view.findViewById(R.id.settings_main_button_app)
+        buttonLibrarySettings = view.findViewById(R.id.settings_main_button_library)
+        buttonTorSettings = view.findViewById(R.id.settings_main_button_tor)
+    }
+
+    private fun initButtons() {
+        buttonAppSettings.setOnClickListener {
+            findNavController()
+        }
+        buttonLibrarySettings.setOnClickListener {
+            findNavController()
+        }
+        buttonTorSettings.setOnClickListener {
+            findNavController()
+        }
+    }
+}
