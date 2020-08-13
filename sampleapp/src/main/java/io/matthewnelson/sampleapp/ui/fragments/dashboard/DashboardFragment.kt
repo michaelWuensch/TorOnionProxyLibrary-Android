@@ -65,5 +65,20 @@ class DashboardFragment : Fragment() {
                 textViewNetworkState.text = data.networkState
             })
         }
+        TorServiceController.appEventBroadcaster?.let {
+            (it as MyEventBroadcaster).liveControlPortAddress.observe(owner, Observer { data ->
+                textViewControlPort.text = data ?: "None"
+            })
+        }
+        TorServiceController.appEventBroadcaster?.let {
+            (it as MyEventBroadcaster).liveSocksPortAddress.observe(owner, Observer { data ->
+                textViewSocksPort.text = data ?: "None"
+            })
+        }
+        TorServiceController.appEventBroadcaster?.let {
+            (it as MyEventBroadcaster).liveHttpPortAddress.observe(owner, Observer { data ->
+                textViewHttpPort.text = data ?: "None"
+            })
+        }
     }
 }
