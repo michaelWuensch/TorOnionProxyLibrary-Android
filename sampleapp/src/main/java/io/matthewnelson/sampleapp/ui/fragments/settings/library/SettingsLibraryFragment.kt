@@ -64,7 +64,7 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.sampleapp.ui.fragments.settings
+package io.matthewnelson.sampleapp.ui.fragments.settings.library
 
 import android.content.Context
 import android.os.Bundle
@@ -80,7 +80,6 @@ import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.App
 import io.matthewnelson.sampleapp.BuildConfig
 import io.matthewnelson.sampleapp.R
-import kotlinx.android.synthetic.main.fragment_settings_library.*
 
 class SettingsLibraryFragment : Fragment() {
 
@@ -96,19 +95,24 @@ class SettingsLibraryFragment : Fragment() {
         private const val NOTIFICATION_SHOW = "NOTIFICATION_SHOW"
 
         fun getNotificationVisibilitySetting(): Int =
-            prefs.read(NOTIFICATION_VISIBILITY, NotificationCompat.VISIBILITY_PRIVATE)
+            prefs.read(
+                NOTIFICATION_VISIBILITY, NotificationCompat.VISIBILITY_PRIVATE)
 
         fun getNotificationColorSetting(): Int =
-            prefs.read(NOTIFICATION_COLOR_RESOURCE, R.color.primaryColor)
+            prefs.read(
+                NOTIFICATION_COLOR_RESOURCE, R.color.primaryColor)
 
         fun getNotificationRestartEnableSetting(): Boolean =
-            prefs.read(NOTIFICATION_ENABLE_RESTART, true)
+            prefs.read(
+                NOTIFICATION_ENABLE_RESTART, true)
 
         fun getNotificationStopEnableSetting(): Boolean =
-            prefs.read(NOTIFICATION_ENABLE_STOP, true)
+            prefs.read(
+                NOTIFICATION_ENABLE_STOP, true)
 
         fun getNotificationShowSetting(): Boolean =
-            prefs.read(NOTIFICATION_SHOW, true)
+            prefs.read(
+                NOTIFICATION_SHOW, true)
 
         // BackgroundManager Keys
         private const val BACKGROUND_MANAGER_POLICY = "BACKGROUND_MANAGER_POLICY"
@@ -120,13 +124,16 @@ class SettingsLibraryFragment : Fragment() {
         const val BACKGROUND_MANAGER_POLICY_FOREGROUND = "BACKGROUND_MANAGER_POLICY_FOREGROUND"
 
         fun getBackgroundManagerPolicySetting(): String? =
-            prefs.read(BACKGROUND_MANAGER_POLICY, Prefs.INVALID_STRING)
+            prefs.read(
+                BACKGROUND_MANAGER_POLICY, Prefs.INVALID_STRING)
 
         fun getBackgroundManagerExecuteDelaySetting(): Int =
-            prefs.read(BACKGROUND_MANAGER_EXECUTE_DELAY, 20)
+            prefs.read(
+                BACKGROUND_MANAGER_EXECUTE_DELAY, 20)
 
         fun getBackgroundManagerKillAppSetting(): Boolean =
-            prefs.read(BACKGROUND_MANAGER_KILL_APP, true)
+            prefs.read(
+                BACKGROUND_MANAGER_KILL_APP, true)
 
         // Controller Keys
         private const val CONTROLLER_BUILD_CONFIG_DEBUG = "CONTROLLER_BUILD_CONFIG_DEBUG"
@@ -135,16 +142,20 @@ class SettingsLibraryFragment : Fragment() {
         private const val CONTROLLER_DISABLE_STOP_SERVICE_TASK_REMOVED = "CONTROLLER_DISABLE_STOP_SERVICE_TASK_REMOVED"
 
         fun getControllerRestartDelaySetting(): Long =
-            prefs.read(CONTROLLER_RESTART_DELAY, 100L)
+            prefs.read(
+                CONTROLLER_RESTART_DELAY, 100L)
 
         fun getControllerStopDelaySetting(): Long =
-            prefs.read(CONTROLLER_STOP_DELAY, 100L)
+            prefs.read(
+                CONTROLLER_STOP_DELAY, 100L)
 
         fun getControllerDisableStopServiceOnTaskRemovedSetting(): Boolean =
-            prefs.read(CONTROLLER_DISABLE_STOP_SERVICE_TASK_REMOVED, false)
+            prefs.read(
+                CONTROLLER_DISABLE_STOP_SERVICE_TASK_REMOVED, false)
 
         fun getControllerBuildConfigDebugSetting(): Boolean =
-            prefs.read(CONTROLLER_BUILD_CONFIG_DEBUG, BuildConfig.DEBUG)
+            prefs.read(
+                CONTROLLER_BUILD_CONFIG_DEBUG, BuildConfig.DEBUG)
 
 
         // Spinner Notification Visibility
@@ -210,7 +221,11 @@ class SettingsLibraryFragment : Fragment() {
     }
 
     private fun initSpinnerNotificationVisibility(context: Context) {
-        val categoryVisibility = arrayOf(PRIVATE, PUBLIC, SECRET)
+        val categoryVisibility = arrayOf(
+            PRIVATE,
+            PUBLIC,
+            SECRET
+        )
         adapterVisibility = ArrayAdapter(context, R.layout.spinner_list_item, categoryVisibility)
         adapterVisibility.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerVisibility.adapter = adapterVisibility
@@ -233,7 +248,13 @@ class SettingsLibraryFragment : Fragment() {
     }
 
     private fun initSpinnerNotificationColor(context: Context) {
-        val categoryColor = arrayOf(NONE, TOR_PURPLE, YELLOW, GREEN, BLUE)
+        val categoryColor = arrayOf(
+            NONE,
+            TOR_PURPLE,
+            YELLOW,
+            GREEN,
+            BLUE
+        )
         adapterColor = ArrayAdapter(context, R.layout.spinner_list_item, categoryColor)
         adapterColor.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerColor.adapter = adapterColor
@@ -262,7 +283,10 @@ class SettingsLibraryFragment : Fragment() {
     }
 
     private fun initSpinnerNotificationRestartButton(context: Context) {
-        val categoryEnabledDisabled = arrayOf(ENABLED, DISABLED)
+        val categoryEnabledDisabled = arrayOf(
+            ENABLED,
+            DISABLED
+        )
         adapterRestart = ArrayAdapter(context, R.layout.spinner_list_item, categoryEnabledDisabled)
         adapterRestart.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerRestart.adapter = adapterRestart
@@ -282,7 +306,10 @@ class SettingsLibraryFragment : Fragment() {
     }
 
     private fun initSpinnerNotificationStopButton(context: Context) {
-        val categoryEnabledDisabled = arrayOf(ENABLED, DISABLED)
+        val categoryEnabledDisabled = arrayOf(
+            ENABLED,
+            DISABLED
+        )
         adapterStop = ArrayAdapter(context, R.layout.spinner_list_item, categoryEnabledDisabled)
         adapterStop.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerStop.adapter = adapterStop
@@ -302,7 +329,10 @@ class SettingsLibraryFragment : Fragment() {
     }
 
     private fun initSpinnerNotificationShow(context: Context) {
-        val categoryEnabledDisabled = arrayOf(SHOW, HIDE)
+        val categoryEnabledDisabled = arrayOf(
+            SHOW,
+            HIDE
+        )
         adapterShow = ArrayAdapter(context, R.layout.spinner_list_item, categoryEnabledDisabled)
         adapterShow.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerShow.adapter = adapterShow
@@ -351,7 +381,8 @@ class SettingsLibraryFragment : Fragment() {
                             return
                         }
                     }
-                    prefs.write(NOTIFICATION_VISIBILITY, visibility)
+                    prefs.write(
+                        NOTIFICATION_VISIBILITY, visibility)
                 }
                 adapterColor -> {
                     val colorRes: Int = when (item.toString()) {
@@ -374,7 +405,8 @@ class SettingsLibraryFragment : Fragment() {
                             return
                         }
                     }
-                    prefs.write(NOTIFICATION_COLOR_RESOURCE, colorRes)
+                    prefs.write(
+                        NOTIFICATION_COLOR_RESOURCE, colorRes)
                 }
                 adapterRestart -> {
                     val enabled: Boolean = when (item.toString()) {
@@ -388,7 +420,8 @@ class SettingsLibraryFragment : Fragment() {
                             return
                         }
                     }
-                    prefs.write(NOTIFICATION_ENABLE_RESTART, enabled)
+                    prefs.write(
+                        NOTIFICATION_ENABLE_RESTART, enabled)
                 }
                 adapterStop -> {
                     val enabled: Boolean = when (item.toString()) {
@@ -402,7 +435,8 @@ class SettingsLibraryFragment : Fragment() {
                             return
                         }
                     }
-                    prefs.write(NOTIFICATION_ENABLE_STOP, enabled)
+                    prefs.write(
+                        NOTIFICATION_ENABLE_STOP, enabled)
                 }
                 adapterShow -> {
                     val show: Boolean = when (item.toString()) {
@@ -416,7 +450,8 @@ class SettingsLibraryFragment : Fragment() {
                             return
                         }
                     }
-                    prefs.write(NOTIFICATION_SHOW, show)
+                    prefs.write(
+                        NOTIFICATION_SHOW, show)
                 }
             }
             // TODO: add restart app popup

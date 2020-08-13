@@ -72,7 +72,7 @@ import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster
 import io.matthewnelson.sampleapp.topl_android.MyTorSettings
 import io.matthewnelson.sampleapp.ui.MainActivity
-import io.matthewnelson.sampleapp.ui.fragments.settings.SettingsLibraryFragment
+import io.matthewnelson.sampleapp.ui.fragments.settings.library.SettingsLibraryFragment
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
