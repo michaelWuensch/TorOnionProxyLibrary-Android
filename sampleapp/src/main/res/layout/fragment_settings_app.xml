@@ -67,70 +67,11 @@
 * */
 -->
 
-<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="io.matthewnelson.sampleapp.ui.fragments.settings.SettingsAppFragment">
 
-    <fragment
-        android:id="@+id/navigation_home"
-        android:name="io.matthewnelson.sampleapp.ui.fragments.home.HomeFragment"
-        android:label="@string/navigation_label"
-        tools:layout="@layout/fragment_home" >
-        <action
-            android:id="@+id/action_navigation_home_to_navigation_settings_main"
-            app:destination="@id/navigation_settings_main"
-            app:enterAnim="@anim/slide_in_left"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_right"
-            app:popExitAnim="@anim/slide_out_right" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/navigation_settings_main"
-        android:name="io.matthewnelson.sampleapp.ui.fragments.settings.SettingsMainFragment"
-        android:label="@string/navigation_label"
-        tools:layout="@layout/fragment_settings_main" >
-        <action
-            android:id="@+id/action_navigation_settings_main_to_navigation_settings_app"
-            app:destination="@id/navigation_settings_app"
-            app:enterAnim="@anim/slide_in_left"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_right"
-            app:popExitAnim="@anim/slide_out_right" />
-        <action
-            android:id="@+id/action_navigation_settings_main_to_navigation_settings_tor"
-            app:destination="@id/navigation_settings_tor"
-            app:enterAnim="@anim/slide_in_left"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_right"
-            app:popExitAnim="@anim/slide_out_right" />
-        <action
-            android:id="@+id/action_navigation_settings_main_to_navigation_settings_library"
-            app:destination="@id/navigation_settings_library"
-            app:enterAnim="@anim/slide_in_left"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_right"
-            app:popExitAnim="@anim/slide_out_right" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/navigation_settings_app"
-        android:name="io.matthewnelson.sampleapp.ui.fragments.settings.SettingsAppFragment"
-        android:label="@string/navigation_label"
-        tools:layout="@layout/fragment_settings_app" />
-
-    <fragment
-        android:id="@+id/navigation_settings_library"
-        android:name="io.matthewnelson.sampleapp.ui.fragments.settings.SettingsLibraryFragment"
-        android:label="@string/navigation_label"
-        tools:layout="@layout/fragment_settings_library" />
-
-    <fragment
-        android:id="@+id/navigation_settings_tor"
-        android:name="io.matthewnelson.sampleapp.ui.fragments.settings.SettingsTorFragment"
-        android:label="@string/navigation_label"
-        tools:layout="@layout/fragment_settings_tor" />
-
-</navigation>
+</androidx.constraintlayout.widget.ConstraintLayout>

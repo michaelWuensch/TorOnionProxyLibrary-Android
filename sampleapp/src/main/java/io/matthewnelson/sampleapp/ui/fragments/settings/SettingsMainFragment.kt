@@ -107,13 +107,13 @@ class SettingsMainFragment : Fragment() {
 
     private fun initButtons() {
         buttonAppSettings.setOnClickListener {
-            findNavController()
+            findNavController().navigate(R.id.action_navigation_settings_main_to_navigation_settings_app)
         }
         buttonLibrarySettings.setOnClickListener {
-            findNavController()
+            findNavController().navigate(R.id.action_navigation_settings_main_to_navigation_settings_library)
         }
         buttonTorSettings.setOnClickListener {
-            findNavController()
+            findNavController().navigate(R.id.action_navigation_settings_main_to_navigation_settings_tor)
         }
     }
 }

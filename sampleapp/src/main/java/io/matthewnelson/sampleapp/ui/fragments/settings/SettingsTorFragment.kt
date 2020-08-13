@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?><!--
 /*
 * TorOnionProxyLibrary-Android (a.k.a. topl-android) is a derivation of
 * work from the Tor_Onion_Proxy_Library project that started at commit
@@ -65,72 +64,30 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
--->
+package io.matthewnelson.sampleapp.ui.fragments.settings
 
-<navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+import android.os.Bundle
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import io.matthewnelson.sampleapp.R
 
-    <fragment
-        android:id="@+id/navigation_home"
-        android:name="io.matthewnelson.sampleapp.ui.fragments.home.HomeFragment"
-        android:label="@string/navigation_label"
-        tools:layout="@layout/fragment_home" >
-        <action
-            android:id="@+id/action_navigation_home_to_navigation_settings_main"
-            app:destination="@id/navigation_settings_main"
-            app:enterAnim="@anim/slide_in_left"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_right"
-            app:popExitAnim="@anim/slide_out_right" />
-    </fragment>
+class SettingsTorFragment : Fragment() {
 
-    <fragment
-        android:id="@+id/navigation_settings_main"
-        android:name="io.matthewnelson.sampleapp.ui.fragments.settings.SettingsMainFragment"
-        android:label="@string/navigation_label"
-        tools:layout="@layout/fragment_settings_main" >
-        <action
-            android:id="@+id/action_navigation_settings_main_to_navigation_settings_app"
-            app:destination="@id/navigation_settings_app"
-            app:enterAnim="@anim/slide_in_left"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_right"
-            app:popExitAnim="@anim/slide_out_right" />
-        <action
-            android:id="@+id/action_navigation_settings_main_to_navigation_settings_tor"
-            app:destination="@id/navigation_settings_tor"
-            app:enterAnim="@anim/slide_in_left"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_right"
-            app:popExitAnim="@anim/slide_out_right" />
-        <action
-            android:id="@+id/action_navigation_settings_main_to_navigation_settings_library"
-            app:destination="@id/navigation_settings_library"
-            app:enterAnim="@anim/slide_in_left"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_right"
-            app:popExitAnim="@anim/slide_out_right" />
-    </fragment>
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_settings_tor, container, false)
+    }
 
-    <fragment
-        android:id="@+id/navigation_settings_app"
-        android:name="io.matthewnelson.sampleapp.ui.fragments.settings.SettingsAppFragment"
-        android:label="@string/navigation_label"
-        tools:layout="@layout/fragment_settings_app" />
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+    }
 
-    <fragment
-        android:id="@+id/navigation_settings_library"
-        android:name="io.matthewnelson.sampleapp.ui.fragments.settings.SettingsLibraryFragment"
-        android:label="@string/navigation_label"
-        tools:layout="@layout/fragment_settings_library" />
-
-    <fragment
-        android:id="@+id/navigation_settings_tor"
-        android:name="io.matthewnelson.sampleapp.ui.fragments.settings.SettingsTorFragment"
-        android:label="@string/navigation_label"
-        tools:layout="@layout/fragment_settings_tor" />
-
-</navigation>
+    override fun onDestroyView() {
+        super.onDestroyView()
+    }
+}
