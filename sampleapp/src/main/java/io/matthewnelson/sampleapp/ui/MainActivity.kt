@@ -72,6 +72,8 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
 import io.matthewnelson.sampleapp.R
 
 /**
@@ -85,6 +87,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         navController = findNavController(R.id.nav_host_fragment)
+        val appBarConfiguration = AppBarConfiguration(
+            setOf(R.id.navigation_home)
+        )
+        setupActionBarWithNavController(navController, appBarConfiguration)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        navController.popBackStack()
+        return super.onSupportNavigateUp()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -99,9 +110,6 @@ class MainActivity : AppCompatActivity() {
                 when (navController.currentDestination?.id) {
                     R.id.navigation_home -> {
                         navController.navigate(R.id.navigation_settings_main)
-                    }
-                    R.id.navigation_settings_main -> {
-                        navController.popBackStack()
                     }
                 }
 
