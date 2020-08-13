@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--/*
+<?xml version="1.0" encoding="utf-8"?><!--
+/*
 * TorOnionProxyLibrary-Android (a.k.a. topl-android) is a derivation of
 * work from the Tor_Onion_Proxy_Library project that started at commit
 * hash `74407114cbfa8ea6f2ac51417dda8be98d8aba86`. Contributions made after
@@ -64,7 +64,8 @@
 *     exception. If you modify "The Interfaces", this exception does not apply to your
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
-* */-->
+* */
+-->
 
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"

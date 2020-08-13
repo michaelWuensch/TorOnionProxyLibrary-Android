@@ -77,12 +77,12 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/container_dashboard"
+        android:name="io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:name="io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <fragment
         android:id="@+id/nav_host_fragment"
