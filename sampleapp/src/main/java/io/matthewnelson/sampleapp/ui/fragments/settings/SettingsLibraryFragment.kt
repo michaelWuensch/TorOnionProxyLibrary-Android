@@ -136,7 +136,7 @@ class SettingsLibraryFragment : Fragment() {
             prefs.read(CONTROLLER_STOP_DELAY, 100L)
 
         fun getControllerDisableStopServiceOnTaskRemovedSetting(): Boolean =
-            prefs.read(CONTROLLER_DISABLE_STOP_SERVICE_TASK_REMOVED, true)
+            prefs.read(CONTROLLER_DISABLE_STOP_SERVICE_TASK_REMOVED, false)
 
         fun getControllerBuildConfigDebugSetting(): Boolean =
             prefs.read(CONTROLLER_BUILD_CONFIG_DEBUG, BuildConfig.DEBUG)
