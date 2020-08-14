@@ -117,7 +117,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    app:layout_constraintGuide_percent=".33" />
+                    app:layout_constraintGuide_percent=".40" />
 
                 <TextView
                     android:id="@+id/settings_library_text_view_notification_visibility"
@@ -251,6 +251,88 @@
                 android:textSize="16sp" />
 
             <!-- BackgroundManager Options -->
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/settings_library_background_manager_guide_left"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent=".40" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_background_manager_policy"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:singleLine="true"
+                    android:text="Policy:"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_background_manager_policy"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_background_manager_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_spinner_background_manager_policy" />
+
+                <Spinner
+                    android:id="@+id/settings_library_spinner_background_manager_policy"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/primaryLightColor"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_background_manager_guide_left"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:listitem="@layout/spinner_list_item" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_background_manager_delay"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:singleLine="true"
+                    android:text="Execution Delay:"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_background_manager_delay"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_background_manager_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_spinner_background_manager_delay" />
+
+                <Spinner
+                    android:id="@+id/settings_library_spinner_background_manager_delay"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/primaryLightColor"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_background_manager_guide_left"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_library_spinner_background_manager_policy"
+                    tools:listitem="@layout/spinner_list_item" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_background_manager_kill_app"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:singleLine="true"
+                    android:text="On Task Remove:"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_background_manager_kill_app"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_background_manager_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_spinner_background_manager_kill_app" />
+
+                <Spinner
+                    android:id="@+id/settings_library_spinner_background_manager_kill_app"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/primaryLightColor"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_background_manager_guide_left"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_library_spinner_background_manager_delay"
+                    tools:listitem="@layout/spinner_list_item" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
                 android:layout_width="match_parent"
