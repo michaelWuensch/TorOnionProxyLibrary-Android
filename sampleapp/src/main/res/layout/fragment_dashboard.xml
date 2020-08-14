@@ -183,15 +183,25 @@
         app:layout_constraintTop_toBottomOf="@+id/dash_text_view_port_http_header"
         tools:text="127.0.0.1:40195" />
 
+    <Space
+        android:id="@+id/dash_space"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dash_text_view_port_control" />
+
     <Button
         android:id="@+id/dash_button_app_restart"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
         android:text="@string/dash_button_app_restart"
         android:textAllCaps="false"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@+id/dash_text_view_port_http"
-        app:layout_constraintStart_toStartOf="@+id/dash_text_view_port_control"
-        app:layout_constraintTop_toBottomOf="@+id/dash_text_view_port_http" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dash_space" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
