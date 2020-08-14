@@ -106,12 +106,21 @@ class SettingsLibraryFragment : Fragment() {
         super.onDestroyView()
     }
 
+    private fun isBackgroundManagerPolicyRespectResources(): Boolean =
+        backgroundManagerSpinners.policy == LibraryPrefs.BACKGROUND_MANAGER_POLICY_RESPECT
+
     private fun saveSettings(context: Context) {
+
+        // Will return null if outside of the range 5 to 45 and a toast is displayed
+        if (isBackgroundManagerPolicyRespectResources())
+            backgroundManagerSpinners.getExecutionDelay(context) ?: return
+
         // TODO: check settings are compliant with TorServiceController.Builder
         //  and display toast if that is not the case instead of saving settings
 
-        notificationSpinners.saveSettings(prefs)
-        backgroundManagerSpinners.saveSettings(context, prefs)
+        val bmChanges = backgroundManagerSpinners.saveSettings(context, prefs) ?: return
+        val nChanges = notificationSpinners.saveSettings(prefs)
+
 
         // TODO: If Something was changed, display on dashboard a button to restart the
         //  application for settings to be applied.

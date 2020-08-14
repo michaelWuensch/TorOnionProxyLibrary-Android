@@ -23,8 +23,6 @@ class BackgroundManagerSpinners(view: View, prefs: Prefs) {
         private set
 
     private val initialExecutionDelay: Int = LibraryPrefs.getBackgroundManagerExecuteDelaySetting(prefs)
-    var executionDelay: Int = initialExecutionDelay
-        private set
 
     private val initialKillApp: Boolean = LibraryPrefs.getBackgroundManagerKillAppSetting(prefs)
     var killApp: Boolean = initialKillApp
@@ -35,24 +33,10 @@ class BackgroundManagerSpinners(view: View, prefs: Prefs) {
 
         when (policy) {
             LibraryPrefs.BACKGROUND_MANAGER_POLICY_RESPECT -> {
-                executionDelay = try {
-                    editTextDelay.text.toString().toInt()
-                } catch (e: Exception) {
-                    executionDelay
-                }
-
+                val executionDelay = getExecutionDelay(context) ?: return null
                 if (executionDelay != initialExecutionDelay) {
-
-                    if (executionDelay in 5..45) {
-                        prefs.write(LibraryPrefs.BACKGROUND_MANAGER_EXECUTE_DELAY, executionDelay)
-                        somethingChanged = true
-                    } else {
-                        Toast.makeText(
-                            context, "Execution Delay must be between 5 and 45", Toast.LENGTH_LONG
-                        ).show()
-                        return null
-                    }
-
+                    prefs.write(LibraryPrefs.BACKGROUND_MANAGER_EXECUTE_DELAY, executionDelay)
+                    somethingChanged = true
                 }
             }
             LibraryPrefs.BACKGROUND_MANAGER_POLICY_FOREGROUND -> {
@@ -71,6 +55,22 @@ class BackgroundManagerSpinners(view: View, prefs: Prefs) {
         return somethingChanged
     }
 
+    fun getExecutionDelay(context: Context): Int? {
+        var executionDelay: Int? = null
+        try {
+            val value = editTextDelay.text.toString().toInt()
+            if (value in 5..45)
+                executionDelay = value
+        } catch (e: Exception) {}
+
+        if (executionDelay == null)
+            Toast.makeText(
+                context, "Execution Delay must be between 5 and 45 seconds", Toast.LENGTH_SHORT
+            ).show()
+
+        return executionDelay
+    }
+
     private lateinit var spinnerPolicy: Spinner
     private lateinit var adapterPolicy: ArrayAdapter<String>
     private lateinit var textViewDelay: TextView
@@ -81,8 +81,8 @@ class BackgroundManagerSpinners(view: View, prefs: Prefs) {
 
     init {
         findViews(view)
-        editTextDelay.setText(executionDelay.toString())
         editTextDelay.filters = arrayOf(InputFilter.LengthFilter(2))
+        editTextDelay.setText(initialExecutionDelay.toString())
         initSpinnerBackgroundManagerPolicy(view.context)
         initSpinnerBackgroundManagerKillApp(view.context)
     }
