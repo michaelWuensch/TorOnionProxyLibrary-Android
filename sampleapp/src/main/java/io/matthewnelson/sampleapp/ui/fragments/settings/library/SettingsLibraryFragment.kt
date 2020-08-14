@@ -78,6 +78,7 @@ import android.widget.Toast
 import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.App
 import io.matthewnelson.sampleapp.R
+import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
 
@@ -158,7 +159,7 @@ class SettingsLibraryFragment : Fragment() {
         val nChanges = notificationOptions.saveSettings(prefs)
         val cChanges = controllerOptions.saveSettings(prefs)
 
-        // TODO: If Something was changed, display on dashboard a button to restart the
-        //  application for settings to be applied.
+        if (bmChanges || nChanges || cChanges)
+            DashboardFragment.librarySettingsWereChanged()
     }
 }

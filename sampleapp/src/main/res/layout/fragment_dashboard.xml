@@ -187,8 +187,6 @@
         android:id="@+id/dash_button_app_restart"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingStart="4dp"
-        android:paddingEnd="4dp"
         android:text="@string/dash_button_app_restart"
         android:textAllCaps="false"
         android:visibility="gone"
