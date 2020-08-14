@@ -51,6 +51,7 @@
         screen)</string>
     <string name="settings_library_text_view_background_manager_policy">Policy:</string>
     <string name="settings_library_text_view_background_manager_execution_delay">Execution Delay:</string>
+    <string name="settings_library_edit_text_background_manager_execution_delay">5s to 45s</string>
     <string name="settings_library_text_view_background_manager_on_task_remove">On Task Remove:</string>
 
 
