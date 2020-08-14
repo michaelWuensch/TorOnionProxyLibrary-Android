@@ -33,23 +33,23 @@ class NotificationOptions(view: View, prefs: Prefs) {
         const val HIDE = "Hide"
     }
 
-    private val initialVisibility: Int = LibraryPrefs.getNotificationVisibilitySetting(prefs)
+    private var initialVisibility: Int = LibraryPrefs.getNotificationVisibilitySetting(prefs)
     var visibility: Int = initialVisibility
         private set
 
-    private val initialIconColor: Int = LibraryPrefs.getNotificationColorSetting(prefs)
+    private var initialIconColor: Int = LibraryPrefs.getNotificationColorSetting(prefs)
     var iconColor: Int = initialIconColor
         private set
 
-    private val initialEnableRestart: Boolean = LibraryPrefs.getNotificationRestartEnableSetting(prefs)
+    private var initialEnableRestart: Boolean = LibraryPrefs.getNotificationRestartEnableSetting(prefs)
     var enableRestart: Boolean = initialEnableRestart
         private set
 
-    private val initialEnableStop: Boolean = LibraryPrefs.getNotificationStopEnableSetting(prefs)
+    private var initialEnableStop: Boolean = LibraryPrefs.getNotificationStopEnableSetting(prefs)
     var enableStop: Boolean = initialEnableStop
         private set
 
-    private val initialShow: Boolean = LibraryPrefs.getNotificationShowSetting(prefs)
+    private var initialShow: Boolean = LibraryPrefs.getNotificationShowSetting(prefs)
     var show: Boolean = initialShow
         private set
 
@@ -57,22 +57,27 @@ class NotificationOptions(view: View, prefs: Prefs) {
         var somethingChanged = false
         if (visibility != initialVisibility) {
             prefs.write(LibraryPrefs.NOTIFICATION_VISIBILITY, visibility)
+            initialVisibility = visibility
             somethingChanged = true
         }
         if (iconColor != initialIconColor) {
             prefs.write(LibraryPrefs.NOTIFICATION_COLOR_RESOURCE, iconColor)
+            initialIconColor = iconColor
             somethingChanged = true
         }
         if (enableRestart != initialEnableRestart) {
             prefs.write(LibraryPrefs.NOTIFICATION_ENABLE_RESTART, enableRestart)
+            initialEnableRestart = enableRestart
             somethingChanged = true
         }
         if (enableStop != initialEnableStop) {
             prefs.write(LibraryPrefs.NOTIFICATION_ENABLE_STOP, enableStop)
+            initialEnableStop = enableStop
             somethingChanged = true
         }
         if (show != initialShow) {
             prefs.write(LibraryPrefs.NOTIFICATION_SHOW, show)
+            initialShow = show
             somethingChanged = true
         }
         return somethingChanged

@@ -18,13 +18,13 @@ class BackgroundManagerOptions(view: View, prefs: Prefs) {
         const val NO_KILL_APP = "Don't Kill Application"
     }
 
-    private val initialPolicy: String = LibraryPrefs.getBackgroundManagerPolicySetting(prefs)
+    private var initialPolicy: String = LibraryPrefs.getBackgroundManagerPolicySetting(prefs)
     var policy: String = initialPolicy
         private set
 
-    private val initialExecutionDelay: Int = LibraryPrefs.getBackgroundManagerExecuteDelaySetting(prefs)
+    private var initialExecutionDelay: Int = LibraryPrefs.getBackgroundManagerExecuteDelaySetting(prefs)
 
-    private val initialKillApp: Boolean = LibraryPrefs.getBackgroundManagerKillAppSetting(prefs)
+    private var initialKillApp: Boolean = LibraryPrefs.getBackgroundManagerKillAppSetting(prefs)
     var killApp: Boolean = initialKillApp
         private set
 
@@ -36,12 +36,14 @@ class BackgroundManagerOptions(view: View, prefs: Prefs) {
                 val executionDelay = getExecutionDelay(context) ?: return null
                 if (executionDelay != initialExecutionDelay) {
                     prefs.write(LibraryPrefs.BACKGROUND_MANAGER_EXECUTE_DELAY, executionDelay)
+                    initialExecutionDelay = executionDelay
                     somethingChanged = true
                 }
             }
             LibraryPrefs.BACKGROUND_MANAGER_POLICY_FOREGROUND -> {
                 if (killApp != initialKillApp) {
                     prefs.write(LibraryPrefs.BACKGROUND_MANAGER_KILL_APP, killApp)
+                    initialKillApp = killApp
                     somethingChanged = true
                 }
             }
@@ -49,6 +51,7 @@ class BackgroundManagerOptions(view: View, prefs: Prefs) {
 
         if (policy != initialPolicy) {
             prefs.write(LibraryPrefs.BACKGROUND_MANAGER_POLICY, policy)
+            initialPolicy = policy
             somethingChanged = true
         }
 

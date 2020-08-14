@@ -21,15 +21,15 @@ class ControllerOptions(view: View, prefs: Prefs) {
         const val RELEASE = "Release"
     }
 
-    private val initialRestartDelayTime: Long = LibraryPrefs.getControllerRestartDelaySetting(prefs)
+    private var initialRestartDelayTime: Long = LibraryPrefs.getControllerRestartDelaySetting(prefs)
 
-    private val initialStopDelayTime: Long = LibraryPrefs.getControllerStopDelaySetting(prefs)
+    private var initialStopDelayTime: Long = LibraryPrefs.getControllerStopDelaySetting(prefs)
 
-    private val initialDisableStopServiceOnTaskRemoved: Boolean = LibraryPrefs.getControllerDisableStopServiceOnTaskRemovedSetting(prefs)
+    private var initialDisableStopServiceOnTaskRemoved: Boolean = LibraryPrefs.getControllerDisableStopServiceOnTaskRemovedSetting(prefs)
     var disableStopServiceOnTaskRemoved: Boolean = initialDisableStopServiceOnTaskRemoved
         private set
 
-    private val initialBuildConfigDebug: Boolean = LibraryPrefs.getControllerBuildConfigDebugSetting(prefs)
+    private var initialBuildConfigDebug: Boolean = LibraryPrefs.getControllerBuildConfigDebugSetting(prefs)
     var buildConfigDebug: Boolean = initialBuildConfigDebug
         private set
 
@@ -37,18 +37,22 @@ class ControllerOptions(view: View, prefs: Prefs) {
         var somethingChanged = false
         if (getRestartDelayValue() != initialRestartDelayTime) {
             prefs.write(LibraryPrefs.CONTROLLER_RESTART_DELAY, getRestartDelayValue())
+            initialRestartDelayTime = getRestartDelayValue()
             somethingChanged = true
         }
         if (getStopDelayTime() != initialStopDelayTime) {
             prefs.write(LibraryPrefs.CONTROLLER_STOP_DELAY, getStopDelayTime())
+            initialStopDelayTime = getStopDelayTime()
             somethingChanged = true
         }
         if (disableStopServiceOnTaskRemoved != initialDisableStopServiceOnTaskRemoved) {
             prefs.write(LibraryPrefs.CONTROLLER_DISABLE_STOP_SERVICE_TASK_REMOVED, disableStopServiceOnTaskRemoved)
+            initialDisableStopServiceOnTaskRemoved = disableStopServiceOnTaskRemoved
             somethingChanged = true
         }
         if (buildConfigDebug != initialBuildConfigDebug) {
             prefs.write(LibraryPrefs.CONTROLLER_BUILD_CONFIG_DEBUG, buildConfigDebug)
+            initialBuildConfigDebug = buildConfigDebug
             somethingChanged = true
         }
         return somethingChanged
