@@ -30,4 +30,17 @@
         <item name="android:paddingTop">4dp</item>
     </style>
 
+    <style name="SpinnerTextView">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="SpinnerStyle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_marginTop">8dp</item>
+    </style>
+
 </resources>

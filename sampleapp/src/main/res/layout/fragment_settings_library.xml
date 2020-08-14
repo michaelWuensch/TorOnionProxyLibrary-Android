@@ -81,6 +81,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="12dp"
+        android:fadeScrollbars="false"
         app:layout_constraintBottom_toTopOf="@+id/settings_library_button_save"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -101,7 +102,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
                 android:text="@string/settings_library_text_view_notification_preamble"
                 android:textSize="16sp" />
 
@@ -109,8 +110,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
+                android:layout_height="wrap_content">
 
                 <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/settings_library_notification_guide_left"
@@ -121,11 +121,8 @@
 
                 <TextView
                     android:id="@+id/settings_library_text_view_notification_visibility"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:singleLine="true"
+                    style="@style/SpinnerTextView"
                     android:text="@string/settings_library_text_view_notification_option_visibility"
-                    android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_notification_visibility"
                     app:layout_constraintEnd_toEndOf="@+id/settings_library_notification_guide_left"
                     app:layout_constraintStart_toStartOf="parent"
@@ -133,8 +130,7 @@
 
                 <Spinner
                     android:id="@+id/settings_library_spinner_notification_visibility"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    style="@style/SpinnerStyle"
                     android:background="@color/primaryLightColor"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/settings_library_notification_guide_left"
@@ -143,11 +139,8 @@
 
                 <TextView
                     android:id="@+id/settings_library_text_view_notification_icon_color"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:singleLine="true"
+                    style="@style/SpinnerTextView"
                     android:text="@string/settings_library_text_view_notification_option_icon_color"
-                    android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_notification_icon_color"
                     app:layout_constraintEnd_toEndOf="@+id/settings_library_notification_guide_left"
                     app:layout_constraintStart_toStartOf="parent"
@@ -155,9 +148,7 @@
 
                 <Spinner
                     android:id="@+id/settings_library_spinner_notification_icon_color"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="8dp"
+                    style="@style/SpinnerStyle"
                     android:background="@color/primaryLightColor"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/settings_library_notification_guide_left"
@@ -166,11 +157,8 @@
 
                 <TextView
                     android:id="@+id/settings_library_text_view_notification_restart_button"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:singleLine="true"
+                    style="@style/SpinnerTextView"
                     android:text="@string/settings_library_text_view_notification_option_restart_button"
-                    android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_notification_restart_button"
                     app:layout_constraintEnd_toEndOf="@+id/settings_library_notification_guide_left"
                     app:layout_constraintStart_toStartOf="parent"
@@ -178,9 +166,7 @@
 
                 <Spinner
                     android:id="@+id/settings_library_spinner_notification_restart_button"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="8dp"
+                    style="@style/SpinnerStyle"
                     android:background="@color/primaryLightColor"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/settings_library_notification_guide_left"
@@ -189,11 +175,8 @@
 
                 <TextView
                     android:id="@+id/settings_library_text_view_notification_stop_button"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:singleLine="true"
+                    style="@style/SpinnerTextView"
                     android:text="@string/settings_library_text_view_notification_option_stop_button"
-                    android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_notification_stop_button"
                     app:layout_constraintEnd_toEndOf="@+id/settings_library_notification_guide_left"
                     app:layout_constraintStart_toStartOf="parent"
@@ -201,9 +184,7 @@
 
                 <Spinner
                     android:id="@+id/settings_library_spinner_notification_stop_button"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="8dp"
+                    style="@style/SpinnerStyle"
                     android:background="@color/primaryLightColor"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/settings_library_notification_guide_left"
@@ -212,11 +193,8 @@
 
                 <TextView
                     android:id="@+id/settings_library_text_view_notification_show"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:singleLine="true"
+                    style="@style/SpinnerTextView"
                     android:text="@string/settings_library_text_view_notification_option_show_notification"
-                    android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_notification_show"
                     app:layout_constraintEnd_toEndOf="@+id/settings_library_notification_guide_left"
                     app:layout_constraintStart_toStartOf="parent"
@@ -224,9 +202,7 @@
 
                 <Spinner
                     android:id="@+id/settings_library_spinner_notification_show"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="8dp"
+                    style="@style/SpinnerStyle"
                     android:background="@color/primaryLightColor"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/settings_library_notification_guide_left"
@@ -246,7 +222,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
                 android:text="@string/settings_library_text_view_background_manager_preamble"
                 android:textSize="16sp" />
 
@@ -254,8 +230,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
+                android:layout_height="wrap_content">
 
                 <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/settings_library_background_manager_guide_left"
@@ -266,11 +241,8 @@
 
                 <TextView
                     android:id="@+id/settings_library_text_view_background_manager_policy"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:singleLine="true"
-                    android:text="Policy:"
-                    android:textStyle="bold"
+                    style="@style/SpinnerTextView"
+                    android:text="@string/settings_library_text_view_background_manager_policy"
                     app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_background_manager_policy"
                     app:layout_constraintEnd_toEndOf="@+id/settings_library_background_manager_guide_left"
                     app:layout_constraintStart_toStartOf="parent"
@@ -278,8 +250,7 @@
 
                 <Spinner
                     android:id="@+id/settings_library_spinner_background_manager_policy"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    style="@style/SpinnerStyle"
                     android:background="@color/primaryLightColor"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/settings_library_background_manager_guide_left"
@@ -288,11 +259,8 @@
 
                 <TextView
                     android:id="@+id/settings_library_text_view_background_manager_delay"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:singleLine="true"
-                    android:text="Execution Delay:"
-                    android:textStyle="bold"
+                    style="@style/SpinnerTextView"
+                    android:text="@string/settings_library_text_view_background_manager_execution_delay"
                     app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_background_manager_delay"
                     app:layout_constraintEnd_toEndOf="@+id/settings_library_background_manager_guide_left"
                     app:layout_constraintStart_toStartOf="parent"
@@ -300,9 +268,7 @@
 
                 <Spinner
                     android:id="@+id/settings_library_spinner_background_manager_delay"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="8dp"
+                    style="@style/SpinnerStyle"
                     android:background="@color/primaryLightColor"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/settings_library_background_manager_guide_left"
@@ -311,11 +277,8 @@
 
                 <TextView
                     android:id="@+id/settings_library_text_view_background_manager_kill_app"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:singleLine="true"
-                    android:text="On Task Remove:"
-                    android:textStyle="bold"
+                    style="@style/SpinnerTextView"
+                    android:text="@string/settings_library_text_view_background_manager_on_task_remove"
                     app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_background_manager_kill_app"
                     app:layout_constraintEnd_toEndOf="@+id/settings_library_background_manager_guide_left"
                     app:layout_constraintStart_toStartOf="parent"
@@ -323,9 +286,7 @@
 
                 <Spinner
                     android:id="@+id/settings_library_spinner_background_manager_kill_app"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="8dp"
+                    style="@style/SpinnerStyle"
                     android:background="@color/primaryLightColor"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/settings_library_background_manager_guide_left"
@@ -345,7 +306,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
                 android:text="@string/settings_library_text_view_service_controller_preamble"
                 android:textSize="16sp" />
 
