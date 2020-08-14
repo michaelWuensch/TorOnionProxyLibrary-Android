@@ -108,7 +108,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         findViews(view)
         initButtons()
-        logMessageAdapter = LogMessageAdapter(this, view)
+        logMessageAdapter = LogMessageAdapter(viewLifecycleOwner, view)
     }
 
     override fun onStart() {
