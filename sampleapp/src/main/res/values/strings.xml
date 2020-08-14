@@ -6,6 +6,7 @@
     <string name="dashboard_text_view_control_port">Control Port:</string>
     <string name="dashboard_text_view_socks_port">Socks Port:</string>
     <string name="dashboard_text_view_http_port">Http Port:</string>
+    <string name="dash_button_app_restart">Application Restart Needed</string>
 
     <!-- HomeFragment -->
     <string name="home_button_debugging_enable">Enable Debugging</string>
