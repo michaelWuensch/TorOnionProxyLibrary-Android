@@ -68,6 +68,7 @@ package io.matthewnelson.sampleapp
 
 import android.app.Application
 import android.app.Service
+import android.content.Context
 import android.os.Process
 import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster
@@ -86,7 +87,7 @@ import io.matthewnelson.topl_service.lifecycle.BackgroundManager
 class App: Application() {
 
     companion object {
-        lateinit var prefs: Prefs
+        const val PREFS_NAME = "TOPL-Android_SampleApp"
 
         /**
          * See [io.matthewnelson.sampleapp.topl_android.CodeSamples.generateTorServiceNotificationBuilder]
@@ -152,24 +153,24 @@ class App: Application() {
 
     override fun onCreate() {
         super.onCreate()
-        prefs = Prefs.createUnencrypted("TOPL-Android_SampleApp", this)
+        val prefs = Prefs.createUnencrypted(PREFS_NAME, this)
 
         val serviceNotificationBuilder = generateTorServiceNotificationBuilder(
-            LibraryPrefs.getNotificationVisibilitySetting(),
-            LibraryPrefs.getNotificationColorSetting(),
-            LibraryPrefs.getNotificationRestartEnableSetting(),
-            LibraryPrefs.getNotificationStopEnableSetting(),
-            LibraryPrefs.getNotificationShowSetting()
+            LibraryPrefs.getNotificationVisibilitySetting(prefs),
+            LibraryPrefs.getNotificationColorSetting(prefs),
+            LibraryPrefs.getNotificationRestartEnableSetting(prefs),
+            LibraryPrefs.getNotificationStopEnableSetting(prefs),
+            LibraryPrefs.getNotificationShowSetting(prefs)
         )
 
         setupTorServices(
             this,
             serviceNotificationBuilder,
-            generateBackgroundManagerPolicy(),
-            LibraryPrefs.getControllerRestartDelaySetting(),
-            LibraryPrefs.getControllerStopDelaySetting(),
-            LibraryPrefs.getControllerDisableStopServiceOnTaskRemovedSetting(),
-            LibraryPrefs.getControllerBuildConfigDebugSetting()
+            generateBackgroundManagerPolicy(prefs),
+            LibraryPrefs.getControllerRestartDelaySetting(prefs),
+            LibraryPrefs.getControllerStopDelaySetting(prefs),
+            LibraryPrefs.getControllerDisableStopServiceOnTaskRemovedSetting(prefs),
+            LibraryPrefs.getControllerBuildConfigDebugSetting(prefs)
         )
 
         TorServiceController.appEventBroadcaster?.let {
@@ -183,17 +184,17 @@ class App: Application() {
      * See [io.matthewnelson.sampleapp.topl_android.CodeSamples.generateBackgroundManagerPolicy]
      * for a cleaner sample
      * */
-    private fun generateBackgroundManagerPolicy(): BackgroundManager.Builder.Policy {
+    private fun generateBackgroundManagerPolicy(prefs: Prefs): BackgroundManager.Builder.Policy {
         val builder = BackgroundManager.Builder()
-        return when (LibraryPrefs.getBackgroundManagerPolicySetting()) {
+        return when (LibraryPrefs.getBackgroundManagerPolicySetting(prefs)) {
             LibraryPrefs.BACKGROUND_MANAGER_POLICY_FOREGROUND -> {
                 builder.runServiceInForeground(
-                    LibraryPrefs.getBackgroundManagerKillAppSetting()
+                    LibraryPrefs.getBackgroundManagerKillAppSetting(prefs)
                 )
             }
             LibraryPrefs.BACKGROUND_MANAGER_POLICY_RESPECT -> {
                 builder.respectResourcesWhileInBackground(
-                    LibraryPrefs.getBackgroundManagerExecuteDelaySetting()
+                    LibraryPrefs.getBackgroundManagerExecuteDelaySetting(prefs)
                 )
             }
             else -> {

@@ -7,10 +7,9 @@ import android.widget.ArrayAdapter
 import android.widget.Spinner
 import androidx.core.app.NotificationCompat
 import io.matthewnelson.encrypted_storage.Prefs
-import io.matthewnelson.sampleapp.App
 import io.matthewnelson.sampleapp.R
 
-class NotificationSpinners(view: View) {
+class NotificationSpinners(view: View, private val prefs: Prefs) {
 
     private companion object {
         // Spinner Notification Visibility
@@ -34,26 +33,23 @@ class NotificationSpinners(view: View) {
         const val HIDE = "Hide"
     }
 
-    private val prefs: Prefs
-        get() = App.prefs
-
-    private val initialVisibility: Int = LibraryPrefs.getNotificationVisibilitySetting()
+    private val initialVisibility: Int = LibraryPrefs.getNotificationVisibilitySetting(prefs)
     var visibility: Int = initialVisibility
         private set
 
-    private val initialIconColor: Int = LibraryPrefs.getNotificationColorSetting()
+    private val initialIconColor: Int = LibraryPrefs.getNotificationColorSetting(prefs)
     var iconColor: Int = initialIconColor
         private set
 
-    private val initialEnableRestart: Boolean = LibraryPrefs.getNotificationRestartEnableSetting()
+    private val initialEnableRestart: Boolean = LibraryPrefs.getNotificationRestartEnableSetting(prefs)
     var enableRestart: Boolean = initialEnableRestart
         private set
 
-    private val initialEnableStop: Boolean = LibraryPrefs.getNotificationStopEnableSetting()
+    private val initialEnableStop: Boolean = LibraryPrefs.getNotificationStopEnableSetting(prefs)
     var enableStop: Boolean = initialEnableStop
         private set
 
-    private val initialShow: Boolean = LibraryPrefs.getNotificationShowSetting()
+    private val initialShow: Boolean = LibraryPrefs.getNotificationShowSetting(prefs)
     var show: Boolean = initialShow
         private set
 

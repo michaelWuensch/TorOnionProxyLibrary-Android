@@ -72,11 +72,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import io.matthewnelson.encrypted_storage.Prefs
+import io.matthewnelson.sampleapp.App
 import io.matthewnelson.sampleapp.R
 
 class SettingsLibraryFragment : Fragment() {
 
     private lateinit var notificationSpinners: NotificationSpinners
+    private lateinit var prefs: Prefs
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -88,7 +91,9 @@ class SettingsLibraryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        notificationSpinners = NotificationSpinners(view)
+        prefs = Prefs.createUnencrypted(App.PREFS_NAME, view.context)
+        notificationSpinners = NotificationSpinners(view, prefs)
+
         view.findViewById<Button>(R.id.settings_library_button_save).setOnClickListener {
             saveSettings()
         }

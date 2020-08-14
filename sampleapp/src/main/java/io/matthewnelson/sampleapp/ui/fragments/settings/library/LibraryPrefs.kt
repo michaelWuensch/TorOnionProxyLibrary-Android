@@ -2,7 +2,6 @@ package io.matthewnelson.sampleapp.ui.fragments.settings.library
 
 import androidx.core.app.NotificationCompat
 import io.matthewnelson.encrypted_storage.Prefs
-import io.matthewnelson.sampleapp.App
 import io.matthewnelson.sampleapp.BuildConfig
 import io.matthewnelson.sampleapp.R
 
@@ -30,45 +29,42 @@ object LibraryPrefs {
     const val CONTROLLER_STOP_DELAY = "CONTROLLER_STOP_DELAY"
     const val CONTROLLER_DISABLE_STOP_SERVICE_TASK_REMOVED = "CONTROLLER_DISABLE_STOP_SERVICE_TASK_REMOVED"
 
-    private val prefs: Prefs
-        get() = App.prefs
-
     // Notification Settings
-    fun getNotificationVisibilitySetting(): Int =
+    fun getNotificationVisibilitySetting(prefs: Prefs): Int =
         prefs.read(NOTIFICATION_VISIBILITY, NotificationCompat.VISIBILITY_PRIVATE)
 
-    fun getNotificationColorSetting(): Int =
+    fun getNotificationColorSetting(prefs: Prefs): Int =
         prefs.read(NOTIFICATION_COLOR_RESOURCE, R.color.primaryColor)
 
-    fun getNotificationRestartEnableSetting(): Boolean =
+    fun getNotificationRestartEnableSetting(prefs: Prefs): Boolean =
         prefs.read(NOTIFICATION_ENABLE_RESTART, true)
 
-    fun getNotificationStopEnableSetting(): Boolean =
+    fun getNotificationStopEnableSetting(prefs: Prefs): Boolean =
         prefs.read(NOTIFICATION_ENABLE_STOP, true)
 
-    fun getNotificationShowSetting(): Boolean =
+    fun getNotificationShowSetting(prefs: Prefs): Boolean =
         prefs.read(NOTIFICATION_SHOW, true)
 
     // Background Manager Settings
-    fun getBackgroundManagerPolicySetting(): String? =
+    fun getBackgroundManagerPolicySetting(prefs: Prefs): String? =
         prefs.read(BACKGROUND_MANAGER_POLICY, Prefs.INVALID_STRING)
 
-    fun getBackgroundManagerExecuteDelaySetting(): Int =
+    fun getBackgroundManagerExecuteDelaySetting(prefs: Prefs): Int =
         prefs.read(BACKGROUND_MANAGER_EXECUTE_DELAY, 20)
 
-    fun getBackgroundManagerKillAppSetting(): Boolean =
+    fun getBackgroundManagerKillAppSetting(prefs: Prefs): Boolean =
         prefs.read(BACKGROUND_MANAGER_KILL_APP, true)
 
     // Controller Settings
-    fun getControllerRestartDelaySetting(): Long =
+    fun getControllerRestartDelaySetting(prefs: Prefs): Long =
         prefs.read(CONTROLLER_RESTART_DELAY, 100L)
 
-    fun getControllerStopDelaySetting(): Long =
+    fun getControllerStopDelaySetting(prefs: Prefs): Long =
         prefs.read(CONTROLLER_STOP_DELAY, 100L)
 
-    fun getControllerDisableStopServiceOnTaskRemovedSetting(): Boolean =
+    fun getControllerDisableStopServiceOnTaskRemovedSetting(prefs: Prefs): Boolean =
         prefs.read(CONTROLLER_DISABLE_STOP_SERVICE_TASK_REMOVED, false)
 
-    fun getControllerBuildConfigDebugSetting(): Boolean =
+    fun getControllerBuildConfigDebugSetting(prefs: Prefs): Boolean =
         prefs.read(CONTROLLER_BUILD_CONFIG_DEBUG, BuildConfig.DEBUG)
 }
