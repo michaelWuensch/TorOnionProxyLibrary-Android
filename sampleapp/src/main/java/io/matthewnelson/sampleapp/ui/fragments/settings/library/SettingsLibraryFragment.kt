@@ -66,6 +66,7 @@
 * */
 package io.matthewnelson.sampleapp.ui.fragments.settings.library
 
+import android.app.Application
 import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -73,14 +74,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Toast
 import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.App
 import io.matthewnelson.sampleapp.R
+import io.matthewnelson.topl_service.TorServiceController
+import io.matthewnelson.topl_service.lifecycle.BackgroundManager
 
 class SettingsLibraryFragment : Fragment() {
 
     private lateinit var notificationOptions: NotificationOptions
     private lateinit var backgroundManagerOptions: BackgroundManagerOptions
+    private lateinit var controllerOptions: ControllerOptions
     private lateinit var prefs: Prefs
 
     override fun onCreateView(
@@ -96,6 +101,7 @@ class SettingsLibraryFragment : Fragment() {
         prefs = Prefs.createUnencrypted(App.PREFS_NAME, view.context)
         notificationOptions = NotificationOptions(view, prefs)
         backgroundManagerOptions = BackgroundManagerOptions(view, prefs)
+        controllerOptions = ControllerOptions(view, prefs)
 
         view.findViewById<Button>(R.id.settings_library_button_save).setOnClickListener {
             saveSettings(view.context)
@@ -115,12 +121,42 @@ class SettingsLibraryFragment : Fragment() {
         if (isBackgroundManagerPolicyRespectResources())
             backgroundManagerOptions.getExecutionDelay(context) ?: return
 
-        // TODO: check settings are compliant with TorServiceController.Builder
-        //  and display toast if that is not the case instead of saving settings
+        // Ensure settings chosen are compatible before saving to prefs
+        val notificationBuilder = App.generateTorServiceNotificationBuilder(
+            notificationOptions.visibility,
+            notificationOptions.iconColor,
+            notificationOptions.enableRestart,
+            notificationOptions.enableStop,
+            notificationOptions.show
+        )
+
+        val backgroundManagerPolicy = if (isBackgroundManagerPolicyRespectResources())
+            BackgroundManager.Builder().respectResourcesWhileInBackground(
+                backgroundManagerOptions.getExecutionDelay(context)
+            )
+        else
+            BackgroundManager.Builder().runServiceInForeground(
+                backgroundManagerOptions.killApp
+            )
+
+        try {
+            App.setupTorServices(
+                context.applicationContext as Application,
+                notificationBuilder,
+                backgroundManagerPolicy,
+                controllerOptions.getRestartDelayValue(),
+                controllerOptions.getStopDelayTime(),
+                controllerOptions.disableStopServiceOnTaskRemoved,
+                controllerOptions.buildConfigDebug
+            )
+        } catch (e: Exception) {
+            Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
+            return
+        }
 
         val bmChanges = backgroundManagerOptions.saveSettings(context, prefs) ?: return
         val nChanges = notificationOptions.saveSettings(prefs)
-
+        val cChanges = controllerOptions.saveSettings(prefs)
 
         // TODO: If Something was changed, display on dashboard a button to restart the
         //  application for settings to be applied.

@@ -318,6 +318,95 @@
 
             <!-- Controller Options -->
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/settings_library_controller_guide_left"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent=".40" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_controller_restart_delay"
+                    style="@style/SpinnerTextView"
+                    android:text="@string/settings_library_text_view_controller_restart_delay"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_edit_text_controller_restart_delay"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_controller_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_edit_text_controller_restart_delay" />
+
+                <EditText
+                    android:id="@+id/settings_library_edit_text_controller_restart_delay"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:hint="@string/settings_library_edit_text_controller_restart_delay"
+                    android:inputType="number"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_controller_guide_left"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_controller_stop_delay"
+                    style="@style/SpinnerTextView"
+                    android:text="@string/settings_library_text_view_controller_stop_delay"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_edit_text_controller_stop_delay"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_controller_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_edit_text_controller_stop_delay" />
+
+                <EditText
+                    android:id="@+id/settings_library_edit_text_controller_stop_delay"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:hint="@string/settings_library_edit_text_controller_stop_delay"
+                    android:inputType="number"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_controller_guide_left"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_library_edit_text_controller_restart_delay" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_controller_stop_on_task_removed"
+                    style="@style/SpinnerTextView"
+                    android:text="@string/settings_library_text_view_controller_stop_on_task_removed"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_controller_stop_on_task_removed"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_controller_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_spinner_controller_stop_on_task_removed" />
+
+                <Spinner
+                    android:id="@+id/settings_library_spinner_controller_stop_on_task_removed"
+                    style="@style/SpinnerStyle"
+                    android:background="@color/primaryLightColor"
+                    tools:listitem="@layout/spinner_list_item"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_controller_guide_left"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_library_edit_text_controller_stop_delay" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_controller_build_config"
+                    style="@style/SpinnerTextView"
+                    android:text="@string/settings_library_text_view_controller_build_config"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_controller_build_config"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_controller_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_spinner_controller_build_config" />
+
+                <Spinner
+                    android:id="@+id/settings_library_spinner_controller_build_config"
+                    style="@style/SpinnerStyle"
+                    android:background="@color/primaryLightColor"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_controller_guide_left"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_library_spinner_controller_stop_on_task_removed"
+                    tools:listitem="@layout/spinner_list_item" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
         </LinearLayout>
 
     </ScrollView>

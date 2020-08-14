@@ -101,7 +101,12 @@ class HomeFragment : Fragment() {
     ): View? {
         torServicePrefs = TorServicePrefs(inflater.context)
         hasDebugLogs = torServicePrefs.getBoolean(
-            ServiceConsts.PrefKeyBoolean.HAS_DEBUG_LOGS, TorServiceController.getTorSettings().hasDebugLogs
+            ServiceConsts.PrefKeyBoolean.HAS_DEBUG_LOGS,
+            try {
+                TorServiceController.getTorSettings().hasDebugLogs
+            } catch (e: RuntimeException) {
+                false
+            }
         )
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
