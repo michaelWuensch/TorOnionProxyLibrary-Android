@@ -70,6 +70,7 @@ import android.app.Application
 import android.app.Service
 import android.content.Context
 import android.os.Process
+import android.widget.Toast
 import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster
 import io.matthewnelson.sampleapp.topl_android.MyTorSettings
@@ -191,20 +192,24 @@ class App: Application() {
             LibraryPrefs.getNotificationShowSetting(prefs)
         )
 
-        setupTorServices(
-            this,
-            serviceNotificationBuilder,
-            generateBackgroundManagerPolicy(prefs),
-            LibraryPrefs.getControllerRestartDelaySetting(prefs),
-            LibraryPrefs.getControllerStopDelaySetting(prefs),
-            LibraryPrefs.getControllerDisableStopServiceOnTaskRemovedSetting(prefs),
-            LibraryPrefs.getControllerBuildConfigDebugSetting(prefs)
-        )
-
-        TorServiceController.appEventBroadcaster?.let {
-            (it as MyEventBroadcaster).broadcastLogMessage(
-                "SampleApp|Application|Process ID: ${Process.myPid()}"
+        try {
+            setupTorServices(
+                this,
+                serviceNotificationBuilder,
+                generateBackgroundManagerPolicy(prefs),
+                LibraryPrefs.getControllerRestartDelaySetting(prefs),
+                LibraryPrefs.getControllerStopDelaySetting(prefs),
+                LibraryPrefs.getControllerDisableStopServiceOnTaskRemovedSetting(prefs),
+                LibraryPrefs.getControllerBuildConfigDebugSetting(prefs)
             )
+
+            TorServiceController.appEventBroadcaster?.let {
+                (it as MyEventBroadcaster).broadcastLogMessage(
+                    "SampleApp|Application|Process ID: ${Process.myPid()}"
+                )
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
         }
     }
 }
