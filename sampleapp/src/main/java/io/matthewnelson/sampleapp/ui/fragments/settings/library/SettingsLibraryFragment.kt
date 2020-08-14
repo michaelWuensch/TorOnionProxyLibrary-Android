@@ -71,6 +71,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import io.matthewnelson.sampleapp.R
 
 class SettingsLibraryFragment : Fragment() {
@@ -88,9 +89,22 @@ class SettingsLibraryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         notificationSpinners = NotificationSpinners(view)
+        view.findViewById<Button>(R.id.settings_library_button_save).setOnClickListener {
+            saveSettings()
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+    }
+
+    private fun saveSettings() {
+        // TODO: check settings are compliant with TorServiceController.Builder
+        //  and display toast if that is not the case instead of saving settings
+
+        notificationSpinners.saveSettings()
+
+        // TODO: If Something was changed, display on dashboard a button to restart the
+        //  application for settings to be applied.
     }
 }

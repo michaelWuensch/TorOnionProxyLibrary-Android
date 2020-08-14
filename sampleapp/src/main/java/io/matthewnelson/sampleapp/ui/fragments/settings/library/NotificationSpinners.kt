@@ -37,6 +37,51 @@ class NotificationSpinners(view: View) {
     private val prefs: Prefs
         get() = App.prefs
 
+    private val initialVisibility: Int = LibraryPrefs.getNotificationVisibilitySetting()
+    var visibility: Int = initialVisibility
+        private set
+
+    private val initialIconColor: Int = LibraryPrefs.getNotificationColorSetting()
+    var iconColor: Int = initialIconColor
+        private set
+
+    private val initialEnableRestart: Boolean = LibraryPrefs.getNotificationRestartEnableSetting()
+    var enableRestart: Boolean = initialEnableRestart
+        private set
+
+    private val initialEnableStop: Boolean = LibraryPrefs.getNotificationStopEnableSetting()
+    var enableStop: Boolean = initialEnableStop
+        private set
+
+    private val initialShow: Boolean = LibraryPrefs.getNotificationShowSetting()
+    var show: Boolean = initialShow
+        private set
+
+    fun saveSettings(): Boolean {
+        var somethingChanged = false
+        if (visibility != initialVisibility) {
+            prefs.write(LibraryPrefs.NOTIFICATION_VISIBILITY, visibility)
+            somethingChanged = true
+        }
+        if (iconColor != initialIconColor) {
+            prefs.write(LibraryPrefs.NOTIFICATION_COLOR_RESOURCE, iconColor)
+            somethingChanged = true
+        }
+        if (enableRestart != initialEnableRestart) {
+            prefs.write(LibraryPrefs.NOTIFICATION_ENABLE_RESTART, enableRestart)
+            somethingChanged = true
+        }
+        if (enableStop != initialEnableStop) {
+            prefs.write(LibraryPrefs.NOTIFICATION_ENABLE_STOP, enableStop)
+            somethingChanged = true
+        }
+        if (show != initialShow) {
+            prefs.write(LibraryPrefs.NOTIFICATION_SHOW, show)
+            somethingChanged = true
+        }
+        return somethingChanged
+    }
+
     private lateinit var spinnerVisibility: Spinner
     private lateinit var adapterVisibility: ArrayAdapter<String>
     private lateinit var spinnerColor: Spinner
@@ -79,7 +124,7 @@ class NotificationSpinners(view: View) {
     }
 
     private fun setNotificationVisibilitySpinnerValue() {
-        when (LibraryPrefs.getNotificationVisibilitySetting()) {
+        when (initialVisibility) {
             NotificationCompat.VISIBILITY_PRIVATE -> {
                 spinnerVisibility.setSelection(0)
             }
@@ -108,7 +153,7 @@ class NotificationSpinners(view: View) {
     }
 
     private fun setNotificationColorSpinnerValue() {
-        when (LibraryPrefs.getNotificationColorSetting()) {
+        when (initialIconColor) {
             R.color.tor_service_white -> {
                 spinnerColor.setSelection(0)
             }
@@ -140,7 +185,7 @@ class NotificationSpinners(view: View) {
     }
 
     private fun setNotificationRestartButtonSpinnerValue() {
-        when (LibraryPrefs.getNotificationRestartEnableSetting()) {
+        when (initialEnableRestart) {
             true -> {
                 spinnerRestart.setSelection(0)
             }
@@ -163,7 +208,7 @@ class NotificationSpinners(view: View) {
     }
 
     private fun setNotificationStopButtonSpinnerValue() {
-        when (LibraryPrefs.getNotificationStopEnableSetting()) {
+        when (initialEnableStop) {
             true -> {
                 spinnerStop.setSelection(0)
             }
@@ -186,7 +231,7 @@ class NotificationSpinners(view: View) {
     }
 
     private fun setNotificationShowSpinnerValue() {
-        when (LibraryPrefs.getNotificationShowSetting()) {
+        when (initialShow) {
             true -> {
                 spinnerShow.setSelection(0)
             }
@@ -212,7 +257,7 @@ class NotificationSpinners(view: View) {
 
             when (parent.adapter) {
                 adapterVisibility -> {
-                    val visibility: Int = when (item.toString()) {
+                    visibility = when (item.toString()) {
                         PRIVATE -> {
                             NotificationCompat.VISIBILITY_PRIVATE
                         }
@@ -226,10 +271,9 @@ class NotificationSpinners(view: View) {
                             return
                         }
                     }
-                    prefs.write(LibraryPrefs.NOTIFICATION_VISIBILITY, visibility)
                 }
                 adapterColor -> {
-                    val colorRes: Int = when (item.toString()) {
+                    iconColor = when (item.toString()) {
                         NONE -> {
                             R.color.tor_service_white
                         }
@@ -249,10 +293,9 @@ class NotificationSpinners(view: View) {
                             return
                         }
                     }
-                    prefs.write(LibraryPrefs.NOTIFICATION_COLOR_RESOURCE, colorRes)
                 }
                 adapterRestart -> {
-                    val enabled: Boolean = when (item.toString()) {
+                    enableRestart = when (item.toString()) {
                         ENABLED -> {
                             true
                         }
@@ -263,10 +306,9 @@ class NotificationSpinners(view: View) {
                             return
                         }
                     }
-                    prefs.write(LibraryPrefs.NOTIFICATION_ENABLE_RESTART, enabled)
                 }
                 adapterStop -> {
-                    val enabled: Boolean = when (item.toString()) {
+                    enableStop = when (item.toString()) {
                         ENABLED -> {
                             true
                         }
@@ -277,10 +319,9 @@ class NotificationSpinners(view: View) {
                             return
                         }
                     }
-                    prefs.write(LibraryPrefs.NOTIFICATION_ENABLE_STOP, enabled)
                 }
                 adapterShow -> {
-                    val show: Boolean = when (item.toString()) {
+                    show = when (item.toString()) {
                         SHOW -> {
                             true
                         }
@@ -291,7 +332,6 @@ class NotificationSpinners(view: View) {
                             return
                         }
                     }
-                    prefs.write(LibraryPrefs.NOTIFICATION_SHOW, show)
                 }
             }
             // TODO: add restart app popup

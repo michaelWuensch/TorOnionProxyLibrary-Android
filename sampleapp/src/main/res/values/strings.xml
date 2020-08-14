@@ -54,5 +54,7 @@
         operates. There are some settings that can\'t be modified here, but you can when
         implementing the Library into your own application</string>
 
+    <string name="settings_library_button_save">Save Settings</string>
+
     <!-- SettingsTorFragment -->
 </resources>
