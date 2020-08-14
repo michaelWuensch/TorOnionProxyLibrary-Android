@@ -9,7 +9,7 @@ import androidx.core.app.NotificationCompat
 import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.R
 
-class NotificationSpinners(view: View, prefs: Prefs) {
+class NotificationOptions(view: View, prefs: Prefs) {
 
     private companion object {
         // Spinner Notification Visibility

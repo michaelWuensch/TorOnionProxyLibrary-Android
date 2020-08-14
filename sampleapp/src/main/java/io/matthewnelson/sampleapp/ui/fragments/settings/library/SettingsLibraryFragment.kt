@@ -79,8 +79,8 @@ import io.matthewnelson.sampleapp.R
 
 class SettingsLibraryFragment : Fragment() {
 
-    private lateinit var notificationSpinners: NotificationSpinners
-    private lateinit var backgroundManagerSpinners: BackgroundManagerSpinners
+    private lateinit var notificationOptions: NotificationOptions
+    private lateinit var backgroundManagerOptions: BackgroundManagerOptions
     private lateinit var prefs: Prefs
 
     override fun onCreateView(
@@ -94,8 +94,8 @@ class SettingsLibraryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         prefs = Prefs.createUnencrypted(App.PREFS_NAME, view.context)
-        notificationSpinners = NotificationSpinners(view, prefs)
-        backgroundManagerSpinners = BackgroundManagerSpinners(view, prefs)
+        notificationOptions = NotificationOptions(view, prefs)
+        backgroundManagerOptions = BackgroundManagerOptions(view, prefs)
 
         view.findViewById<Button>(R.id.settings_library_button_save).setOnClickListener {
             saveSettings(view.context)
@@ -107,19 +107,19 @@ class SettingsLibraryFragment : Fragment() {
     }
 
     private fun isBackgroundManagerPolicyRespectResources(): Boolean =
-        backgroundManagerSpinners.policy == LibraryPrefs.BACKGROUND_MANAGER_POLICY_RESPECT
+        backgroundManagerOptions.policy == LibraryPrefs.BACKGROUND_MANAGER_POLICY_RESPECT
 
     private fun saveSettings(context: Context) {
 
         // Will return null if outside of the range 5 to 45 and a toast is displayed
         if (isBackgroundManagerPolicyRespectResources())
-            backgroundManagerSpinners.getExecutionDelay(context) ?: return
+            backgroundManagerOptions.getExecutionDelay(context) ?: return
 
         // TODO: check settings are compliant with TorServiceController.Builder
         //  and display toast if that is not the case instead of saving settings
 
-        val bmChanges = backgroundManagerSpinners.saveSettings(context, prefs) ?: return
-        val nChanges = notificationSpinners.saveSettings(prefs)
+        val bmChanges = backgroundManagerOptions.saveSettings(context, prefs) ?: return
+        val nChanges = notificationOptions.saveSettings(prefs)
 
 
         // TODO: If Something was changed, display on dashboard a button to restart the

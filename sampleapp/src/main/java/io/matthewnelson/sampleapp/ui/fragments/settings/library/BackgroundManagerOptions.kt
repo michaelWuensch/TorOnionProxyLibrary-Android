@@ -7,7 +7,7 @@ import android.widget.*
 import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.R
 
-class BackgroundManagerSpinners(view: View, prefs: Prefs) {
+class BackgroundManagerOptions(view: View, prefs: Prefs) {
 
     private companion object {
         // Spinner BackgroundManager Policy
