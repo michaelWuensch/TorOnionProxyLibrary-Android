@@ -107,7 +107,7 @@ class SettingsLibraryFragment : Fragment() {
         // TODO: check settings are compliant with TorServiceController.Builder
         //  and display toast if that is not the case instead of saving settings
 
-        notificationSpinners.saveSettings()
+        notificationSpinners.saveSettings(prefs)
 
         // TODO: If Something was changed, display on dashboard a button to restart the
         //  application for settings to be applied.

@@ -9,7 +9,7 @@ import androidx.core.app.NotificationCompat
 import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.R
 
-class NotificationSpinners(view: View, private val prefs: Prefs) {
+class NotificationSpinners(view: View, prefs: Prefs) {
 
     private companion object {
         // Spinner Notification Visibility
@@ -53,7 +53,7 @@ class NotificationSpinners(view: View, private val prefs: Prefs) {
     var show: Boolean = initialShow
         private set
 
-    fun saveSettings(): Boolean {
+    fun saveSettings(prefs: Prefs): Boolean {
         var somethingChanged = false
         if (visibility != initialVisibility) {
             prefs.write(LibraryPrefs.NOTIFICATION_VISIBILITY, visibility)
