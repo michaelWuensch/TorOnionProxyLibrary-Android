@@ -121,6 +121,34 @@ class App: Application() {
         }
 
         /**
+         * See [io.matthewnelson.sampleapp.topl_android.CodeSamples.generateBackgroundManagerPolicy]
+         * for a cleaner sample
+         * */
+        fun generateBackgroundManagerPolicy(
+            prefs: Prefs,
+            policy: String? = null,
+            killApp: Boolean? = null,
+            executionDelay: Int? = null
+        ): BackgroundManager.Builder.Policy {
+            val builder = BackgroundManager.Builder()
+            return when (policy ?: LibraryPrefs.getBackgroundManagerPolicySetting(prefs)) {
+                LibraryPrefs.BACKGROUND_MANAGER_POLICY_FOREGROUND -> {
+                    builder.runServiceInForeground(
+                        killApp ?: LibraryPrefs.getBackgroundManagerKillAppSetting(prefs)
+                    )
+                }
+                LibraryPrefs.BACKGROUND_MANAGER_POLICY_RESPECT -> {
+                    builder.respectResourcesWhileInBackground(
+                        executionDelay ?: LibraryPrefs.getBackgroundManagerExecuteDelaySetting(prefs)
+                    )
+                }
+                else -> {
+                    builder.respectResourcesWhileInBackground(20)
+                }
+            }
+        }
+
+        /**
          * See [io.matthewnelson.sampleapp.topl_android.CodeSamples.setupTorServices]
          * for a cleaner sample
          * */
@@ -177,29 +205,6 @@ class App: Application() {
             (it as MyEventBroadcaster).broadcastLogMessage(
                 "SampleApp|Application|Process ID: ${Process.myPid()}"
             )
-        }
-    }
-
-    /**
-     * See [io.matthewnelson.sampleapp.topl_android.CodeSamples.generateBackgroundManagerPolicy]
-     * for a cleaner sample
-     * */
-    private fun generateBackgroundManagerPolicy(prefs: Prefs): BackgroundManager.Builder.Policy {
-        val builder = BackgroundManager.Builder()
-        return when (LibraryPrefs.getBackgroundManagerPolicySetting(prefs)) {
-            LibraryPrefs.BACKGROUND_MANAGER_POLICY_FOREGROUND -> {
-                builder.runServiceInForeground(
-                    LibraryPrefs.getBackgroundManagerKillAppSetting(prefs)
-                )
-            }
-            LibraryPrefs.BACKGROUND_MANAGER_POLICY_RESPECT -> {
-                builder.respectResourcesWhileInBackground(
-                    LibraryPrefs.getBackgroundManagerExecuteDelaySetting(prefs)
-                )
-            }
-            else -> {
-                builder.respectResourcesWhileInBackground(20)
-            }
         }
     }
 }
