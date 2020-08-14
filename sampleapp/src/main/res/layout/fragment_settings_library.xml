@@ -282,7 +282,7 @@
                 <TextView
                     android:id="@+id/settings_library_text_view_background_manager_kill_app"
                     style="@style/SpinnerTextView"
-                    android:text="@string/settings_library_text_view_background_manager_on_task_remove"
+                    android:text="@string/settings_library_text_view_background_manager_on_service_stop"
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_background_manager_kill_app"
                     app:layout_constraintEnd_toEndOf="@+id/settings_library_background_manager_guide_left"

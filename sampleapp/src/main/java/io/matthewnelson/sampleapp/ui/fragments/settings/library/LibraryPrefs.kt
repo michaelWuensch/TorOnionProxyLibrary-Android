@@ -46,8 +46,8 @@ object LibraryPrefs {
         prefs.read(NOTIFICATION_SHOW, true)
 
     // Background Manager Settings
-    fun getBackgroundManagerPolicySetting(prefs: Prefs): String? =
-        prefs.read(BACKGROUND_MANAGER_POLICY, Prefs.INVALID_STRING)
+    fun getBackgroundManagerPolicySetting(prefs: Prefs): String =
+        prefs.read(BACKGROUND_MANAGER_POLICY, BACKGROUND_MANAGER_POLICY_RESPECT) ?: BACKGROUND_MANAGER_POLICY_RESPECT
 
     fun getBackgroundManagerExecuteDelaySetting(prefs: Prefs): Int =
         prefs.read(BACKGROUND_MANAGER_EXECUTE_DELAY, 20)

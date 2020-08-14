@@ -66,6 +66,7 @@
 * */
 package io.matthewnelson.sampleapp.ui.fragments.settings.library
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -79,6 +80,7 @@ import io.matthewnelson.sampleapp.R
 class SettingsLibraryFragment : Fragment() {
 
     private lateinit var notificationSpinners: NotificationSpinners
+    private lateinit var backgroundManagerSpinners: BackgroundManagerSpinners
     private lateinit var prefs: Prefs
 
     override fun onCreateView(
@@ -93,9 +95,10 @@ class SettingsLibraryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         prefs = Prefs.createUnencrypted(App.PREFS_NAME, view.context)
         notificationSpinners = NotificationSpinners(view, prefs)
+        backgroundManagerSpinners = BackgroundManagerSpinners(view, prefs)
 
         view.findViewById<Button>(R.id.settings_library_button_save).setOnClickListener {
-            saveSettings()
+            saveSettings(view.context)
         }
     }
 
@@ -103,11 +106,12 @@ class SettingsLibraryFragment : Fragment() {
         super.onDestroyView()
     }
 
-    private fun saveSettings() {
+    private fun saveSettings(context: Context) {
         // TODO: check settings are compliant with TorServiceController.Builder
         //  and display toast if that is not the case instead of saving settings
 
         notificationSpinners.saveSettings(prefs)
+        backgroundManagerSpinners.saveSettings(context, prefs)
 
         // TODO: If Something was changed, display on dashboard a button to restart the
         //  application for settings to be applied.
