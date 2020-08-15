@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="io.matthewnelson.sampleapp">
+
+    <!-- encrypted_storage dependency requires minSdk 23, but only if using the
+         encryption (which we're not) -->
+    <uses-sdk tools:overrideLibrary="io.matthewnelson.encrypted_storage, androidx.security" />
 
     <application
         android:name=".App"
@@ -10,7 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".ui.MainActivity"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

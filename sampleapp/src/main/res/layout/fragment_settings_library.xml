@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+/*
+* TorOnionProxyLibrary-Android (a.k.a. topl-android) is a derivation of
+* work from the Tor_Onion_Proxy_Library project that started at commit
+* hash `74407114cbfa8ea6f2ac51417dda8be98d8aba86`. Contributions made after
+* said commit hash are:
+*
+*     Copyright (C) 2020 Matthew Nelson
+*
+*     This program is free software: you can redistribute it and/or modify it
+*     under the terms of the GNU General Public License as published by the
+*     Free Software Foundation, either version 3 of the License, or (at your
+*     option) any later version.
+*
+*     This program is distributed in the hope that it will be useful, but
+*     WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+*     or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+*     for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program. If not, see <https://www.gnu.org/licenses/>.
+*
+* `===========================================================================`
+* `+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++`
+* `===========================================================================`
+*
+* The following exception is an additional permission under section 7 of the
+* GNU General Public License, version 3 (“GPLv3”).
+*
+*     "The Interfaces" is henceforth defined as Application Programming Interfaces
+*     that are publicly available classes/functions/etc (ie: do not contain the
+*     visibility modifiers `internal`, `private`, `protected`, or are within
+*     classes/functions/etc that contain the aforementioned visibility modifiers)
+*     to TorOnionProxyLibrary-Android users that are needed to implement
+*     TorOnionProxyLibrary-Android and reside in ONLY the following modules:
+*
+*      - topl-core-base
+*      - topl-service
+*
+*     The following are excluded from "The Interfaces":
+*
+*       - All other code
+*
+*     Linking TorOnionProxyLibrary-Android statically or dynamically with other
+*     modules is making a combined work based on TorOnionProxyLibrary-Android.
+*     Thus, the terms and conditions of the GNU General Public License cover the
+*     whole combination.
+*
+*     As a special exception, the copyright holder of TorOnionProxyLibrary-Android
+*     gives you permission to combine TorOnionProxyLibrary-Android program with free
+*     software programs or libraries that are released under the GNU LGPL and with
+*     independent modules that communicate with TorOnionProxyLibrary-Android solely
+*     through "The Interfaces". You may copy and distribute such a system following
+*     the terms of the GNU GPL for TorOnionProxyLibrary-Android and the licenses of
+*     the other code concerned, provided that you include the source code of that
+*     other code when and as the GNU GPL requires distribution of source code and
+*     provided that you do not modify "The Interfaces".
+*
+*     Note that people who make modified versions of TorOnionProxyLibrary-Android
+*     are not obligated to grant this special exception for their modified versions;
+*     it is their choice whether to do so. The GNU General Public License gives
+*     permission to release a modified version without this exception; this exception
+*     also makes it possible to release a modified version which carries forward this
+*     exception. If you modify "The Interfaces", this exception does not apply to your
+*     modified version of TorOnionProxyLibrary-Android, and you must remove this
+*     exception when you distribute your modified version.
+* */
+-->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="io.matthewnelson.sampleapp.ui.fragments.settings.library.SettingsLibraryFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:fadeScrollbars="false"
+        app:layout_constraintBottom_toTopOf="@+id/settings_library_button_save"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/settings_library_text_view_notification_header"
+                android:textSize="24sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/settings_library_text_view_notification_preamble"
+                android:textSize="16sp" />
+
+            <!-- Notification Options -->
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/settings_library_notification_guide_left"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent=".40" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_notification_visibility"
+                    style="@style/SpinnerTextView"
+                    android:text="@string/settings_library_text_view_notification_option_visibility"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_notification_visibility"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_notification_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_spinner_notification_visibility" />
+
+                <Spinner
+                    android:id="@+id/settings_library_spinner_notification_visibility"
+                    style="@style/SpinnerStyle"
+                    android:background="@color/primaryLightColor"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_notification_guide_left"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:listitem="@layout/spinner_list_item" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_notification_icon_color"
+                    style="@style/SpinnerTextView"
+                    android:text="@string/settings_library_text_view_notification_option_icon_color"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_notification_icon_color"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_notification_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_spinner_notification_icon_color" />
+
+                <Spinner
+                    android:id="@+id/settings_library_spinner_notification_icon_color"
+                    style="@style/SpinnerStyle"
+                    android:background="@color/primaryLightColor"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_notification_guide_left"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_library_spinner_notification_visibility"
+                    tools:listitem="@layout/spinner_list_item" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_notification_restart_button"
+                    style="@style/SpinnerTextView"
+                    android:text="@string/settings_library_text_view_notification_option_restart_button"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_notification_restart_button"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_notification_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_spinner_notification_restart_button" />
+
+                <Spinner
+                    android:id="@+id/settings_library_spinner_notification_restart_button"
+                    style="@style/SpinnerStyle"
+                    android:background="@color/primaryLightColor"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_notification_guide_left"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_library_spinner_notification_icon_color"
+                    tools:listitem="@layout/spinner_list_item" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_notification_stop_button"
+                    style="@style/SpinnerTextView"
+                    android:text="@string/settings_library_text_view_notification_option_stop_button"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_notification_stop_button"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_notification_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_spinner_notification_stop_button" />
+
+                <Spinner
+                    android:id="@+id/settings_library_spinner_notification_stop_button"
+                    style="@style/SpinnerStyle"
+                    android:background="@color/primaryLightColor"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_notification_guide_left"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_library_spinner_notification_restart_button"
+                    tools:listitem="@layout/spinner_list_item" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_notification_show"
+                    style="@style/SpinnerTextView"
+                    android:text="@string/settings_library_text_view_notification_option_show_notification"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_notification_show"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_notification_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_spinner_notification_show" />
+
+                <Spinner
+                    android:id="@+id/settings_library_spinner_notification_show"
+                    style="@style/SpinnerStyle"
+                    android:background="@color/primaryLightColor"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_notification_guide_left"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_library_spinner_notification_stop_button"
+                    tools:listitem="@layout/spinner_list_item" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:gravity="center_horizontal"
+                android:text="@string/settings_library_text_view_background_manager_header"
+                android:textSize="24sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/settings_library_text_view_background_manager_preamble"
+                android:textSize="16sp" />
+
+            <!-- BackgroundManager Options -->
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/settings_library_background_manager_guide_left"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent=".40" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_background_manager_policy"
+                    style="@style/SpinnerTextView"
+                    android:text="@string/settings_library_text_view_background_manager_policy"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_background_manager_policy"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_background_manager_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_spinner_background_manager_policy" />
+
+                <Spinner
+                    android:id="@+id/settings_library_spinner_background_manager_policy"
+                    style="@style/SpinnerStyle"
+                    android:background="@color/primaryLightColor"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_background_manager_guide_left"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:listitem="@layout/spinner_list_item" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_background_manager_delay"
+                    style="@style/SpinnerTextView"
+                    android:text="@string/settings_library_text_view_background_manager_execution_delay"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_edit_text_background_manager_execution_delay"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_background_manager_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_edit_text_background_manager_execution_delay" />
+
+                <EditText
+                    android:id="@+id/settings_library_edit_text_background_manager_execution_delay"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:hint="@string/settings_library_edit_text_background_manager_execution_delay"
+                    android:inputType="number"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_background_manager_guide_left"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_library_spinner_background_manager_policy" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_background_manager_kill_app"
+                    style="@style/SpinnerTextView"
+                    android:text="@string/settings_library_text_view_background_manager_on_service_stop"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_background_manager_kill_app"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_background_manager_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_spinner_background_manager_kill_app" />
+
+                <Spinner
+                    android:id="@+id/settings_library_spinner_background_manager_kill_app"
+                    style="@style/SpinnerStyle"
+                    android:background="@color/primaryLightColor"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_background_manager_guide_left"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_library_edit_text_background_manager_execution_delay"
+                    tools:listitem="@layout/spinner_list_item" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:gravity="center_horizontal"
+                android:text="@string/settings_library_text_view_service_controller_header"
+                android:textSize="24sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/settings_library_text_view_service_controller_preamble"
+                android:textSize="16sp" />
+
+            <!-- Controller Options -->
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/settings_library_controller_guide_left"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent=".40" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_controller_restart_delay"
+                    style="@style/SpinnerTextView"
+                    android:text="@string/settings_library_text_view_controller_restart_delay"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_edit_text_controller_restart_delay"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_controller_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_edit_text_controller_restart_delay" />
+
+                <EditText
+                    android:id="@+id/settings_library_edit_text_controller_restart_delay"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:hint="@string/settings_library_edit_text_controller_restart_delay"
+                    android:inputType="number"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_controller_guide_left"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_controller_stop_delay"
+                    style="@style/SpinnerTextView"
+                    android:text="@string/settings_library_text_view_controller_stop_delay"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_edit_text_controller_stop_delay"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_controller_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_edit_text_controller_stop_delay" />
+
+                <EditText
+                    android:id="@+id/settings_library_edit_text_controller_stop_delay"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:hint="@string/settings_library_edit_text_controller_stop_delay"
+                    android:inputType="number"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_controller_guide_left"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_library_edit_text_controller_restart_delay" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_controller_stop_on_task_removed"
+                    style="@style/SpinnerTextView"
+                    android:text="@string/settings_library_text_view_controller_stop_on_task_removed"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_controller_stop_on_task_removed"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_controller_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_spinner_controller_stop_on_task_removed" />
+
+                <Spinner
+                    android:id="@+id/settings_library_spinner_controller_stop_on_task_removed"
+                    style="@style/SpinnerStyle"
+                    android:background="@color/primaryLightColor"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_controller_guide_left"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_library_edit_text_controller_stop_delay"
+                    tools:listitem="@layout/spinner_list_item" />
+
+                <TextView
+                    android:id="@+id/settings_library_text_view_controller_build_config"
+                    style="@style/SpinnerTextView"
+                    android:text="@string/settings_library_text_view_controller_build_config"
+                    app:layout_constraintBottom_toBottomOf="@+id/settings_library_spinner_controller_build_config"
+                    app:layout_constraintEnd_toEndOf="@+id/settings_library_controller_guide_left"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/settings_library_spinner_controller_build_config" />
+
+                <Spinner
+                    android:id="@+id/settings_library_spinner_controller_build_config"
+                    style="@style/SpinnerStyle"
+                    android:background="@color/primaryLightColor"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/settings_library_controller_guide_left"
+                    app:layout_constraintTop_toBottomOf="@+id/settings_library_spinner_controller_stop_on_task_removed"
+                    tools:listitem="@layout/spinner_list_item" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <Button
+        android:id="@+id/settings_library_button_save"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/rounded_rectangle_color_secondary"
+        android:text="@string/settings_library_button_save"
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

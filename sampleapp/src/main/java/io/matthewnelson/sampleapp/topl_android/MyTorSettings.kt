@@ -64,55 +64,124 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.topl_service.service.components.onionproxy
+package io.matthewnelson.sampleapp.topl_android
 
-import io.matthewnelson.topl_core_base.EventBroadcaster
+import io.matthewnelson.topl_core_base.TorSettings
 
 /**
- * Adds broadcasting methods to the [EventBroadcaster] to update you with information about
- * what addresses Tor is operating on. Very helpful when choosing "auto" in your
- * [io.matthewnelson.topl_core_base.TorSettings] to easily identifying what addresses to
- * use for making network calls, as well as being notified when Tor is ready to be used.
- *
- * The addresses will be broadcast to you after Tor has been fully Bootstrapped. If Tor is
- * stopped (ie. it's [io.matthewnelson.topl_core_base.BaseConsts.TorState] changes from **ON**
- * to **OFF**), `null` will be broadcast.
- *
- * All broadcasts to your implementation to this class will occur on the Main thread.
- *
- * @sample [io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster]
+ * @suppress
+ * @see [TorSettings]
  * */
-abstract class TorServiceEventBroadcaster: EventBroadcaster() {
+class MyTorSettings: TorSettings() {
 
-    /**
-     * Override this method to implement receiving of the control port address that Tor
-     * is operating on.
-     *
-     * Example of what will be broadcast:
-     *
-     *   - "127.0.0.1:33432"
-     * */
-    abstract fun broadcastControlPortAddress(controlPortAddress: String?)
+    override val disableNetwork: Boolean
+        get() = DEFAULT__DISABLE_NETWORK
 
-    /**
-     * Override this method to implement receiving of the Socks port address that Tor
-     * is operating on (if you've specified a
-     * [io.matthewnelson.topl_core_base.TorSettings.socksPort]).
-     *
-     * Example of what will be broadcast:
-     *
-     *   - "127.0.0.1:9051"
-     * */
-    abstract fun broadcastSocksPortAddress(socksPortAddress: String?)
+    override val dnsPort: String
+        get() = DEFAULT__DNS_PORT
 
-    /**
-     * Override this method to implement receiving of the http port address that Tor
-     * is operating on (if you've specified a
-     * [io.matthewnelson.topl_core_base.TorSettings.httpTunnelPort]).
-     *
-     * Example of what will be broadcast:
-     *
-     *   - "127.0.0.1:33432"
-     * */
-    abstract fun broadcastHttpPortAddress(httpPortAddress: String?)
+    override val customTorrc: String?
+        get() = null
+
+    override val entryNodes: String?
+        get() = DEFAULT__ENTRY_NODES
+
+    override val excludeNodes: String?
+        get() = DEFAULT__EXCLUDED_NODES
+
+    override val exitNodes: String?
+        get() = DEFAULT__EXIT_NODES
+
+    override val httpTunnelPort: String
+        get() = "auto"
+
+    override val listOfSupportedBridges: List<@SupportedBridges String>
+        get() = arrayListOf(SupportedBridges.MEEK, SupportedBridges.OBFS4)
+
+    override val proxyHost: String?
+        get() = DEFAULT__PROXY_HOST
+
+    override val proxyPassword: String?
+        get() = DEFAULT__PROXY_PASSWORD
+
+    override val proxyPort: Int?
+        get() = null
+
+    override val proxySocks5Host: String?
+        get() = DEFAULT__PROXY_SOCKS5_HOST
+
+    override val proxySocks5ServerPort: Int?
+        get() = null
+
+    override val proxyType: String?
+        get() = DEFAULT__PROXY_TYPE
+
+    override val proxyUser: String?
+        get() = DEFAULT__PROXY_USER
+
+    override val reachableAddressPorts: String
+        get() = DEFAULT__REACHABLE_ADDRESS_PORTS
+
+    override val relayNickname: String?
+        get() = DEFAULT__RELAY_NICKNAME
+
+    override val relayPort: Int?
+        get() = null
+
+    override val socksPort: String
+        get() = "auto"
+
+    override val virtualAddressNetwork: String?
+        get() = "10.192.0.2/10"
+
+    override val hasBridges: Boolean
+        get() = DEFAULT__HAS_BRIDGES
+
+    override val connectionPadding: @ConnectionPadding String
+        get() = DEFAULT__HAS_CONNECTION_PADDING
+
+    override val hasCookieAuthentication: Boolean
+        get() = DEFAULT__HAS_COOKIE_AUTHENTICATION
+
+    override val hasDebugLogs: Boolean
+        get() = DEFAULT__HAS_DEBUG_LOGS
+
+    override val hasDormantCanceledByStartup: Boolean
+        get() = DEFAULT__HAS_DORMANT_CANCELED_BY_STARTUP
+
+    override val hasIsolationAddressFlagForTunnel: Boolean
+        get() = DEFAULT__HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL
+
+    override val hasOpenProxyOnAllInterfaces: Boolean
+        get() = DEFAULT__HAS_OPEN_PROXY_ON_ALL_INTERFACES
+
+    override val hasReachableAddress: Boolean
+        get() = DEFAULT__HAS_REACHABLE_ADDRESS
+
+    override val hasReducedConnectionPadding: Boolean
+        get() = DEFAULT__HAS_REDUCED_CONNECTION_PADDING
+
+    override val hasSafeSocks: Boolean
+        get() = DEFAULT__HAS_SAFE_SOCKS
+
+    override val hasStrictNodes: Boolean
+        get() = DEFAULT__HAS_STRICT_NODES
+
+    override val hasTestSocks: Boolean
+        get() = DEFAULT__HAS_TEST_SOCKS
+
+    override val isAutoMapHostsOnResolve: Boolean
+        get() = DEFAULT__IS_AUTO_MAP_HOSTS_ON_RESOLVE
+
+    override val isRelay: Boolean
+        get() = DEFAULT__IS_RELAY
+
+    override val runAsDaemon: Boolean
+        get() = DEFAULT__RUN_AS_DAEMON
+
+    override val transPort: String
+        get() = DEFAULT__TRANS_PORT
+
+    override val useSocks5: Boolean
+        get() = DEFAULT__USE_SOCKS5
 }

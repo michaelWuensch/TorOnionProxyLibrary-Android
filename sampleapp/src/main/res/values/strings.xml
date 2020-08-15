@@ -1,9 +1,73 @@
 <resources>
-<!--    <string name="app_name">SampleApp</string>   See build.gradle buildTypes -->
-    <string name="button_start">Start</string>
-    <string name="button_stop">Stop</string>
-    <string name="button_restart">Restart</string>
-    <string name="button_new_identity">New Identity</string>
-    <string name="button_debugging_disable">Disable Debugging</string>
-    <string name="button_debugging_enable">Enable Debugging</string>
+    <!--    <string name="app_name">SampleApp</string>   See build.gradle buildTypes -->
+    <string name="navigation_label">TOPL-Android Demo</string>
+
+    <!-- DashboardFragment -->
+    <string name="dashboard_text_view_control_port">Control Port:</string>
+    <string name="dashboard_text_view_socks_port">Socks Port:</string>
+    <string name="dashboard_text_view_http_port">Http Port:</string>
+    <string name="dash_button_app_restart">Application Restart Needed</string>
+
+    <!-- HomeFragment -->
+    <string name="home_button_debugging_enable">Enable Debugging</string>
+    <string name="home_button_debugging_disable">Disable Debugging</string>
+    <string name="home_button_new_identity">New Identity</string>
+    <string name="home_button_restart">Restart</string>
+    <string name="home_button_start">Start</string>
+    <string name="home_button_stop">Stop</string>
+
+    <!-- Menu -->
+    <string name="menu_settings_main">Settings</string>
+
+    <!-- SettingsMainFragment -->
+    <string name="settings_main_button_app">Application Settings</string>
+    <string name="settings_main_button_library">Library Settings</string>
+    <string name="settings_main_button_tor">Tor Settings</string>
+    <string name="settings_main_text_view_app">These are settings specific to the Sample App
+        and are not a part of the TOPL-Android Library.</string>
+    <string name="settings_main_text_view_library">These are settings specific to TOPL-Android\'s
+        Service Module, allowing you to see customization features to suit your Application\'s
+        needs.</string>
+    <string name="settings_main_text_view_tor">These are settings specific to Tor and is an
+        example of how the Service Module\'s TorServicePrefs Class enables End User
+        customization.</string>
+
+    <!-- SettingsAppFragment -->
+
+    <!-- SettingsLibraryFragment -->
+    <string name="settings_library_text_view_notification_header">Notification</string>
+    <string name="settings_library_text_view_notification_preamble">There are some settings that
+        can\'t be modified here, but you can when implementing the Library into your own
+        application (channel information, notification icons, etc.).</string>
+    <string name="settings_library_text_view_notification_option_visibility">Lock Visibility:</string>
+    <string name="settings_library_text_view_notification_option_icon_color">Icon Color:</string>
+    <string name="settings_library_text_view_notification_option_restart_button">Restart Button:</string>
+    <string name="settings_library_text_view_notification_option_stop_button">Stop Button:</string>
+    <string name="settings_library_text_view_notification_option_show_notification">Notification:</string>
+
+
+    <string name="settings_library_text_view_background_manager_header">BackgroundManager</string>
+    <string name="settings_library_text_view_background_manager_preamble">Customize how the Service
+        operates while your application is in the background (sent to the recent apps tray or lock
+        screen)</string>
+    <string name="settings_library_text_view_background_manager_policy">Policy:</string>
+    <string name="settings_library_text_view_background_manager_execution_delay">Execution Delay (s):</string>
+    <string name="settings_library_edit_text_background_manager_execution_delay">5 to 45</string>
+    <string name="settings_library_text_view_background_manager_on_service_stop">On Service Stop:</string>
+
+
+    <string name="settings_library_text_view_service_controller_header">ServiceController</string>
+    <string name="settings_library_text_view_service_controller_preamble">Customize how the Service
+        operates. There are some settings that can\'t be modified here, but you can when
+        implementing the Library into your own application</string>
+
+    <string name="settings_library_button_save">Save Settings</string>
+    <string name="settings_library_text_view_controller_restart_delay">Restart Delay (ms):</string>
+    <string name="settings_library_edit_text_controller_restart_delay">500ms + your value</string>
+    <string name="settings_library_text_view_controller_stop_delay">Stop Delay (ms):</string>
+    <string name="settings_library_edit_text_controller_stop_delay">100ms + your value</string>
+    <string name="settings_library_text_view_controller_stop_on_task_removed">On Task Removed:</string>
+    <string name="settings_library_text_view_controller_build_config">Build Config:</string>
+
+    <!-- SettingsTorFragment -->
 </resources>

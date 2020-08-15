@@ -97,12 +97,18 @@ dependencies {
     implementation deps.androidx.lifecycle.commonJava8
     implementation deps.androidx.lifecycle.liveData
     implementation deps.androidx.lifecycle.reactiveStreams
+    implementation deps.androidx.navigation.fragment
+    implementation deps.androidx.navigation.fragmentKtx
+    implementation deps.androidx.navigation.ui
+    implementation deps.androidx.navigation.uiKtx
     implementation deps.androidx.recyclerView
     implementation deps.kotlin.coroutinesCore
     implementation deps.kotlin.coroutinesAndroid
     implementation deps.kotlin.stdlib
 
+    implementation 'io.matthewnelson.encrypted-storage:encrypted-storage:2.0.0'
     implementation 'io.matthewnelson.topl-android:tor-binary:0.4.3.5a'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     testImplementation deps.junit
 

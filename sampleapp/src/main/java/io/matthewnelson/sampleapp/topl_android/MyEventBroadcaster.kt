@@ -64,11 +64,11 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.sampleapp
+package io.matthewnelson.sampleapp.topl_android
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import io.matthewnelson.topl_core_base.BaseConsts
+import io.matthewnelson.sampleapp.ui.fragments.home.LogMessageAdapter
 import io.matthewnelson.topl_service.service.components.onionproxy.TorServiceEventBroadcaster
 import io.matthewnelson.topl_service.util.ServiceUtilities
 
@@ -83,45 +83,33 @@ class MyEventBroadcaster: TorServiceEventBroadcaster() {
     //////////////////////////
     /// ControlPortAddress ///
     //////////////////////////
-
-    // Make Volatile so that if referencing on a different thread, we get
-    // the update immediately
-    @Volatile
-    var controlPortAddress: String? = null
-        private set
+    private val _liveControlPortAddress = MutableLiveData<String?>(null)
+    val liveControlPortAddress: LiveData<String?> = _liveControlPortAddress
 
     override fun broadcastControlPortAddress(controlPortAddress: String?) {
-        this.controlPortAddress = controlPortAddress
+        _liveControlPortAddress.value = controlPortAddress
     }
 
 
     ////////////////////////
     /// SocksPortAddress ///
     ////////////////////////
-
-    // Make Volatile so that if referencing on a different thread, we get
-    // the update immediately
-    @Volatile
-    var socksPortAddress: String? = null
-        private set
+    private val _liveSocksPortAddress = MutableLiveData<String?>(null)
+    val liveSocksPortAddress: LiveData<String?> = _liveSocksPortAddress
 
     override fun broadcastSocksPortAddress(socksPortAddress: String?) {
-        this.socksPortAddress = socksPortAddress
+        _liveSocksPortAddress.value = socksPortAddress
     }
 
 
     ///////////////////////
     /// HttpPortAddress ///
     ///////////////////////
-
-    // Make Volatile so that if referencing on a different thread, we get
-    // the update immediately
-    @Volatile
-    var httpPortAddress: String? = null
-        private set
+    private val _liveHttpPortAddress = MutableLiveData<String?>(null)
+    val liveHttpPortAddress: LiveData<String?> = _liveHttpPortAddress
 
     override fun broadcastHttpPortAddress(httpPortAddress: String?) {
-        this.httpPortAddress = httpPortAddress
+        _liveHttpPortAddress.value = httpPortAddress
     }
 
 
@@ -185,15 +173,15 @@ class MyEventBroadcaster: TorServiceEventBroadcaster() {
     ///////////////////
     inner class TorStateData(val state: String, val networkState: String)
 
-    private var lastState = BaseConsts.TorState.OFF
-    private var lastNetworkState = BaseConsts.TorNetworkState.DISABLED
+    private var lastState = TorState.OFF
+    private var lastNetworkState = TorNetworkState.DISABLED
 
     private val _liveTorState = MutableLiveData<TorStateData>(
         TorStateData(lastState, lastNetworkState)
     )
     val liveTorState: LiveData<TorStateData> = _liveTorState
 
-    override fun broadcastTorState(@BaseConsts.TorState state: String, @BaseConsts.TorNetworkState networkState: String) {
+    override fun broadcastTorState(@TorState state: String, @TorNetworkState networkState: String) {
         if (state == lastState && networkState == lastNetworkState) return
 
         lastState = state

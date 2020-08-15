@@ -64,55 +64,30 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.topl_service.service.components.onionproxy
+package io.matthewnelson.sampleapp.ui.fragments.settings.tor
 
-import io.matthewnelson.topl_core_base.EventBroadcaster
+import android.os.Bundle
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import io.matthewnelson.sampleapp.R
 
-/**
- * Adds broadcasting methods to the [EventBroadcaster] to update you with information about
- * what addresses Tor is operating on. Very helpful when choosing "auto" in your
- * [io.matthewnelson.topl_core_base.TorSettings] to easily identifying what addresses to
- * use for making network calls, as well as being notified when Tor is ready to be used.
- *
- * The addresses will be broadcast to you after Tor has been fully Bootstrapped. If Tor is
- * stopped (ie. it's [io.matthewnelson.topl_core_base.BaseConsts.TorState] changes from **ON**
- * to **OFF**), `null` will be broadcast.
- *
- * All broadcasts to your implementation to this class will occur on the Main thread.
- *
- * @sample [io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster]
- * */
-abstract class TorServiceEventBroadcaster: EventBroadcaster() {
+class SettingsTorFragment : Fragment() {
 
-    /**
-     * Override this method to implement receiving of the control port address that Tor
-     * is operating on.
-     *
-     * Example of what will be broadcast:
-     *
-     *   - "127.0.0.1:33432"
-     * */
-    abstract fun broadcastControlPortAddress(controlPortAddress: String?)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_settings_tor, container, false)
+    }
 
-    /**
-     * Override this method to implement receiving of the Socks port address that Tor
-     * is operating on (if you've specified a
-     * [io.matthewnelson.topl_core_base.TorSettings.socksPort]).
-     *
-     * Example of what will be broadcast:
-     *
-     *   - "127.0.0.1:9051"
-     * */
-    abstract fun broadcastSocksPortAddress(socksPortAddress: String?)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+    }
 
-    /**
-     * Override this method to implement receiving of the http port address that Tor
-     * is operating on (if you've specified a
-     * [io.matthewnelson.topl_core_base.TorSettings.httpTunnelPort]).
-     *
-     * Example of what will be broadcast:
-     *
-     *   - "127.0.0.1:33432"
-     * */
-    abstract fun broadcastHttpPortAddress(httpPortAddress: String?)
+    override fun onDestroyView() {
+        super.onDestroyView()
+    }
 }

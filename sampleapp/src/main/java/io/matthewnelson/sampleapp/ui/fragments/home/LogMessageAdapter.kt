@@ -64,105 +64,95 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.sampleapp
+package io.matthewnelson.sampleapp.ui.fragments.home
 
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.widget.Button
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import io.matthewnelson.topl_service.TorServiceController
-import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyBoolean
-import io.matthewnelson.topl_service.prefs.TorServicePrefs
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import io.matthewnelson.sampleapp.R
 
 /**
  * @suppress
  * */
-class MainActivity : AppCompatActivity() {
+class LogMessageAdapter(
+    lifecycleOwner: LifecycleOwner,
+    view: View
+): RecyclerView.Adapter<LogMessageAdapter.LogMessageHolder>(){
 
-    private companion object {
-        var hasDebugLogs = false
-    }
+    companion object {
+        private val logMessageList = mutableListOf<String>()
+        private const val maxMessages = 200
 
-    private lateinit var buttonDebug: Button
-    private lateinit var buttonNewId: Button
-    private lateinit var buttonRestart: Button
-    private lateinit var buttonStart: Button
-    private lateinit var buttonStop: Button
-
-    private lateinit var textViewBandwidth: TextView
-    private lateinit var textViewNetworkState: TextView
-    private lateinit var textViewState: TextView
-
-    private lateinit var torServicePrefs: TorServicePrefs
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        torServicePrefs = TorServicePrefs(this)
-        hasDebugLogs = torServicePrefs.getBoolean(
-            PrefKeyBoolean.HAS_DEBUG_LOGS, TorServiceController.getTorSettings().hasDebugLogs
-        )
-        findViews()
-        initButtons()
-        LogMessageAdapter(this)
-        initObservers(this)
-    }
-
-    private fun findViews() {
-        buttonDebug = findViewById(R.id.button_debug)
-        buttonNewId = findViewById(R.id.button_new_identity)
-        buttonRestart = findViewById(R.id.button_restart)
-        buttonStart = findViewById(R.id.button_start)
-        buttonStop = findViewById(R.id.button_stop)
-
-        textViewBandwidth = findViewById(R.id.text_view_bandwidth)
-        textViewNetworkState = findViewById(R.id.text_view_tor_network_state)
-        textViewState = findViewById(R.id.text_view_tor_state)
-    }
-
-    private fun initButtons() {
-        setButtonDebugText()
-        buttonDebug.setOnClickListener {
-            hasDebugLogs = !hasDebugLogs
-            setButtonDebugText()
-            torServicePrefs.putBoolean(PrefKeyBoolean.HAS_DEBUG_LOGS, hasDebugLogs)
+        private val liveNotifyInserted = MutableLiveData(false)
+        private fun observeLiveNotifyInserted(): LiveData<Boolean> {
+            liveNotifyInserted.value = null
+            return liveNotifyInserted
         }
-        buttonStart.setOnClickListener {
-            TorServiceController.startTor()
+
+        private val liveNotifyRemoved = MutableLiveData(false)
+        private fun observeLiveNotifyRemoved(): LiveData<Boolean> {
+            liveNotifyRemoved.value = null
+            return liveNotifyRemoved
         }
-        buttonStop.setOnClickListener {
-            TorServiceController.stopTor()
+
+        fun addLogMessageNotifyAndCurate(msg: String) {
+            logMessageList.add(msg)
+            if (liveNotifyInserted.hasActiveObservers()) {
+                liveNotifyInserted.value = liveNotifyInserted.value != true
+            }
+            if (logMessageList.size > maxMessages) {
+                removeFirstLogMessageAndNotify()
+            }
         }
-        buttonRestart.setOnClickListener {
-            TorServiceController.restartTor()
-        }
-        buttonNewId.setOnClickListener {
-            TorServiceController.newIdentity()
+
+        private fun removeFirstLogMessageAndNotify() {
+            logMessageList.removeAt(0)
+
+            if (!liveNotifyRemoved.hasActiveObservers()) return
+            liveNotifyRemoved.value = liveNotifyRemoved.value != true
         }
     }
 
-    private fun setButtonDebugText() {
-        buttonDebug.text = if (hasDebugLogs) {
-            getString(R.string.button_debugging_disable)
-        } else {
-            getString(R.string.button_debugging_enable)
+    init {
+        view.findViewById<RecyclerView>(R.id.recycler_view_log_messages).apply {
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(context)
+            adapter = this@LogMessageAdapter
         }
+
+        observeLiveNotifyInserted()
+            .observe(lifecycleOwner, Observer {
+            if (it == null) return@Observer
+            this.notifyItemInserted(logMessageList.size - 1)
+        })
+
+        observeLiveNotifyRemoved()
+            .observe(lifecycleOwner, Observer {
+            if (it == null) return@Observer
+            this.notifyItemRemoved(0)
+        })
     }
 
-    private fun initObservers(activity: MainActivity) {
-        TorServiceController.appEventBroadcaster?.let {
-            (it as MyEventBroadcaster).liveBandwidth.observe(activity, Observer { string ->
-                if (string.isNullOrEmpty()) return@Observer
-                textViewBandwidth.text = string
-            })
-        }
-        TorServiceController.appEventBroadcaster?.let {
-            (it as MyEventBroadcaster).liveTorState.observe(activity, Observer { data ->
-                if (data == null) return@Observer
-                textViewState.text = data.state
-                textViewNetworkState.text = data.networkState
-            })
-        }
+    inner class LogMessageHolder(val textView: TextView): RecyclerView.ViewHolder(textView)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LogMessageHolder {
+        val textView = LayoutInflater.from(parent.context)
+            .inflate(R.layout.log_message, parent, false) as TextView
+        return LogMessageHolder(textView)
     }
+
+    override fun getItemCount(): Int =
+        logMessageList.size
+
+    override fun onBindViewHolder(holder: LogMessageHolder, position: Int) {
+        holder.textView.text = logMessageList[position]
+    }
+
 }

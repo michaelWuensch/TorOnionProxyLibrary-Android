@@ -67,128 +67,151 @@
 package io.matthewnelson.sampleapp
 
 import android.app.Application
-import android.content.Context
 import android.os.Process
-import androidx.core.app.NotificationCompat
-import io.matthewnelson.topl_core_base.TorConfigFiles
+import android.widget.Toast
+import io.matthewnelson.encrypted_storage.Prefs
+import io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster
+import io.matthewnelson.sampleapp.topl_android.MyTorSettings
+import io.matthewnelson.sampleapp.ui.MainActivity
+import io.matthewnelson.sampleapp.ui.fragments.settings.library.LibraryPrefs
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
-import java.io.File
 
 /**
  * @suppress
+ *
+ * See [io.matthewnelson.sampleapp.topl_android.CodeSamples] for code samples
  * */
 class App: Application() {
 
+    companion object {
+        const val PREFS_NAME = "TOPL-Android_SampleApp"
+        lateinit var stopTorDelaySettingAtAppStartup: String
+            private set
+
+        /**
+         * See [io.matthewnelson.sampleapp.topl_android.CodeSamples.generateTorServiceNotificationBuilder]
+         * for a cleaner sample
+         * */
+        fun generateTorServiceNotificationBuilder(
+            visibility: Int,
+            iconColorRes: Int,
+            enableRestart: Boolean,
+            enableStop: Boolean,
+            show: Boolean
+        ): ServiceNotification.Builder {
+            return ServiceNotification.Builder(
+                channelName = "TOPL-Android Demo",
+                channelDescription = "TorOnionProxyLibrary-Android Demo",
+                channelID = "TOPL-Android Demo",
+                notificationID = 615
+            )
+                .setActivityToBeOpenedOnTap(
+                    clazz = MainActivity::class.java,
+                    intentExtrasKey = null,
+                    intentExtras = null,
+                    intentRequestCode = null
+                )
+
+                .setVisibility(visibility)
+                .setCustomColor(iconColorRes)
+                .enableTorRestartButton(enableRestart)
+                .enableTorStopButton(enableStop)
+                .showNotification(show)
+        }
+
+        /**
+         * See [io.matthewnelson.sampleapp.topl_android.CodeSamples.generateBackgroundManagerPolicy]
+         * for a cleaner sample
+         * */
+        fun generateBackgroundManagerPolicy(
+            prefs: Prefs,
+            policy: String? = null,
+            killApp: Boolean? = null,
+            executionDelay: Int? = null
+        ): BackgroundManager.Builder.Policy {
+            val builder = BackgroundManager.Builder()
+            return when (policy ?: LibraryPrefs.getBackgroundManagerPolicySetting(prefs)) {
+                LibraryPrefs.BACKGROUND_MANAGER_POLICY_FOREGROUND -> {
+                    builder.runServiceInForeground(
+                        killApp ?: LibraryPrefs.getBackgroundManagerKillAppSetting(prefs)
+                    )
+                }
+                LibraryPrefs.BACKGROUND_MANAGER_POLICY_RESPECT -> {
+                    builder.respectResourcesWhileInBackground(
+                        executionDelay ?: LibraryPrefs.getBackgroundManagerExecuteDelaySetting(prefs)
+                    )
+                }
+                else -> {
+                    builder.respectResourcesWhileInBackground(20)
+                }
+            }
+        }
+
+        /**
+         * See [io.matthewnelson.sampleapp.topl_android.CodeSamples.setupTorServices]
+         * for a cleaner sample
+         * */
+        fun setupTorServices(
+            application: Application,
+            serviceNotificationBuilder: ServiceNotification.Builder,
+            backgroundManagerPolicy: BackgroundManager.Builder.Policy,
+            restartTimeDelay: Long,
+            stopServiceTimeDelay: Long,
+            stopServiceOnTaskRemoved: Boolean,
+            buildConfigDebug: Boolean
+        ) {
+            TorServiceController.Builder(
+                application = application,
+                torServiceNotificationBuilder = serviceNotificationBuilder,
+                backgroundManagerPolicy = backgroundManagerPolicy,
+                buildConfigVersionCode = BuildConfig.VERSION_CODE,
+                torSettings = MyTorSettings(),
+                geoipAssetPath = "common/geoip",
+                geoip6AssetPath = "common/geoip6"
+            )
+                .addTimeToRestartTorDelay(restartTimeDelay)
+                .addTimeToStopServiceDelay(stopServiceTimeDelay)
+                .disableStopServiceOnTaskRemoved(stopServiceOnTaskRemoved)
+                .setBuildConfigDebug(buildConfigDebug)
+                .setEventBroadcaster(eventBroadcaster = MyEventBroadcaster())
+                .build()
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
-        setupTorServices(this, TorConfigFiles.createConfig(this))
-        TorServiceController.appEventBroadcaster?.let {
-            (it as MyEventBroadcaster).broadcastLogMessage(
-                "SampleApp|Application|Process ID: ${Process.myPid()}"
+        val prefs = Prefs.createUnencrypted(PREFS_NAME, this)
+
+        val serviceNotificationBuilder = generateTorServiceNotificationBuilder(
+            LibraryPrefs.getNotificationVisibilitySetting(prefs),
+            LibraryPrefs.getNotificationColorSetting(prefs),
+            LibraryPrefs.getNotificationRestartEnableSetting(prefs),
+            LibraryPrefs.getNotificationStopEnableSetting(prefs),
+            LibraryPrefs.getNotificationShowSetting(prefs)
+        )
+
+        stopTorDelaySettingAtAppStartup = LibraryPrefs.getControllerStopDelaySetting(prefs).toString()
+
+        try {
+            setupTorServices(
+                this,
+                serviceNotificationBuilder,
+                generateBackgroundManagerPolicy(prefs),
+                LibraryPrefs.getControllerRestartDelaySetting(prefs),
+                stopTorDelaySettingAtAppStartup.toLong(),
+                LibraryPrefs.getControllerDisableStopServiceOnTaskRemovedSetting(prefs),
+                LibraryPrefs.getControllerBuildConfigDebugSetting(prefs)
             )
+
+            TorServiceController.appEventBroadcaster?.let {
+                (it as MyEventBroadcaster).broadcastLogMessage(
+                    "SampleApp|Application|Process ID: ${Process.myPid()}"
+                )
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
         }
-        TorServiceController.startTor()
-    }
-
-    private fun generateTorServiceNotificationBuilder(): ServiceNotification.Builder {
-//  private fun generateTorServiceNotificationBuilder(): ServiceNotification.Builder {
-        return ServiceNotification.Builder(
-            channelName = "TorService Channel",
-            channelDescription = "Tor Channel",
-            channelID = "My Sample Application",
-            notificationID = 615
-        )
-            .setActivityToBeOpenedOnTap(
-                clazz = MainActivity::class.java,
-                intentExtrasKey = null,
-                intentExtras = null,
-                intentRequestCode = null
-            )
-            .setImageTorNetworkingEnabled(drawableRes = R.drawable.tor_stat_network_enabled)
-            .setImageTorNetworkingDisabled(drawableRes = R.drawable.tor_stat_network_disabled)
-            .setImageTorDataTransfer(drawableRes = R.drawable.tor_stat_network_dataxfer)
-            .setImageTorErrors(drawableRes = R.drawable.tor_stat_notifyerr)
-            .setVisibility(visibility = NotificationCompat.VISIBILITY_PRIVATE)
-            .setCustomColor(colorRes = R.color.primaryColor)
-            .enableTorRestartButton(enable = true)
-            .enableTorStopButton(enable = true)
-            .showNotification(show = true)
-//  }
-    }
-
-    private fun generateBackgroundManagerPolicy(): BackgroundManager.Builder.Policy {
-//  private fun generateBackgroundManagerPolicy(): BackgroundManager.Builder.Policy {
-        return BackgroundManager.Builder()
-
-            // All available options present. Only 1 is able to be chosen.
-            .respectResourcesWhileInBackground(secondsFrom5To45 = 20)
-            //.runServiceInForeground(killAppIfTaskIsRemoved = true)
-//  }
-    }
-
-    private fun setupTorServices(application: Application, torConfigFiles: TorConfigFiles) {
-//  private fun setupTorServices(application: Application, torConfigFiles: TorConfigFiles ) {
-        TorServiceController.Builder(
-            application = application,
-            torServiceNotificationBuilder = generateTorServiceNotificationBuilder(),
-            backgroundManagerPolicy = generateBackgroundManagerPolicy(),
-            buildConfigVersionCode = BuildConfig.VERSION_CODE,
-
-            // Can instantiate directly here then access it from
-            // TorServiceController.Companion.getTorSettings() and cast what's returned
-            // as MyTorSettings
-            torSettings = MyTorSettings(),
-
-            // These should live somewhere in your module's assets directory,
-            // ex: my-project/my-application-module/src/main/assets/common/geoip
-            // ex: my-project/my-application-module/src/main/assets/common/geoip6
-            geoipAssetPath = "common/geoip",
-            geoip6AssetPath = "common/geoip6"
-        )
-            .addTimeToRestartTorDelay(milliseconds = 100L)
-            .addTimeToStopServiceDelay(milliseconds = 100L)
-            .disableStopServiceOnTaskRemoved(disable = false)
-            .setBuildConfigDebug(buildConfigDebug = BuildConfig.DEBUG)
-
-            // Can instantiate directly here then access it from
-            // TorServiceController.Companion?.appEventBroadcaster and cast what's returned
-            // as MyEventBroadcaster
-            .setEventBroadcaster(eventBroadcaster = MyEventBroadcaster())
-
-            // Only needed if you wish to customize the directories/files used by Tor if
-            // the defaults aren't to your liking.
-            .useCustomTorConfigFiles(torConfigFiles = torConfigFiles)
-
-            .build()
-//  }
-    }
-
-    fun customTorConfigFilesSetup(context: Context): TorConfigFiles {
-//  fun customTorConfigFilesSetup(context: Context): TorConfigFiles {
-
-        // This is modifying the directory hierarchy from TorService's
-        // default setup. For example, if you are using binaries for Tor that
-        // are named differently that that expressed in TorConfigFiles.createConfig()
-
-        // Post Android API 28 requires that executable files be contained in your
-        // application's data/app directory, as they can no longer execute from data/data.
-        val installDir = File(context.applicationInfo.nativeLibraryDir)
-
-        // Will create a directory within your application's data/data dir
-        val configDir = context.getDir("torservice", Context.MODE_PRIVATE)
-
-        val builder = TorConfigFiles.Builder(installDir, configDir)
-
-        // Customize the tor executable file name. Requires that the executable file
-        // be in your module's src/main/jniLibs directory. If you are getting your
-        // executable files via a dependency be sure to consult that Library's documentation.
-        builder.torExecutable(File(installDir, "libtor.so"))
-
-        // customize further via the builder methods...
-
-        return builder.build()
-//  }
     }
 }
