@@ -95,12 +95,10 @@ class ControllerOptions(view: View, prefs: Prefs) {
 
     private fun initEditTextViews() {
         editTextRestartDelay.filters = arrayOf(InputFilter.LengthFilter(4))
-        if (initialRestartDelayTime > 0L)
-            editTextRestartDelay.setText(initialRestartDelayTime.toString())
+        editTextRestartDelay.setText(initialRestartDelayTime.toString())
 
         editTextStopDelay.filters = arrayOf(InputFilter.LengthFilter(4))
-        if (initialStopDelayTime > 0L)
-            editTextStopDelay.setText(initialStopDelayTime.toString())
+        editTextStopDelay.setText(initialStopDelayTime.toString())
     }
 
     private fun initSpinnerControllerDisableStopOnTaskRemoved(context: Context) {
