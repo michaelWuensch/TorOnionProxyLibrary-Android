@@ -67,8 +67,6 @@
 package io.matthewnelson.sampleapp
 
 import android.app.Application
-import android.app.Service
-import android.content.Context
 import android.os.Process
 import android.widget.Toast
 import io.matthewnelson.encrypted_storage.Prefs

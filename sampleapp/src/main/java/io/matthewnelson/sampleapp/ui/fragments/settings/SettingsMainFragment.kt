@@ -72,7 +72,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import io.matthewnelson.sampleapp.R
 
