@@ -81,8 +81,12 @@ import io.matthewnelson.topl_service.util.ServiceConsts
 
 class HomeFragment : Fragment() {
 
-    private companion object {
-        var hasDebugLogs = false
+    companion object {
+        private var hasDebugLogs = false
+        private var appIsBeingKilled = false
+        fun appIsBeingKilled() {
+            appIsBeingKilled = true
+        }
     }
 
     private lateinit var buttonDebug: Button
@@ -146,6 +150,7 @@ class HomeFragment : Fragment() {
             )
         }
         buttonStart.setOnClickListener {
+            if (appIsBeingKilled) return@setOnClickListener
             try {
                 TorServiceController.startTor()
             } catch (e: RuntimeException) {

@@ -87,6 +87,8 @@ class App: Application() {
 
     companion object {
         const val PREFS_NAME = "TOPL-Android_SampleApp"
+        lateinit var stopTorDelaySettingAtAppStartup: String
+            private set
 
         /**
          * See [io.matthewnelson.sampleapp.topl_android.CodeSamples.generateTorServiceNotificationBuilder]
@@ -190,13 +192,15 @@ class App: Application() {
             LibraryPrefs.getNotificationShowSetting(prefs)
         )
 
+        stopTorDelaySettingAtAppStartup = LibraryPrefs.getControllerStopDelaySetting(prefs).toString()
+
         try {
             setupTorServices(
                 this,
                 serviceNotificationBuilder,
                 generateBackgroundManagerPolicy(prefs),
                 LibraryPrefs.getControllerRestartDelaySetting(prefs),
-                LibraryPrefs.getControllerStopDelaySetting(prefs),
+                stopTorDelaySettingAtAppStartup.toLong(),
                 LibraryPrefs.getControllerDisableStopServiceOnTaskRemovedSetting(prefs),
                 LibraryPrefs.getControllerBuildConfigDebugSetting(prefs)
             )

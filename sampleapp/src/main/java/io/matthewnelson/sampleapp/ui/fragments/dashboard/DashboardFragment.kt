@@ -24,6 +24,7 @@ import io.matthewnelson.sampleapp.App
 import io.matthewnelson.sampleapp.R
 import io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster
 import io.matthewnelson.sampleapp.ui.MainActivity
+import io.matthewnelson.sampleapp.ui.fragments.home.HomeFragment
 import io.matthewnelson.sampleapp.ui.fragments.settings.library.LibraryPrefs
 import io.matthewnelson.topl_core_base.BaseConsts.TorState
 import io.matthewnelson.topl_service.TorServiceController
@@ -125,9 +126,9 @@ class DashboardFragment : Fragment() {
     private fun initButtons(context: Context, owner: LifecycleOwner) {
         buttonAppRestart.setOnClickListener {
             buttonAppRestart.visibility = View.GONE
+            HomeFragment.appIsBeingKilled()
 
             Toast.makeText(context, "Killing Application", Toast.LENGTH_LONG).show()
-            val prefs = Prefs.createUnencrypted(App.PREFS_NAME, context)
 
             TorServiceController.appEventBroadcaster?.let {
                 (it as MyEventBroadcaster).liveTorState.observe(owner, Observer { data ->
@@ -144,7 +145,7 @@ class DashboardFragment : Fragment() {
                                     killAppJob?.cancel()
 
                                 killAppJob = CoroutineScope(Dispatchers.Main).launch {
-                                    delay(1000L + LibraryPrefs.getControllerStopDelaySetting(prefs))
+                                    delay(500L + App.stopTorDelaySettingAtAppStartup.toLong())
                                     killApplication(context)
                                 }
                             }
