@@ -25,12 +25,9 @@ import io.matthewnelson.sampleapp.R
 import io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster
 import io.matthewnelson.sampleapp.ui.MainActivity
 import io.matthewnelson.sampleapp.ui.fragments.settings.library.LibraryPrefs
-import io.matthewnelson.topl_core_base.BaseConsts
+import io.matthewnelson.topl_core_base.BaseConsts.TorState
 import io.matthewnelson.topl_service.TorServiceController
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlin.system.exitProcess
 
 class DashboardFragment : Fragment() {
@@ -123,23 +120,36 @@ class DashboardFragment : Fragment() {
         }
     }
 
+    private var killAppJob: Job? = null
+
     private fun initButtons(context: Context, owner: LifecycleOwner) {
         buttonAppRestart.setOnClickListener {
+            buttonAppRestart.visibility = View.GONE
+
             Toast.makeText(context, "Killing Application", Toast.LENGTH_LONG).show()
             val prefs = Prefs.createUnencrypted(App.PREFS_NAME, context)
 
             TorServiceController.appEventBroadcaster?.let {
                 (it as MyEventBroadcaster).liveTorState.observe(owner, Observer { data ->
                     if (data != null) {
-                        var delayLength = 500L + LibraryPrefs.getControllerStopDelaySetting(prefs)
-                        if (data.state == BaseConsts.TorState.OFF)
-                            delayLength = 200L
 
-                        TorServiceController.stopTor()
-                        CoroutineScope(Dispatchers.Main).launch {
-                            delay(delayLength)
-                            killApplication(context)
+                        when (data.state) {
+                            TorState.ON,
+                            TorState.STARTING -> {
+                                killAppJob?.cancel()
+                                TorServiceController.stopTor()
+                            }
+                            TorState.OFF -> {
+                                if (killAppJob?.isActive == true)
+                                    killAppJob?.cancel()
+
+                                killAppJob = CoroutineScope(Dispatchers.Main).launch {
+                                    delay(1000L + LibraryPrefs.getControllerStopDelaySetting(prefs))
+                                    killApplication(context)
+                                }
+                            }
                         }
+
                     }
                 })
             }
