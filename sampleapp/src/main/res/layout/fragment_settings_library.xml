@@ -78,9 +78,9 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginBottom="8dp"
         android:fadeScrollbars="false"
         app:layout_constraintBottom_toTopOf="@+id/settings_library_button_save"
         app:layout_constraintEnd_toEndOf="parent"
@@ -382,10 +382,10 @@
                     android:id="@+id/settings_library_spinner_controller_stop_on_task_removed"
                     style="@style/SpinnerStyle"
                     android:background="@color/primaryLightColor"
-                    tools:listitem="@layout/spinner_list_item"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/settings_library_controller_guide_left"
-                    app:layout_constraintTop_toBottomOf="@+id/settings_library_edit_text_controller_stop_delay" />
+                    app:layout_constraintTop_toBottomOf="@+id/settings_library_edit_text_controller_stop_delay"
+                    tools:listitem="@layout/spinner_list_item" />
 
                 <TextView
                     android:id="@+id/settings_library_text_view_controller_build_config"
@@ -415,9 +415,10 @@
         android:id="@+id/settings_library_button_save"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
-        android:layout_marginBottom="12dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/rounded_rectangle_color_secondary"
         android:text="@string/settings_library_button_save"
         android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -4,6 +4,9 @@
     <color name="primaryLightColor">#8b5a96</color>
     <color name="primaryDarkColor">#31043d</color>
     <color name="primaryTextColor">#ffffff</color>
+    <color name="secondaryColor">#FFC03E</color>
+    <color name="secondaryLightColor">#fff270</color>
+    <color name="buttonGrey">#D6D7D7</color>
 
     <color name="yellow">#CDDC39</color>
     <color name="green">#4CAF50</color>
