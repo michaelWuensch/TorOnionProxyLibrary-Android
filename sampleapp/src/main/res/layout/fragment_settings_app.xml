@@ -72,6 +72,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="io.matthewnelson.sampleapp.ui.fragments.settings.SettingsAppFragment">
+    tools:context="io.matthewnelson.sampleapp.ui.fragments.settings.app.SettingsAppFragment">
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -117,7 +117,7 @@
 
     <fragment
         android:id="@+id/navigation_settings_app"
-        android:name="io.matthewnelson.sampleapp.ui.fragments.settings.SettingsAppFragment"
+        android:name="io.matthewnelson.sampleapp.ui.fragments.settings.app.SettingsAppFragment"
         android:label="@string/navigation_label"
         tools:layout="@layout/fragment_settings_app" />
 
@@ -129,7 +129,7 @@
 
     <fragment
         android:id="@+id/navigation_settings_tor"
-        android:name="io.matthewnelson.sampleapp.ui.fragments.settings.SettingsTorFragment"
+        android:name="io.matthewnelson.sampleapp.ui.fragments.settings.tor.SettingsTorFragment"
         android:label="@string/navigation_label"
         tools:layout="@layout/fragment_settings_tor" />
 

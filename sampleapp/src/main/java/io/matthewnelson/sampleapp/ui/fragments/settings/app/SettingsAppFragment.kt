@@ -64,7 +64,7 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.sampleapp.ui.fragments.settings
+package io.matthewnelson.sampleapp.ui.fragments.settings.app
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -73,14 +73,14 @@ import android.view.View
 import android.view.ViewGroup
 import io.matthewnelson.sampleapp.R
 
-class SettingsTorFragment : Fragment() {
+class SettingsAppFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_settings_tor, container, false)
+        return inflater.inflate(R.layout.fragment_settings_app, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
