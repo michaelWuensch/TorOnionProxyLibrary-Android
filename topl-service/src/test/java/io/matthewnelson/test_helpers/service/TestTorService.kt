@@ -77,6 +77,7 @@ import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState
 import io.matthewnelson.topl_core_base.BaseConsts.TorState
 import io.matthewnelson.topl_service.TorServiceController
+import io.matthewnelson.topl_service.prefs.TorServicePrefs
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceEventBroadcaster
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceEventListener
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorInstaller
@@ -173,7 +174,7 @@ internal class TestTorService(
         ServiceEventBroadcaster(this)
     }
     val serviceTorSettings: ServiceTorSettings by lazy {
-        ServiceTorSettings(this, TorServiceController.getTorSettings())
+        TorServiceController.getServiceTorSettings(context)
     }
     val onionProxyManager: OnionProxyManager by lazy {
         OnionProxyManager(

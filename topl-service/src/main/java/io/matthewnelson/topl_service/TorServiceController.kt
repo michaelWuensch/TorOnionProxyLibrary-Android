@@ -381,6 +381,16 @@ class TorServiceController private constructor(): ServiceConsts() {
         }
 
         /**
+         * Helper method for easily obtaining [ServiceTorSettings].
+         *
+         * @throws [RuntimeException] See [getTorSettings]
+         * */
+        @JvmStatic
+        @Throws(RuntimeException::class)
+        fun getServiceTorSettings(context: Context): ServiceTorSettings =
+            ServiceTorSettings(TorServicePrefs(context), getTorSettings())
+
+        /**
          * Starts [TorService] and then Tor. You can call this as much as you want. If
          * the Tor [Process] is already running, it will do nothing.
          *

@@ -74,6 +74,7 @@ import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core.util.FileUtilities
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
+import io.matthewnelson.topl_service.prefs.TorServicePrefs
 import io.matthewnelson.topl_service.service.components.binding.TorServiceBinder
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceEventBroadcaster
@@ -197,7 +198,7 @@ internal class TorService: BaseService() {
             context,
             TorServiceController.getTorConfigFiles(),
             ServiceTorInstaller(this),
-            ServiceTorSettings(this, TorServiceController.getTorSettings()),
+            TorServiceController.getServiceTorSettings(context),
             ServiceEventListener(),
             ServiceEventBroadcaster(this),
             buildConfigDebug
