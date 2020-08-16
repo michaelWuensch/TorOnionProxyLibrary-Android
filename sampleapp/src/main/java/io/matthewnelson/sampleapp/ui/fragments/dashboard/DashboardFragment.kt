@@ -15,10 +15,8 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.*
 import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.App
 import io.matthewnelson.sampleapp.R
@@ -36,10 +34,19 @@ class DashboardFragment : Fragment() {
     companion object {
         private val _liveAppRestartButtonShow = MutableLiveData<Boolean>(false)
         private val liveAppRestartButtonShow: LiveData<Boolean> = _liveAppRestartButtonShow
-
         fun librarySettingsWereChanged() {
             if (liveAppRestartButtonShow.value != true)
                 _liveAppRestartButtonShow.value = true
+        }
+
+        private const val EXCEPTION = "EXCEPTION: "
+        private val _liveDashMessage = MutableLiveData<Pair<String, Long>?>(null)
+        private val liveDashMessage: LiveData<Pair<String, Long>?> = _liveDashMessage
+        fun showMessage(msg: String, showLength: Long, isException: Boolean = false) {
+            _liveDashMessage.value = if (isException)
+                Pair("$EXCEPTION\n$msg", showLength)
+            else
+                Pair(msg, showLength)
         }
     }
 
@@ -52,6 +59,9 @@ class DashboardFragment : Fragment() {
     private lateinit var textViewControlPort: TextView
     private lateinit var textViewSocksPort: TextView
     private lateinit var textViewHttpPort: TextView
+
+    // Messages
+    private lateinit var textViewMessage: TextView
 
     // Button
     private lateinit var buttonAppRestart: Button
@@ -82,6 +92,7 @@ class DashboardFragment : Fragment() {
         textViewControlPort = view.findViewById(R.id.dash_text_view_port_control)
         textViewSocksPort = view.findViewById(R.id.dash_text_view_port_socks)
         textViewHttpPort = view.findViewById(R.id.dash_text_view_port_http)
+        textViewMessage = view.findViewById(R.id.dash_text_view_message)
         buttonAppRestart = view.findViewById(R.id.dash_button_app_restart)
     }
 
@@ -89,6 +100,19 @@ class DashboardFragment : Fragment() {
         liveAppRestartButtonShow.observe(owner, Observer {
             if (it == true) {
                 buttonAppRestart.visibility = View.VISIBLE
+            }
+        })
+        liveDashMessage.observe(owner, Observer {
+            if (it != null) {
+                textViewMessage.text = it.first
+                textViewMessage.background = if (it.first.contains(EXCEPTION))
+                    ContextCompat.getDrawable(textViewMessage.context, R.drawable.rounded_rectangle_color_red)
+                else
+                    ContextCompat.getDrawable(textViewMessage.context, R.drawable.rounded_rectangle_color_primary_light)
+                textViewMessage.visibility = View.VISIBLE
+                launchCleanUpMessageJob(it.second)
+            } else {
+                textViewMessage.visibility = View.GONE
             }
         })
         TorServiceController.appEventBroadcaster?.let {
@@ -118,6 +142,17 @@ class DashboardFragment : Fragment() {
             (it as MyEventBroadcaster).liveHttpPortAddress.observe(owner, Observer { data ->
                 textViewHttpPort.text = data ?: "None"
             })
+        }
+    }
+
+    private var showMessageCleanUpJob: Job? = null
+
+    private fun launchCleanUpMessageJob(delayLength: Long) {
+        showMessageCleanUpJob?.cancel()
+
+        showMessageCleanUpJob = lifecycleScope.launch {
+            delay(delayLength)
+            _liveDashMessage.value = null
         }
     }
 
