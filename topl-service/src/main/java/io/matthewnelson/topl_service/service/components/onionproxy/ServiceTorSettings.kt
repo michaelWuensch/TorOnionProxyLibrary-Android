@@ -72,139 +72,145 @@ import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyList
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyInt
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyBoolean
 import io.matthewnelson.topl_service.prefs.TorServicePrefs
-import io.matthewnelson.topl_service.service.BaseService
 
 /**
- * This class is for enabling the updating of settings in a standardized manner
- * such that library users can simply instantiate [TorServicePrefs], change things,
- * and then call [io.matthewnelson.topl_service.TorServiceController.restartTor] to have
- * them applied to the Tor Process.
+ * This class enables the querying of [TorServicePrefs] to obtain values potentially set by
+ * the User such that they are *preferred* over static/default values you may have set in the
+ * [io.matthewnelson.topl_service.TorServiceController.Builder]'s constructor argument for
+ * [TorSettings].
  *
- * @param [torService] To instantiate [TorServicePrefs]
- * @param [defaults] Default values to fall back on if nothing is returned from [TorServicePrefs]
+ * It enables the updating of settings in a standardized manner such that library users can
+ * simply instantiate [TorServicePrefs], change things, and then call
+ * [io.matthewnelson.topl_service.TorServiceController.restartTor] to have them applied to the
+ * Tor Process.
+ *
+ * It also makes designing of a settings screen much easier for your application.
+ *
+ * @param [servicePrefs] [TorServicePrefs] to query shared preferences for potential values set by user.
+ * @param [defaultTorSettings] Default values to fall back on if nothing is returned from
+ *   [TorServicePrefs]. Use [io.matthewnelson.topl_service.TorServiceController.getTorSettings] for
+ *   this value.
  * */
-internal class ServiceTorSettings(
-    torService: BaseService,
-    private val defaults: TorSettings
+class ServiceTorSettings(
+    val servicePrefs: TorServicePrefs,
+    val defaultTorSettings: TorSettings
 ): TorSettings() {
 
-    private val prefs = TorServicePrefs(torService.context)
-
     override val disableNetwork: Boolean
-        get() = prefs.getBoolean(PrefKeyBoolean.DISABLE_NETWORK, defaults.disableNetwork)
+        get() = servicePrefs.getBoolean(PrefKeyBoolean.DISABLE_NETWORK, defaultTorSettings.disableNetwork)
 
     override val dnsPort: String
-        get() = prefs.getString(PrefKeyString.DNS_PORT, defaults.dnsPort)
-            ?: defaults.dnsPort
+        get() = servicePrefs.getString(PrefKeyString.DNS_PORT, defaultTorSettings.dnsPort)
+            ?: defaultTorSettings.dnsPort
 
     override val customTorrc: String?
-        get() = prefs.getString(PrefKeyString.CUSTOM_TORRC, defaults.customTorrc)
+        get() = servicePrefs.getString(PrefKeyString.CUSTOM_TORRC, defaultTorSettings.customTorrc)
 
     override val entryNodes: String?
-        get() = prefs.getString(PrefKeyString.ENTRY_NODES, defaults.entryNodes)
+        get() = servicePrefs.getString(PrefKeyString.ENTRY_NODES, defaultTorSettings.entryNodes)
 
     override val excludeNodes: String?
-        get() = prefs.getString(PrefKeyString.EXCLUDED_NODES, defaults.excludeNodes)
+        get() = servicePrefs.getString(PrefKeyString.EXCLUDED_NODES, defaultTorSettings.excludeNodes)
 
     override val exitNodes: String?
-        get() = prefs.getString(PrefKeyString.EXIT_NODES, defaults.exitNodes)
+        get() = servicePrefs.getString(PrefKeyString.EXIT_NODES, defaultTorSettings.exitNodes)
 
     override val httpTunnelPort: String
-        get() = prefs.getString(PrefKeyString.HTTP_TUNNEL_PORT, defaults.httpTunnelPort)
-            ?: defaults.httpTunnelPort
+        get() = servicePrefs.getString(PrefKeyString.HTTP_TUNNEL_PORT, defaultTorSettings.httpTunnelPort)
+            ?: defaultTorSettings.httpTunnelPort
 
     override val listOfSupportedBridges: List<String>
-        get() = prefs.getList(PrefKeyList.LIST_OF_SUPPORTED_BRIDGES, defaults.listOfSupportedBridges)
+        get() = servicePrefs.getList(PrefKeyList.LIST_OF_SUPPORTED_BRIDGES, defaultTorSettings.listOfSupportedBridges)
 
     override val proxyHost: String?
-        get() = prefs.getString(PrefKeyString.PROXY_HOST, defaults.proxyHost)
+        get() = servicePrefs.getString(PrefKeyString.PROXY_HOST, defaultTorSettings.proxyHost)
 
     override val proxyPassword: String?
-        get() = prefs.getString(PrefKeyString.PROXY_PASSWORD, defaults.proxyPassword)
+        get() = servicePrefs.getString(PrefKeyString.PROXY_PASSWORD, defaultTorSettings.proxyPassword)
 
     override val proxyPort: Int?
-        get() = prefs.getInt(PrefKeyInt.PROXY_PORT, defaults.proxyPort)
+        get() = servicePrefs.getInt(PrefKeyInt.PROXY_PORT, defaultTorSettings.proxyPort)
 
     override val proxySocks5Host: String?
-        get() = prefs.getString(PrefKeyString.PROXY_SOCKS5_HOST, defaults.proxySocks5Host)
+        get() = servicePrefs.getString(PrefKeyString.PROXY_SOCKS5_HOST, defaultTorSettings.proxySocks5Host)
 
     override val proxySocks5ServerPort: Int?
-        get() = prefs.getInt(PrefKeyInt.PROXY_SOCKS5_SERVER_PORT, defaults.proxySocks5ServerPort)
+        get() = servicePrefs.getInt(PrefKeyInt.PROXY_SOCKS5_SERVER_PORT, defaultTorSettings.proxySocks5ServerPort)
 
     override val proxyType: String?
-        get() = prefs.getString(PrefKeyString.PROXY_TYPE, defaults.proxyType)
+        get() = servicePrefs.getString(PrefKeyString.PROXY_TYPE, defaultTorSettings.proxyType)
 
     override val proxyUser: String?
-        get() = prefs.getString(PrefKeyString.PROXY_USER, defaults.proxyUser)
+        get() = servicePrefs.getString(PrefKeyString.PROXY_USER, defaultTorSettings.proxyUser)
 
     override val reachableAddressPorts: String
-        get() = prefs.getString(PrefKeyString.REACHABLE_ADDRESS_PORTS, defaults.reachableAddressPorts)
-            ?: defaults.reachableAddressPorts
+        get() = servicePrefs.getString(PrefKeyString.REACHABLE_ADDRESS_PORTS, defaultTorSettings.reachableAddressPorts)
+            ?: defaultTorSettings.reachableAddressPorts
 
     override val relayNickname: String?
-        get() = prefs.getString(PrefKeyString.RELAY_NICKNAME, defaults.relayNickname)
+        get() = servicePrefs.getString(PrefKeyString.RELAY_NICKNAME, defaultTorSettings.relayNickname)
 
     override val relayPort: Int?
-        get() = prefs.getInt(PrefKeyInt.RELAY_PORT, defaults.relayPort)
-            ?: defaults.relayPort
+        get() = servicePrefs.getInt(PrefKeyInt.RELAY_PORT, defaultTorSettings.relayPort)
+            ?: defaultTorSettings.relayPort
 
     override val socksPort: String
-        get() = prefs.getString(PrefKeyString.SOCKS_PORT, defaults.socksPort)
-            ?: defaults.socksPort
+        get() = servicePrefs.getString(PrefKeyString.SOCKS_PORT, defaultTorSettings.socksPort)
+            ?: defaultTorSettings.socksPort
 
     override val virtualAddressNetwork: String?
-        get() = prefs.getString(PrefKeyString.VIRTUAL_ADDRESS_NETWORK, defaults.virtualAddressNetwork)
+        get() = servicePrefs.getString(PrefKeyString.VIRTUAL_ADDRESS_NETWORK, defaultTorSettings.virtualAddressNetwork)
 
     override val hasBridges: Boolean
-        get() = prefs.getBoolean(PrefKeyBoolean.HAS_BRIDGES, defaults.hasBridges)
+        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_BRIDGES, defaultTorSettings.hasBridges)
 
     override val connectionPadding: String
-        get() = prefs.getString(PrefKeyString.HAS_CONNECTION_PADDING, defaults.connectionPadding)
-            ?: defaults.connectionPadding
+        get() = servicePrefs.getString(PrefKeyString.HAS_CONNECTION_PADDING, defaultTorSettings.connectionPadding)
+            ?: defaultTorSettings.connectionPadding
 
     override val hasCookieAuthentication: Boolean
-        get() = prefs.getBoolean(PrefKeyBoolean.HAS_COOKIE_AUTHENTICATION, defaults.hasCookieAuthentication)
+        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_COOKIE_AUTHENTICATION, defaultTorSettings.hasCookieAuthentication)
 
     override val hasDebugLogs: Boolean
-        get() = prefs.getBoolean(PrefKeyBoolean.HAS_DEBUG_LOGS, defaults.hasDebugLogs)
+        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_DEBUG_LOGS, defaultTorSettings.hasDebugLogs)
 
     override val hasDormantCanceledByStartup: Boolean
-        get() = prefs.getBoolean(PrefKeyBoolean.HAS_DORMANT_CANCELED_BY_STARTUP, defaults.hasDormantCanceledByStartup)
+        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_DORMANT_CANCELED_BY_STARTUP, defaultTorSettings.hasDormantCanceledByStartup)
 
     override val hasIsolationAddressFlagForTunnel: Boolean
-        get() = prefs.getBoolean(PrefKeyBoolean.HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL, defaults.hasIsolationAddressFlagForTunnel)
+        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL, defaultTorSettings.hasIsolationAddressFlagForTunnel)
 
     override val hasOpenProxyOnAllInterfaces: Boolean
-        get() = prefs.getBoolean(PrefKeyBoolean.HAS_OPEN_PROXY_ON_ALL_INTERFACES, defaults.hasOpenProxyOnAllInterfaces)
+        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_OPEN_PROXY_ON_ALL_INTERFACES, defaultTorSettings.hasOpenProxyOnAllInterfaces)
 
     override val hasReachableAddress: Boolean
-        get() = prefs.getBoolean(PrefKeyBoolean.HAS_REACHABLE_ADDRESS, defaults.hasReachableAddress)
+        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_REACHABLE_ADDRESS, defaultTorSettings.hasReachableAddress)
 
     override val hasReducedConnectionPadding: Boolean
-        get() = prefs.getBoolean(PrefKeyBoolean.HAS_REDUCED_CONNECTION_PADDING, defaults.hasReducedConnectionPadding)
+        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_REDUCED_CONNECTION_PADDING, defaultTorSettings.hasReducedConnectionPadding)
 
     override val hasSafeSocks: Boolean
-        get() = prefs.getBoolean(PrefKeyBoolean.HAS_SAFE_SOCKS, defaults.hasSafeSocks)
+        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_SAFE_SOCKS, defaultTorSettings.hasSafeSocks)
 
     override val hasStrictNodes: Boolean
-        get() = prefs.getBoolean(PrefKeyBoolean.HAS_STRICT_NODES, defaults.hasStrictNodes)
+        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_STRICT_NODES, defaultTorSettings.hasStrictNodes)
 
     override val hasTestSocks: Boolean
-        get() = prefs.getBoolean(PrefKeyBoolean.HAS_TEST_SOCKS, defaults.hasTestSocks)
+        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_TEST_SOCKS, defaultTorSettings.hasTestSocks)
 
     override val isAutoMapHostsOnResolve: Boolean
-        get() = prefs.getBoolean(PrefKeyBoolean.IS_AUTO_MAP_HOSTS_ON_RESOLVE, defaults.isAutoMapHostsOnResolve)
+        get() = servicePrefs.getBoolean(PrefKeyBoolean.IS_AUTO_MAP_HOSTS_ON_RESOLVE, defaultTorSettings.isAutoMapHostsOnResolve)
 
     override val isRelay: Boolean
-        get() = prefs.getBoolean(PrefKeyBoolean.IS_RELAY, defaults.isRelay)
+        get() = servicePrefs.getBoolean(PrefKeyBoolean.IS_RELAY, defaultTorSettings.isRelay)
 
     override val runAsDaemon: Boolean
-        get() = prefs.getBoolean(PrefKeyBoolean.RUN_AS_DAEMON, defaults.runAsDaemon)
+        get() = servicePrefs.getBoolean(PrefKeyBoolean.RUN_AS_DAEMON, defaultTorSettings.runAsDaemon)
 
     override val transPort: String
-        get() = prefs.getString(PrefKeyString.TRANS_PORT, defaults.transPort) ?: defaults.transPort
+        get() = servicePrefs.getString(PrefKeyString.TRANS_PORT, defaultTorSettings.transPort) ?: defaultTorSettings.transPort
 
     override val useSocks5: Boolean
-        get() = prefs.getBoolean(PrefKeyBoolean.USE_SOCKS5, defaults.useSocks5)
+        get() = servicePrefs.getBoolean(PrefKeyBoolean.USE_SOCKS5, defaultTorSettings.useSocks5)
 
 }
