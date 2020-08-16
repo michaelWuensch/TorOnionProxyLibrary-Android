@@ -108,9 +108,16 @@ internal abstract class BaseService: Service() {
         var geoip6AssetPath: String = ""
             private set
         lateinit var torConfigFiles: TorConfigFiles
+            private set
         lateinit var torSettings: TorSettings
+            private set
         var stopServiceOnTaskRemoved: Boolean = true
             private set
+
+        fun initializTorSettings(settings: TorSettings) {
+            if (!::torSettings.isInitialized)
+                torSettings = settings
+        }
 
         fun initialize(
             application: Application,
@@ -119,7 +126,6 @@ internal abstract class BaseService: Service() {
             geoipAssetPath: String,
             geoip6AssetPath: String,
             torConfigFiles: TorConfigFiles,
-            torSettings: TorSettings,
             stopServiceOnTaskRemoved: Boolean
         ) {
             this.application = application
@@ -128,7 +134,6 @@ internal abstract class BaseService: Service() {
             this.geoipAssetPath = geoipAssetPath
             this.geoip6AssetPath = geoip6AssetPath
             this.torConfigFiles = torConfigFiles
-            this.torSettings = torSettings
             this.stopServiceOnTaskRemoved = stopServiceOnTaskRemoved
         }
 
