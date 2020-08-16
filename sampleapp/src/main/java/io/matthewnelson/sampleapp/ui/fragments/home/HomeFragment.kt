@@ -73,6 +73,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import io.matthewnelson.sampleapp.R
+import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashMessage
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.prefs.TorServicePrefs
@@ -154,7 +155,13 @@ class HomeFragment : Fragment() {
                 TorServiceController.startTor()
             } catch (e: RuntimeException) {
                 DashboardFragment.showMessage(
-                    "TorServiceController.Builder.build() has not been called yet.", 3_000, true)
+                    DashMessage(
+                        DashMessage.EXCEPTION +
+                                "TorServiceController.Builder.build() has not been called yet.",
+                        R.drawable.rounded_rectangle_color_red,
+                        3_000
+                    )
+                )
             }
         }
         buttonStop.setOnClickListener {

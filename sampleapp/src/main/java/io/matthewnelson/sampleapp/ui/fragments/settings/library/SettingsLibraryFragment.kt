@@ -74,10 +74,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.Toast
 import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.App
 import io.matthewnelson.sampleapp.R
+import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashMessage
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
 import io.matthewnelson.topl_service.util.ServiceConsts.BackgroundPolicy
@@ -153,14 +153,16 @@ class SettingsLibraryFragment : Fragment() {
         } catch (e: Exception) {
             e.message?.let {
                 val msg = if (it.contains(BackgroundPolicy.RUN_IN_FOREGROUND))
-                        "Selected Controller option\n" +
+                        "${DashMessage.EXCEPTION}Selected Controller option\n" +
                                 ">>> ${ControllerOptions.DO_NOT_STOP_SERVICE} <<<\n" +
                                 "requires BackgroundManager Policy of\n" +
                                 ">>> ${BackgroundManagerOptions.FOREGROUND} <<< and\n" +
                                 ">>> ${BackgroundManagerOptions.KILL_APP} <<<"
                     else
                         it
-                DashboardFragment.showMessage(msg, 8_000L, true)
+                DashboardFragment.showMessage(
+                    DashMessage(msg, R.drawable.rounded_rectangle_color_red, 8_000L)
+                )
             }
             return
         }
@@ -171,7 +173,9 @@ class SettingsLibraryFragment : Fragment() {
 
         if (bmChanges || nChanges || cChanges) {
             DashboardFragment.librarySettingsWereChanged()
-            Toast.makeText(context, "Settings Saved", Toast.LENGTH_SHORT).show()
+            DashboardFragment.showMessage(
+                DashMessage("Settings Saved", R.drawable.rounded_rectangle_color_green, 3_000L)
+            )
         }
     }
 }

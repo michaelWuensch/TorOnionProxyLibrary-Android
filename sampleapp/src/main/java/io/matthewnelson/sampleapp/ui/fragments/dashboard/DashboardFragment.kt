@@ -17,13 +17,11 @@ import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
-import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.App
 import io.matthewnelson.sampleapp.R
 import io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster
 import io.matthewnelson.sampleapp.ui.MainActivity
 import io.matthewnelson.sampleapp.ui.fragments.home.HomeFragment
-import io.matthewnelson.sampleapp.ui.fragments.settings.library.LibraryPrefs
 import io.matthewnelson.topl_core_base.BaseConsts.TorState
 import io.matthewnelson.topl_service.TorServiceController
 import kotlinx.coroutines.*
@@ -39,14 +37,10 @@ class DashboardFragment : Fragment() {
                 _liveAppRestartButtonShow.value = true
         }
 
-        private const val EXCEPTION = "EXCEPTION: "
-        private val _liveDashMessage = MutableLiveData<Pair<String, Long>?>(null)
-        private val liveDashMessage: LiveData<Pair<String, Long>?> = _liveDashMessage
-        fun showMessage(msg: String, showLength: Long, isException: Boolean = false) {
-            _liveDashMessage.value = if (isException)
-                Pair("$EXCEPTION\n$msg", showLength)
-            else
-                Pair(msg, showLength)
+        private val _liveDashMessage = MutableLiveData<DashMessage?>(null)
+        private val liveDashMessage: LiveData<DashMessage?> = _liveDashMessage
+        fun showMessage(dashboardMessage: DashMessage) {
+            _liveDashMessage.value = dashboardMessage
         }
     }
 
@@ -104,13 +98,10 @@ class DashboardFragment : Fragment() {
         })
         liveDashMessage.observe(owner, Observer {
             if (it != null) {
-                textViewMessage.text = it.first
-                textViewMessage.background = if (it.first.contains(EXCEPTION))
-                    ContextCompat.getDrawable(textViewMessage.context, R.drawable.rounded_rectangle_color_red)
-                else
-                    ContextCompat.getDrawable(textViewMessage.context, R.drawable.rounded_rectangle_color_primary_light)
+                textViewMessage.text = it.message
+                textViewMessage.background = ContextCompat.getDrawable(textViewMessage.context, it.background)
                 textViewMessage.visibility = View.VISIBLE
-                launchCleanUpMessageJob(it.second)
+                launchCleanUpMessageJob(it.showLength)
             } else {
                 textViewMessage.visibility = View.GONE
             }
