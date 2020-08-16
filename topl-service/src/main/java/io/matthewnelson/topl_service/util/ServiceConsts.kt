@@ -87,7 +87,7 @@ abstract class ServiceConsts: BaseConsts() {
         BackgroundPolicy.RUN_IN_FOREGROUND
     )
     @Retention(AnnotationRetention.SOURCE)
-    internal annotation class BackgroundPolicy {
+    annotation class BackgroundPolicy {
         companion object {
             private const val BACKGROUND_POLICY = "BackgroundPolicy_"
             const val RESPECT_RESOURCES = "${BACKGROUND_POLICY}RESPECT_RESOURCES"
