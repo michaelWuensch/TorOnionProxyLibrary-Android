@@ -158,7 +158,7 @@ class HomeFragment : Fragment() {
                     DashMessage(
                         DashMessage.EXCEPTION +
                                 "TorServiceController.Builder.build() has not been called yet.",
-                        R.drawable.rounded_rectangle_color_red,
+                        R.drawable.dash_message_color_red,
                         3_000
                     )
                 )

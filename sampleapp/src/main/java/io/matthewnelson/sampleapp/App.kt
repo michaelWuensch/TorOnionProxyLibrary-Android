@@ -215,7 +215,7 @@ class App: Application() {
             e.message?.let {
                 DashboardFragment.showMessage(
                     DashMessage(
-                        "${DashMessage.EXCEPTION}$it", R.drawable.rounded_rectangle_color_red, 5_000
+                        "${DashMessage.EXCEPTION}$it", R.drawable.dash_message_color_red, 5_000
                     )
                 )
             }

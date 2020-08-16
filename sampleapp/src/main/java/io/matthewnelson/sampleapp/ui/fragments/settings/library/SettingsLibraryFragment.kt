@@ -161,7 +161,7 @@ class SettingsLibraryFragment : Fragment() {
                     else
                         it
                 DashboardFragment.showMessage(
-                    DashMessage(msg, R.drawable.rounded_rectangle_color_red, 8_000L)
+                    DashMessage(msg, R.drawable.dash_message_color_red, 8_000L)
                 )
             }
             return
@@ -174,7 +174,7 @@ class SettingsLibraryFragment : Fragment() {
         if (bmChanges || nChanges || cChanges) {
             DashboardFragment.librarySettingsWereChanged()
             DashboardFragment.showMessage(
-                DashMessage("Settings Saved", R.drawable.rounded_rectangle_color_green, 3_000L)
+                DashMessage("Settings Saved", R.drawable.dash_message_color_green, 3_000L)
             )
         }
     }

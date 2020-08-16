@@ -204,7 +204,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:background="@drawable/rounded_rectangle_color_secondary"
+        android:background="@drawable/button_color_secondary"
         android:text="@string/dash_button_app_restart"
         android:textAllCaps="false"
         android:visibility="gone"
