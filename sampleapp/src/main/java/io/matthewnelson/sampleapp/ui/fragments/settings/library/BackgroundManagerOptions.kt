@@ -6,6 +6,8 @@ import android.view.View
 import android.widget.*
 import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.R
+import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashMessage
+import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment
 import io.matthewnelson.topl_service.util.ServiceConsts.BackgroundPolicy
 
 class BackgroundManagerOptions(view: View, prefs: Prefs) {
@@ -29,12 +31,12 @@ class BackgroundManagerOptions(view: View, prefs: Prefs) {
     var killApp: Boolean = initialKillApp
         private set
 
-    fun saveSettings(context: Context, prefs: Prefs): Boolean? {
+    fun saveSettings(prefs: Prefs): Boolean? {
         var somethingChanged = false
 
         when (policy) {
             BackgroundPolicy.RESPECT_RESOURCES -> {
-                val executionDelay = getExecutionDelay(context) ?: return null
+                val executionDelay = getExecutionDelay() ?: return null
                 if (executionDelay != initialExecutionDelay) {
                     prefs.write(LibraryPrefs.BACKGROUND_MANAGER_EXECUTE_DELAY, executionDelay)
                     initialExecutionDelay = executionDelay
@@ -59,7 +61,7 @@ class BackgroundManagerOptions(view: View, prefs: Prefs) {
         return somethingChanged
     }
 
-    fun getExecutionDelay(context: Context): Int? {
+    fun getExecutionDelay(): Int? {
         var executionDelay: Int? = null
         try {
             val value = editTextDelay.text.toString().toInt()
@@ -68,9 +70,13 @@ class BackgroundManagerOptions(view: View, prefs: Prefs) {
         } catch (e: Exception) {}
 
         if (executionDelay == null)
-            Toast.makeText(
-                context, "Execution Delay must be between 5 and 45 seconds", Toast.LENGTH_SHORT
-            ).show()
+            DashboardFragment.showMessage(
+                DashMessage(
+                    "${DashMessage.EXCEPTION}Execution Delay must be between 5 and 45 seconds",
+                    R.drawable.dash_message_color_red,
+                    5_000
+                )
+            )
 
         return executionDelay
     }

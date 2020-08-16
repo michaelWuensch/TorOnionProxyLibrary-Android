@@ -67,7 +67,6 @@
 package io.matthewnelson.sampleapp.ui.fragments.settings.library
 
 import android.app.Application
-import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -79,7 +78,6 @@ import io.matthewnelson.sampleapp.App
 import io.matthewnelson.sampleapp.R
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashMessage
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment
-import io.matthewnelson.topl_service.lifecycle.BackgroundManager
 import io.matthewnelson.topl_service.util.ServiceConsts.BackgroundPolicy
 
 class SettingsLibraryFragment : Fragment() {
@@ -105,7 +103,7 @@ class SettingsLibraryFragment : Fragment() {
         controllerOptions = ControllerOptions(view, prefs)
 
         view.findViewById<Button>(R.id.settings_library_button_save).setOnClickListener {
-            saveSettings(view.context)
+            saveSettings(view.context.applicationContext as Application)
         }
     }
 
@@ -116,11 +114,19 @@ class SettingsLibraryFragment : Fragment() {
     private fun isBackgroundManagerPolicyRespectResources(): Boolean =
         backgroundManagerOptions.policy == BackgroundPolicy.RESPECT_RESOURCES
 
-    private fun saveSettings(context: Context) {
+    private fun saveSettings(application: Application) {
+        val backgroundManagerPolicy = App.generateBackgroundManagerPolicy(
+            prefs,
+            backgroundManagerOptions.policy,
+            backgroundManagerOptions.killApp,
 
-        // Will return null if outside of the range 5 to 45 and a toast is displayed
-        if (isBackgroundManagerPolicyRespectResources())
-            backgroundManagerOptions.getExecutionDelay(context) ?: return
+            // Will return null if outside of the range 5 to 45 and show a message
+            if (backgroundManagerOptions.policy == BackgroundPolicy.RESPECT_RESOURCES) {
+                backgroundManagerOptions.getExecutionDelay() ?: return
+            } else {
+                null
+            }
+        )
 
         // Ensure settings chosen are compatible before saving to prefs
         val notificationBuilder = App.generateTorServiceNotificationBuilder(
@@ -131,18 +137,9 @@ class SettingsLibraryFragment : Fragment() {
             notificationOptions.show
         )
 
-        val backgroundManagerPolicy = if (isBackgroundManagerPolicyRespectResources())
-            BackgroundManager.Builder().respectResourcesWhileInBackground(
-                backgroundManagerOptions.getExecutionDelay(context)
-            )
-        else
-            BackgroundManager.Builder().runServiceInForeground(
-                backgroundManagerOptions.killApp
-            )
-
         try {
             App.setupTorServices(
-                context.applicationContext as Application,
+                application,
                 notificationBuilder,
                 backgroundManagerPolicy,
                 controllerOptions.getRestartDelayValue(),
@@ -167,7 +164,7 @@ class SettingsLibraryFragment : Fragment() {
             return
         }
 
-        val bmChanges = backgroundManagerOptions.saveSettings(context, prefs) ?: return
+        val bmChanges = backgroundManagerOptions.saveSettings(prefs) ?: return
         val nChanges = notificationOptions.saveSettings(prefs)
         val cChanges = controllerOptions.saveSettings(prefs)
 
