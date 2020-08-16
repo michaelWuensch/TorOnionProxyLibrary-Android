@@ -108,7 +108,6 @@ dependencies {
 
     implementation 'io.matthewnelson.encrypted-storage:encrypted-storage:2.0.0'
     implementation 'io.matthewnelson.topl-android:tor-binary:0.4.3.5a'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     testImplementation deps.junit
 

@@ -66,15 +66,15 @@
 * */
 package io.matthewnelson.sampleapp.ui.fragments.home
 
-import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.Toast
 import io.matthewnelson.sampleapp.R
+import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashMessage
+import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.prefs.TorServicePrefs
 import io.matthewnelson.topl_service.util.ServiceConsts
@@ -118,7 +118,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         findViews(view)
-        initButtons(view.context)
+        initButtons()
         logMessageAdapter = LogMessageAdapter(viewLifecycleOwner, view)
     }
 
@@ -139,7 +139,7 @@ class HomeFragment : Fragment() {
         buttonStop = view.findViewById(R.id.home_button_stop)
     }
 
-    private fun initButtons(context: Context) {
+    private fun initButtons() {
         setButtonDebugText()
         buttonDebug.setOnClickListener {
             hasDebugLogs = !hasDebugLogs
@@ -154,7 +154,14 @@ class HomeFragment : Fragment() {
             try {
                 TorServiceController.startTor()
             } catch (e: RuntimeException) {
-                Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
+                DashboardFragment.showMessage(
+                    DashMessage(
+                        DashMessage.EXCEPTION +
+                                "TorServiceController.Builder.build() has not been called yet.",
+                        R.drawable.dash_message_color_red,
+                        3_000
+                    )
+                )
             }
         }
         buttonStop.setOnClickListener {

@@ -68,11 +68,12 @@ package io.matthewnelson.sampleapp
 
 import android.app.Application
 import android.os.Process
-import android.widget.Toast
 import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster
 import io.matthewnelson.sampleapp.topl_android.MyTorSettings
 import io.matthewnelson.sampleapp.ui.MainActivity
+import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashMessage
+import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment
 import io.matthewnelson.sampleapp.ui.fragments.settings.library.LibraryPrefs
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.notification.ServiceNotification
@@ -211,7 +212,13 @@ class App: Application() {
                 )
             }
         } catch (e: Exception) {
-            Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
+            e.message?.let {
+                DashboardFragment.showMessage(
+                    DashMessage(
+                        "${DashMessage.EXCEPTION}$it", R.drawable.dash_message_color_red, 5_000
+                    )
+                )
+            }
         }
     }
 }

@@ -13,9 +13,9 @@ import kotlin.math.absoluteValue
 
 class ControllerOptions(view: View, prefs: Prefs) {
 
-    private companion object {
-        const val DISABLED = "Don't Stop Service"
-        const val ENABLED = "Stop Service"
+    companion object {
+        const val DO_NOT_STOP_SERVICE = "Don't Stop Service"
+        const val STOP_SERVICE = "Stop Service"
 
         const val DEBUG = "Debug"
         const val RELEASE = "Release"
@@ -103,8 +103,8 @@ class ControllerOptions(view: View, prefs: Prefs) {
 
     private fun initSpinnerControllerDisableStopOnTaskRemoved(context: Context) {
         val categoryDisable = arrayOf(
-            DISABLED,
-            ENABLED
+            DO_NOT_STOP_SERVICE,
+            STOP_SERVICE
         )
         adapterDisableStopOnTaskRemoved = ArrayAdapter(context, R.layout.spinner_list_item, categoryDisable)
         adapterDisableStopOnTaskRemoved.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -164,10 +164,10 @@ class ControllerOptions(view: View, prefs: Prefs) {
             when (parent.adapter) {
                 adapterDisableStopOnTaskRemoved -> {
                     disableStopServiceOnTaskRemoved = when (item.toString()) {
-                        DISABLED -> {
+                        DO_NOT_STOP_SERVICE -> {
                             true
                         }
-                        ENABLED -> {
+                        STOP_SERVICE -> {
                             false
                         }
                         else -> {
