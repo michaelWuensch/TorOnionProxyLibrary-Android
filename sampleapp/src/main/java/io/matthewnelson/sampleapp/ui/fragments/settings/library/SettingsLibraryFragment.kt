@@ -114,7 +114,7 @@ class SettingsLibraryFragment : Fragment() {
     }
 
     private fun isBackgroundManagerPolicyRespectResources(): Boolean =
-        backgroundManagerOptions.policy == LibraryPrefs.BACKGROUND_MANAGER_POLICY_RESPECT
+        backgroundManagerOptions.policy == BackgroundPolicy.RESPECT_RESOURCES
 
     private fun saveSettings(context: Context) {
 

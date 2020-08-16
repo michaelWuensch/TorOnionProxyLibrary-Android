@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.*
 import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.R
+import io.matthewnelson.topl_service.util.ServiceConsts.BackgroundPolicy
 
 class BackgroundManagerOptions(view: View, prefs: Prefs) {
 
@@ -32,7 +33,7 @@ class BackgroundManagerOptions(view: View, prefs: Prefs) {
         var somethingChanged = false
 
         when (policy) {
-            LibraryPrefs.BACKGROUND_MANAGER_POLICY_RESPECT -> {
+            BackgroundPolicy.RESPECT_RESOURCES -> {
                 val executionDelay = getExecutionDelay(context) ?: return null
                 if (executionDelay != initialExecutionDelay) {
                     prefs.write(LibraryPrefs.BACKGROUND_MANAGER_EXECUTE_DELAY, executionDelay)
@@ -40,7 +41,7 @@ class BackgroundManagerOptions(view: View, prefs: Prefs) {
                     somethingChanged = true
                 }
             }
-            LibraryPrefs.BACKGROUND_MANAGER_POLICY_FOREGROUND -> {
+            BackgroundPolicy.RUN_IN_FOREGROUND -> {
                 if (killApp != initialKillApp) {
                     prefs.write(LibraryPrefs.BACKGROUND_MANAGER_KILL_APP, killApp)
                     initialKillApp = killApp
@@ -112,11 +113,11 @@ class BackgroundManagerOptions(view: View, prefs: Prefs) {
 
     private fun setBackgroundManagerPolicySpinnerValue() {
         when (initialPolicy) {
-            LibraryPrefs.BACKGROUND_MANAGER_POLICY_RESPECT -> {
+            BackgroundPolicy.RESPECT_RESOURCES -> {
                 executionDelayOptionVisibility(true)
                 spinnerPolicy.setSelection(0)
             }
-            LibraryPrefs.BACKGROUND_MANAGER_POLICY_FOREGROUND -> {
+            BackgroundPolicy.RUN_IN_FOREGROUND -> {
                 executionDelayOptionVisibility(false)
                 spinnerPolicy.setSelection(1)
             }
@@ -173,11 +174,11 @@ class BackgroundManagerOptions(view: View, prefs: Prefs) {
                     policy = when (item.toString()) {
                         RESPECT_RESOURCES -> {
                             executionDelayOptionVisibility(true)
-                            LibraryPrefs.BACKGROUND_MANAGER_POLICY_RESPECT
+                            BackgroundPolicy.RESPECT_RESOURCES
                         }
                         FOREGROUND -> {
                             executionDelayOptionVisibility(false)
-                            LibraryPrefs.BACKGROUND_MANAGER_POLICY_FOREGROUND
+                            BackgroundPolicy.RUN_IN_FOREGROUND
                         }
                         else -> {
                             return

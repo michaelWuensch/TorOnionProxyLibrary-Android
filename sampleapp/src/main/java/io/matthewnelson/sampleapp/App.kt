@@ -78,6 +78,7 @@ import io.matthewnelson.sampleapp.ui.fragments.settings.library.LibraryPrefs
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
+import io.matthewnelson.topl_service.util.ServiceConsts.BackgroundPolicy
 
 /**
  * @suppress
@@ -128,18 +129,18 @@ class App: Application() {
          * */
         fun generateBackgroundManagerPolicy(
             prefs: Prefs,
-            policy: String? = null,
+            @BackgroundPolicy policy: String? = null,
             killApp: Boolean? = null,
             executionDelay: Int? = null
         ): BackgroundManager.Builder.Policy {
             val builder = BackgroundManager.Builder()
             return when (policy ?: LibraryPrefs.getBackgroundManagerPolicySetting(prefs)) {
-                LibraryPrefs.BACKGROUND_MANAGER_POLICY_FOREGROUND -> {
+                BackgroundPolicy.RUN_IN_FOREGROUND -> {
                     builder.runServiceInForeground(
                         killApp ?: LibraryPrefs.getBackgroundManagerKillAppSetting(prefs)
                     )
                 }
-                LibraryPrefs.BACKGROUND_MANAGER_POLICY_RESPECT -> {
+                BackgroundPolicy.RESPECT_RESOURCES -> {
                     builder.respectResourcesWhileInBackground(
                         executionDelay ?: LibraryPrefs.getBackgroundManagerExecuteDelaySetting(prefs)
                     )

@@ -4,6 +4,7 @@ import androidx.core.app.NotificationCompat
 import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.BuildConfig
 import io.matthewnelson.sampleapp.R
+import io.matthewnelson.topl_service.util.ServiceConsts.BackgroundPolicy
 
 object LibraryPrefs {
 
@@ -18,10 +19,6 @@ object LibraryPrefs {
     const val BACKGROUND_MANAGER_POLICY = "BACKGROUND_MANAGER_POLICY"
     const val BACKGROUND_MANAGER_EXECUTE_DELAY = "BACKGROUND_MANAGER_EXECUTE_DELAY"
     const val BACKGROUND_MANAGER_KILL_APP = "BACKGROUND_MANAGER_KILL_APP"
-
-    // values
-    const val BACKGROUND_MANAGER_POLICY_RESPECT = "BACKGROUND_MANAGER_POLICY_RESPECT"
-    const val BACKGROUND_MANAGER_POLICY_FOREGROUND = "BACKGROUND_MANAGER_POLICY_FOREGROUND"
 
     // Controller Keys
     const val CONTROLLER_BUILD_CONFIG_DEBUG = "CONTROLLER_BUILD_CONFIG_DEBUG"
@@ -47,7 +44,7 @@ object LibraryPrefs {
 
     // Background Manager Settings
     fun getBackgroundManagerPolicySetting(prefs: Prefs): String =
-        prefs.read(BACKGROUND_MANAGER_POLICY, BACKGROUND_MANAGER_POLICY_RESPECT) ?: BACKGROUND_MANAGER_POLICY_RESPECT
+        prefs.read(BACKGROUND_MANAGER_POLICY, BackgroundPolicy.RESPECT_RESOURCES) ?: BackgroundPolicy.RESPECT_RESOURCES
 
     fun getBackgroundManagerExecuteDelaySetting(prefs: Prefs): Int =
         prefs.read(BACKGROUND_MANAGER_EXECUTE_DELAY, 20)
