@@ -9,7 +9,7 @@ import io.matthewnelson.sampleapp.R
 
 class BackgroundManagerOptions(view: View, prefs: Prefs) {
 
-    private companion object {
+    companion object {
         // Spinner BackgroundManager Policy
         const val RESPECT_RESOURCES = "Stop Service After"
         const val FOREGROUND = "Run In Foreground"

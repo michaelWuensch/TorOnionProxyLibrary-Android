@@ -80,6 +80,7 @@ import io.matthewnelson.sampleapp.App
 import io.matthewnelson.sampleapp.R
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
+import io.matthewnelson.topl_service.util.ServiceConsts.BackgroundPolicy
 
 class SettingsLibraryFragment : Fragment() {
 
@@ -150,7 +151,17 @@ class SettingsLibraryFragment : Fragment() {
                 controllerOptions.buildConfigDebug
             )
         } catch (e: Exception) {
-            Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
+            e.message?.let {
+                val msg = if (it.contains(BackgroundPolicy.RUN_IN_FOREGROUND))
+                        "Selected Controller option\n" +
+                                ">>> ${ControllerOptions.DO_NOT_STOP_SERVICE} <<<\n" +
+                                "requires BackgroundManager Policy of\n" +
+                                ">>> ${BackgroundManagerOptions.FOREGROUND} <<< and\n" +
+                                ">>> ${BackgroundManagerOptions.KILL_APP} <<<"
+                    else
+                        it
+                DashboardFragment.showMessage(msg, 8_000L, true)
+            }
             return
         }
 
