@@ -362,10 +362,9 @@ class TorServiceController private constructor(): ServiceConsts() {
          * Get the [TorSettings] that have been set after instantiating [Builder]. These are
          * the [TorSettings] you initialized [TorServiceController.Builder] with.
          *
-         * If you call [Builder.build] from Application.onCreate, no matter if it throws an
-         * exception for configuration issues elsewhere in the [Builder], this method will
-         * *never* throw the [NullPointerException]. [BaseService.initializTorSettings] is
-         * called immediately upon instantiation of [Builder], so.
+         * This method will *never* throw the [RuntimeException] if you call it after
+         * you have instantiated the [Builder] object, as [TorSettings] are set immediately
+         * via [BaseService.initializTorSettings].
          *
          * @return Instance of [TorSettings] that are being used throughout TOPL-Android
          * @throws [RuntimeException] if called before [Builder] is instantiated
