@@ -229,24 +229,29 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
                 handleBootstrappedMsg(msg)
             }
             // Control Port
+            // NOTICE|OnionProxyManager|Successfully connected to Control Port: 44201
             msg.contains("Successfully connected to Control Port:") -> {
-                handleControlPortMsg(msg)
+                controlPort = getPortFromMsg(msg)
             }
             // Dns Port
+            // NOTICE|OnionProxyManager|Opened DNS listener on 127.0.0.1:5400
             msg.contains("Opened DNS listener on ") -> {
-                handleDnsPortMsg(msg)
+                dnsPort = getPortFromMsg(msg)
             }
             // Http Tunnel Port
+            // NOTICE|BaseEventListener|Opened HTTP tunnel listener on 127.0.0.1:8118
             msg.contains("Opened HTTP tunnel listener on ") -> {
-                handleHttpTunnelPortMsg(msg)
+                httpTunnelPort = getPortFromMsg(msg)
             }
             // Socks Port
+            // NOTICE|BaseEventListener|Opened Socks listener on 127.0.0.1:9050
             msg.contains("Opened Socks listener on ") -> {
-                handleSocksPortMsg(msg)
+                socksPort = getPortFromMsg(msg)
             }
             // Trans Port
+            // NOTICE|BaseEventListener|Opened Transparent pf/netfilter listener on 127.0.0.1:9040
             msg.contains("Opened Transparent pf/netfilter listener on ") -> {
-                handleTransPortMsg(msg)
+                transPort = getPortFromMsg(msg)
             }
             // NEWNYM
             msg.contains(TorControlCommands.SIGNAL_NEWNYM) -> {
@@ -290,35 +295,8 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
         }
     }
 
-    // NOTICE|OnionProxyManager|Successfully connected to Control Port: 44201
-    private fun handleControlPortMsg(msg: String) {
-        val port = msg.split(":")[1].trim()
-        controlPort = "127.0.0.1:$port"
-    }
-
-    // NOTICE|OnionProxyManager|Opened DNS listener on 127.0.0.1:5400
-    private fun handleDnsPortMsg(msg: String) {
-        val port = msg.split(":")[1].trim()
-        dnsPort = "127.0.0.1:$port"
-    }
-
-    // NOTICE|BaseEventListener|Opened HTTP tunnel listener on 127.0.0.1:8118
-    private fun handleHttpTunnelPortMsg(msg: String) {
-        val port = msg.split(":")[1].trim()
-        httpTunnelPort = "127.0.0.1:$port"
-    }
-
-    // NOTICE|BaseEventListener|Opened Socks listener on 127.0.0.1:9050
-    private fun handleSocksPortMsg(msg: String) {
-        val port = msg.split(":")[1].trim()
-        socksPort = "127.0.0.1:$port"
-    }
-
-    // NOTICE|BaseEventListener|Opened Transparent pf/netfilter listener on 127.0.0.1:9040
-    private fun handleTransPortMsg(msg: String) {
-        val port = msg.split(":")[1].trim()
-        transPort = "127.0.0.1:$port"
-    }
+    private fun getPortFromMsg(msg: String): String =
+        "127.0.0.1:${msg.split(":")[1].trim()}"
 
     private fun handleNewNymMsg(msg: String) {
         val msgToShow: String? =
