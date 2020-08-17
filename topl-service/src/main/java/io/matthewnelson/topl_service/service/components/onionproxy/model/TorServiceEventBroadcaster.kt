@@ -71,48 +71,23 @@ import io.matthewnelson.topl_core_base.EventBroadcaster
 /**
  * Adds broadcasting methods to the [EventBroadcaster] to update you with information about
  * what addresses Tor is operating on. Very helpful when choosing "auto" in your
- * [io.matthewnelson.topl_core_base.TorSettings] to easily identifying what addresses to
+ * [io.matthewnelson.topl_core_base.TorSettings] to easily identify what addresses to
  * use for making network calls, as well as being notified when Tor is ready to be used.
  *
  * The addresses will be broadcast to you after Tor has been fully Bootstrapped. If Tor is
  * stopped (ie. it's [io.matthewnelson.topl_core_base.BaseConsts.TorState] changes from **ON**
- * to **OFF**), `null` will be broadcast.
+ * to **OFF**), a [TorPortInfo] object containing 'null' for all fields will be broadcast.
  *
- * All broadcasts to your implementation to this class will occur on the Main thread.
+ * All broadcasts to your implementation to this class will occur on the Main Thread.
  *
  * @sample [io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster]
  * */
 abstract class TorServiceEventBroadcaster: EventBroadcaster() {
 
     /**
-     * Override this method to implement receiving of the control port address that Tor
-     * is operating on.
+     * Override this method to implement receiving of port information pertaining to Tor.
      *
-     * Example of what will be broadcast:
-     *
-     *   - "127.0.0.1:33432"
+     * @see [TorPortInfo]
      * */
-    abstract fun broadcastControlPortAddress(controlPortAddress: String?)
-
-    /**
-     * Override this method to implement receiving of the Socks port address that Tor
-     * is operating on (if you've specified a
-     * [io.matthewnelson.topl_core_base.TorSettings.socksPort]).
-     *
-     * Example of what will be broadcast:
-     *
-     *   - "127.0.0.1:9051"
-     * */
-    abstract fun broadcastSocksPortAddress(socksPortAddress: String?)
-
-    /**
-     * Override this method to implement receiving of the http port address that Tor
-     * is operating on (if you've specified a
-     * [io.matthewnelson.topl_core_base.TorSettings.httpTunnelPort]).
-     *
-     * Example of what will be broadcast:
-     *
-     *   - "127.0.0.1:33432"
-     * */
-    abstract fun broadcastHttpPortAddress(httpPortAddress: String?)
+    abstract fun broadcastPortInformation(torPortInfo: TorPortInfo)
 }
