@@ -71,7 +71,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import io.matthewnelson.sampleapp.R
+import io.matthewnelson.sampleapp.ui.fragments.settings.CloseKeyBoardNavListener
 
 class SettingsAppFragment : Fragment() {
 
@@ -85,6 +87,8 @@ class SettingsAppFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        findNavController().addOnDestinationChangedListener(CloseKeyBoardNavListener(view))
     }
 
     override fun onDestroyView() {

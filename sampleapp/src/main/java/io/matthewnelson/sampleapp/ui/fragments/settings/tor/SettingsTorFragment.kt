@@ -72,9 +72,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.annotation.NavigationRes
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
+import androidx.navigation.fragment.findNavController
 import io.matthewnelson.sampleapp.R
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashMessage
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment
+import io.matthewnelson.sampleapp.ui.fragments.settings.CloseKeyBoardNavListener
 import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.DnsPortOption
 import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.HttpPortOption
 import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.SocksPortOption
@@ -106,21 +111,12 @@ class SettingsTorFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        socksPortOption =
-            SocksPortOption(
-                view,
-                serviceTorSettings
-            )
-        httpPortOption =
-            HttpPortOption(
-                view,
-                serviceTorSettings
-            )
-        dnsPortOption =
-            DnsPortOption(
-                view,
-                serviceTorSettings
-            )
+        socksPortOption = SocksPortOption(view, serviceTorSettings)
+        httpPortOption = HttpPortOption(view, serviceTorSettings)
+        dnsPortOption = DnsPortOption(view, serviceTorSettings)
+
+        findNavController().addOnDestinationChangedListener(CloseKeyBoardNavListener(view))
+
         findViews(view)
         setButtonClickListener()
     }

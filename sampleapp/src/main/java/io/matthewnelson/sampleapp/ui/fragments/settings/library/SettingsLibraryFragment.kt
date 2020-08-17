@@ -73,11 +73,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.navigation.fragment.findNavController
 import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.App
 import io.matthewnelson.sampleapp.R
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashMessage
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment
+import io.matthewnelson.sampleapp.ui.fragments.settings.CloseKeyBoardNavListener
 import io.matthewnelson.sampleapp.ui.fragments.settings.library.components.BackgroundManagerOptions
 import io.matthewnelson.sampleapp.ui.fragments.settings.library.components.ControllerOptions
 import io.matthewnelson.sampleapp.ui.fragments.settings.library.components.NotificationOptions
@@ -101,21 +103,11 @@ class SettingsLibraryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         prefs = Prefs.createUnencrypted(App.PREFS_NAME, view.context)
-        notificationOptions =
-            NotificationOptions(
-                view,
-                prefs
-            )
-        backgroundManagerOptions =
-            BackgroundManagerOptions(
-                view,
-                prefs
-            )
-        controllerOptions =
-            ControllerOptions(
-                view,
-                prefs
-            )
+        notificationOptions = NotificationOptions(view, prefs)
+        backgroundManagerOptions = BackgroundManagerOptions(view, prefs)
+        controllerOptions = ControllerOptions(view, prefs)
+
+        findNavController().addOnDestinationChangedListener(CloseKeyBoardNavListener(view))
 
         view.findViewById<Button>(R.id.settings_library_button_save).setOnClickListener {
             saveSettings(view.context.applicationContext as Application)
@@ -125,9 +117,6 @@ class SettingsLibraryFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
     }
-
-    private fun isBackgroundManagerPolicyRespectResources(): Boolean =
-        backgroundManagerOptions.policy == BackgroundPolicy.RESPECT_RESOURCES
 
     private fun saveSettings(application: Application) {
         val backgroundManagerPolicy = App.generateBackgroundManagerPolicy(
