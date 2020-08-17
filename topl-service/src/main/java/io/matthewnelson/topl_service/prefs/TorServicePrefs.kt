@@ -126,7 +126,7 @@ class TorServicePrefs(context: Context): ServiceConsts() {
      *  @return True if the SharedPreference contains a value for the associated
      *   [prefsKey], false if not
      *  * */
-    fun contains(@PrefKeyBoolean @PrefKeyInt @PrefKeyList @PrefKeyString prefsKey: String): Boolean =
+    fun contains(prefsKey: String): Boolean =
         prefs.contains(prefsKey)
 
     /**
@@ -209,7 +209,7 @@ class TorServicePrefs(context: Context): ServiceConsts() {
      *
      *  @param [prefsKey] String of type ServiceConsts.PrefKey*
      *  * */
-    fun remove(@PrefKeyBoolean @PrefKeyInt @PrefKeyList @PrefKeyString prefsKey: String) {
+    fun remove(prefsKey: String) {
         val editor = prefs.edit().remove(prefsKey)
         if (!editor.commit())
             editor.apply()
