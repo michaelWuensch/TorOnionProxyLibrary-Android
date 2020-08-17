@@ -68,6 +68,9 @@
     <string name="settings_library_edit_text_controller_stop_delay">100ms + your value</string>
     <string name="settings_library_text_view_controller_stop_on_task_removed">On Task Removed:</string>
     <string name="settings_library_text_view_controller_build_config">Build Config:</string>
+    <string name="settings_tor_text_view_socks_port">Socks Port:</string>
+    <string name="settings_tor_text_view_socks_port_custom">Custom (eg. 9050):</string>
+    <string name="settings_tor_edit_text_hint_socks_port_custom">1024 to 65535</string>
 
     <!-- SettingsTorFragment -->
 </resources>
