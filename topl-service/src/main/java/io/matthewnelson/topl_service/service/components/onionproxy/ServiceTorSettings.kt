@@ -91,7 +91,7 @@ import io.matthewnelson.topl_service.prefs.TorServicePrefs
  *   [TorServicePrefs]. Use [io.matthewnelson.topl_service.TorServiceController.getTorSettings] for
  *   this value.
  * */
-class ServiceTorSettings(
+class ServiceTorSettings internal constructor(
     val servicePrefs: TorServicePrefs,
     val defaultTorSettings: TorSettings
 ): TorSettings() {
@@ -99,25 +99,94 @@ class ServiceTorSettings(
     override val disableNetwork: Boolean
         get() = servicePrefs.getBoolean(PrefKeyBoolean.DISABLE_NETWORK, defaultTorSettings.disableNetwork)
 
+    fun disableNetworkSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.disableNetwork)
+            servicePrefs.remove(PrefKeyBoolean.DISABLE_NETWORK)
+        else
+            servicePrefs.putBoolean(PrefKeyBoolean.DISABLE_NETWORK, boolean)
+    }
+
     override val dnsPort: String
         get() = servicePrefs.getString(PrefKeyString.DNS_PORT, defaultTorSettings.dnsPort)
             ?: defaultTorSettings.dnsPort
 
+    @Throws(IllegalArgumentException::class)
+    fun dnsPortSave(dnsPort: String) {
+        when {
+            dnsPort == defaultTorSettings.dnsPort -> {
+                servicePrefs.remove(PrefKeyString.DNS_PORT)
+            }
+            checkPortRange(dnsPort) -> {
+                servicePrefs.putString(PrefKeyString.DNS_PORT, dnsPort)
+            }
+            else -> {
+                throw IllegalArgumentException(
+                    "DNS Port must be 0 (disabled), auto, or between 1024 and 65535"
+                )
+            }
+        }
+    }
+
     override val customTorrc: String?
         get() = servicePrefs.getString(PrefKeyString.CUSTOM_TORRC, defaultTorSettings.customTorrc)
+
+    fun customTorrcSave(customTorrc: String?) {
+        if (customTorrc == defaultTorSettings.customTorrc)
+            servicePrefs.remove(PrefKeyString.CUSTOM_TORRC)
+        else
+            servicePrefs.putString(PrefKeyString.CUSTOM_TORRC, customTorrc)
+    }
 
     override val entryNodes: String?
         get() = servicePrefs.getString(PrefKeyString.ENTRY_NODES, defaultTorSettings.entryNodes)
 
+    fun entryNodesSave(entryNodes: String?) {
+        if (entryNodes == defaultTorSettings.entryNodes)
+            servicePrefs.remove(PrefKeyString.ENTRY_NODES)
+        else
+            servicePrefs.putString(PrefKeyString.ENTRY_NODES, entryNodes)
+    }
+
     override val excludeNodes: String?
         get() = servicePrefs.getString(PrefKeyString.EXCLUDED_NODES, defaultTorSettings.excludeNodes)
+
+    fun excludeNodesSave(excludeNodes: String?) {
+        if (excludeNodes == defaultTorSettings.excludeNodes)
+            servicePrefs.remove(PrefKeyString.EXCLUDED_NODES)
+        else
+            servicePrefs.putString(PrefKeyString.EXCLUDED_NODES, excludeNodes)
+    }
 
     override val exitNodes: String?
         get() = servicePrefs.getString(PrefKeyString.EXIT_NODES, defaultTorSettings.exitNodes)
 
+    fun exitNodesSave(exitNodes: String?) {
+        if (exitNodes == defaultTorSettings.exitNodes)
+            servicePrefs.remove(PrefKeyString.EXIT_NODES)
+        else
+            servicePrefs.putString(PrefKeyString.EXIT_NODES, exitNodes)
+    }
+
     override val httpTunnelPort: String
         get() = servicePrefs.getString(PrefKeyString.HTTP_TUNNEL_PORT, defaultTorSettings.httpTunnelPort)
             ?: defaultTorSettings.httpTunnelPort
+
+    @Throws(IllegalArgumentException::class)
+    fun httpTunnelPortSave(httpPort: String) {
+        when {
+            httpPort == defaultTorSettings.httpTunnelPort -> {
+                servicePrefs.remove(PrefKeyString.HTTP_TUNNEL_PORT)
+            }
+            checkPortRange(httpPort) -> {
+                servicePrefs.putString(PrefKeyString.HTTP_TUNNEL_PORT, httpPort)
+            }
+            else -> {
+                throw IllegalArgumentException(
+                    "HTTP Port must be 0 (disabled), auto, or between 1024 and 65535"
+                )
+            }
+        }
+    }
 
     override val listOfSupportedBridges: List<String>
         get() = servicePrefs.getList(PrefKeyList.LIST_OF_SUPPORTED_BRIDGES, defaultTorSettings.listOfSupportedBridges)
@@ -147,6 +216,13 @@ class ServiceTorSettings(
         get() = servicePrefs.getString(PrefKeyString.REACHABLE_ADDRESS_PORTS, defaultTorSettings.reachableAddressPorts)
             ?: defaultTorSettings.reachableAddressPorts
 
+    fun reachableAddressPortsSave(reachableAddressPorts: String) {
+        if (reachableAddressPorts == defaultTorSettings.reachableAddressPorts)
+            servicePrefs.remove(PrefKeyString.REACHABLE_ADDRESS_PORTS)
+        else
+            servicePrefs.putString(PrefKeyString.REACHABLE_ADDRESS_PORTS, reachableAddressPorts)
+    }
+
     override val relayNickname: String?
         get() = servicePrefs.getString(PrefKeyString.RELAY_NICKNAME, defaultTorSettings.relayNickname)
 
@@ -158,6 +234,23 @@ class ServiceTorSettings(
         get() = servicePrefs.getString(PrefKeyString.SOCKS_PORT, defaultTorSettings.socksPort)
             ?: defaultTorSettings.socksPort
 
+    @Throws(IllegalArgumentException::class)
+    fun socksPortSave(socksPort: String) {
+        when {
+            socksPort == defaultTorSettings.socksPort -> {
+                servicePrefs.remove(PrefKeyString.SOCKS_PORT)
+            }
+            checkPortRange(socksPort) -> {
+                servicePrefs.putString(PrefKeyString.SOCKS_PORT, socksPort)
+            }
+            else -> {
+                throw IllegalArgumentException(
+                    "Socks Port must be 0 (disabled), auto, or between 1024 and 65535"
+                )
+            }
+        }
+    }
+
     override val virtualAddressNetwork: String?
         get() = servicePrefs.getString(PrefKeyString.VIRTUAL_ADDRESS_NETWORK, defaultTorSettings.virtualAddressNetwork)
 
@@ -168,49 +261,191 @@ class ServiceTorSettings(
         get() = servicePrefs.getString(PrefKeyString.HAS_CONNECTION_PADDING, defaultTorSettings.connectionPadding)
             ?: defaultTorSettings.connectionPadding
 
+    @Throws(IllegalArgumentException::class)
+    fun connectionPaddingSave(@ConnectionPadding connectionPadding: String) {
+        when (connectionPadding) {
+            ConnectionPadding.AUTO,
+            ConnectionPadding.OFF,
+            ConnectionPadding.ON -> {
+                if (connectionPadding == defaultTorSettings.connectionPadding)
+                    servicePrefs.remove(PrefKeyString.HAS_CONNECTION_PADDING)
+                else
+                    servicePrefs.putString(PrefKeyString.HAS_CONNECTION_PADDING, connectionPadding)
+            }
+            else -> {
+                throw IllegalArgumentException(
+                    "ConnectionPadding must be 0 (Off), 1 (On), or auto"
+                )
+            }
+        }
+    }
+
     override val hasCookieAuthentication: Boolean
         get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_COOKIE_AUTHENTICATION, defaultTorSettings.hasCookieAuthentication)
+
+    fun hasCookieAuthenticationSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.hasCookieAuthentication)
+            servicePrefs.remove(PrefKeyBoolean.HAS_COOKIE_AUTHENTICATION)
+        else
+            servicePrefs.putBoolean(PrefKeyBoolean.HAS_COOKIE_AUTHENTICATION, boolean)
+    }
 
     override val hasDebugLogs: Boolean
         get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_DEBUG_LOGS, defaultTorSettings.hasDebugLogs)
 
+    fun hasDebugLogsSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.hasDebugLogs)
+            servicePrefs.remove(PrefKeyBoolean.HAS_DEBUG_LOGS)
+        else
+            servicePrefs.putBoolean(PrefKeyBoolean.HAS_DEBUG_LOGS, boolean)
+    }
+
     override val hasDormantCanceledByStartup: Boolean
         get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_DORMANT_CANCELED_BY_STARTUP, defaultTorSettings.hasDormantCanceledByStartup)
+
+    fun hasDormantCanceledByStartupSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.hasDormantCanceledByStartup)
+            servicePrefs.remove(PrefKeyBoolean.HAS_DORMANT_CANCELED_BY_STARTUP)
+        else
+            servicePrefs.putBoolean(PrefKeyBoolean.HAS_DORMANT_CANCELED_BY_STARTUP, boolean)
+    }
 
     override val hasIsolationAddressFlagForTunnel: Boolean
         get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL, defaultTorSettings.hasIsolationAddressFlagForTunnel)
 
+    fun hasIsolationAddressFlagForTunnelSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.hasIsolationAddressFlagForTunnel)
+            servicePrefs.remove(PrefKeyBoolean.HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL)
+        else
+            servicePrefs.putBoolean(PrefKeyBoolean.HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL, boolean)
+    }
+
     override val hasOpenProxyOnAllInterfaces: Boolean
         get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_OPEN_PROXY_ON_ALL_INTERFACES, defaultTorSettings.hasOpenProxyOnAllInterfaces)
+
+    fun hasOpenProxyOnAllInterfacesSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.hasOpenProxyOnAllInterfaces)
+            servicePrefs.remove(PrefKeyBoolean.HAS_OPEN_PROXY_ON_ALL_INTERFACES)
+        else
+            servicePrefs.putBoolean(PrefKeyBoolean.HAS_OPEN_PROXY_ON_ALL_INTERFACES, boolean)
+    }
 
     override val hasReachableAddress: Boolean
         get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_REACHABLE_ADDRESS, defaultTorSettings.hasReachableAddress)
 
+    fun hasReachableAddressSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.hasReachableAddress)
+            servicePrefs.remove(PrefKeyBoolean.HAS_REACHABLE_ADDRESS)
+        else
+            servicePrefs.putBoolean(PrefKeyBoolean.HAS_REACHABLE_ADDRESS, boolean)
+    }
+
     override val hasReducedConnectionPadding: Boolean
         get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_REDUCED_CONNECTION_PADDING, defaultTorSettings.hasReducedConnectionPadding)
+
+    fun hasReducedConnectionPaddingSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.hasReducedConnectionPadding)
+            servicePrefs.remove(PrefKeyBoolean.HAS_REDUCED_CONNECTION_PADDING)
+        else
+            servicePrefs.putBoolean(PrefKeyBoolean.HAS_REDUCED_CONNECTION_PADDING, boolean)
+    }
 
     override val hasSafeSocks: Boolean
         get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_SAFE_SOCKS, defaultTorSettings.hasSafeSocks)
 
+    fun hasSafeSocksSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.hasSafeSocks)
+            servicePrefs.remove(PrefKeyBoolean.HAS_SAFE_SOCKS)
+        else
+            servicePrefs.putBoolean(PrefKeyBoolean.HAS_SAFE_SOCKS, boolean)
+    }
+
     override val hasStrictNodes: Boolean
         get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_STRICT_NODES, defaultTorSettings.hasStrictNodes)
+
+    fun hasStrictNodesSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.hasStrictNodes)
+            servicePrefs.remove(PrefKeyBoolean.HAS_STRICT_NODES)
+        else
+            servicePrefs.putBoolean(PrefKeyBoolean.HAS_STRICT_NODES, boolean)
+    }
 
     override val hasTestSocks: Boolean
         get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_TEST_SOCKS, defaultTorSettings.hasTestSocks)
 
+    fun hasTestSocksSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.hasTestSocks)
+            servicePrefs.remove(PrefKeyBoolean.HAS_TEST_SOCKS)
+        else
+            servicePrefs.putBoolean(PrefKeyBoolean.HAS_TEST_SOCKS, boolean)
+    }
+
     override val isAutoMapHostsOnResolve: Boolean
         get() = servicePrefs.getBoolean(PrefKeyBoolean.IS_AUTO_MAP_HOSTS_ON_RESOLVE, defaultTorSettings.isAutoMapHostsOnResolve)
+
+    fun isAutoMapHostsOnResolveSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.isAutoMapHostsOnResolve)
+            servicePrefs.remove(PrefKeyBoolean.IS_AUTO_MAP_HOSTS_ON_RESOLVE)
+        else
+            servicePrefs.putBoolean(PrefKeyBoolean.IS_AUTO_MAP_HOSTS_ON_RESOLVE, boolean)
+    }
 
     override val isRelay: Boolean
         get() = servicePrefs.getBoolean(PrefKeyBoolean.IS_RELAY, defaultTorSettings.isRelay)
 
+    fun isRelaySave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.isRelay)
+            servicePrefs.remove(PrefKeyBoolean.IS_RELAY)
+        else
+            servicePrefs.putBoolean(PrefKeyBoolean.IS_RELAY, boolean)
+    }
+
     override val runAsDaemon: Boolean
         get() = servicePrefs.getBoolean(PrefKeyBoolean.RUN_AS_DAEMON, defaultTorSettings.runAsDaemon)
+
+    fun runAsDaemonSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.runAsDaemon)
+            servicePrefs.remove(PrefKeyBoolean.RUN_AS_DAEMON)
+        else
+            servicePrefs.putBoolean(PrefKeyBoolean.RUN_AS_DAEMON, boolean)
+    }
 
     override val transPort: String
         get() = servicePrefs.getString(PrefKeyString.TRANS_PORT, defaultTorSettings.transPort) ?: defaultTorSettings.transPort
 
+    @Throws(IllegalArgumentException::class)
+    fun socksTransPortSave(transPort: String) {
+        when {
+            transPort == defaultTorSettings.transPort -> {
+                servicePrefs.remove(PrefKeyString.TRANS_PORT)
+            }
+            checkPortRange(transPort) -> {
+                servicePrefs.putString(PrefKeyString.TRANS_PORT, transPort)
+            }
+            else -> {
+                throw IllegalArgumentException(
+                    "Socks Trans Port must be 0 (disabled), auto, or between 1024 and 65535"
+                )
+            }
+        }
+    }
+
     override val useSocks5: Boolean
         get() = servicePrefs.getBoolean(PrefKeyBoolean.USE_SOCKS5, defaultTorSettings.useSocks5)
 
+    fun useSocks5Save(boolean: Boolean) {
+        if (boolean == defaultTorSettings.useSocks5)
+            servicePrefs.remove(PrefKeyBoolean.USE_SOCKS5)
+        else
+            servicePrefs.putBoolean(PrefKeyBoolean.USE_SOCKS5, boolean)
+    }
+
+    private fun checkPortRange(port: String): Boolean {
+        return try {
+            val portInt = port.toInt()
+            portInt == 0 || portInt in 1024..65535
+        } catch (e: Exception) {
+            false
+        }
+    }
 }
