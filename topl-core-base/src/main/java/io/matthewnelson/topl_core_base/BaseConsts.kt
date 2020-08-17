@@ -67,7 +67,6 @@
 package io.matthewnelson.topl_core_base
 
 import androidx.annotation.StringDef
-import java.lang.Error
 
 abstract class BaseConsts {
 
@@ -147,22 +146,38 @@ abstract class BaseConsts {
     ///////////////////
     /// TorSettings ///
     ///////////////////
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE)
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.TYPE
+    )
     @StringDef(
-        SupportedBridges.MEEK,
-        SupportedBridges.OBFS4,
-        SupportedBridges.SNOWFLAKE
+        SupportedBridgeType.MEEK,
+        SupportedBridgeType.OBFS4,
+        SupportedBridgeType.SNOWFLAKE
     )
     @Retention(AnnotationRetention.SOURCE)
-    annotation class SupportedBridges {
+    annotation class SupportedBridgeType {
         companion object {
             const val MEEK = "meek"
             const val OBFS4 = "obfs4"
             const val SNOWFLAKE = "snowflake"
+
+            fun getAll(): List<@SupportedBridgeType String> {
+                return arrayListOf(
+                    MEEK,
+                    OBFS4,
+                    SNOWFLAKE
+                )
+            }
         }
     }
 
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.VALUE_PARAMETER)
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.TYPE,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.PROPERTY
+    )
     @StringDef(
         ConnectionPadding.AUTO,
         ConnectionPadding.OFF,
@@ -174,10 +189,23 @@ abstract class BaseConsts {
             const val AUTO = "auto"
             const val OFF = "0"
             const val ON = "1"
+
+            fun getAll(): List<@ConnectionPadding String> {
+                return arrayListOf(
+                    AUTO,
+                    OFF,
+                    ON
+                )
+            }
         }
     }
 
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.VALUE_PARAMETER)
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.TYPE,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.PROPERTY
+    )
     @StringDef(
         PortOption.AUTO,
         PortOption.DISABLED
@@ -190,11 +218,44 @@ abstract class BaseConsts {
         }
     }
 
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.TYPE,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.PROPERTY
+    )
+    @StringDef(
+        ProxyType.DISABLED,
+        ProxyType.HTTPS,
+        ProxyType.SOCKS_5
+    )
+    @Retention(AnnotationRetention.SOURCE)
+    annotation class ProxyType {
+        companion object {
+            const val DISABLED = ""
+            const val HTTPS = "HTTPS"
+            const val SOCKS_5 = "Socks5"
+
+            fun getAll(): List<@ProxyType String> {
+                return arrayListOf(
+                    DISABLED,
+                    HTTPS,
+                    SOCKS_5
+                )
+            }
+        }
+    }
+
 
     ///////////////////////////
     /// TorConfigFile Names ///
     ///////////////////////////
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.VALUE_PARAMETER)
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.TYPE,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.PROPERTY
+    )
     @StringDef(
         ConfigFileName.CONTROL_PORT,
         ConfigFileName.COOKIE_AUTH,
