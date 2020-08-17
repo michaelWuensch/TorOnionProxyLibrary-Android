@@ -80,7 +80,7 @@ import io.matthewnelson.topl_service.service.components.actions.ServiceActionPro
 import io.matthewnelson.topl_service.service.components.actions.ServiceActions
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
-import io.matthewnelson.topl_service.service.components.onionproxy.TorServiceEventBroadcaster
+import io.matthewnelson.topl_service.service.components.onionproxy.model.TorServiceEventBroadcaster
 import io.matthewnelson.topl_service.util.ServiceConsts
 
 class TorServiceController private constructor(): ServiceConsts() {

@@ -67,7 +67,6 @@
 package io.matthewnelson.topl_service.service.components.onionproxy
 
 import io.matthewnelson.topl_core.OnionProxyManager
-import io.matthewnelson.topl_core.listener.BaseEventListener
 import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.service.BaseService

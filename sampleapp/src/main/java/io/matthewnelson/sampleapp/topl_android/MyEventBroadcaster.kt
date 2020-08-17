@@ -69,7 +69,7 @@ package io.matthewnelson.sampleapp.topl_android
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.matthewnelson.sampleapp.ui.fragments.home.LogMessageAdapter
-import io.matthewnelson.topl_service.service.components.onionproxy.TorServiceEventBroadcaster
+import io.matthewnelson.topl_service.service.components.onionproxy.model.TorServiceEventBroadcaster
 import io.matthewnelson.topl_service.util.ServiceUtilities
 
 /**
