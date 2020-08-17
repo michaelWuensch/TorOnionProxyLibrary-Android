@@ -50,9 +50,9 @@ class DashboardFragment : Fragment() {
     private lateinit var textViewState: TextView
 
     // Bottom row
-    private lateinit var textViewControlPort: TextView
-    private lateinit var textViewSocksPort: TextView
+    private lateinit var textViewDnsPort: TextView
     private lateinit var textViewHttpPort: TextView
+    private lateinit var textViewSocksPort: TextView
 
     // Messages
     private lateinit var textViewMessage: TextView
@@ -83,9 +83,9 @@ class DashboardFragment : Fragment() {
         textViewBandwidth = view.findViewById(R.id.dash_text_view_bandwidth)
         textViewNetworkState = view.findViewById(R.id.dash_text_view_tor_network_state)
         textViewState = view.findViewById(R.id.dash_text_view_tor_state)
-        textViewControlPort = view.findViewById(R.id.dash_text_view_port_control)
-        textViewSocksPort = view.findViewById(R.id.dash_text_view_port_socks)
+        textViewDnsPort = view.findViewById(R.id.dash_text_view_port_dns)
         textViewHttpPort = view.findViewById(R.id.dash_text_view_port_http)
+        textViewSocksPort = view.findViewById(R.id.dash_text_view_port_socks)
         textViewMessage = view.findViewById(R.id.dash_text_view_message)
         buttonAppRestart = view.findViewById(R.id.dash_button_app_restart)
     }
@@ -121,9 +121,9 @@ class DashboardFragment : Fragment() {
         }
         TorServiceController.appEventBroadcaster?.let {
             (it as MyEventBroadcaster).liveTorPortInfo.observe(owner, Observer { data ->
-                textViewControlPort.text = data?.controlPort ?: "-----"
-                textViewSocksPort.text = data?.socksPort ?: "-----"
+                textViewDnsPort.text = data?.dnsPort ?: "-----"
                 textViewHttpPort.text = data?.httpPort ?: "-----"
+                textViewSocksPort.text = data?.socksPort ?: "-----"
             })
         }
     }

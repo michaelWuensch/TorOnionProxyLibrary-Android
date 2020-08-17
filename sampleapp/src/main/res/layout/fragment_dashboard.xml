@@ -127,44 +127,24 @@
         tools:text="Network: enabled" />
 
     <TextView
-        android:id="@+id/dash_text_view_port_control_header"
+        android:id="@+id/dash_text_view_port_dns_header"
         style="@style/DashboardTextViewTopPadding"
         android:layout_marginTop="8dp"
         android:paddingBottom="4dp"
-        android:text="@string/dashboard_text_view_control_port"
+        android:text="@string/dashboard_text_view_dns_port"
         app:layout_constraintEnd_toEndOf="@+id/dash_text_view_tor_state"
         app:layout_constraintStart_toStartOf="@+id/dash_text_view_tor_state"
         app:layout_constraintTop_toBottomOf="@+id/dash_text_view_tor_state" />
 
     <TextView
-        android:id="@+id/dash_text_view_port_control"
+        android:id="@+id/dash_text_view_port_dns"
         style="@style/DashboardTextViewBotPadding"
         android:textColorHighlight="@android:color/holo_blue_bright"
         android:textIsSelectable="true"
-        app:layout_constraintEnd_toEndOf="@+id/dash_text_view_port_control_header"
-        app:layout_constraintStart_toStartOf="@+id/dash_text_view_port_control_header"
-        app:layout_constraintTop_toBottomOf="@+id/dash_text_view_port_control_header"
-        tools:text="127.0.0.1:41429" />
-
-    <TextView
-        android:id="@+id/dash_text_view_port_socks_header"
-        style="@style/DashboardTextViewTopPadding"
-        android:layout_marginTop="8dp"
-        android:paddingBottom="4dp"
-        android:text="@string/dashboard_text_view_socks_port"
-        app:layout_constraintEnd_toEndOf="@+id/dash_text_view_bandwidth"
-        app:layout_constraintStart_toStartOf="@+id/dash_text_view_bandwidth"
-        app:layout_constraintTop_toBottomOf="@+id/dash_text_view_bandwidth" />
-
-    <TextView
-        android:id="@+id/dash_text_view_port_socks"
-        style="@style/DashboardTextViewBotPadding"
-        android:textColorHighlight="@android:color/holo_blue_bright"
-        android:textIsSelectable="true"
-        app:layout_constraintEnd_toEndOf="@+id/dash_text_view_port_socks_header"
-        app:layout_constraintStart_toStartOf="@+id/dash_text_view_port_socks_header"
-        app:layout_constraintTop_toBottomOf="@+id/dash_text_view_port_socks_header"
-        tools:text="127.0.0.1:35145" />
+        app:layout_constraintEnd_toEndOf="@+id/dash_text_view_port_dns_header"
+        app:layout_constraintStart_toStartOf="@+id/dash_text_view_port_dns_header"
+        app:layout_constraintTop_toBottomOf="@+id/dash_text_view_port_dns_header"
+        tools:text="127.0.0.1:5400" />
 
     <TextView
         android:id="@+id/dash_text_view_port_http_header"
@@ -172,9 +152,9 @@
         android:layout_marginTop="8dp"
         android:paddingBottom="4dp"
         android:text="@string/dashboard_text_view_http_port"
-        app:layout_constraintEnd_toEndOf="@+id/dash_text_view_tor_network_state"
-        app:layout_constraintStart_toStartOf="@+id/dash_text_view_tor_network_state"
-        app:layout_constraintTop_toBottomOf="@+id/dash_text_view_tor_network_state" />
+        app:layout_constraintEnd_toEndOf="@+id/dash_text_view_bandwidth"
+        app:layout_constraintStart_toStartOf="@+id/dash_text_view_bandwidth"
+        app:layout_constraintTop_toBottomOf="@+id/dash_text_view_bandwidth" />
 
     <TextView
         android:id="@+id/dash_text_view_port_http"
@@ -184,7 +164,27 @@
         app:layout_constraintEnd_toEndOf="@+id/dash_text_view_port_http_header"
         app:layout_constraintStart_toStartOf="@+id/dash_text_view_port_http_header"
         app:layout_constraintTop_toBottomOf="@+id/dash_text_view_port_http_header"
-        tools:text="127.0.0.1:40195" />
+        tools:text="127.0.0.1:8118" />
+
+    <TextView
+        android:id="@+id/dash_text_view_port_socks_header"
+        style="@style/DashboardTextViewTopPadding"
+        android:layout_marginTop="8dp"
+        android:paddingBottom="4dp"
+        android:text="@string/dashboard_text_view_socks_port"
+        app:layout_constraintEnd_toEndOf="@+id/dash_text_view_tor_network_state"
+        app:layout_constraintStart_toStartOf="@+id/dash_text_view_tor_network_state"
+        app:layout_constraintTop_toBottomOf="@+id/dash_text_view_tor_network_state" />
+
+    <TextView
+        android:id="@+id/dash_text_view_port_socks"
+        style="@style/DashboardTextViewBotPadding"
+        android:textColorHighlight="@android:color/holo_blue_bright"
+        android:textIsSelectable="true"
+        app:layout_constraintEnd_toEndOf="@+id/dash_text_view_port_socks_header"
+        app:layout_constraintStart_toStartOf="@+id/dash_text_view_port_socks_header"
+        app:layout_constraintTop_toBottomOf="@+id/dash_text_view_port_socks_header"
+        tools:text="127.0.0.1:9050" />
 
     <Button
         android:id="@+id/dash_button_app_restart"
@@ -195,9 +195,9 @@
         android:text="@string/dash_button_app_restart"
         android:textAllCaps="false"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@+id/dash_text_view_port_http"
-        app:layout_constraintStart_toStartOf="@+id/dash_text_view_port_control"
-        app:layout_constraintTop_toBottomOf="@+id/dash_text_view_port_http" />
+        app:layout_constraintEnd_toEndOf="@+id/dash_text_view_port_socks"
+        app:layout_constraintStart_toStartOf="@+id/dash_text_view_port_dns"
+        app:layout_constraintTop_toBottomOf="@+id/dash_text_view_port_socks" />
 
     <TextView
         android:id="@+id/dash_text_view_message"
@@ -208,8 +208,8 @@
         android:padding="8dp"
         android:textColor="@color/primaryTextColor"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@+id/dash_text_view_port_http"
-        app:layout_constraintStart_toStartOf="@+id/dash_text_view_port_control"
+        app:layout_constraintEnd_toEndOf="@+id/dash_text_view_port_socks"
+        app:layout_constraintStart_toStartOf="@+id/dash_text_view_port_dns"
         app:layout_constraintTop_toBottomOf="@+id/dash_button_app_restart" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
