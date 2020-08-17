@@ -75,4 +75,6 @@
     <string name="settings_tor_text_view_socks_port_custom">Custom (eg. 9050):</string>
     <string name="settings_tor_text_view_http_port">Http Port:</string>
     <string name="settings_tor_text_view_http_port_custom">Custom (eg. 8118):</string>
+    <string name="settings_tor_text_view_dns_port">Dns Port:</string>
+    <string name="settings_tor_text_view_dns_port_custom">Custom (eg. 5400):</string>
 </resources>

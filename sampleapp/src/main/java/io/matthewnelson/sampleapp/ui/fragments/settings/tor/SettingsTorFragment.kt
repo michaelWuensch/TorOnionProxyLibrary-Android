@@ -89,6 +89,7 @@ class SettingsTorFragment : Fragment() {
     private lateinit var serviceTorSettings: ServiceTorSettings
     private lateinit var socksPortOption: SocksPortOption
     private lateinit var httpPortOption: HttpPortOption
+    private lateinit var dnsPortOption: DnsPortOption
     private lateinit var buttonSave: Button
 
     override fun onCreateView(
@@ -104,6 +105,7 @@ class SettingsTorFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         socksPortOption = SocksPortOption(view, serviceTorSettings)
         httpPortOption = HttpPortOption(view, serviceTorSettings)
+        dnsPortOption = DnsPortOption(view, serviceTorSettings)
         findViews(view)
         setButtonClickListener()
     }
@@ -120,6 +122,7 @@ class SettingsTorFragment : Fragment() {
         buttonSave.setOnClickListener {
             socksPortOption.saveSocksPort() ?: return@setOnClickListener
             httpPortOption.saveHttpPort() ?: return@setOnClickListener
+            dnsPortOption.saveDnsPort() ?: return@setOnClickListener
 
             DashboardFragment.showMessage(
                 DashMessage("Settings Saved", R.drawable.dash_message_color_green, 3_000L)
