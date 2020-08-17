@@ -177,6 +177,19 @@ abstract class BaseConsts {
         }
     }
 
+    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.VALUE_PARAMETER)
+    @StringDef(
+        PortOption.AUTO,
+        PortOption.DISABLED
+    )
+    @Retention(AnnotationRetention.SOURCE)
+    annotation class PortOption {
+        companion object {
+            const val AUTO = "auto"
+            const val DISABLED = "0"
+        }
+    }
+
 
     ///////////////////////////
     /// TorConfigFile Names ///
