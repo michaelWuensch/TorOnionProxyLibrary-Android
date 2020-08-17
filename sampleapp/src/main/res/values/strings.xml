@@ -73,8 +73,10 @@
     <string name="settings_tor_edit_text_hint_port_custom">1024 to 65535</string>
     <string name="settings_tor_text_view_socks_port">Socks Port:</string>
     <string name="settings_tor_text_view_socks_port_custom">Custom (eg. 9050):</string>
-    <string name="settings_tor_text_view_http_port">Http Port:</string>
+    <string name="settings_tor_text_view_http_port">HTTP Port:</string>
     <string name="settings_tor_text_view_http_port_custom">Custom (eg. 8118):</string>
-    <string name="settings_tor_text_view_dns_port">Dns Port:</string>
+    <string name="settings_tor_text_view_dns_port">DNS Port:</string>
     <string name="settings_tor_text_view_dns_port_custom">Custom (eg. 5400):</string>
+    <string name="settings_tor_text_view_trans_port">Trans Port:</string>
+    <string name="settings_tor_text_view_trans_port_custom">Custom (eg. 9040):</string>
 </resources>

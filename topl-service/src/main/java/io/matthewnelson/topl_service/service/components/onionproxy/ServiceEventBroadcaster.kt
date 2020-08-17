@@ -214,6 +214,8 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
     private var httpTunnelPort: String? = null
     @Volatile
     private var socksPort: String? = null
+    @Volatile
+    private var transPort: String? = null
 
     override fun broadcastNotice(msg: String) {
 
@@ -241,6 +243,10 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
             // Socks Port
             msg.contains("Opened Socks listener on ") -> {
                 handleSocksPortMsg(msg)
+            }
+            // Trans Port
+            msg.contains("Opened Transparent pf/netfilter listener on ") -> {
+                handleTransPortMsg(msg)
             }
             // NEWNYM
             msg.contains(TorControlCommands.SIGNAL_NEWNYM) -> {
@@ -308,6 +314,12 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
         socksPort = "127.0.0.1:$port"
     }
 
+    // NOTICE|BaseEventListener|Opened Transparent pf/netfilter listener on 127.0.0.1:9040
+    private fun handleTransPortMsg(msg: String) {
+        val port = msg.split(":")[1].trim()
+        transPort = "127.0.0.1:$port"
+    }
+
     private fun handleNewNymMsg(msg: String) {
         val msgToShow: String? =
             when {
@@ -368,7 +380,8 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
                         controlPort,
                         dnsPort,
                         httpTunnelPort,
-                        socksPort
+                        socksPort,
+                        transPort
                     )
                 )
             }
@@ -414,6 +427,7 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
             dnsPort = null
             httpTunnelPort = null
             socksPort = null
+            transPort = null
             updateAppEventBroadcasterWithPortInfo()
             torService.removeNotificationActions()
         }

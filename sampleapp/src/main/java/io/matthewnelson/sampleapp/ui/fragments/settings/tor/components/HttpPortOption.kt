@@ -67,12 +67,12 @@ class HttpPortOption(view: View, private val serviceTorSettings: ServiceTorSetti
     }
 
     private fun initSpinnerTorHttpPort(context: Context) {
-        val categorySocksPort = arrayOf(
+        val categoryHttpPort = arrayOf(
             SettingsTorFragment.AUTO,
             SettingsTorFragment.CUSTOM,
             SettingsTorFragment.DISABLED
         )
-        adapterHttpPort = ArrayAdapter(context, R.layout.spinner_list_item, categorySocksPort)
+        adapterHttpPort = ArrayAdapter(context, R.layout.spinner_list_item, categoryHttpPort)
         adapterHttpPort.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerHttpPort.adapter = adapterHttpPort
         setHttpPortSpinnerValue()

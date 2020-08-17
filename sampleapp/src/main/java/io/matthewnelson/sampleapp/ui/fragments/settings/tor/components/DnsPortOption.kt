@@ -67,12 +67,12 @@ class DnsPortOption(view: View, private val serviceTorSettings: ServiceTorSettin
     }
 
     private fun initSpinnerTorDnsPort(context: Context) {
-        val categorySocksPort = arrayOf(
+        val categoryDnsPort = arrayOf(
             SettingsTorFragment.AUTO,
             SettingsTorFragment.CUSTOM,
             SettingsTorFragment.DISABLED
         )
-        adapterDnsPort = ArrayAdapter(context, R.layout.spinner_list_item, categorySocksPort)
+        adapterDnsPort = ArrayAdapter(context, R.layout.spinner_list_item, categoryDnsPort)
         adapterDnsPort.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerDnsPort.adapter = adapterDnsPort
         setDnsPortSpinnerValue()

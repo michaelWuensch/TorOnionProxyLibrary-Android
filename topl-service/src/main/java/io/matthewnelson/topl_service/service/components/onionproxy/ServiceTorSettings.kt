@@ -414,7 +414,7 @@ class ServiceTorSettings internal constructor(
         get() = servicePrefs.getString(PrefKeyString.TRANS_PORT, defaultTorSettings.transPort) ?: defaultTorSettings.transPort
 
     @Throws(IllegalArgumentException::class)
-    fun socksTransPortSave(transPort: String) {
+    fun transPortSave(transPort: String) {
         when {
             transPort == defaultTorSettings.transPort -> {
                 servicePrefs.remove(PrefKeyString.TRANS_PORT)

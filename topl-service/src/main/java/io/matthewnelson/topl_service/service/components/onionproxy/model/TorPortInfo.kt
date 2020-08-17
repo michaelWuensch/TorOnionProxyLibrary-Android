@@ -11,5 +11,6 @@ class TorPortInfo(
     val controlPort: String?,
     val dnsPort: String?,
     val httpPort: String?,
-    val socksPort: String?
+    val socksPort: String?,
+    val transPort: String?
 )

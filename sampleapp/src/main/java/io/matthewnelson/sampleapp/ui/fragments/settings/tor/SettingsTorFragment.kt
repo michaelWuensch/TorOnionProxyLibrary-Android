@@ -83,6 +83,7 @@ import io.matthewnelson.sampleapp.ui.fragments.settings.CloseKeyBoardNavListener
 import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.DnsPortOption
 import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.HttpPortOption
 import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.SocksPortOption
+import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.TransPortOption
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
 
@@ -98,6 +99,8 @@ class SettingsTorFragment : Fragment() {
     private lateinit var socksPortOption: SocksPortOption
     private lateinit var httpPortOption: HttpPortOption
     private lateinit var dnsPortOption: DnsPortOption
+    private lateinit var transPortOption: TransPortOption
+
     private lateinit var buttonSave: Button
 
     override fun onCreateView(
@@ -114,6 +117,7 @@ class SettingsTorFragment : Fragment() {
         socksPortOption = SocksPortOption(view, serviceTorSettings)
         httpPortOption = HttpPortOption(view, serviceTorSettings)
         dnsPortOption = DnsPortOption(view, serviceTorSettings)
+//        transPortOption = TransPortOption(view, serviceTorSettings)
 
         findNavController().addOnDestinationChangedListener(CloseKeyBoardNavListener(view))
 
@@ -134,6 +138,7 @@ class SettingsTorFragment : Fragment() {
             socksPortOption.saveSocksPort() ?: return@setOnClickListener
             httpPortOption.saveHttpPort() ?: return@setOnClickListener
             dnsPortOption.saveDnsPort() ?: return@setOnClickListener
+//            transPortOption.saveTransPort() ?: return@setOnClickListener
 
             DashboardFragment.showMessage(
                 DashMessage("Settings Saved\nTor may need to be restarted", R.drawable.dash_message_color_green, 4_000L)
