@@ -1,4 +1,4 @@
-package io.matthewnelson.sampleapp.ui.fragments.settings.library
+package io.matthewnelson.sampleapp.ui.fragments.settings.library.components
 
 import android.content.Context
 import android.view.View

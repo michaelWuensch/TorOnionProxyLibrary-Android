@@ -1,4 +1,4 @@
-package io.matthewnelson.sampleapp.ui.fragments.settings.tor
+package io.matthewnelson.sampleapp.ui.fragments.settings.tor.components
 
 import android.content.Context
 import android.text.InputFilter
@@ -7,6 +7,7 @@ import android.widget.*
 import io.matthewnelson.sampleapp.R
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashMessage
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment
+import io.matthewnelson.sampleapp.ui.fragments.settings.tor.SettingsTorFragment
 import io.matthewnelson.topl_core_base.BaseConsts
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
 

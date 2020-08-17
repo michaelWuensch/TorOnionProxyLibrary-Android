@@ -1,4 +1,4 @@
-package io.matthewnelson.sampleapp.ui.fragments.settings.library
+package io.matthewnelson.sampleapp.ui.fragments.settings.library.components
 
 import android.content.Context
 import android.text.InputFilter
@@ -21,15 +21,27 @@ class ControllerOptions(view: View, prefs: Prefs) {
         const val RELEASE = "Release"
     }
 
-    private var initialRestartDelayTime: Long = LibraryPrefs.getControllerRestartDelaySetting(prefs)
+    private var initialRestartDelayTime: Long =
+        LibraryPrefs.getControllerRestartDelaySetting(
+            prefs
+        )
 
-    private var initialStopDelayTime: Long = LibraryPrefs.getControllerStopDelaySetting(prefs)
+    private var initialStopDelayTime: Long =
+        LibraryPrefs.getControllerStopDelaySetting(
+            prefs
+        )
 
-    private var initialDisableStopServiceOnTaskRemoved: Boolean = LibraryPrefs.getControllerDisableStopServiceOnTaskRemovedSetting(prefs)
+    private var initialDisableStopServiceOnTaskRemoved: Boolean =
+        LibraryPrefs.getControllerDisableStopServiceOnTaskRemovedSetting(
+            prefs
+        )
     var disableStopServiceOnTaskRemoved: Boolean = initialDisableStopServiceOnTaskRemoved
         private set
 
-    private var initialBuildConfigDebug: Boolean = LibraryPrefs.getControllerBuildConfigDebugSetting(prefs)
+    private var initialBuildConfigDebug: Boolean =
+        LibraryPrefs.getControllerBuildConfigDebugSetting(
+            prefs
+        )
     var buildConfigDebug: Boolean = initialBuildConfigDebug
         private set
 

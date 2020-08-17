@@ -1,4 +1,4 @@
-package io.matthewnelson.sampleapp.ui.fragments.settings.library
+package io.matthewnelson.sampleapp.ui.fragments.settings.library.components
 
 import android.content.Context
 import android.text.InputFilter
@@ -21,13 +21,22 @@ class BackgroundManagerOptions(view: View, prefs: Prefs) {
         const val NO_KILL_APP = "Don't Kill Application"
     }
 
-    private var initialPolicy: String = LibraryPrefs.getBackgroundManagerPolicySetting(prefs)
+    private var initialPolicy: String =
+        LibraryPrefs.getBackgroundManagerPolicySetting(
+            prefs
+        )
     var policy: String = initialPolicy
         private set
 
-    private var initialExecutionDelay: Int = LibraryPrefs.getBackgroundManagerExecuteDelaySetting(prefs)
+    private var initialExecutionDelay: Int =
+        LibraryPrefs.getBackgroundManagerExecuteDelaySetting(
+            prefs
+        )
 
-    private var initialKillApp: Boolean = LibraryPrefs.getBackgroundManagerKillAppSetting(prefs)
+    private var initialKillApp: Boolean =
+        LibraryPrefs.getBackgroundManagerKillAppSetting(
+            prefs
+        )
     var killApp: Boolean = initialKillApp
         private set
 

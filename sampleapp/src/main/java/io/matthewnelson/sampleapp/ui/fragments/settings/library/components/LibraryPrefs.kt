@@ -1,4 +1,4 @@
-package io.matthewnelson.sampleapp.ui.fragments.settings.library
+package io.matthewnelson.sampleapp.ui.fragments.settings.library.components
 
 import androidx.core.app.NotificationCompat
 import io.matthewnelson.encrypted_storage.Prefs

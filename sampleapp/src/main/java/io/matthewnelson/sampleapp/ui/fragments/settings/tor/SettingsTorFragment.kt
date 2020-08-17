@@ -75,6 +75,9 @@ import android.widget.*
 import io.matthewnelson.sampleapp.R
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashMessage
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment
+import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.DnsPortOption
+import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.HttpPortOption
+import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.SocksPortOption
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
 
@@ -103,9 +106,21 @@ class SettingsTorFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        socksPortOption = SocksPortOption(view, serviceTorSettings)
-        httpPortOption = HttpPortOption(view, serviceTorSettings)
-        dnsPortOption = DnsPortOption(view, serviceTorSettings)
+        socksPortOption =
+            SocksPortOption(
+                view,
+                serviceTorSettings
+            )
+        httpPortOption =
+            HttpPortOption(
+                view,
+                serviceTorSettings
+            )
+        dnsPortOption =
+            DnsPortOption(
+                view,
+                serviceTorSettings
+            )
         findViews(view)
         setButtonClickListener()
     }

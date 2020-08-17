@@ -74,7 +74,7 @@ import io.matthewnelson.sampleapp.topl_android.MyTorSettings
 import io.matthewnelson.sampleapp.ui.MainActivity
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashMessage
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment
-import io.matthewnelson.sampleapp.ui.fragments.settings.library.LibraryPrefs
+import io.matthewnelson.sampleapp.ui.fragments.settings.library.components.LibraryPrefs
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager

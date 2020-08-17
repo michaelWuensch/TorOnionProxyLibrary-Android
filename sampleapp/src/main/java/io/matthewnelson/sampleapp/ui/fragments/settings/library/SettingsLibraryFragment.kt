@@ -78,6 +78,9 @@ import io.matthewnelson.sampleapp.App
 import io.matthewnelson.sampleapp.R
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashMessage
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment
+import io.matthewnelson.sampleapp.ui.fragments.settings.library.components.BackgroundManagerOptions
+import io.matthewnelson.sampleapp.ui.fragments.settings.library.components.ControllerOptions
+import io.matthewnelson.sampleapp.ui.fragments.settings.library.components.NotificationOptions
 import io.matthewnelson.topl_service.util.ServiceConsts.BackgroundPolicy
 
 class SettingsLibraryFragment : Fragment() {
@@ -98,9 +101,21 @@ class SettingsLibraryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         prefs = Prefs.createUnencrypted(App.PREFS_NAME, view.context)
-        notificationOptions = NotificationOptions(view, prefs)
-        backgroundManagerOptions = BackgroundManagerOptions(view, prefs)
-        controllerOptions = ControllerOptions(view, prefs)
+        notificationOptions =
+            NotificationOptions(
+                view,
+                prefs
+            )
+        backgroundManagerOptions =
+            BackgroundManagerOptions(
+                view,
+                prefs
+            )
+        controllerOptions =
+            ControllerOptions(
+                view,
+                prefs
+            )
 
         view.findViewById<Button>(R.id.settings_library_button_save).setOnClickListener {
             saveSettings(view.context.applicationContext as Application)
