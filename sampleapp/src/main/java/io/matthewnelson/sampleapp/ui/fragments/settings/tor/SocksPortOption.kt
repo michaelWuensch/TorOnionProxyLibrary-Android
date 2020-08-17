@@ -18,7 +18,6 @@ class SocksPortOption(view: View, private val serviceTorSettings: ServiceTorSett
     private lateinit var listenerSocksPort: SocksPortSelectionListener
     private lateinit var textViewSocksPortCustom: TextView
     private lateinit var editTextSocksPortCustom: EditText
-    private lateinit var buttonSave: Button
 
     private var initialSocksPort = serviceTorSettings.socksPort
 
@@ -60,7 +59,6 @@ class SocksPortOption(view: View, private val serviceTorSettings: ServiceTorSett
         spinnerSocksPort = view.findViewById(R.id.settings_tor_spinner_socks_port)
         textViewSocksPortCustom = view.findViewById(R.id.settings_tor_text_view_socks_port_custom)
         editTextSocksPortCustom = view.findViewById(R.id.settings_tor_edit_text_socks_port_custom)
-        buttonSave = view.findViewById(R.id.settings_tor_button_save)
     }
 
     private fun setViewParameters() {
@@ -145,5 +143,4 @@ class SocksPortOption(view: View, private val serviceTorSettings: ServiceTorSett
             }
         }
     }
-
 }
