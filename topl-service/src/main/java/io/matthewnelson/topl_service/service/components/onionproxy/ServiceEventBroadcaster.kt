@@ -72,6 +72,7 @@ import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.TorService
+import io.matthewnelson.topl_service.service.components.onionproxy.model.TorPortInfo
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import io.matthewnelson.topl_service.util.ServiceUtilities
@@ -208,6 +209,8 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
     @Volatile
     private var controlPort: String? = null
     @Volatile
+    private var dnsPort: String? = null
+    @Volatile
     private var httpTunnelPort: String? = null
     @Volatile
     private var socksPort: String? = null
@@ -226,6 +229,10 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
             // Control Port
             msg.contains("Successfully connected to Control Port:") -> {
                 handleControlPortMsg(msg)
+            }
+            // Dns Port
+            msg.contains("Opened DNS listener on ") -> {
+                handleDnsPortMsg(msg)
             }
             // Http Tunnel Port
             msg.contains("Opened HTTP tunnel listener on ") -> {
@@ -283,13 +290,19 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
         controlPort = "127.0.0.1:$port"
     }
 
-    // NOTICE|BaseEventListener|Opened HTTP tunnel listener on 127.0.0.1:37397
+    // NOTICE|OnionProxyManager|Opened DNS listener on 127.0.0.1:5400
+    private fun handleDnsPortMsg(msg: String) {
+        val port = msg.split(":")[1].trim()
+        dnsPort = "127.0.0.1:$port"
+    }
+
+    // NOTICE|BaseEventListener|Opened HTTP tunnel listener on 127.0.0.1:8118
     private fun handleHttpTunnelPortMsg(msg: String) {
         val port = msg.split(":")[1].trim()
         httpTunnelPort = "127.0.0.1:$port"
     }
 
-    // NOTICE|BaseEventListener|Opened Socks listener on 127.0.0.1:9051
+    // NOTICE|BaseEventListener|Opened Socks listener on 127.0.0.1:9050
     private fun handleSocksPortMsg(msg: String) {
         val port = msg.split(":")[1].trim()
         socksPort = "127.0.0.1:$port"
@@ -350,9 +363,14 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
     private fun updateAppEventBroadcasterWithPortInfo() {
         TorServiceController.appEventBroadcaster?.let {
             scopeMain.launch {
-                it.broadcastControlPortAddress(controlPort)
-                it.broadcastHttpPortAddress(httpTunnelPort)
-                it.broadcastSocksPortAddress(socksPort)
+                it.broadcastPortInformation(
+                    TorPortInfo(
+                        controlPort,
+                        dnsPort,
+                        httpTunnelPort,
+                        socksPort
+                    )
+                )
             }
         }
     }
@@ -393,6 +411,7 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
         if (torState == TorState.ON && state != torState) {
             bootstrapProgress = ""
             controlPort = null
+            dnsPort = null
             httpTunnelPort = null
             socksPort = null
             updateAppEventBroadcasterWithPortInfo()
