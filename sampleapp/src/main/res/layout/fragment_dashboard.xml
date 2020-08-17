@@ -186,19 +186,6 @@
         app:layout_constraintTop_toBottomOf="@+id/dash_text_view_port_http_header"
         tools:text="127.0.0.1:40195" />
 
-    <TextView
-        android:id="@+id/dash_text_view_message"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:gravity="center_horizontal"
-        android:padding="8dp"
-        android:textColor="@color/primaryTextColor"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@+id/dash_text_view_port_http"
-        app:layout_constraintStart_toStartOf="@+id/dash_text_view_port_control"
-        app:layout_constraintTop_toBottomOf="@+id/dash_text_view_port_http" />
-
     <Button
         android:id="@+id/dash_button_app_restart"
         android:layout_width="0dp"
@@ -210,6 +197,19 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@+id/dash_text_view_port_http"
         app:layout_constraintStart_toStartOf="@+id/dash_text_view_port_control"
-        app:layout_constraintTop_toBottomOf="@+id/dash_text_view_message" />
+        app:layout_constraintTop_toBottomOf="@+id/dash_text_view_port_http" />
+
+    <TextView
+        android:id="@+id/dash_text_view_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center_horizontal"
+        android:padding="8dp"
+        android:textColor="@color/primaryTextColor"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/dash_text_view_port_http"
+        app:layout_constraintStart_toStartOf="@+id/dash_text_view_port_control"
+        app:layout_constraintTop_toBottomOf="@+id/dash_button_app_restart" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
