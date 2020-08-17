@@ -125,7 +125,7 @@ class SettingsTorFragment : Fragment() {
             dnsPortOption.saveDnsPort() ?: return@setOnClickListener
 
             DashboardFragment.showMessage(
-                DashMessage("Settings Saved", R.drawable.dash_message_color_green, 3_000L)
+                DashMessage("Settings Saved\nTor may need to be restarted", R.drawable.dash_message_color_green, 4_000L)
             )
         }
     }
