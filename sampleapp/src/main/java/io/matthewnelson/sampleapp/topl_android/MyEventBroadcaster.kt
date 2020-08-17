@@ -69,6 +69,7 @@ package io.matthewnelson.sampleapp.topl_android
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.matthewnelson.sampleapp.ui.fragments.home.LogMessageAdapter
+import io.matthewnelson.topl_service.service.components.onionproxy.model.TorPortInfo
 import io.matthewnelson.topl_service.service.components.onionproxy.model.TorServiceEventBroadcaster
 import io.matthewnelson.topl_service.util.ServiceUtilities
 
@@ -80,36 +81,14 @@ import io.matthewnelson.topl_service.util.ServiceUtilities
 class MyEventBroadcaster: TorServiceEventBroadcaster() {
 
 
-    //////////////////////////
-    /// ControlPortAddress ///
-    //////////////////////////
-    private val _liveControlPortAddress = MutableLiveData<String?>(null)
-    val liveControlPortAddress: LiveData<String?> = _liveControlPortAddress
+    ///////////////////
+    /// TorPortInfo ///
+    ///////////////////
+    private val _liveTorPortInfo = MutableLiveData<TorPortInfo>(null)
+    val liveTorPortInfo: LiveData<TorPortInfo> = _liveTorPortInfo
 
-    override fun broadcastControlPortAddress(controlPortAddress: String?) {
-        _liveControlPortAddress.value = controlPortAddress
-    }
-
-
-    ////////////////////////
-    /// SocksPortAddress ///
-    ////////////////////////
-    private val _liveSocksPortAddress = MutableLiveData<String?>(null)
-    val liveSocksPortAddress: LiveData<String?> = _liveSocksPortAddress
-
-    override fun broadcastSocksPortAddress(socksPortAddress: String?) {
-        _liveSocksPortAddress.value = socksPortAddress
-    }
-
-
-    ///////////////////////
-    /// HttpPortAddress ///
-    ///////////////////////
-    private val _liveHttpPortAddress = MutableLiveData<String?>(null)
-    val liveHttpPortAddress: LiveData<String?> = _liveHttpPortAddress
-
-    override fun broadcastHttpPortAddress(httpPortAddress: String?) {
-        _liveHttpPortAddress.value = httpPortAddress
+    override fun broadcastPortInformation(torPortInfo: TorPortInfo) {
+        _liveTorPortInfo.value = torPortInfo
     }
 
 

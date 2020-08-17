@@ -120,18 +120,10 @@ class DashboardFragment : Fragment() {
             })
         }
         TorServiceController.appEventBroadcaster?.let {
-            (it as MyEventBroadcaster).liveControlPortAddress.observe(owner, Observer { data ->
-                textViewControlPort.text = data ?: "None"
-            })
-        }
-        TorServiceController.appEventBroadcaster?.let {
-            (it as MyEventBroadcaster).liveSocksPortAddress.observe(owner, Observer { data ->
-                textViewSocksPort.text = data ?: "None"
-            })
-        }
-        TorServiceController.appEventBroadcaster?.let {
-            (it as MyEventBroadcaster).liveHttpPortAddress.observe(owner, Observer { data ->
-                textViewHttpPort.text = data ?: "None"
+            (it as MyEventBroadcaster).liveTorPortInfo.observe(owner, Observer { data ->
+                textViewControlPort.text = data?.controlPort ?: "-----"
+                textViewSocksPort.text = data?.socksPort ?: "-----"
+                textViewHttpPort.text = data?.httpPort ?: "-----"
             })
         }
     }
