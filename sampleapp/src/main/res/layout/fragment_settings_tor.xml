@@ -226,11 +226,13 @@
 
 
             <!-- Trans Port -->
+            <!-- TEMPORARILY DISABLED -->
 
             <TextView
                 android:id="@+id/settings_tor_text_view_trans_port"
                 style="@style/SpinnerTextView"
                 android:text="@string/settings_tor_text_view_trans_port"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="@+id/settings_tor_spinner_trans_port"
                 app:layout_constraintEnd_toEndOf="@+id/settings_tor_guide_left"
                 app:layout_constraintStart_toStartOf="parent"
@@ -240,6 +242,7 @@
                 android:id="@+id/settings_tor_spinner_trans_port"
                 style="@style/SpinnerStyle"
                 android:background="@color/primaryLightColor"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/settings_tor_guide_left"
                 app:layout_constraintTop_toBottomOf="@+id/settings_tor_edit_text_dns_port_custom"
