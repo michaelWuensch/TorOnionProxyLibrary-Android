@@ -100,6 +100,9 @@ class SettingsTorFragment : Fragment() {
 //    private lateinit var transPortOption: TransPortOption
 
     private lateinit var buttonSocksFlags: Button
+    private lateinit var buttonHttpFlags: Button
+    private lateinit var buttonDnsFlags: Button
+//    private lateinit var buttonTransFlags: Button
     private var saveButtonHeight = 0
 
     private lateinit var buttonSave: Button
@@ -132,6 +135,10 @@ class SettingsTorFragment : Fragment() {
 
     private fun findViews(view: View) {
         buttonSocksFlags = view.findViewById(R.id.settings_tor_button_socks_isolation_flags)
+        buttonHttpFlags = view.findViewById(R.id.settings_tor_button_http_isolation_flags)
+        buttonDnsFlags = view.findViewById(R.id.settings_tor_button_dns_isolation_flags)
+//        buttonTransFlags = view.findViewById(R.id.settings_tor_button_trans_isolation_flags)
+
         buttonSave = view.findViewById(R.id.settings_tor_button_save)
 
         val viewTreeObserver = view.viewTreeObserver
@@ -158,17 +165,30 @@ class SettingsTorFragment : Fragment() {
             )
         }
         buttonSocksFlags.setOnClickListener {
-            childFragmentManager.beginTransaction().apply {
-                add(
-                    R.id.settings_tor_fragment_container,
-                    IsolationFlagsFragment(
-                        saveButtonHeight,
-                        IsolationFlagsFragment.SOCKS_FLAGS,
-                        serviceTorSettings
-                    )
+            openIsolationFlagsFragment(IsolationFlagsFragment.SOCKS_FLAGS)
+        }
+        buttonHttpFlags.setOnClickListener {
+            openIsolationFlagsFragment(IsolationFlagsFragment.HTTP_FLAGS)
+        }
+        buttonDnsFlags.setOnClickListener {
+            openIsolationFlagsFragment(IsolationFlagsFragment.DNS_FLAGS)
+        }
+//        buttonTransFlags.setOnClickListener {
+//            openIsolationFlagsFragment(IsolationFlagsFragment.TRANS_FLAGS)
+//        }
+    }
+
+    private fun openIsolationFlagsFragment(portType: String) {
+        childFragmentManager.beginTransaction().apply {
+            add(
+                R.id.settings_tor_fragment_container,
+                IsolationFlagsFragment(
+                    saveButtonHeight,
+                    portType,
+                    serviceTorSettings
                 )
-                commit()
-            }
+            )
+            commit()
         }
     }
 }

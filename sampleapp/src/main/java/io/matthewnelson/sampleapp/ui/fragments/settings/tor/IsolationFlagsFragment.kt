@@ -88,6 +88,9 @@ class IsolationFlagsFragment(
 
     companion object {
         const val SOCKS_FLAGS = "SOCKS_FLAGS"
+        const val HTTP_FLAGS = "HTTP_FLAGS"
+        const val DNS_FLAGS = "DNS_FLAGS"
+        const val TRANS_FLAGS = "TRANS_FLAGS"
     }
 
     private val backPressHandler = BackPressHandler(true)
