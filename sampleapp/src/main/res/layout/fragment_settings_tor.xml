@@ -70,11 +70,13 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/settings_tor_layout_constraint_primary"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="io.matthewnelson.sampleapp.ui.fragments.settings.tor.SettingsTorFragment">
 
     <ScrollView
+        android:id="@+id/settings_tor_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
@@ -88,6 +90,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/settings_tor_layout_constraint_scroll"
             android:layout_width="match_parent"
             android:layout_height="0dp">
 
@@ -118,6 +121,14 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:listitem="@layout/spinner_list_item" />
 
+            <Space
+                android:id="@+id/settings_tor_space_socks_port_custom_top"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/settings_tor_spinner_socks_port" />
+
             <TextView
                 android:id="@+id/settings_tor_text_view_socks_port_custom"
                 style="@style/SpinnerTextView"
@@ -138,7 +149,26 @@
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/settings_tor_guide_left"
-                app:layout_constraintTop_toBottomOf="@+id/settings_tor_spinner_socks_port" />
+                app:layout_constraintTop_toBottomOf="@+id/settings_tor_space_socks_port_custom_top" />
+
+            <Space
+                android:id="@+id/settings_tor_space_socks_port_custom_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/settings_tor_edit_text_socks_port_custom" />
+
+            <Button
+                android:id="@+id/settings_tor_button_socks_isolation_flags"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_color_grey"
+                android:text="@string/settings_tor_button_socks_isolation_flags"
+                android:textAllCaps="false"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/settings_tor_guide_left"
+                app:layout_constraintTop_toBottomOf="@+id/settings_tor_space_socks_port_custom_bottom" />
 
             <!-- HTTP Port -->
 
@@ -157,8 +187,16 @@
                 android:background="@color/primaryLightColor"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/settings_tor_guide_left"
-                app:layout_constraintTop_toBottomOf="@+id/settings_tor_edit_text_socks_port_custom"
+                app:layout_constraintTop_toBottomOf="@+id/settings_tor_button_socks_isolation_flags"
                 tools:listitem="@layout/spinner_list_item" />
+
+            <Space
+                android:id="@+id/settings_tor_space_http_port_custom_top"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/settings_tor_spinner_http_port" />
 
             <TextView
                 android:id="@+id/settings_tor_text_view_http_port_custom"
@@ -180,7 +218,26 @@
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/settings_tor_guide_left"
-                app:layout_constraintTop_toBottomOf="@+id/settings_tor_spinner_http_port" />
+                app:layout_constraintTop_toBottomOf="@+id/settings_tor_space_http_port_custom_top" />
+
+            <Space
+                android:id="@+id/settings_tor_space_http_port_custom_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/settings_tor_edit_text_http_port_custom" />
+
+            <Button
+                android:id="@+id/settings_tor_button_http_isolation_flags"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_color_grey"
+                android:text="@string/settings_tor_button_http_isolation_flags"
+                android:textAllCaps="false"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/settings_tor_guide_left"
+                app:layout_constraintTop_toBottomOf="@+id/settings_tor_space_http_port_custom_bottom" />
 
             <!-- DNS Port -->
 
@@ -199,8 +256,16 @@
                 android:background="@color/primaryLightColor"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/settings_tor_guide_left"
-                app:layout_constraintTop_toBottomOf="@+id/settings_tor_edit_text_http_port_custom"
+                app:layout_constraintTop_toBottomOf="@+id/settings_tor_button_http_isolation_flags"
                 tools:listitem="@layout/spinner_list_item" />
+
+            <Space
+                android:id="@+id/settings_tor_space_dns_port_custom_top"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/settings_tor_spinner_dns_port" />
 
             <TextView
                 android:id="@+id/settings_tor_text_view_dns_port_custom"
@@ -222,8 +287,26 @@
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/settings_tor_guide_left"
-                app:layout_constraintTop_toBottomOf="@+id/settings_tor_spinner_dns_port" />
+                app:layout_constraintTop_toBottomOf="@+id/settings_tor_space_dns_port_custom_top" />
 
+            <Space
+                android:id="@+id/settings_tor_space_dns_port_custom_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/settings_tor_edit_text_dns_port_custom" />
+
+            <Button
+                android:id="@+id/settings_tor_button_dns_isolation_flags"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_color_grey"
+                android:text="@string/settings_tor_button_dns_isolation_flags"
+                android:textAllCaps="false"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/settings_tor_guide_left"
+                app:layout_constraintTop_toBottomOf="@+id/settings_tor_space_dns_port_custom_bottom" />
 
             <!-- Trans Port -->
             <!-- TEMPORARILY DISABLED -->
@@ -245,8 +328,17 @@
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/settings_tor_guide_left"
-                app:layout_constraintTop_toBottomOf="@+id/settings_tor_edit_text_dns_port_custom"
+                app:layout_constraintTop_toBottomOf="@+id/settings_tor_button_dns_isolation_flags"
                 tools:listitem="@layout/spinner_list_item" />
+
+            <Space
+                android:id="@+id/settings_tor_space_trans_port_custom_top"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/settings_tor_spinner_trans_port" />
 
             <TextView
                 android:id="@+id/settings_tor_text_view_trans_port_custom"
@@ -268,7 +360,28 @@
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/settings_tor_guide_left"
-                app:layout_constraintTop_toBottomOf="@+id/settings_tor_spinner_trans_port" />
+                app:layout_constraintTop_toBottomOf="@+id/settings_tor_space_trans_port_custom_top" />
+
+            <Space
+                android:id="@+id/settings_tor_space_trans_port_custom_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/settings_tor_edit_text_trans_port_custom" />
+
+            <Button
+                android:id="@+id/settings_tor_button_trans_isolation_flags"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_color_grey"
+                android:text="@string/settings_tor_button_trans_isolation_flags"
+                android:textAllCaps="false"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/settings_tor_guide_left"
+                app:layout_constraintTop_toBottomOf="@+id/settings_tor_space_trans_port_custom_bottom" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -287,5 +400,14 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/settings_tor_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
