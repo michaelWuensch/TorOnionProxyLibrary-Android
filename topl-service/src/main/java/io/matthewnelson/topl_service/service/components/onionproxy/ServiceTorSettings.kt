@@ -116,7 +116,7 @@ class ServiceTorSettings internal constructor(
             dnsPort == defaultTorSettings.dnsPort -> {
                 servicePrefs.remove(PrefKeyString.DNS_PORT)
             }
-            checkPortRange(dnsPort) -> {
+            checkPortSelection(dnsPort) -> {
                 servicePrefs.putString(PrefKeyString.DNS_PORT, dnsPort)
             }
             else -> {
@@ -191,7 +191,7 @@ class ServiceTorSettings internal constructor(
             httpPort == defaultTorSettings.httpTunnelPort -> {
                 servicePrefs.remove(PrefKeyString.HTTP_TUNNEL_PORT)
             }
-            checkPortRange(httpPort) -> {
+            checkPortSelection(httpPort) -> {
                 servicePrefs.putString(PrefKeyString.HTTP_TUNNEL_PORT, httpPort)
             }
             else -> {
@@ -264,7 +264,7 @@ class ServiceTorSettings internal constructor(
             relayPort == defaultTorSettings.relayPort -> {
                 servicePrefs.remove(PrefKeyString.RELAY_PORT)
             }
-            checkPortRange(relayPort) || relayPort.isEmpty() -> {
+            checkPortSelection(relayPort) || relayPort.isEmpty() -> {
                 servicePrefs.putString(PrefKeyString.RELAY_PORT, relayPort)
             }
             else -> {
@@ -285,7 +285,7 @@ class ServiceTorSettings internal constructor(
             socksPort == defaultTorSettings.socksPort -> {
                 servicePrefs.remove(PrefKeyString.SOCKS_PORT)
             }
-            checkPortRange(socksPort) -> {
+            checkPortSelection(socksPort) -> {
                 servicePrefs.putString(PrefKeyString.SOCKS_PORT, socksPort)
             }
             else -> {
@@ -468,7 +468,7 @@ class ServiceTorSettings internal constructor(
             transPort == defaultTorSettings.transPort -> {
                 servicePrefs.remove(PrefKeyString.TRANS_PORT)
             }
-            checkPortRange(transPort) -> {
+            checkPortSelection(transPort) -> {
                 servicePrefs.putString(PrefKeyString.TRANS_PORT, transPort)
             }
             else -> {
@@ -503,7 +503,9 @@ class ServiceTorSettings internal constructor(
             servicePrefs.putBoolean(PrefKeyBoolean.USE_SOCKS5, boolean)
     }
 
-    private fun checkPortRange(port: String): Boolean {
+    private fun checkPortSelection(port: String): Boolean {
+        if (port == PortOption.AUTO) return true
+
         return try {
             val portInt = port.toInt()
             portInt == 0 || portInt in 1024..65535
