@@ -8,6 +8,14 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 
 class CloseKeyBoardNavListener(private val view: View): NavController.OnDestinationChangedListener {
+
+    companion object {
+        fun closeKeyboard(view: View) {
+            val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
+            imm?.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+    }
+
     private var startLock: Any? = null
 
     override fun onDestinationChanged(
@@ -20,12 +28,7 @@ class CloseKeyBoardNavListener(private val view: View): NavController.OnDestinat
             return
         }
 
-        closeKeyboard()
+        closeKeyboard(view)
         controller.removeOnDestinationChangedListener(this)
-    }
-
-    private fun closeKeyboard() {
-        val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
-        imm?.hideSoftInputFromWindow(view.windowToken, 0)
     }
 }
