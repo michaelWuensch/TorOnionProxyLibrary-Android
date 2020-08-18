@@ -127,6 +127,20 @@ class ServiceTorSettings internal constructor(
         }
     }
 
+    override val dnsPortIsolationFlags: List<@IsolationFlag String>?
+        get() = servicePrefs.getList(
+            PrefKeyList.DNS_PORT_ISOLATION_FLAGS,
+            defaultTorSettings.dnsPortIsolationFlags ?: arrayListOf()
+        )
+
+    fun dnsPortIsolationFlagsSave(isolationFlags: List<@IsolationFlag String>) {
+        if (isolationFlags == defaultTorSettings.dnsPortIsolationFlags) {
+            servicePrefs.remove(PrefKeyList.DNS_PORT_ISOLATION_FLAGS)
+        } else {
+            servicePrefs.putList(PrefKeyList.DNS_PORT_ISOLATION_FLAGS, isolationFlags)
+        }
+    }
+
     override val customTorrc: String?
         get() = servicePrefs.getString(PrefKeyString.CUSTOM_TORRC, defaultTorSettings.customTorrc)
 
@@ -188,8 +202,22 @@ class ServiceTorSettings internal constructor(
         }
     }
 
-    override val listOfSupportedBridges: List<String>
-        get() = servicePrefs.getList(PrefKeyList.LIST_OF_SUPPORTED_BRIDGES, defaultTorSettings.listOfSupportedBridges)
+    override val httpTunnelPortIsolationFlags: List<@IsolationFlag String>?
+        get() = servicePrefs.getList(
+            PrefKeyList.HTTP_TUNNEL_PORT_ISOLATION_FLAGS,
+            defaultTorSettings.httpTunnelPortIsolationFlags ?: arrayListOf()
+        )
+
+    fun httpPortIsolationFlagsSave(isolationFlags: List<@IsolationFlag String>) {
+        if (isolationFlags == defaultTorSettings.httpTunnelPortIsolationFlags) {
+            servicePrefs.remove(PrefKeyList.HTTP_TUNNEL_PORT_ISOLATION_FLAGS)
+        } else {
+            servicePrefs.putList(PrefKeyList.HTTP_TUNNEL_PORT_ISOLATION_FLAGS, isolationFlags)
+        }
+    }
+
+    override val listOfSupportedBridges: List<@SupportedBridgeType String>
+        get() = defaultTorSettings.listOfSupportedBridges
 
     override val proxyHost: String?
         get() = servicePrefs.getString(PrefKeyString.PROXY_HOST, defaultTorSettings.proxyHost)
@@ -206,8 +234,8 @@ class ServiceTorSettings internal constructor(
     override val proxySocks5ServerPort: Int?
         get() = servicePrefs.getInt(PrefKeyInt.PROXY_SOCKS5_SERVER_PORT, defaultTorSettings.proxySocks5ServerPort)
 
-    override val proxyType: String?
-        get() = servicePrefs.getString(PrefKeyString.PROXY_TYPE, defaultTorSettings.proxyType)
+    override val proxyType: @ProxyType String
+        get() = servicePrefs.getString(PrefKeyString.PROXY_TYPE, defaultTorSettings.proxyType) ?: defaultTorSettings.proxyType
 
     override val proxyUser: String?
         get() = servicePrefs.getString(PrefKeyString.PROXY_USER, defaultTorSettings.proxyUser)
@@ -226,9 +254,26 @@ class ServiceTorSettings internal constructor(
     override val relayNickname: String?
         get() = servicePrefs.getString(PrefKeyString.RELAY_NICKNAME, defaultTorSettings.relayNickname)
 
-    override val relayPort: Int?
-        get() = servicePrefs.getInt(PrefKeyInt.RELAY_PORT, defaultTorSettings.relayPort)
+    override val relayPort: String
+        get() = servicePrefs.getString(PrefKeyString.RELAY_PORT, defaultTorSettings.relayPort)
             ?: defaultTorSettings.relayPort
+
+    @Throws(IllegalArgumentException::class)
+    fun relayPortSave(relayPort: String) {
+        when {
+            relayPort == defaultTorSettings.relayPort -> {
+                servicePrefs.remove(PrefKeyString.RELAY_PORT)
+            }
+            checkPortRange(relayPort) || relayPort.isEmpty() -> {
+                servicePrefs.putString(PrefKeyString.RELAY_PORT, relayPort)
+            }
+            else -> {
+                throw IllegalArgumentException(
+                    "Relay Port must be empty, 0 (disabled), auto, or between 1024 and 65535"
+                )
+            }
+        }
+    }
 
     override val socksPort: String
         get() = servicePrefs.getString(PrefKeyString.SOCKS_PORT, defaultTorSettings.socksPort)
@@ -248,6 +293,20 @@ class ServiceTorSettings internal constructor(
                     "Socks Port must be 0 (disabled), auto, or between 1024 and 65535"
                 )
             }
+        }
+    }
+
+    override val socksPortIsolationFlags: List<@IsolationFlag String>?
+        get() = servicePrefs.getList(
+            PrefKeyList.SOCKS_PORT_ISOLATION_FLAGS,
+            defaultTorSettings.socksPortIsolationFlags ?: arrayListOf()
+        )
+
+    fun socksPortIsolationFlagsSave(isolationFlags: List<@IsolationFlag String>) {
+        if (isolationFlags == defaultTorSettings.socksPortIsolationFlags) {
+            servicePrefs.remove(PrefKeyList.SOCKS_PORT_ISOLATION_FLAGS)
+        } else {
+            servicePrefs.putList(PrefKeyList.SOCKS_PORT_ISOLATION_FLAGS, isolationFlags)
         }
     }
 
@@ -308,16 +367,6 @@ class ServiceTorSettings internal constructor(
             servicePrefs.remove(PrefKeyBoolean.HAS_DORMANT_CANCELED_BY_STARTUP)
         else
             servicePrefs.putBoolean(PrefKeyBoolean.HAS_DORMANT_CANCELED_BY_STARTUP, boolean)
-    }
-
-    override val hasIsolationAddressFlagForTunnel: Boolean
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL, defaultTorSettings.hasIsolationAddressFlagForTunnel)
-
-    fun hasIsolationAddressFlagForTunnelSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.hasIsolationAddressFlagForTunnel)
-            servicePrefs.remove(PrefKeyBoolean.HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL)
-        else
-            servicePrefs.putBoolean(PrefKeyBoolean.HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL, boolean)
     }
 
     override val hasOpenProxyOnAllInterfaces: Boolean
@@ -427,6 +476,20 @@ class ServiceTorSettings internal constructor(
                     "Socks Trans Port must be 0 (disabled), auto, or between 1024 and 65535"
                 )
             }
+        }
+    }
+
+    override val transPortIsolationFlags: List<@IsolationFlag String>?
+        get() = servicePrefs.getList(
+            PrefKeyList.TRANS_PORT_ISOLATION_FLAGS,
+            defaultTorSettings.transPortIsolationFlags ?: arrayListOf()
+        )
+
+    fun transPortIsolationFlagsSave(isolationFlags: List<@IsolationFlag String>) {
+        if (isolationFlags == defaultTorSettings.transPortIsolationFlags) {
+            servicePrefs.remove(PrefKeyList.TRANS_PORT_ISOLATION_FLAGS)
+        } else {
+            servicePrefs.putList(PrefKeyList.TRANS_PORT_ISOLATION_FLAGS, isolationFlags)
         }
     }
 

@@ -168,14 +168,14 @@ internal class ServiceTorInstaller(private val torService: BaseService): TorInst
         * */
         // TODO: Completely refactor how bridges work.
         val userDefinedBridgeList: String =
-            torServicePrefs.getList(PrefKeyList.LIST_OF_SUPPORTED_BRIDGES, arrayListOf()).joinToString()
+            torServicePrefs.getList(PrefKeyList.USER_DEFINED_BRIDGES, arrayListOf()).joinToString()
         var bridgeType = (if (userDefinedBridgeList.length > 9) 1 else 0).toByte()
         // Terrible hack. Must keep in sync with topl::addBridgesFromResources.
         if (bridgeType.toInt() == 0) {
             when (userDefinedBridgeList) {
-                SupportedBridges.OBFS4 -> bridgeType = 2
-                SupportedBridges.MEEK -> bridgeType = 3
-                SupportedBridges.SNOWFLAKE -> bridgeType = 4
+                SupportedBridgeType.OBFS4 -> bridgeType = 2
+                SupportedBridgeType.MEEK -> bridgeType = 3
+                SupportedBridgeType.SNOWFLAKE -> bridgeType = 4
             }
         }
 

@@ -91,8 +91,8 @@ class TorServicePrefsUnitTest: ServiceConsts() {
 
     @Test
     fun testInts_null() {
-        prefs.putInt(PrefKeyInt.RELAY_PORT, null)
-        val result = prefs.getInt(PrefKeyInt.RELAY_PORT, 9999)
+        prefs.putInt(PrefKeyInt.PROXY_SOCKS5_SERVER_PORT, null)
+        val result = prefs.getInt(PrefKeyInt.PROXY_SOCKS5_SERVER_PORT, 9999)
         assertEquals(null, result)
     }
 
@@ -106,17 +106,17 @@ class TorServicePrefsUnitTest: ServiceConsts() {
     @Test
     fun testLists_empty() {
         val invalid = arrayListOf("INVALID")
-        prefs.putList(PrefKeyList.LIST_OF_SUPPORTED_BRIDGES, arrayListOf())
-        val result = prefs.getList(PrefKeyList.LIST_OF_SUPPORTED_BRIDGES, invalid)
+        prefs.putList(PrefKeyList.DNS_PORT_ISOLATION_FLAGS, arrayListOf())
+        val result = prefs.getList(PrefKeyList.DNS_PORT_ISOLATION_FLAGS, invalid)
         assertEquals(invalid, result)
     }
 
     @Test
     fun testLists() {
         val myList = arrayListOf("ONE", "TWO", "THREE")
-        val invalid = arrayListOf("INVALID")
-        prefs.putList(PrefKeyList.LIST_OF_SUPPORTED_BRIDGES, myList)
-        val result = prefs.getList(PrefKeyList.LIST_OF_SUPPORTED_BRIDGES, invalid)
+        val invalid = arrayListOf<String>()
+        prefs.putList(PrefKeyList.DNS_PORT_ISOLATION_FLAGS, myList)
+        val result = prefs.getList(PrefKeyList.DNS_PORT_ISOLATION_FLAGS, invalid)
         assertEquals(myList, result)
     }
 

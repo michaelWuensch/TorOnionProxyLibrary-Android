@@ -176,7 +176,6 @@ abstract class ServiceConsts: BaseConsts() {
         PrefKeyBoolean.HAS_COOKIE_AUTHENTICATION,
         PrefKeyBoolean.HAS_DEBUG_LOGS,
         PrefKeyBoolean.HAS_DORMANT_CANCELED_BY_STARTUP,
-        PrefKeyBoolean.HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL,
         PrefKeyBoolean.HAS_OPEN_PROXY_ON_ALL_INTERFACES,
         PrefKeyBoolean.HAS_REACHABLE_ADDRESS,
         PrefKeyBoolean.HAS_REDUCED_CONNECTION_PADDING,
@@ -197,7 +196,6 @@ abstract class ServiceConsts: BaseConsts() {
             const val HAS_COOKIE_AUTHENTICATION = "HAS_COOKIE_AUTHENTICATION"
             const val HAS_DEBUG_LOGS = "HAS_DEBUG_LOGS"
             const val HAS_DORMANT_CANCELED_BY_STARTUP = "HAS_DORMANT_CANCELED_BY_STARTUP"
-            const val HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL = "HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL"
             const val HAS_OPEN_PROXY_ON_ALL_INTERFACES = "HAS_OPEN_PROXY_ON_ALL_INTERFACES"
             const val HAS_REACHABLE_ADDRESS = "HAS_REACHABLE_ADDRESS"
             const val HAS_REDUCED_CONNECTION_PADDING = "HAS_REDUCED_CONNECTION_PADDING"
@@ -213,8 +211,7 @@ abstract class ServiceConsts: BaseConsts() {
 
     @StringDef(
         PrefKeyInt.PROXY_PORT,
-        PrefKeyInt.PROXY_SOCKS5_SERVER_PORT,
-        PrefKeyInt.RELAY_PORT
+        PrefKeyInt.PROXY_SOCKS5_SERVER_PORT
     )
     @Retention(AnnotationRetention.SOURCE)
     annotation class PrefKeyInt {
@@ -222,18 +219,24 @@ abstract class ServiceConsts: BaseConsts() {
             // Keys for returning Ints
             const val PROXY_PORT = "PROXY_PORT"
             const val PROXY_SOCKS5_SERVER_PORT = "PROXY_SOCKS5_SERVER_PORT"
-            const val RELAY_PORT = "RELAY_PORT"
         }
     }
 
     @StringDef(
-        PrefKeyList.LIST_OF_SUPPORTED_BRIDGES
+        PrefKeyList.DNS_PORT_ISOLATION_FLAGS,
+        PrefKeyList.HTTP_TUNNEL_PORT_ISOLATION_FLAGS,
+        PrefKeyList.SOCKS_PORT_ISOLATION_FLAGS,
+        PrefKeyList.TRANS_PORT_ISOLATION_FLAGS
     )
     @Retention(AnnotationRetention.SOURCE)
     annotation class PrefKeyList {
         companion object {
             // Keys for returning Lists
-            const val LIST_OF_SUPPORTED_BRIDGES = "LIST_OF_SUPPORTED_BRIDGES"
+            const val DNS_PORT_ISOLATION_FLAGS = "DNS_PORT_ISOLATION_FLAGS"
+            const val HTTP_TUNNEL_PORT_ISOLATION_FLAGS = "HTTP_PORT_ISOLATION_FLAGS"
+            const val SOCKS_PORT_ISOLATION_FLAGS = "SOCKS_PORT_ISOLATION_FLAGS"
+            const val TRANS_PORT_ISOLATION_FLAGS = "TRANS_PORT_ISOLATION_FLAGS"
+            const val USER_DEFINED_BRIDGES = "USER_DEFINED_BRIDGES"
         }
     }
 
@@ -251,6 +254,7 @@ abstract class ServiceConsts: BaseConsts() {
         PrefKeyString.PROXY_USER,
         PrefKeyString.REACHABLE_ADDRESS_PORTS,
         PrefKeyString.RELAY_NICKNAME,
+        PrefKeyString.RELAY_PORT,
         PrefKeyString.SOCKS_PORT,
         PrefKeyString.VIRTUAL_ADDRESS_NETWORK,
         PrefKeyString.HAS_CONNECTION_PADDING,
@@ -273,6 +277,7 @@ abstract class ServiceConsts: BaseConsts() {
             const val PROXY_USER = "PROXY_USER"
             const val REACHABLE_ADDRESS_PORTS = "REACHABLE_ADDRESS_PORTS"
             const val RELAY_NICKNAME = "RELAY_NICKNAME"
+            const val RELAY_PORT = "RELAY_PORT"
             const val SOCKS_PORT = "SOCKS_PORT"
             const val VIRTUAL_ADDRESS_NETWORK = "VIRTUAL_ADDRESS_NETWORK"
             const val HAS_CONNECTION_PADDING = "HAS_CONNECTION_PADDING"
