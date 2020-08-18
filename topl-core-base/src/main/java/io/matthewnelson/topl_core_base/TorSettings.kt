@@ -111,24 +111,20 @@ abstract class TorSettings: BaseConsts() {
      * */
     companion object {
         const val DEFAULT__DISABLE_NETWORK = true
-        const val DEFAULT__DNS_PORT = "0"
         const val DEFAULT__ENTRY_NODES = ""
         const val DEFAULT__EXCLUDED_NODES = ""
         const val DEFAULT__EXIT_NODES = ""
-        const val DEFAULT__HTTP_TUNNEL_PORT = "0"
         const val DEFAULT__PROXY_HOST = ""
         const val DEFAULT__PROXY_PASSWORD = ""
         const val DEFAULT__PROXY_SOCKS5_HOST = "" // "127.0.0.1"
-        const val DEFAULT__PROXY_TYPE = ""
         const val DEFAULT__PROXY_USER = ""
         const val DEFAULT__REACHABLE_ADDRESS_PORTS = "" // "*:80,*:443"
         const val DEFAULT__RELAY_NICKNAME = ""
+        const val DEFAULT__RELAY_PORT = ""
         const val DEFAULT__HAS_BRIDGES = false
-        const val DEFAULT__HAS_CONNECTION_PADDING = ConnectionPadding.OFF
         const val DEFAULT__HAS_COOKIE_AUTHENTICATION = true
         const val DEFAULT__HAS_DEBUG_LOGS = false
         const val DEFAULT__HAS_DORMANT_CANCELED_BY_STARTUP = true
-        const val DEFAULT__HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL = false
         const val DEFAULT__HAS_OPEN_PROXY_ON_ALL_INTERFACES = false
         const val DEFAULT__HAS_REACHABLE_ADDRESS = false
         const val DEFAULT__HAS_REDUCED_CONNECTION_PADDING = true
@@ -138,8 +134,7 @@ abstract class TorSettings: BaseConsts() {
         const val DEFAULT__IS_AUTO_MAP_HOSTS_ON_RESOLVE = true
         const val DEFAULT__IS_RELAY = false
         const val DEFAULT__RUN_AS_DAEMON = true
-        const val DEFAULT__TRANS_PORT = "0"
-        const val DEFAULT__USE_SOCKS5 = true
+        const val DEFAULT__USE_SOCKS5 = false
     }
 
     /**
@@ -151,9 +146,16 @@ abstract class TorSettings: BaseConsts() {
      * TorBrowser and Orbot use "5400" by default. It may be wise to pick something
      * that won't conflict.
      *
-     * See [DEFAULT__DNS_PORT]
+     * See [BaseConsts.PortOption.DISABLED]
      * */
     abstract val dnsPort: String
+
+    /**
+     * Express isolation flags to be added when enabling the [dnsPort]
+     *
+     * See [BaseConsts.IsolationFlag] for available options
+     * */
+    abstract val dnsPortIsolationFlags: List<@IsolationFlag String>?
 
     /**
      * Default [java.null]
@@ -183,20 +185,24 @@ abstract class TorSettings: BaseConsts() {
      *
      * Docs: https://2019.www.torproject.org/docs/tor-manual.html.en#HTTPTunnelPort
      *
-     * See [DEFAULT__HTTP_TUNNEL_PORT] ("0", to disable it)
-     *
-     * TODO: Change to List<String> and update TorSettingsBuilder method for
-     *  multi-port support.
+     * See [BaseConsts.PortOption.DISABLED]
      * */
     abstract val httpTunnelPort: String
+
+    /**
+     * Express isolation flags to be added when enabling the [httpTunnelPort]
+     *
+     * See [BaseConsts.IsolationFlag] for available options
+     * */
+    abstract val httpTunnelPortIsolationFlags: List<@IsolationFlag String>?
 
     /**
      * Must have the transport binaries for obfs4 and/or snowflake, depending
      * on if you wish to include them in your bridges file to use.
      *
-     * See [BaseConsts.SupportedBridges] for options.
+     * See [BaseConsts.SupportedBridgeType] for options
      */
-    abstract val listOfSupportedBridges: List<@SupportedBridges String>
+    abstract val listOfSupportedBridges: List<@SupportedBridgeType String>
 
     /**
      * See [DEFAULT__PROXY_HOST]
@@ -226,9 +232,9 @@ abstract class TorSettings: BaseConsts() {
     abstract val proxySocks5ServerPort: Int?
 
     /**
-     * See [DEFAULT__PROXY_TYPE]
+     * See [BaseConsts.ProxyType.DISABLED]
      * */
-    abstract val proxyType: String?
+    abstract val proxyType: @ProxyType String
 
     /**
      * See [DEFAULT__PROXY_USER]
@@ -257,19 +263,28 @@ abstract class TorSettings: BaseConsts() {
      *   [hasBridges] false
      *   [isRelay] true
      *   [relayNickname] "your nickname"
-     *   [relayPort] some Int value
+     *   [relayPort] "auto", or a port between 1024 and 65535
      *
-     * Default = [java.null]
+     * See [DEFAULT__RELAY_PORT]
      * */
-    abstract val relayPort: Int?
+    abstract val relayPort: String
 
     /**
      * Could be "auto" or a specific port, such as "9051".
      *
      * TorBrowser uses "9150", and Orbot uses "9050" by default. It may be wise
      * to pick something that won't conflict.
+     *
+     * See [BaseConsts.PortOption]
      * */
     abstract val socksPort: String
+
+    /**
+     * Express isolation flags to be added when enabling the [socksPort]
+     *
+     * See [BaseConsts.IsolationFlag] for available options
+     * */
+    abstract val socksPortIsolationFlags: List<@IsolationFlag String>?
 
     /**
      * TorBrowser and Orbot use "10.192.0.1/10", it may be wise to pick something
@@ -285,7 +300,7 @@ abstract class TorSettings: BaseConsts() {
     abstract val hasBridges: Boolean
 
     /**
-     * See [DEFAULT__HAS_CONNECTION_PADDING]
+     * See [BaseConsts.ConnectionPadding.OFF]
      * */
     abstract val connectionPadding: @ConnectionPadding String
 
@@ -305,11 +320,6 @@ abstract class TorSettings: BaseConsts() {
      * See [DEFAULT__HAS_DORMANT_CANCELED_BY_STARTUP]
      * */
     abstract val hasDormantCanceledByStartup: Boolean
-
-    /**
-     * See [DEFAULT__HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL]
-     * */
-    abstract val hasIsolationAddressFlagForTunnel: Boolean
 
     /**
      * See [DEFAULT__HAS_OPEN_PROXY_ON_ALL_INTERFACES]
@@ -365,14 +375,19 @@ abstract class TorSettings: BaseConsts() {
      *
      * See [listOfSupportedBridges] documentation.
      *
-     * Orbot and TorBrowser default to "9140". It may be wise to pick something
-     * that won't conflict.
+     * Orbot and TorBrowser default to "9140" and "9040" respectively. It may be wise to pick
+     * something that won't conflict.
      *
-     * See [DEFAULT__TRANS_PORT]
-     *
-     * TODO: Change to a List<String>? to support multiple ports
+     * See [BaseConsts.PortOption.DISABLED]
      * */
     abstract val transPort: String
+
+    /**
+     * Express isolation flags to be added when enabling the [transPort]
+     *
+     * See [BaseConsts.IsolationFlag] for available options
+     * */
+    abstract val transPortIsolationFlags: List<@IsolationFlag String>?
 
     /**
      * See [DEFAULT__USE_SOCKS5]
