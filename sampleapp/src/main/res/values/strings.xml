@@ -1,6 +1,9 @@
 <resources>
     <!--    <string name="app_name">SampleApp</string>   See build.gradle buildTypes -->
     <string name="navigation_label">TOPL-Android Demo</string>
+    <string name="navigation_settings_application">Application Settings</string>
+    <string name="navigation_settings_library">Library Settings</string>
+    <string name="navigation_settings_tor">Tor Settings</string>
 
     <!-- DashboardFragment -->
     <string name="dashboard_text_view_dns_port">DNS:</string>
