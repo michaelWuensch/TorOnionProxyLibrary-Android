@@ -114,13 +114,6 @@ abstract class TorSettings: BaseConsts() {
         const val DEFAULT__ENTRY_NODES = ""
         const val DEFAULT__EXCLUDED_NODES = ""
         const val DEFAULT__EXIT_NODES = ""
-        const val DEFAULT__PROXY_HOST = ""
-        const val DEFAULT__PROXY_PASSWORD = ""
-        const val DEFAULT__PROXY_SOCKS5_HOST = "" // "127.0.0.1"
-        const val DEFAULT__PROXY_USER = ""
-        const val DEFAULT__REACHABLE_ADDRESS_PORTS = "" // "*:80,*:443"
-        const val DEFAULT__RELAY_NICKNAME = ""
-        const val DEFAULT__RELAY_PORT = ""
         const val DEFAULT__HAS_BRIDGES = false
         const val DEFAULT__HAS_COOKIE_AUTHENTICATION = true
         const val DEFAULT__HAS_DEBUG_LOGS = false
@@ -133,9 +126,26 @@ abstract class TorSettings: BaseConsts() {
         const val DEFAULT__HAS_TEST_SOCKS = false
         const val DEFAULT__IS_AUTO_MAP_HOSTS_ON_RESOLVE = true
         const val DEFAULT__IS_RELAY = false
+        const val DEFAULT__PROXY_HOST = ""
+        const val DEFAULT__PROXY_PASSWORD = ""
+        const val DEFAULT__PROXY_SOCKS5_HOST = "" // "127.0.0.1"
+        const val DEFAULT__PROXY_USER = ""
+        const val DEFAULT__REACHABLE_ADDRESS_PORTS = "" // "*:80,*:443"
+        const val DEFAULT__RELAY_NICKNAME = ""
+        const val DEFAULT__RELAY_PORT = ""
         const val DEFAULT__RUN_AS_DAEMON = true
         const val DEFAULT__USE_SOCKS5 = false
     }
+
+    /**
+     * See [BaseConsts.ConnectionPadding.OFF]
+     * */
+    abstract val connectionPadding: @ConnectionPadding String
+
+    /**
+     * Default [java.null]
+     * */
+    abstract val customTorrc: String?
 
     /**
      * See [DEFAULT__DISABLE_NETWORK]
@@ -158,11 +168,6 @@ abstract class TorSettings: BaseConsts() {
     abstract val dnsPortIsolationFlags: List<@IsolationFlag String>?
 
     /**
-     * Default [java.null]
-     * */
-    abstract val customTorrc: String?
-
-    /**
      * See [DEFAULT__ENTRY_NODES]
      * */
     abstract val entryNodes: String?
@@ -176,6 +181,56 @@ abstract class TorSettings: BaseConsts() {
      * See [DEFAULT__EXIT_NODES]
      * */
     abstract val exitNodes: String?
+
+    /**
+     * See [DEFAULT__HAS_BRIDGES]
+     * */
+    abstract val hasBridges: Boolean
+
+    /**
+     * See [DEFAULT__HAS_COOKIE_AUTHENTICATION]
+     * */
+    abstract val hasCookieAuthentication: Boolean
+
+    /**
+     * See [DEFAULT__HAS_DEBUG_LOGS]
+     * */
+    abstract val hasDebugLogs: Boolean
+
+    /**
+     * See [DEFAULT__HAS_DORMANT_CANCELED_BY_STARTUP]
+     * */
+    abstract val hasDormantCanceledByStartup: Boolean
+
+    /**
+     * See [DEFAULT__HAS_OPEN_PROXY_ON_ALL_INTERFACES]
+     * */
+    abstract val hasOpenProxyOnAllInterfaces: Boolean
+
+    /**
+     * See [DEFAULT__HAS_REACHABLE_ADDRESS]
+     * */
+    abstract val hasReachableAddress: Boolean
+
+    /**
+     * See [DEFAULT__HAS_REDUCED_CONNECTION_PADDING]
+     * */
+    abstract val hasReducedConnectionPadding: Boolean
+
+    /**
+     * See [DEFAULT__HAS_SAFE_SOCKS]
+     * */
+    abstract val hasSafeSocks: Boolean
+
+    /**
+     * See [DEFAULT__HAS_STRICT_NODES]
+     * */
+    abstract val hasStrictNodes: Boolean
+
+    /**
+     * See [DEFAULT__HAS_TEST_SOCKS]
+     * */
+    abstract val hasTestSocks: Boolean
 
     /**
      * Could be "auto" or a specific port, such as "8288".
@@ -195,6 +250,20 @@ abstract class TorSettings: BaseConsts() {
      * See [BaseConsts.IsolationFlag] for available options
      * */
     abstract val httpTunnelPortIsolationFlags: List<@IsolationFlag String>?
+
+    /**
+     * See [DEFAULT__IS_AUTO_MAP_HOSTS_ON_RESOLVE]
+     *
+     * Docs: https://2019.www.torproject.org/docs/tor-manual.html.en#AutomapHostsOnResolve
+     * */
+    abstract val isAutoMapHostsOnResolve: Boolean
+
+    /**
+     * See [DEFAULT__IS_RELAY]
+     *
+     * If setting this to true, see [relayPort] documentation.
+     * */
+    abstract val isRelay: Boolean
 
     /**
      * Must have the transport binaries for obfs4 and/or snowflake, depending
@@ -270,6 +339,11 @@ abstract class TorSettings: BaseConsts() {
     abstract val relayPort: String
 
     /**
+     * See [DEFAULT__RUN_AS_DAEMON]
+     * */
+    abstract val runAsDaemon: Boolean
+
+    /**
      * Could be "auto" or a specific port, such as "9051".
      *
      * TorBrowser uses "9150", and Orbot uses "9050" by default. It may be wise
@@ -285,90 +359,6 @@ abstract class TorSettings: BaseConsts() {
      * See [BaseConsts.IsolationFlag] for available options
      * */
     abstract val socksPortIsolationFlags: List<@IsolationFlag String>?
-
-    /**
-     * TorBrowser and Orbot use "10.192.0.1/10", it may be wise to pick something
-     * that won't conflict if you are using this setting.
-     *
-     * Docs: https://2019.www.torproject.org/docs/tor-manual.html.en#VirtualAddrNetworkIPv6
-     * */
-    abstract val virtualAddressNetwork: String?
-
-    /**
-     * See [DEFAULT__HAS_BRIDGES]
-     * */
-    abstract val hasBridges: Boolean
-
-    /**
-     * See [BaseConsts.ConnectionPadding.OFF]
-     * */
-    abstract val connectionPadding: @ConnectionPadding String
-
-    /**
-     * See [DEFAULT__HAS_COOKIE_AUTHENTICATION]
-     * */
-    abstract val hasCookieAuthentication: Boolean
-
-    /**
-     * See [DEFAULT__HAS_DEBUG_LOGS]
-     *
-     * 
-     * */
-    abstract val hasDebugLogs: Boolean
-
-    /**
-     * See [DEFAULT__HAS_DORMANT_CANCELED_BY_STARTUP]
-     * */
-    abstract val hasDormantCanceledByStartup: Boolean
-
-    /**
-     * See [DEFAULT__HAS_OPEN_PROXY_ON_ALL_INTERFACES]
-     * */
-    abstract val hasOpenProxyOnAllInterfaces: Boolean
-
-    /**
-     * See [DEFAULT__HAS_REACHABLE_ADDRESS]
-     * */
-    abstract val hasReachableAddress: Boolean
-
-    /**
-     * See [DEFAULT__HAS_REDUCED_CONNECTION_PADDING]
-     * */
-    abstract val hasReducedConnectionPadding: Boolean
-
-    /**
-     * See [DEFAULT__HAS_SAFE_SOCKS]
-     * */
-    abstract val hasSafeSocks: Boolean
-
-    /**
-     * See [DEFAULT__HAS_STRICT_NODES]
-     * */
-    abstract val hasStrictNodes: Boolean
-
-    /**
-     * See [DEFAULT__HAS_TEST_SOCKS]
-     * */
-    abstract val hasTestSocks: Boolean
-
-    /**
-     * See [DEFAULT__IS_AUTO_MAP_HOSTS_ON_RESOLVE]
-     *
-     * Docs: https://2019.www.torproject.org/docs/tor-manual.html.en#AutomapHostsOnResolve
-     * */
-    abstract val isAutoMapHostsOnResolve: Boolean
-
-    /**
-     * See [DEFAULT__IS_RELAY]
-     *
-     * If setting this to true, see [relayPort] documentation.
-     * */
-    abstract val isRelay: Boolean
-
-    /**
-     * See [DEFAULT__RUN_AS_DAEMON]
-     * */
-    abstract val runAsDaemon: Boolean
 
     /**
      * Can be "auto", or a specified port such as "9141"
@@ -393,6 +383,14 @@ abstract class TorSettings: BaseConsts() {
      * See [DEFAULT__USE_SOCKS5]
      * */
     abstract val useSocks5: Boolean
+
+    /**
+     * TorBrowser and Orbot use "10.192.0.1/10", it may be wise to pick something
+     * that won't conflict if you are using this setting.
+     *
+     * Docs: https://2019.www.torproject.org/docs/tor-manual.html.en#VirtualAddrNetworkIPv6
+     * */
+    abstract val virtualAddressNetwork: String?
 
 //    override fun toString(): String {
 //        return "TorSettings{ " +
