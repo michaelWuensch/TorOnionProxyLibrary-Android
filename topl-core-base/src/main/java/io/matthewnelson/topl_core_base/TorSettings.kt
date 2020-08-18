@@ -132,7 +132,6 @@ abstract class TorSettings: BaseConsts() {
         const val DEFAULT__PROXY_USER = ""
         const val DEFAULT__REACHABLE_ADDRESS_PORTS = "" // "*:80,*:443"
         const val DEFAULT__RELAY_NICKNAME = ""
-        const val DEFAULT__RELAY_PORT = ""
         const val DEFAULT__RUN_AS_DAEMON = true
         const val DEFAULT__USE_SOCKS5 = false
     }
@@ -441,7 +440,7 @@ abstract class TorSettings: BaseConsts() {
      *
      * **Docs:** https://2019.www.torproject.org/docs/tor-manual.html.en#ORPort
      *
-     * See [DEFAULT__RELAY_PORT]
+     * See [BaseConsts.PortOption.DISABLED]
      * */
     abstract val relayPort: String
 

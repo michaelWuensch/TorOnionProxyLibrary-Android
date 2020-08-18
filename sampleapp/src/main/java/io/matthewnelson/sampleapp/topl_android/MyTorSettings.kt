@@ -136,7 +136,7 @@ class MyTorSettings: TorSettings() {
         get() = DEFAULT__RELAY_NICKNAME
 
     override val relayPort: String
-        get() = DEFAULT__RELAY_PORT
+        get() = PortOption.DISABLED
 
     override val socksPort: String
         get() = PortOption.AUTO
