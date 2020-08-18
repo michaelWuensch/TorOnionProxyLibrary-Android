@@ -67,14 +67,13 @@
 package io.matthewnelson.sampleapp.ui.fragments.settings.tor
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
-import androidx.annotation.NavigationRes
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
+import android.widget.Button
+import androidx.core.view.marginBottom
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import io.matthewnelson.sampleapp.R
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashMessage
@@ -83,7 +82,6 @@ import io.matthewnelson.sampleapp.ui.fragments.settings.CloseKeyBoardNavListener
 import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.DnsPortOption
 import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.HttpPortOption
 import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.SocksPortOption
-import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.TransPortOption
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
 
@@ -99,7 +97,10 @@ class SettingsTorFragment : Fragment() {
     private lateinit var socksPortOption: SocksPortOption
     private lateinit var httpPortOption: HttpPortOption
     private lateinit var dnsPortOption: DnsPortOption
-    private lateinit var transPortOption: TransPortOption
+//    private lateinit var transPortOption: TransPortOption
+
+    private lateinit var buttonSocksFlags: Button
+    private var saveButtonHeight = 0
 
     private lateinit var buttonSave: Button
 
@@ -122,7 +123,7 @@ class SettingsTorFragment : Fragment() {
         findNavController().addOnDestinationChangedListener(CloseKeyBoardNavListener(view))
 
         findViews(view)
-        setButtonClickListener()
+        setButtonClickListener(view)
     }
 
     override fun onDestroyView() {
@@ -130,11 +131,23 @@ class SettingsTorFragment : Fragment() {
     }
 
     private fun findViews(view: View) {
+        buttonSocksFlags = view.findViewById(R.id.settings_tor_button_socks_isolation_flags)
         buttonSave = view.findViewById(R.id.settings_tor_button_save)
+
+        val viewTreeObserver = view.viewTreeObserver
+        if (viewTreeObserver.isAlive) {
+            viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    view.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                    saveButtonHeight = buttonSave.height + buttonSave.marginBottom
+                }
+            })
+        }
     }
 
-    private fun setButtonClickListener() {
+    private fun setButtonClickListener(view: View) {
         buttonSave.setOnClickListener {
+            CloseKeyBoardNavListener.closeKeyboard(view)
             socksPortOption.saveSocksPort() ?: return@setOnClickListener
             httpPortOption.saveHttpPort() ?: return@setOnClickListener
             dnsPortOption.saveDnsPort() ?: return@setOnClickListener
@@ -143,6 +156,19 @@ class SettingsTorFragment : Fragment() {
             DashboardFragment.showMessage(
                 DashMessage("Settings Saved\nTor may need to be restarted", R.drawable.dash_message_color_green, 4_000L)
             )
+        }
+        buttonSocksFlags.setOnClickListener {
+            childFragmentManager.beginTransaction().apply {
+                add(
+                    R.id.settings_tor_fragment_container,
+                    IsolationFlagsFragment(
+                        saveButtonHeight,
+                        IsolationFlagsFragment.SOCKS_FLAGS,
+                        serviceTorSettings
+                    )
+                )
+                commit()
+            }
         }
     }
 }
