@@ -144,20 +144,20 @@ class IsolationFlagsFragment(
 
     private fun setClickListeners() {
         layoutTop.setOnClickListener {
-            removeFragment()
+            removeFragment(true)
         }
         layoutBottom.setOnClickListener {
-            removeFragment()
+            removeFragment(true)
         }
         layoutEnd.setOnClickListener {
-            removeFragment()
+            removeFragment(true)
         }
         layoutStart.setOnClickListener {
-            removeFragment()
+            removeFragment(true)
         }
     }
 
-    private fun removeFragment() {
+    private fun removeFragment(saveData: Boolean) {
         // TODO: Save Data
         parentFragmentManager.beginTransaction().apply {
             remove(this@IsolationFlagsFragment)
@@ -179,7 +179,7 @@ class IsolationFlagsFragment(
     private inner class BackPressHandler(enable: Boolean): OnBackPressedCallback(enable) {
 
         override fun handleOnBackPressed() {
-            removeFragment()
+            removeFragment(false)
         }
 
     }
