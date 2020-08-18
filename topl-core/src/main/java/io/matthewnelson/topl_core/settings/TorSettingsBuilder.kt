@@ -308,7 +308,6 @@ class TorSettingsBuilder internal constructor(
     fun debugLogs(): TorSettingsBuilder {
         buffer.append("Log debug syslog\n")
         buffer.append("Log info syslog\n")
-        buffer.append("SafeLogging 1\n")
         return this
     }
 
@@ -597,7 +596,7 @@ class TorSettingsBuilder internal constructor(
 
     fun safeSocks(enable: Boolean): TorSettingsBuilder {
         val safeSocksSetting = if (enable) "1" else "0"
-        buffer.append("SafeSocks $safeSocksSetting").append("\n")
+        buffer.append("SafeSocks $safeSocksSetting\n")
         return this
     }
 
@@ -665,7 +664,7 @@ class TorSettingsBuilder internal constructor(
 
     fun testSocks(enable: Boolean): TorSettingsBuilder {
         val testSocksSetting = if (enable) "1" else "0"
-        buffer.append("TestSocks $testSocksSetting").append("\n")
+        buffer.append("TestSocks $testSocksSetting\n")
         return this
     }
 
@@ -758,7 +757,7 @@ class TorSettingsBuilder internal constructor(
     @Throws(IOException::class)
     fun addBridgesFromResources(): TorSettingsBuilder {
         if (torSettings.hasBridges) {
-            val bridgesStream = torInstaller.openBridgesStream()
+            val bridgesStream: InputStream? = torInstaller.openBridgesStream()
             if (bridgesStream != null) {
                 val formatType = bridgesStream.read()
 

@@ -138,16 +138,25 @@ abstract class TorSettings: BaseConsts() {
     }
 
     /**
+     * Adds to the torrc file "ConnectionPadding <0, 1, or auto>"
+     *
      * See [BaseConsts.ConnectionPadding.OFF]
      * */
     abstract val connectionPadding: @ConnectionPadding String
 
     /**
+     * If not null/not empty, will add the string value to the torrc file
+     *
      * Default [java.null]
      * */
     abstract val customTorrc: String?
 
     /**
+     * OnionProxyManager will enable this on startup using the TorControlConnection based off
+     * of the device's network state. Setting this to `true` is highly recommended.
+     *
+     * Adds to the torrc file "DisableNetwork <1 or 0>"
+     *
      * See [DEFAULT__DISABLE_NETWORK]
      * */
     abstract val disableNetwork: Boolean
@@ -155,6 +164,11 @@ abstract class TorSettings: BaseConsts() {
     /**
      * TorBrowser and Orbot use "5400" by default. It may be wise to pick something
      * that won't conflict.
+     *
+     * Disabled by default by Tor. Set to "O" to disable. Can also be "auto", or a specific
+     * port between "1024" and "65535"
+     *
+     * Adds to the torrc file "DNSPort <port or auto> <[dnsPortIsolationFlags]>"
      *
      * See [BaseConsts.PortOption.DISABLED]
      * */
@@ -164,70 +178,137 @@ abstract class TorSettings: BaseConsts() {
      * Express isolation flags to be added when enabling the [dnsPort]
      *
      * See [BaseConsts.IsolationFlag] for available options
+     *
+     * **Docs:** https://2019.www.torproject.org/docs/tor-manual.html.en#SocksPort
      * */
     abstract val dnsPortIsolationFlags: List<@IsolationFlag String>?
 
     /**
+     * Set with a comma separated list of Entry Nodes.
+     *
+     * Adds to the torrc file "EntryNodes <node,node,node,...>"
+     *
+     * **Docs:** https://2019.www.torproject.org/docs/tor-manual.html.en#EntryNodes
+     *
      * See [DEFAULT__ENTRY_NODES]
      * */
     abstract val entryNodes: String?
 
     /**
+     * Set with a comma separated list of Exit Nodes to be excluded.
+     *
+     * Adds to the torrc file "ExcludeExitNodes <node,node,node,...>"
+     *
+     * **Docs:** https://2019.www.torproject.org/docs/tor-manual.html.en#ExcludeExitNodes
+     *
      * See [DEFAULT__EXCLUDED_NODES]
      * */
     abstract val excludeNodes: String?
 
     /**
+     * Set with a comma separated list of Exit Nodes to use.
+     *
+     * Adds to the torrc file "ExitNodes <node,node,node,...>"
+     *
+     * **Docs:** https://2019.www.torproject.org/docs/tor-manual.html.en#ExitNodes
+     *
      * See [DEFAULT__EXIT_NODES]
      * */
     abstract val exitNodes: String?
 
     /**
+     * If `true`, adds to the torrc file "UseBridges 1" and will proc the adding of bridges.
+     *
+     * **Docs:** https://2019.www.torproject.org/docs/tor-manual.html.en#UseBridges
+     *
      * See [DEFAULT__HAS_BRIDGES]
      * */
     abstract val hasBridges: Boolean
 
     /**
+     * **Highly** recommended to be set to `true` for securing the ControlPort
+     *
+     * Adds to the torrc file:
+     *
+     *   "CookieAuthentication 1"
+     *   "CookieAuthFile <[TorConfigFiles.cookieAuthFile] path>
+     *
+     * **Docs:** https://2019.www.torproject.org/docs/tor-manual.html.en#CookieAuthentication
+     * **Docs:** https://2019.www.torproject.org/docs/tor-manual.html.en#CookieAuthFile
+     *
      * See [DEFAULT__HAS_COOKIE_AUTHENTICATION]
      * */
     abstract val hasCookieAuthentication: Boolean
 
     /**
+     * Adds to the torrc file:
+     *
+     *   "Log debug syslog"
+     *   "Log info syslog"
+     *
      * See [DEFAULT__HAS_DEBUG_LOGS]
      * */
     abstract val hasDebugLogs: Boolean
 
     /**
+     * **Highly** recommended to be set to `true` for Android applications.
+     *
+     * If true, adds to the torrc file "DormantCanceledByStartup 1"
+     *
+     * **Docs:** https://2019.www.torproject.org/docs/tor-manual.html.en#DormantCanceledByStartup
+     *
      * See [DEFAULT__HAS_DORMANT_CANCELED_BY_STARTUP]
      * */
     abstract val hasDormantCanceledByStartup: Boolean
 
     /**
+     * If true, adds to the torrc file "SocksListenAddress 0.0.0.0"
+     *
      * See [DEFAULT__HAS_OPEN_PROXY_ON_ALL_INTERFACES]
      * */
     abstract val hasOpenProxyOnAllInterfaces: Boolean
 
     /**
+     * If true, adds to the torrc file "ReachableAddresses <[reachableAddressPorts]>"
+     *
+     * **Docs:** https://2019.www.torproject.org/docs/tor-manual.html.en#ReachableAddresses
+     *
      * See [DEFAULT__HAS_REACHABLE_ADDRESS]
      * */
     abstract val hasReachableAddress: Boolean
 
     /**
+     * If true, adds to the torrc file "ReducedConnectionPadding 1"
+     *
+     * **Docs:** https://2019.www.torproject.org/docs/tor-manual.html.en#ReducedConnectionPadding
+     *
      * See [DEFAULT__HAS_REDUCED_CONNECTION_PADDING]
      * */
     abstract val hasReducedConnectionPadding: Boolean
 
     /**
+     * If true, adds to the torrc file "SafeSocks 1"
+     *
+     * **Docs:** https://2019.www.torproject.org/docs/tor-manual.html.en#SafeSocks
+     *
      * See [DEFAULT__HAS_SAFE_SOCKS]
      * */
     abstract val hasSafeSocks: Boolean
 
     /**
+     * If true, adds to the torrc file "StrictNodes 1"
+     *
+     * **Docs:** https://2019.www.torproject.org/docs/tor-manual.html.en#StrictNodes
+     *
      * See [DEFAULT__HAS_STRICT_NODES]
      * */
     abstract val hasStrictNodes: Boolean
 
     /**
+     * If true, adds to the torrc file "TestSocks 1"
+     *
+     * **Docs:** https://2019.www.torproject.org/docs/tor-manual.html.en#TestSocks
+     *
      * See [DEFAULT__HAS_TEST_SOCKS]
      * */
     abstract val hasTestSocks: Boolean
@@ -235,10 +316,10 @@ abstract class TorSettings: BaseConsts() {
     /**
      * Could be "auto" or a specific port, such as "8288".
      *
-     * TorBrowser and Orbot use "8218" by default. It may be wise to pick something
-     * that won't conflict if you're using this setting.
+     * TorBrowser and Orbot use "8218" and "8118", respectively, by default.
+     * It may be wise to pick something that won't conflict if you're using this setting.
      *
-     * Docs: https://2019.www.torproject.org/docs/tor-manual.html.en#HTTPTunnelPort
+     * **Docs:** https://2019.www.torproject.org/docs/tor-manual.html.en#HTTPTunnelPort
      *
      * See [BaseConsts.PortOption.DISABLED]
      * */
@@ -247,6 +328,8 @@ abstract class TorSettings: BaseConsts() {
     /**
      * Express isolation flags to be added when enabling the [httpTunnelPort]
      *
+     * **Docs:** https://2019.www.torproject.org/docs/tor-manual.html.en#SocksPort
+     *
      * See [BaseConsts.IsolationFlag] for available options
      * */
     abstract val httpTunnelPortIsolationFlags: List<@IsolationFlag String>?
@@ -254,7 +337,7 @@ abstract class TorSettings: BaseConsts() {
     /**
      * See [DEFAULT__IS_AUTO_MAP_HOSTS_ON_RESOLVE]
      *
-     * Docs: https://2019.www.torproject.org/docs/tor-manual.html.en#AutomapHostsOnResolve
+     * **Docs:** https://2019.www.torproject.org/docs/tor-manual.html.en#AutomapHostsOnResolve
      * */
     abstract val isAutoMapHostsOnResolve: Boolean
 
@@ -289,11 +372,17 @@ abstract class TorSettings: BaseConsts() {
     abstract val proxyPort: Int?
 
     /**
+     * Adds to the torrc file "Socks5Proxy [proxySocks5Host]:[proxySocks5ServerPort]"
+     *
+     * **Docs:** https://2019.www.torproject.org/docs/tor-manual.html.en#Socks5Proxy
+     *
      * See [DEFAULT__PROXY_SOCKS5_HOST]
      * */
     abstract val proxySocks5Host: String?
 
     /**
+     * Adds to the torrc file "Socks5Proxy [proxySocks5Host]:[proxySocks5ServerPort]"
+     *
      * Default = [java.null]
      *
      * Try ((Math.random() * 1000) + 10000).toInt()
@@ -301,6 +390,19 @@ abstract class TorSettings: BaseConsts() {
     abstract val proxySocks5ServerPort: Int?
 
     /**
+     * Depending on the [BaseConsts.ProxyType], will add authenticated Socks5 or HTTPS proxy,
+     * if other settings are configured properly.
+     *
+     * This only gets used if you declare the following settings set as:
+     *
+     *   [useSocks5] is set to `false`
+     *   [hasBridges] is set to `false`
+     *   [proxyType] is [BaseConsts.ProxyType.SOCKS_5] or [BaseConsts.ProxyType.HTTPS]
+     *   [proxyHost] is set (eg. 127.0.0.1)
+     *   [proxyPort] is `null`, or a port between 1024 and 65535
+     *   [proxyUser] is set
+     *   [proxyPassword] is set
+     *
      * See [BaseConsts.ProxyType.DISABLED]
      * */
     abstract val proxyType: @ProxyType String
@@ -311,6 +413,8 @@ abstract class TorSettings: BaseConsts() {
     abstract val proxyUser: String?
 
     /**
+     * Adds to the torrc file "ReachableAddresses <[reachableAddressPorts]>"
+     *
      * See [DEFAULT__REACHABLE_ADDRESS_PORTS]
      * */
     abstract val reachableAddressPorts: String
@@ -318,8 +422,7 @@ abstract class TorSettings: BaseConsts() {
     /**
      * See [DEFAULT__RELAY_NICKNAME]
      *
-     * If setting this value to something other than null or an empty String, see
-     * [relayPort] documentation.
+     * See [relayPort] documentation.
      * */
     abstract val relayNickname: String?
 
@@ -327,18 +430,23 @@ abstract class TorSettings: BaseConsts() {
      * TorBrowser and Orbot use 9001 by default. It may be wise to pick something
      * that won't conflict.
      *
+     * Adds to the torrc file "ORPort <[relayPort]>"
+     *
      * This only gets used if you declare the following settings set as:
      *   [hasReachableAddress] false
      *   [hasBridges] false
      *   [isRelay] true
      *   [relayNickname] "your nickname"
-     *   [relayPort] "auto", or a port between 1024 and 65535
+     *   [relayPort] "auto", or a port between "1024" and "65535"
+     *
+     * **Docs:** https://2019.www.torproject.org/docs/tor-manual.html.en#ORPort
      *
      * See [DEFAULT__RELAY_PORT]
      * */
     abstract val relayPort: String
 
     /**
+     * If `true`, adds to the torrc file "RunAsDaemon 1"
      * See [DEFAULT__RUN_AS_DAEMON]
      * */
     abstract val runAsDaemon: Boolean
@@ -355,6 +463,8 @@ abstract class TorSettings: BaseConsts() {
 
     /**
      * Express isolation flags to be added when enabling the [socksPort]
+     *
+     * **Docs:** https://2019.www.torproject.org/docs/tor-manual.html.en#SocksPort
      *
      * See [BaseConsts.IsolationFlag] for available options
      * */
@@ -374,6 +484,8 @@ abstract class TorSettings: BaseConsts() {
 
     /**
      * Express isolation flags to be added when enabling the [transPort]
+     *
+     * **Docs:** https://2019.www.torproject.org/docs/tor-manual.html.en#SocksPort
      *
      * See [BaseConsts.IsolationFlag] for available options
      * */
