@@ -226,7 +226,8 @@ abstract class ServiceConsts: BaseConsts() {
         PrefKeyList.DNS_PORT_ISOLATION_FLAGS,
         PrefKeyList.HTTP_TUNNEL_PORT_ISOLATION_FLAGS,
         PrefKeyList.SOCKS_PORT_ISOLATION_FLAGS,
-        PrefKeyList.TRANS_PORT_ISOLATION_FLAGS
+        PrefKeyList.TRANS_PORT_ISOLATION_FLAGS,
+        PrefKeyList.USER_DEFINED_BRIDGES
     )
     @Retention(AnnotationRetention.SOURCE)
     annotation class PrefKeyList {
