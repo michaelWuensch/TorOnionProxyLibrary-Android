@@ -347,11 +347,16 @@ class TorSettingsBuilder internal constructor(
     }
 
     @SettingsConfig
-    fun dnsPortFromSettings(): TorSettingsBuilder =
-        if (torSettings.dnsPort != PortOption.DISABLED)
-            dnsPort(torSettings.dnsPort, torSettings.dnsPortIsolationFlags)
-        else
-            this
+    fun dnsPortFromSettings(): TorSettingsBuilder  {
+        return when (val port = torSettings.dnsPort) {
+            PortOption.DISABLED -> {
+                this
+            }
+            else -> {
+                dnsPort(port, torSettings.dnsPortIsolationFlags)
+            }
+        }
+    }
 
     fun dormantCanceledByStartup(enable: Boolean): TorSettingsBuilder {
         val dormantCanceledStartup = if (enable) "1" else "0"
@@ -412,15 +417,24 @@ class TorSettingsBuilder internal constructor(
     }
 
     @SettingsConfig
-    fun httpTunnelPortFromSettings(): TorSettingsBuilder {
-        if (torSettings.httpTunnelPort == PortOption.DISABLED)
-            return this
-
-        return httpTunnelPort(torSettings.httpTunnelPort, torSettings.httpTunnelPortIsolationFlags)
+    fun httpTunnelPortFromSettings(): TorSettingsBuilder  {
+        return when (val port = torSettings.httpTunnelPort) {
+            PortOption.DISABLED -> {
+                this
+            }
+            else -> {
+                httpTunnelPort(port, torSettings.httpTunnelPortIsolationFlags)
+            }
+        }
     }
 
     fun makeNonExitRelay(dnsFile: String, orPort: String, nickname: String): TorSettingsBuilder {
-        if (orPort != PortOption.DISABLED) {
+        if (
+            dnsFile.isNotEmpty() &&
+            nickname.isNotEmpty() &&
+            orPort.isNotEmpty() &&
+            orPort != PortOption.DISABLED
+        ) {
             buffer.append("ServerDNSResolvConfFile $dnsFile\n")
             buffer.append("ORPort $orPort\n")
             buffer.append("Nickname $nickname\n")
@@ -460,7 +474,7 @@ class TorSettingsBuilder internal constructor(
                     val resolv = onionProxyContext.createQuad9NameserverFile()
                     makeNonExitRelay(resolv.canonicalPath, relayPort, relayNickname)
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    broadcastLogger.exception(e)
                 }
             }
         }
@@ -613,7 +627,6 @@ class TorSettingsBuilder internal constructor(
      * */
     @Throws(IOException::class, SecurityException::class)
     fun setGeoIpFiles(): TorSettingsBuilder {
-        val torConfigFiles = torConfigFiles
         if (torConfigFiles.geoIpFile.exists())
             geoIpFile(torConfigFiles.geoIpFile.canonicalPath)
         if (torConfigFiles.geoIpv6File.exists())
@@ -679,7 +692,7 @@ class TorSettingsBuilder internal constructor(
     @Throws(UnsupportedEncodingException::class)
     fun torrcCustomFromSettings(): TorSettingsBuilder {
         val customTorrc = torSettings.customTorrc
-        return if (customTorrc != null)
+        return if (!customTorrc.isNullOrEmpty())
             addLine(String(customTorrc.toByteArray(Charsets.US_ASCII)))
         else
             this
