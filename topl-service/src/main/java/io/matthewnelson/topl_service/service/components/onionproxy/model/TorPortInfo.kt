@@ -11,6 +11,9 @@ class TorPortInfo(
     val controlPort: String?,
     val dnsPort: String?,
     val httpPort: String?,
+    // TODO: Add proxyPort after refactor
+    // TODO: Add proxySocks5ServerPort after refactor
+    // TODO: Add relayPort after refactor
     val socksPort: String?,
     val transPort: String?
 )
