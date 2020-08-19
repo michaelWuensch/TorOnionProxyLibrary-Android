@@ -253,9 +253,7 @@ abstract class BaseConsts {
         AnnotationTarget.PROPERTY
     )
     @StringDef(
-        IsolationFlag.ISOLATE_CLIENT_ADDR,
         IsolationFlag.NO_ISOLATE_CLIENT_ADDR,
-        IsolationFlag.ISOLATE_SOCKS_AUTH,
         IsolationFlag.NO_ISOLATE_SOCKS_AUTH,
         IsolationFlag.ISOLATE_CLIENT_PROTOCOL,
         IsolationFlag.ISOLATE_DEST_PORT,
@@ -279,9 +277,7 @@ abstract class BaseConsts {
     @Retention(AnnotationRetention.SOURCE)
     annotation class IsolationFlag {
         companion object {
-            const val ISOLATE_CLIENT_ADDR = "IsolateClientAddr" // on by default
             const val NO_ISOLATE_CLIENT_ADDR = "NoIsolateClientAddr"
-            const val ISOLATE_SOCKS_AUTH = "IsolateSOCKSAuth" // on by default
             const val NO_ISOLATE_SOCKS_AUTH = "NoIsolateSOCKSAuth"
             const val ISOLATE_CLIENT_PROTOCOL = "IsolateClientProtocol"
             const val ISOLATE_DEST_PORT = "IsolateDestPort"
@@ -304,9 +300,7 @@ abstract class BaseConsts {
 
             fun getAll(): List<@IsolationFlag String> {
                 return arrayListOf(
-                    ISOLATE_CLIENT_ADDR,
                     NO_ISOLATE_CLIENT_ADDR,
-                    ISOLATE_SOCKS_AUTH,
                     NO_ISOLATE_SOCKS_AUTH,
                     ISOLATE_CLIENT_PROTOCOL,
                     ISOLATE_DEST_PORT,
