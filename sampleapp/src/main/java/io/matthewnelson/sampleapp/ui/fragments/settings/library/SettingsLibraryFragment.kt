@@ -179,7 +179,12 @@ class SettingsLibraryFragment : Fragment() {
             )
         } else {
             DashboardFragment.showMessage(
-                DashMessage("No Changes", R.drawable.dash_message_color_secondary_light, 2_000)
+                DashMessage(
+                    "No Changes",
+                    R.drawable.dash_message_color_secondary_light,
+                    2_000,
+                    R.color.black
+                )
             )
         }
     }

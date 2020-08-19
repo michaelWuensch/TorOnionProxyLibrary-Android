@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -13,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.annotation.ColorRes
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
@@ -98,6 +100,8 @@ class DashboardFragment : Fragment() {
         liveDashMessage.observe(owner, Observer {
             if (it != null) {
                 textViewMessage.text = it.message
+                val colorHex = colorResToHexString(textViewMessage.context, it.textColor)
+                textViewMessage.setTextColor(Color.parseColor(colorHex))
                 textViewMessage.background = ContextCompat.getDrawable(textViewMessage.context, it.background)
                 textViewMessage.visibility = View.VISIBLE
                 launchCleanUpMessageJob(it.showLength)
@@ -126,6 +130,9 @@ class DashboardFragment : Fragment() {
             })
         }
     }
+
+    private fun colorResToHexString(context: Context, @ColorRes colorRes: Int): String =
+        "#${Integer.toHexString(ContextCompat.getColor(context, colorRes))}"
 
     private var showMessageCleanUpJob: Job? = null
 
