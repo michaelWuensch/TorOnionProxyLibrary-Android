@@ -143,7 +143,7 @@ class DashboardFragment : Fragment() {
 
     private fun initButtons(context: Context, owner: LifecycleOwner) {
         buttonAppRestart.setOnClickListener {
-            buttonAppRestart.visibility = View.GONE
+            buttonAppRestart.isEnabled = false
             HomeFragment.appIsBeingKilled()
 
             Toast.makeText(context, "Killing Application", Toast.LENGTH_LONG).show()
