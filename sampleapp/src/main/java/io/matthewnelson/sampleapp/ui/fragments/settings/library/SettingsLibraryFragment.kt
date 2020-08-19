@@ -154,11 +154,11 @@ class SettingsLibraryFragment : Fragment() {
         } catch (e: Exception) {
             e.message?.let {
                 val msg = if (it.contains(BackgroundPolicy.RUN_IN_FOREGROUND))
-                        "${DashMessage.EXCEPTION}Selected Controller option\n" +
-                                ">>> ${ControllerOptions.DO_NOT_STOP_SERVICE} <<<\n" +
-                                "requires BackgroundManager Policy of\n" +
-                                ">>> ${BackgroundManagerOptions.FOREGROUND} <<< and\n" +
-                                ">>> ${BackgroundManagerOptions.KILL_APP} <<<"
+                        "${DashMessage.EXCEPTION}Selected Controller option " +
+                                "'${ControllerOptions.DO_NOT_STOP_SERVICE}' " +
+                                "requires BackgroundManager Policy of " +
+                                "'${BackgroundManagerOptions.FOREGROUND}' and " +
+                                "'${BackgroundManagerOptions.KILL_APP}'"
                     else
                         it
                 DashboardFragment.showMessage(
