@@ -66,31 +66,37 @@
 * */
 package io.matthewnelson.sampleapp.ui.fragments.settings.tor
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.marginTop
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import io.matthewnelson.sampleapp.R
-import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
-
+import io.matthewnelson.topl_core_base.BaseConsts.IsolationFlag
+import io.matthewnelson.topl_core_base.TorSettings
 
 class IsolationFlagsFragment(
     private val bottomMarginAdjust: Int,
-    private val flagType: String,
-    private val serviceTorSettings: ServiceTorSettings
+    private val portType: String,
+    private val defaultTorSettings: TorSettings,
+    private val enabledIsolationFlags: MutableSet<@IsolationFlag String>
 ) : Fragment() {
 
     companion object {
-        const val SOCKS_FLAGS = "SOCKS_FLAGS"
-        const val HTTP_FLAGS = "HTTP_FLAGS"
-        const val DNS_FLAGS = "DNS_FLAGS"
-        const val TRANS_FLAGS = "TRANS_FLAGS"
+        const val SOCKS_FLAGS = "Socks Isolation Flags"
+        const val HTTP_FLAGS = "HTTP Isolation Flags"
+        const val DNS_FLAGS = "DNS Isolation Flags"
+        const val TRANS_FLAGS = "Trans Isolation Flags"
     }
 
     private val backPressHandler = BackPressHandler(true)
@@ -100,6 +106,9 @@ class IsolationFlagsFragment(
     private lateinit var layoutEnd: LinearLayout
     private lateinit var layoutStart: LinearLayout
     private lateinit var layoutConstraintInner: ConstraintLayout
+    private lateinit var buttonReset: Button
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var isolationFlagsAdapter: IsolationFlagsAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -115,7 +124,9 @@ class IsolationFlagsFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         findViews(view)
+        setResetButtonText()
         setMargins()
+        initRecyclerView(view.context)
         setClickListeners()
         enableParentViews(false)
     }
@@ -131,6 +142,23 @@ class IsolationFlagsFragment(
         layoutEnd = view.findViewById(R.id.isolation_flags_layout_end)
         layoutStart = view.findViewById(R.id.isolation_flags_layout_start)
         layoutConstraintInner = view.findViewById(R.id.isolation_flags_layout_constraint_inner)
+        recyclerView = view.findViewById(R.id.recycler_view_isolation_flags)
+        buttonReset = view.findViewById(R.id.isolation_flags_button_reset)
+    }
+
+    private fun setResetButtonText() {
+        when (portType) {
+            // SOCKS_FLAGS is default string
+            HTTP_FLAGS -> {
+                buttonReset.text = getString(R.string.isolation_fragment_reset_http)
+            }
+            DNS_FLAGS -> {
+                buttonReset.text = getString(R.string.isolation_fragment_reset_dns)
+            }
+            TRANS_FLAGS -> {
+                buttonReset.text = getString(R.string.isolation_fragment_reset_trans)
+            }
+        }
     }
 
     private fun setMargins() {
@@ -142,23 +170,38 @@ class IsolationFlagsFragment(
         }
     }
 
-    private fun setClickListeners() {
-        layoutTop.setOnClickListener {
-            removeFragment(true)
-        }
-        layoutBottom.setOnClickListener {
-            removeFragment(true)
-        }
-        layoutEnd.setOnClickListener {
-            removeFragment(true)
-        }
-        layoutStart.setOnClickListener {
-            removeFragment(true)
+    private fun initRecyclerView(context: Context) {
+        isolationFlagsAdapter = IsolationFlagsAdapter()
+        recyclerView.apply {
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(context)
+            adapter = isolationFlagsAdapter
         }
     }
 
-    private fun removeFragment(saveData: Boolean) {
-        // TODO: Save Data
+    private fun setClickListeners() {
+        layoutTop.setOnClickListener {
+            removeFragment()
+        }
+        layoutBottom.setOnClickListener {
+            removeFragment()
+        }
+        layoutEnd.setOnClickListener {
+            removeFragment()
+        }
+        layoutStart.setOnClickListener {
+            removeFragment()
+        }
+        buttonReset.setOnClickListener {
+            isolationFlagsAdapter.resetToDefaults()
+            isolationFlagsAdapter.notifyDataSetChanged()
+        }
+    }
+
+    private fun removeFragment() {
+        parentFragment?.let {
+            (it as SettingsTorFragment).setIsolationFlags(portType, enabledIsolationFlags.toList())
+        }
         parentFragmentManager.beginTransaction().apply {
             remove(this@IsolationFlagsFragment)
             commit()
@@ -177,10 +220,77 @@ class IsolationFlagsFragment(
     }
 
     private inner class BackPressHandler(enable: Boolean): OnBackPressedCallback(enable) {
-
         override fun handleOnBackPressed() {
-            removeFragment(false)
+            removeFragment()
+        }
+    }
+
+    private inner class IsolationFlagsAdapter: RecyclerView.Adapter<IsolationFlagsAdapter.IsolationFlagHolder>() {
+
+        private val items = IsolationFlag.getAll()
+
+        fun resetToDefaults() {
+            enabledIsolationFlags.clear()
+            when (portType) {
+                SOCKS_FLAGS -> {
+                    defaultTorSettings.socksPortIsolationFlags?.let {
+                        enabledIsolationFlags.addAll(it)
+                    }
+                }
+                HTTP_FLAGS -> {
+                    defaultTorSettings.httpTunnelPortIsolationFlags?.let {
+                        enabledIsolationFlags.addAll(it)
+                    }
+                }
+                DNS_FLAGS -> {
+                    defaultTorSettings.dnsPortIsolationFlags?.let {
+                        enabledIsolationFlags.addAll(it)
+                    }
+                }
+                TRANS_FLAGS -> {
+                    defaultTorSettings.transPortIsolationFlags?.let {
+                        enabledIsolationFlags.addAll(it)
+                    }
+                }
+            }
         }
 
+        inner class IsolationFlagHolder(view: View): RecyclerView.ViewHolder(view)
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): IsolationFlagHolder {
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.holder_isolation_flag, parent, false)
+            return IsolationFlagHolder(view)
+        }
+
+        override fun getItemCount(): Int {
+            return items.size
+        }
+
+        override fun onBindViewHolder(holder: IsolationFlagHolder, position: Int) {
+            val isolationFlag = items[position]
+            val layout = holder.itemView.findViewById<ConstraintLayout>(R.id.holder_isolation_flag_layout_constraint)
+            val textView = holder.itemView.findViewById<TextView>(R.id.holder_isolation_flag_text_view)
+            val checkBox = holder.itemView.findViewById<CheckBox>(R.id.holder_isolation_flag_check_box)
+
+            textView.text = isolationFlag
+            checkBox.isChecked = enabledIsolationFlags.contains(isolationFlag)
+
+            checkBox.setOnClickListener {
+                clicked(isolationFlag, checkBox)
+            }
+            layout.setOnClickListener {
+                clicked(isolationFlag, checkBox)
+            }
+        }
+
+        private fun clicked(@IsolationFlag isolationFlag: String, checkBox: CheckBox) {
+            if (enabledIsolationFlags.contains(isolationFlag)) {
+                enabledIsolationFlags.remove(isolationFlag)
+                checkBox.isChecked = false
+            } else {
+                enabledIsolationFlags.add(isolationFlag)
+                checkBox.isChecked = true
+            }
+        }
     }
 }

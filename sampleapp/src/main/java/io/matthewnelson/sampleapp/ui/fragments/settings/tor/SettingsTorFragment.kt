@@ -82,6 +82,8 @@ import io.matthewnelson.sampleapp.ui.fragments.settings.CloseKeyBoardNavListener
 import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.DnsPortOption
 import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.HttpPortOption
 import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.SocksPortOption
+import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.TransPortOption
+import io.matthewnelson.topl_core_base.BaseConsts.IsolationFlag
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
 
@@ -127,10 +129,52 @@ class SettingsTorFragment : Fragment() {
 
         findViews(view)
         setButtonClickListener(view)
+        initIsolationFlags()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+    }
+
+    private val socksIsolationFlags = mutableListOf<@IsolationFlag String>()
+    private val httpIsolationFlags = mutableListOf<@IsolationFlag String>()
+    private val dnsIsolationFlags = mutableListOf<@IsolationFlag String>()
+//    private val transIsolationFlags = mutableListOf<@IsolationFlag String>()
+
+    fun setIsolationFlags(portType: String, selectedList: List<@IsolationFlag String>) {
+        when (portType) {
+            IsolationFlagsFragment.SOCKS_FLAGS -> {
+                socksIsolationFlags.clear()
+                socksIsolationFlags.addAll(selectedList)
+            }
+            IsolationFlagsFragment.HTTP_FLAGS -> {
+                httpIsolationFlags.clear()
+                httpIsolationFlags.addAll(selectedList)
+            }
+            IsolationFlagsFragment.DNS_FLAGS -> {
+                dnsIsolationFlags.clear()
+                dnsIsolationFlags.addAll(selectedList)
+            }
+//            IsolationFlagsFragment.TRANS_FLAGS -> {
+//                transIsolationFlags.clear()
+//                transIsolationFlags.addAll(selectedList)
+//            }
+        }
+    }
+
+    private fun initIsolationFlags() {
+        serviceTorSettings.socksPortIsolationFlags?.let {
+            setIsolationFlags(IsolationFlagsFragment.SOCKS_FLAGS, it)
+        }
+        serviceTorSettings.httpTunnelPortIsolationFlags?.let {
+            setIsolationFlags(IsolationFlagsFragment.HTTP_FLAGS, it)
+        }
+        serviceTorSettings.dnsPortIsolationFlags?.let {
+            setIsolationFlags(IsolationFlagsFragment.DNS_FLAGS, it)
+        }
+//        serviceTorSettings.transPortIsolationFlags?.let {
+//            setIsolationFlags(IsolationFlagsFragment.TRANS_FLAGS, it)
+//        }
     }
 
     private fun findViews(view: View) {
@@ -160,6 +204,11 @@ class SettingsTorFragment : Fragment() {
             dnsPortOption.saveDnsPort() ?: return@setOnClickListener
 //            transPortOption.saveTransPort() ?: return@setOnClickListener
 
+            serviceTorSettings.socksPortIsolationFlagsSave(socksIsolationFlags)
+            serviceTorSettings.httpPortIsolationFlagsSave(httpIsolationFlags)
+            serviceTorSettings.dnsPortIsolationFlagsSave(dnsIsolationFlags)
+//            serviceTorSettings.transPortIsolationFlagsSave(transIsolationFlags)
+
             DashboardFragment.showMessage(
                 DashMessage("Settings Saved\nTor may need to be restarted", R.drawable.dash_message_color_green, 4_000L)
             )
@@ -185,7 +234,14 @@ class SettingsTorFragment : Fragment() {
                 IsolationFlagsFragment(
                     saveButtonHeight,
                     portType,
-                    serviceTorSettings
+                    serviceTorSettings.defaultTorSettings,
+                    when (portType) {
+                        IsolationFlagsFragment.SOCKS_FLAGS -> socksIsolationFlags.toMutableSet()
+                        IsolationFlagsFragment.HTTP_FLAGS -> httpIsolationFlags.toMutableSet()
+                        IsolationFlagsFragment.DNS_FLAGS -> dnsIsolationFlags.toMutableSet()
+//                        IsolationFlagsFragment.TRANS_FLAGS -> transIsolationFlags.toMutableSet()
+                        else -> return
+                    }
                 )
             )
             commit()
