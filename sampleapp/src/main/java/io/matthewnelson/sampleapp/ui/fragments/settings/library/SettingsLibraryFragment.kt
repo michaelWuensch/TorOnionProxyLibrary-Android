@@ -110,7 +110,7 @@ class SettingsLibraryFragment : Fragment() {
         findNavController().addOnDestinationChangedListener(CloseKeyBoardNavListener(view))
 
         view.findViewById<Button>(R.id.settings_library_button_save).setOnClickListener {
-            saveSettings(view.context.applicationContext as Application)
+            saveSettings(view)
         }
     }
 
@@ -118,7 +118,9 @@ class SettingsLibraryFragment : Fragment() {
         super.onDestroyView()
     }
 
-    private fun saveSettings(application: Application) {
+    private fun saveSettings(view: View) {
+        CloseKeyBoardNavListener.closeKeyboard(view)
+
         val backgroundManagerPolicy = App.generateBackgroundManagerPolicy(
             prefs,
             backgroundManagerOptions.policy,
@@ -143,7 +145,7 @@ class SettingsLibraryFragment : Fragment() {
 
         try {
             App.setupTorServices(
-                application,
+                view.context.applicationContext as Application,
                 notificationBuilder,
                 backgroundManagerPolicy,
                 controllerOptions.getRestartDelayValue(),
