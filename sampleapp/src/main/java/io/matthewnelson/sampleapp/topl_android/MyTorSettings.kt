@@ -78,7 +78,12 @@ class MyTorSettings: TorSettings() {
         get() = DEFAULT__DISABLE_NETWORK
 
     override val dnsPort: String
-        get() = DEFAULT__DNS_PORT
+        get() = PortOption.DISABLED
+
+    override val dnsPortIsolationFlags: List<@IsolationFlag String>?
+        get() = arrayListOf(
+            IsolationFlag.ISOLATE_CLIENT_PROTOCOL
+        )
 
     override val customTorrc: String?
         get() = null
@@ -93,10 +98,15 @@ class MyTorSettings: TorSettings() {
         get() = DEFAULT__EXIT_NODES
 
     override val httpTunnelPort: String
-        get() = "auto"
+        get() = PortOption.DISABLED
 
-    override val listOfSupportedBridges: List<@SupportedBridges String>
-        get() = arrayListOf(SupportedBridges.MEEK, SupportedBridges.OBFS4)
+    override val httpTunnelPortIsolationFlags: List<@IsolationFlag String>?
+        get() = arrayListOf(
+            IsolationFlag.ISOLATE_CLIENT_PROTOCOL
+        )
+
+    override val listOfSupportedBridges: List<@SupportedBridgeType String>
+        get() = arrayListOf(SupportedBridgeType.MEEK, SupportedBridgeType.OBFS4)
 
     override val proxyHost: String?
         get() = DEFAULT__PROXY_HOST
@@ -113,8 +123,8 @@ class MyTorSettings: TorSettings() {
     override val proxySocks5ServerPort: Int?
         get() = null
 
-    override val proxyType: String?
-        get() = DEFAULT__PROXY_TYPE
+    override val proxyType: @ProxyType String
+        get() = ProxyType.DISABLED
 
     override val proxyUser: String?
         get() = DEFAULT__PROXY_USER
@@ -125,11 +135,19 @@ class MyTorSettings: TorSettings() {
     override val relayNickname: String?
         get() = DEFAULT__RELAY_NICKNAME
 
-    override val relayPort: Int?
-        get() = null
+    override val relayPort: String
+        get() = PortOption.DISABLED
 
     override val socksPort: String
-        get() = "auto"
+        get() = PortOption.AUTO
+
+    override val socksPortIsolationFlags: List<@IsolationFlag String>?
+        get() = arrayListOf(
+            IsolationFlag.KEEP_ALIVE_ISOLATE_SOCKS_AUTH,
+            IsolationFlag.IPV6_TRAFFIC,
+            IsolationFlag.PREFER_IPV6,
+            IsolationFlag.ISOLATE_CLIENT_PROTOCOL
+        )
 
     override val virtualAddressNetwork: String?
         get() = "10.192.0.2/10"
@@ -138,7 +156,7 @@ class MyTorSettings: TorSettings() {
         get() = DEFAULT__HAS_BRIDGES
 
     override val connectionPadding: @ConnectionPadding String
-        get() = DEFAULT__HAS_CONNECTION_PADDING
+        get() = ConnectionPadding.OFF
 
     override val hasCookieAuthentication: Boolean
         get() = DEFAULT__HAS_COOKIE_AUTHENTICATION
@@ -148,9 +166,6 @@ class MyTorSettings: TorSettings() {
 
     override val hasDormantCanceledByStartup: Boolean
         get() = DEFAULT__HAS_DORMANT_CANCELED_BY_STARTUP
-
-    override val hasIsolationAddressFlagForTunnel: Boolean
-        get() = DEFAULT__HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL
 
     override val hasOpenProxyOnAllInterfaces: Boolean
         get() = DEFAULT__HAS_OPEN_PROXY_ON_ALL_INTERFACES
@@ -180,7 +195,12 @@ class MyTorSettings: TorSettings() {
         get() = DEFAULT__RUN_AS_DAEMON
 
     override val transPort: String
-        get() = DEFAULT__TRANS_PORT
+        get() = PortOption.DISABLED
+
+    override val transPortIsolationFlags: List<@IsolationFlag String>?
+        get() = arrayListOf(
+            IsolationFlag.ISOLATE_CLIENT_PROTOCOL
+        )
 
     override val useSocks5: Boolean
         get() = DEFAULT__USE_SOCKS5

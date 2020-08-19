@@ -118,19 +118,19 @@
     <fragment
         android:id="@+id/navigation_settings_app"
         android:name="io.matthewnelson.sampleapp.ui.fragments.settings.app.SettingsAppFragment"
-        android:label="@string/navigation_label"
+        android:label="@string/navigation_settings_application"
         tools:layout="@layout/fragment_settings_app" />
 
     <fragment
         android:id="@+id/navigation_settings_library"
         android:name="io.matthewnelson.sampleapp.ui.fragments.settings.library.SettingsLibraryFragment"
-        android:label="@string/navigation_label"
+        android:label="@string/navigation_settings_library"
         tools:layout="@layout/fragment_settings_library" />
 
     <fragment
         android:id="@+id/navigation_settings_tor"
         android:name="io.matthewnelson.sampleapp.ui.fragments.settings.tor.SettingsTorFragment"
-        android:label="@string/navigation_label"
+        android:label="@string/navigation_settings_tor"
         tools:layout="@layout/fragment_settings_tor" />
 
 </navigation>

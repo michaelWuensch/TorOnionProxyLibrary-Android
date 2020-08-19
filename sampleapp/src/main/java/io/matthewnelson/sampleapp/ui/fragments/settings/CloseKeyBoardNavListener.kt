@@ -64,55 +64,37 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.topl_service.service.components.onionproxy
+package io.matthewnelson.sampleapp.ui.fragments.settings
 
-import io.matthewnelson.topl_core_base.EventBroadcaster
+import android.content.Context
+import android.os.Bundle
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 
-/**
- * Adds broadcasting methods to the [EventBroadcaster] to update you with information about
- * what addresses Tor is operating on. Very helpful when choosing "auto" in your
- * [io.matthewnelson.topl_core_base.TorSettings] to easily identifying what addresses to
- * use for making network calls, as well as being notified when Tor is ready to be used.
- *
- * The addresses will be broadcast to you after Tor has been fully Bootstrapped. If Tor is
- * stopped (ie. it's [io.matthewnelson.topl_core_base.BaseConsts.TorState] changes from **ON**
- * to **OFF**), `null` will be broadcast.
- *
- * All broadcasts to your implementation to this class will occur on the Main thread.
- *
- * @sample [io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster]
- * */
-abstract class TorServiceEventBroadcaster: EventBroadcaster() {
+class CloseKeyBoardNavListener(private val view: View): NavController.OnDestinationChangedListener {
 
-    /**
-     * Override this method to implement receiving of the control port address that Tor
-     * is operating on.
-     *
-     * Example of what will be broadcast:
-     *
-     *   - "127.0.0.1:33432"
-     * */
-    abstract fun broadcastControlPortAddress(controlPortAddress: String?)
+    companion object {
+        fun closeKeyboard(view: View) {
+            val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
+            imm?.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+    }
 
-    /**
-     * Override this method to implement receiving of the Socks port address that Tor
-     * is operating on (if you've specified a
-     * [io.matthewnelson.topl_core_base.TorSettings.socksPort]).
-     *
-     * Example of what will be broadcast:
-     *
-     *   - "127.0.0.1:9051"
-     * */
-    abstract fun broadcastSocksPortAddress(socksPortAddress: String?)
+    private var startLock: Any? = null
 
-    /**
-     * Override this method to implement receiving of the http port address that Tor
-     * is operating on (if you've specified a
-     * [io.matthewnelson.topl_core_base.TorSettings.httpTunnelPort]).
-     *
-     * Example of what will be broadcast:
-     *
-     *   - "127.0.0.1:33432"
-     * */
-    abstract fun broadcastHttpPortAddress(httpPortAddress: String?)
+    override fun onDestinationChanged(
+        controller: NavController,
+        destination: NavDestination,
+        arguments: Bundle?
+    ) {
+        if (startLock == null) {
+            startLock = Any()
+            return
+        }
+
+        closeKeyboard(view)
+        controller.removeOnDestinationChangedListener(this)
+    }
 }

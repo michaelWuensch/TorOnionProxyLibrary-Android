@@ -75,10 +75,12 @@ import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
+import io.matthewnelson.topl_service.prefs.TorServicePrefs
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.actions.ServiceActions
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
-import io.matthewnelson.topl_service.service.components.onionproxy.TorServiceEventBroadcaster
+import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
+import io.matthewnelson.topl_service.service.components.onionproxy.model.TorServiceEventBroadcaster
 import io.matthewnelson.topl_service.util.ServiceConsts
 
 class TorServiceController private constructor(): ServiceConsts() {
@@ -129,10 +131,16 @@ class TorServiceController private constructor(): ServiceConsts() {
         private val torServiceNotificationBuilder: ServiceNotification.Builder,
         private val backgroundManagerPolicy: BackgroundManager.Builder.Policy,
         private val buildConfigVersionCode: Int,
-        private val torSettings: TorSettings,
+        torSettings: TorSettings,
         private val geoipAssetPath: String,
         private val geoip6AssetPath: String
     ) {
+
+        init {
+            // Ensure TorSettings gets initialized no matter if exceptions are thrown
+            // elsewhere in the builder
+            BaseService.initializTorSettings(torSettings)
+        }
 
         private var appEventBroadcaster: TorServiceEventBroadcaster? = Companion.appEventBroadcaster
 //        private var heartbeatTime = BackgroundManager.heartbeatTime
@@ -281,7 +289,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * to operate with.
          *
          * @return [Builder]
-         * @sample [io.matthewnelson.sampleapp.App.customTorConfigFilesSetup]
+         * @sample [io.matthewnelson.sampleapp.topl_android.CodeSamples.customTorConfigFilesSetup]
          * @see [Builder.build]
          * */
         fun useCustomTorConfigFiles(torConfigFiles: TorConfigFiles): Builder {
@@ -311,7 +319,6 @@ class TorServiceController private constructor(): ServiceConsts() {
                 geoipAssetPath,
                 geoip6AssetPath,
                 torConfigFiles ?: TorConfigFiles.createConfig(application.applicationContext),
-                torSettings,
                 stopServiceOnTaskRemoved
             )
 
@@ -344,23 +351,43 @@ class TorServiceController private constructor(): ServiceConsts() {
         @JvmStatic
         @Throws(RuntimeException::class)
         fun getTorConfigFiles(): TorConfigFiles {
-            BaseService.getAppContext()
-            return BaseService.torConfigFiles
+            return try {
+                BaseService.torConfigFiles
+            } catch (e: UninitializedPropertyAccessException) {
+                throw RuntimeException(e.message)
+            }
         }
 
         /**
-         * Get the [TorSettings] that have been set after calling [Builder.build]. These are
+         * Get the [TorSettings] that have been set after instantiating [Builder]. These are
          * the [TorSettings] you initialized [TorServiceController.Builder] with.
          *
+         * This method will *never* throw the [RuntimeException] if you call it after
+         * you have instantiated the [Builder] object, as [TorSettings] are set immediately
+         * via [BaseService.initializTorSettings].
+         *
          * @return Instance of [TorSettings] that are being used throughout TOPL-Android
-         * @throws [RuntimeException] if called before [Builder.build]
+         * @throws [RuntimeException] if called before [Builder] is instantiated
          * */
         @JvmStatic
         @Throws(RuntimeException::class)
         fun getTorSettings(): TorSettings {
-            BaseService.getAppContext()
-            return BaseService.torSettings
+            return try {
+                BaseService.torSettings
+            } catch (e: UninitializedPropertyAccessException) {
+                throw RuntimeException(e.message)
+            }
         }
+
+        /**
+         * Helper method for easily obtaining [ServiceTorSettings].
+         *
+         * @throws [RuntimeException] See [getTorSettings]
+         * */
+        @JvmStatic
+        @Throws(RuntimeException::class)
+        fun getServiceTorSettings(context: Context): ServiceTorSettings =
+            ServiceTorSettings(TorServicePrefs(context), getTorSettings())
 
         /**
          * Starts [TorService] and then Tor. You can call this as much as you want. If

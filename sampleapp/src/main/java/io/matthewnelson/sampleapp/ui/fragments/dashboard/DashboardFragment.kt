@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -13,7 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
+import androidx.annotation.ColorRes
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
@@ -50,9 +51,9 @@ class DashboardFragment : Fragment() {
     private lateinit var textViewState: TextView
 
     // Bottom row
-    private lateinit var textViewControlPort: TextView
-    private lateinit var textViewSocksPort: TextView
+    private lateinit var textViewDnsPort: TextView
     private lateinit var textViewHttpPort: TextView
+    private lateinit var textViewSocksPort: TextView
 
     // Messages
     private lateinit var textViewMessage: TextView
@@ -83,9 +84,9 @@ class DashboardFragment : Fragment() {
         textViewBandwidth = view.findViewById(R.id.dash_text_view_bandwidth)
         textViewNetworkState = view.findViewById(R.id.dash_text_view_tor_network_state)
         textViewState = view.findViewById(R.id.dash_text_view_tor_state)
-        textViewControlPort = view.findViewById(R.id.dash_text_view_port_control)
-        textViewSocksPort = view.findViewById(R.id.dash_text_view_port_socks)
+        textViewDnsPort = view.findViewById(R.id.dash_text_view_port_dns)
         textViewHttpPort = view.findViewById(R.id.dash_text_view_port_http)
+        textViewSocksPort = view.findViewById(R.id.dash_text_view_port_socks)
         textViewMessage = view.findViewById(R.id.dash_text_view_message)
         buttonAppRestart = view.findViewById(R.id.dash_button_app_restart)
     }
@@ -99,6 +100,8 @@ class DashboardFragment : Fragment() {
         liveDashMessage.observe(owner, Observer {
             if (it != null) {
                 textViewMessage.text = it.message
+                val colorHex = colorResToHexString(textViewMessage.context, it.textColor)
+                textViewMessage.setTextColor(Color.parseColor(colorHex))
                 textViewMessage.background = ContextCompat.getDrawable(textViewMessage.context, it.background)
                 textViewMessage.visibility = View.VISIBLE
                 launchCleanUpMessageJob(it.showLength)
@@ -120,21 +123,16 @@ class DashboardFragment : Fragment() {
             })
         }
         TorServiceController.appEventBroadcaster?.let {
-            (it as MyEventBroadcaster).liveControlPortAddress.observe(owner, Observer { data ->
-                textViewControlPort.text = data ?: "None"
-            })
-        }
-        TorServiceController.appEventBroadcaster?.let {
-            (it as MyEventBroadcaster).liveSocksPortAddress.observe(owner, Observer { data ->
-                textViewSocksPort.text = data ?: "None"
-            })
-        }
-        TorServiceController.appEventBroadcaster?.let {
-            (it as MyEventBroadcaster).liveHttpPortAddress.observe(owner, Observer { data ->
-                textViewHttpPort.text = data ?: "None"
+            (it as MyEventBroadcaster).liveTorPortInfo.observe(owner, Observer { data ->
+                textViewDnsPort.text = data?.dnsPort ?: "-----"
+                textViewHttpPort.text = data?.httpPort ?: "-----"
+                textViewSocksPort.text = data?.socksPort ?: "-----"
             })
         }
     }
+
+    private fun colorResToHexString(context: Context, @ColorRes colorRes: Int): String =
+        "#${Integer.toHexString(ContextCompat.getColor(context, colorRes))}"
 
     private var showMessageCleanUpJob: Job? = null
 
@@ -151,10 +149,16 @@ class DashboardFragment : Fragment() {
 
     private fun initButtons(context: Context, owner: LifecycleOwner) {
         buttonAppRestart.setOnClickListener {
-            buttonAppRestart.visibility = View.GONE
+            buttonAppRestart.isEnabled = false
             HomeFragment.appIsBeingKilled()
 
-            Toast.makeText(context, "Killing Application", Toast.LENGTH_LONG).show()
+            showMessage(
+                DashMessage(
+                    "Application is being killed",
+                    R.drawable.dash_message_color_red,
+                    10_000
+                )
+            )
 
             TorServiceController.appEventBroadcaster?.let {
                 (it as MyEventBroadcaster).liveTorState.observe(owner, Observer { data ->

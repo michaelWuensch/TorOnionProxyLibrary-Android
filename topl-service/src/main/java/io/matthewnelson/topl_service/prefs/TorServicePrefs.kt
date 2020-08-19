@@ -126,8 +126,12 @@ class TorServicePrefs(context: Context): ServiceConsts() {
      *  @return True if the SharedPreference contains a value for the associated
      *   [prefsKey], false if not
      *  * */
-    fun contains(@PrefKeyBoolean @PrefKeyInt @PrefKeyList @PrefKeyString prefsKey: String): Boolean =
+    fun contains(prefsKey: String): Boolean =
         prefs.contains(prefsKey)
+
+    @Throws(NullPointerException::class)
+    fun getAll(): Map<String, *> =
+        prefs.all
 
     /**
      * Returns a Boolean value for the provided [ServiceConsts.PrefKeyBoolean]. If no
@@ -199,6 +203,13 @@ class TorServicePrefs(context: Context): ServiceConsts() {
     //////////////
     /// Modify ///
     //////////////
+
+    fun clear() {
+        val editor = prefs.edit().clear()
+        if (!editor.commit())
+            editor.apply()
+    }
+
     /**
      * Removes from the SharedPreference the value associated with [prefsKey] if there is one.
      * Accepts the following annotation type String values:
@@ -209,7 +220,7 @@ class TorServicePrefs(context: Context): ServiceConsts() {
      *
      *  @param [prefsKey] String of type ServiceConsts.PrefKey*
      *  * */
-    fun remove(@PrefKeyBoolean @PrefKeyInt @PrefKeyList @PrefKeyString prefsKey: String) {
+    fun remove(prefsKey: String) {
         val editor = prefs.edit().remove(prefsKey)
         if (!editor.commit())
             editor.apply()

@@ -66,15 +66,12 @@
  */
 package io.matthewnelson.test_helpers.application_provided_classes
 
-import io.matthewnelson.topl_service.service.components.onionproxy.TorServiceEventBroadcaster
+import io.matthewnelson.topl_service.service.components.onionproxy.model.TorPortInfo
+import io.matthewnelson.topl_service.service.components.onionproxy.model.TorServiceEventBroadcaster
 
 class TestEventBroadcaster: TorServiceEventBroadcaster() {
 
-    override fun broadcastControlPortAddress(controlPortAddress: String?) {}
-
-    override fun broadcastSocksPortAddress(socksPortAddress: String?) {}
-
-    override fun broadcastHttpPortAddress(httpPortAddress: String?) {}
+    override fun broadcastPortInformation(torPortInfo: TorPortInfo) {}
 
     override fun broadcastBandwidth(bytesRead: String, bytesWritten: String) {}
 

@@ -67,7 +67,6 @@
 package io.matthewnelson.topl_core_base
 
 import androidx.annotation.StringDef
-import java.lang.Error
 
 abstract class BaseConsts {
 
@@ -147,22 +146,38 @@ abstract class BaseConsts {
     ///////////////////
     /// TorSettings ///
     ///////////////////
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE)
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.TYPE
+    )
     @StringDef(
-        SupportedBridges.MEEK,
-        SupportedBridges.OBFS4,
-        SupportedBridges.SNOWFLAKE
+        SupportedBridgeType.MEEK,
+        SupportedBridgeType.OBFS4,
+        SupportedBridgeType.SNOWFLAKE
     )
     @Retention(AnnotationRetention.SOURCE)
-    annotation class SupportedBridges {
+    annotation class SupportedBridgeType {
         companion object {
             const val MEEK = "meek"
             const val OBFS4 = "obfs4"
             const val SNOWFLAKE = "snowflake"
+
+            fun getAll(): List<@SupportedBridgeType String> {
+                return arrayListOf(
+                    MEEK,
+                    OBFS4,
+                    SNOWFLAKE
+                )
+            }
         }
     }
 
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.VALUE_PARAMETER)
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.TYPE,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.PROPERTY
+    )
     @StringDef(
         ConnectionPadding.AUTO,
         ConnectionPadding.OFF,
@@ -174,6 +189,139 @@ abstract class BaseConsts {
             const val AUTO = "auto"
             const val OFF = "0"
             const val ON = "1"
+
+            fun getAll(): List<@ConnectionPadding String> {
+                return arrayListOf(
+                    AUTO,
+                    OFF,
+                    ON
+                )
+            }
+        }
+    }
+
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.TYPE,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.PROPERTY
+    )
+    @StringDef(
+        PortOption.AUTO,
+        PortOption.DISABLED
+    )
+    @Retention(AnnotationRetention.SOURCE)
+    annotation class PortOption {
+        companion object {
+            const val AUTO = "auto"
+            const val DISABLED = "0"
+        }
+    }
+
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.TYPE,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.PROPERTY
+    )
+    @StringDef(
+        ProxyType.DISABLED,
+        ProxyType.HTTPS,
+        ProxyType.SOCKS_5
+    )
+    @Retention(AnnotationRetention.SOURCE)
+    annotation class ProxyType {
+        companion object {
+            const val DISABLED = ""
+            const val HTTPS = "HTTPS"
+            const val SOCKS_5 = "Socks5"
+
+            fun getAll(): List<@ProxyType String> {
+                return arrayListOf(
+                    DISABLED,
+                    HTTPS,
+                    SOCKS_5
+                )
+            }
+        }
+    }
+
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.TYPE,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.PROPERTY
+    )
+    @StringDef(
+        IsolationFlag.NO_ISOLATE_CLIENT_ADDR,
+        IsolationFlag.NO_ISOLATE_SOCKS_AUTH,
+        IsolationFlag.ISOLATE_CLIENT_PROTOCOL,
+        IsolationFlag.ISOLATE_DEST_PORT,
+        IsolationFlag.ISOLATE_DEST_ADDR,
+        IsolationFlag.KEEP_ALIVE_ISOLATE_SOCKS_AUTH,
+        IsolationFlag.NO_IPV4_TRAFFIC,
+        IsolationFlag.IPV6_TRAFFIC,
+        IsolationFlag.PREFER_IPV6,
+        IsolationFlag.NO_DNS_REQUEST,
+        IsolationFlag.NO_ONION_TRAFFIC,
+        IsolationFlag.ONION_TRAFFIC_ONLY,
+        IsolationFlag.CACHE_IPV4_DNS,
+        IsolationFlag.CACHE_IPV6_DNS,
+        IsolationFlag.CACHE_DNS,
+        IsolationFlag.USE_IPV4_CACHE,
+        IsolationFlag.USE_IPV6_CACHE,
+        IsolationFlag.USE_DNS_CACHE,
+        IsolationFlag.PREFER_IPV6_AUTOMAP,
+        IsolationFlag.PREFER_SOCKS_NO_AUTH
+    )
+    @Retention(AnnotationRetention.SOURCE)
+    annotation class IsolationFlag {
+        companion object {
+            const val NO_ISOLATE_CLIENT_ADDR = "NoIsolateClientAddr"
+            const val NO_ISOLATE_SOCKS_AUTH = "NoIsolateSOCKSAuth"
+            const val ISOLATE_CLIENT_PROTOCOL = "IsolateClientProtocol"
+            const val ISOLATE_DEST_PORT = "IsolateDestPort"
+            const val ISOLATE_DEST_ADDR = "IsolateDestAddr"
+            const val KEEP_ALIVE_ISOLATE_SOCKS_AUTH = "KeepAliveIsolateSOCKSAuth"
+            const val NO_IPV4_TRAFFIC = "NoIPv4Traffic"
+            const val IPV6_TRAFFIC = "IPv6Traffic"
+            const val PREFER_IPV6 = "PreferIPv6"
+            const val NO_DNS_REQUEST = "NoDNSRequest"
+            const val NO_ONION_TRAFFIC = "NoOnionTraffic"
+            const val ONION_TRAFFIC_ONLY = "OnionTrafficOnly"
+            const val CACHE_IPV4_DNS = "CacheIPv4DNS"
+            const val CACHE_IPV6_DNS = "CacheIPv6DNS"
+            const val CACHE_DNS = "CacheDNS"
+            const val USE_IPV4_CACHE = "UseIPv4Cache"
+            const val USE_IPV6_CACHE = "UseIPv6Cache"
+            const val USE_DNS_CACHE = "UseDNSCache"
+            const val PREFER_IPV6_AUTOMAP = "PreferIPv6Automap"
+            const val PREFER_SOCKS_NO_AUTH = "PreferSOCKSNoAuth"
+
+            fun getAll(): List<@IsolationFlag String> {
+                return arrayListOf(
+                    NO_ISOLATE_CLIENT_ADDR,
+                    NO_ISOLATE_SOCKS_AUTH,
+                    ISOLATE_CLIENT_PROTOCOL,
+                    ISOLATE_DEST_PORT,
+                    ISOLATE_DEST_ADDR,
+                    KEEP_ALIVE_ISOLATE_SOCKS_AUTH,
+                    NO_IPV4_TRAFFIC,
+                    IPV6_TRAFFIC,
+                    PREFER_IPV6,
+                    NO_DNS_REQUEST,
+                    NO_ONION_TRAFFIC,
+                    ONION_TRAFFIC_ONLY,
+                    CACHE_IPV4_DNS,
+                    CACHE_IPV6_DNS,
+                    CACHE_DNS,
+                    USE_IPV4_CACHE,
+                    USE_IPV6_CACHE,
+                    USE_DNS_CACHE,
+                    PREFER_IPV6_AUTOMAP,
+                    PREFER_SOCKS_NO_AUTH
+                )
+            }
         }
     }
 
@@ -181,7 +329,12 @@ abstract class BaseConsts {
     ///////////////////////////
     /// TorConfigFile Names ///
     ///////////////////////////
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.VALUE_PARAMETER)
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.TYPE,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.PROPERTY
+    )
     @StringDef(
         ConfigFileName.CONTROL_PORT,
         ConfigFileName.COOKIE_AUTH,

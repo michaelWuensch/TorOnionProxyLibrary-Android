@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?><!--
 /*
 * TorOnionProxyLibrary-Android (a.k.a. topl-android) is a derivation of
 * work from the Tor_Onion_Proxy_Library project that started at commit
@@ -65,17 +64,30 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
--->
+package io.matthewnelson.topl_service.service.components.onionproxy.model
 
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/primaryLightColor"
-    android:gravity="center_horizontal"
-    android:padding="4dp"
-    android:textColor="@color/primaryTextColor"
-    android:textSize="14sp"
-    tools:text="Spinner Item">
+import io.matthewnelson.topl_core_base.EventBroadcaster
 
-</TextView>
+/**
+ * Adds broadcasting methods to the [EventBroadcaster] to update you with information about
+ * what addresses Tor is operating on. Very helpful when choosing "auto" in your
+ * [io.matthewnelson.topl_core_base.TorSettings] to easily identify what addresses to
+ * use for making network calls, as well as being notified when Tor is ready to be used.
+ *
+ * The addresses will be broadcast to you after Tor has been fully Bootstrapped. If Tor is
+ * stopped (ie. it's [io.matthewnelson.topl_core_base.BaseConsts.TorState] changes from **ON**
+ * to **OFF**), a [TorPortInfo] object containing 'null' for all fields will be broadcast.
+ *
+ * All broadcasts to your implementation to this class will occur on the Main Thread.
+ *
+ * @sample [io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster]
+ * */
+abstract class TorServiceEventBroadcaster: EventBroadcaster() {
+
+    /**
+     * Override this method to implement receiving of port information pertaining to Tor.
+     *
+     * @see [TorPortInfo]
+     * */
+    abstract fun broadcastPortInformation(torPortInfo: TorPortInfo)
+}

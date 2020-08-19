@@ -66,16 +66,33 @@
 *     exception when you distribute your modified version.
 * */
 -->
-
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/holder_isolation_flag_layout_constraint"
+    android:layout_marginBottom="8dp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/primaryLightColor"
-    android:gravity="center_horizontal"
-    android:padding="4dp"
-    android:textColor="@color/primaryTextColor"
-    android:textSize="14sp"
-    tools:text="Spinner Item">
+    android:layout_height="wrap_content">
 
-</TextView>
+    <TextView
+        android:id="@+id/holder_isolation_flag_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center_vertical"
+        android:singleLine="true"
+        android:textIsSelectable="false"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="OnionTrafficOnly" />
+
+    <CheckBox
+        android:id="@+id/holder_isolation_flag_check_box"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:checked="true" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

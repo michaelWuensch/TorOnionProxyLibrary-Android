@@ -1,11 +1,14 @@
 <resources>
     <!--    <string name="app_name">SampleApp</string>   See build.gradle buildTypes -->
     <string name="navigation_label">TOPL-Android Demo</string>
+    <string name="navigation_settings_application">Application Settings</string>
+    <string name="navigation_settings_library">Library Settings</string>
+    <string name="navigation_settings_tor">Tor Settings</string>
 
     <!-- DashboardFragment -->
-    <string name="dashboard_text_view_control_port">Control Port:</string>
-    <string name="dashboard_text_view_socks_port">Socks Port:</string>
-    <string name="dashboard_text_view_http_port">Http Port:</string>
+    <string name="dashboard_text_view_dns_port">DNS:</string>
+    <string name="dashboard_text_view_http_port">HTTP:</string>
+    <string name="dashboard_text_view_socks_port">Socks:</string>
     <string name="dash_button_app_restart">Application Restart Needed</string>
 
     <!-- HomeFragment -->
@@ -70,4 +73,23 @@
     <string name="settings_library_text_view_controller_build_config">Build Config:</string>
 
     <!-- SettingsTorFragment -->
+    <string name="settings_tor_edit_text_hint_port_custom">1024 to 65535</string>
+    <string name="settings_tor_text_view_socks_port">Socks Port:</string>
+    <string name="settings_tor_text_view_socks_port_custom">Custom (eg. 9050):</string>
+    <string name="settings_tor_button_socks_isolation_flags">Socks Isolation Flags</string>
+    <string name="settings_tor_text_view_http_port">HTTP Port:</string>
+    <string name="settings_tor_text_view_http_port_custom">Custom (eg. 8118):</string>
+    <string name="settings_tor_button_http_isolation_flags">HTTP Isolation Flags</string>
+    <string name="settings_tor_text_view_dns_port">DNS Port:</string>
+    <string name="settings_tor_text_view_dns_port_custom">Custom (eg. 5400):</string>
+    <string name="settings_tor_button_dns_isolation_flags">DNS Isolation Flags</string>
+    <string name="settings_tor_text_view_trans_port">Trans Port:</string>
+    <string name="settings_tor_text_view_trans_port_custom">Custom (eg. 9040):</string>
+    <string name="settings_tor_button_trans_isolation_flags">Trans Isolation Flags</string>
+
+    <!-- IsolationFlagsFragment -->
+    <string name="isolation_fragment_reset_socks">Reset Socks Flags</string>
+    <string name="isolation_fragment_reset_http">Reset HTTP Flags</string>
+    <string name="isolation_fragment_reset_dns">Reset DNS Flags</string>
+    <string name="isolation_fragment_reset_trans">Reset Trans Flags</string>
 </resources>

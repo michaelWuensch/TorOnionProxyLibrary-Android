@@ -67,27 +67,184 @@
 package io.matthewnelson.sampleapp.ui.fragments.settings.tor
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
+import android.widget.Button
+import androidx.core.view.marginBottom
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import io.matthewnelson.sampleapp.R
+import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashMessage
+import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment
+import io.matthewnelson.sampleapp.ui.fragments.settings.CloseKeyBoardNavListener
+import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.DnsPortOption
+import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.HttpPortOption
+import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.SocksPortOption
+import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.TransPortOption
+import io.matthewnelson.topl_core_base.BaseConsts.IsolationFlag
+import io.matthewnelson.topl_service.TorServiceController
+import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
 
 class SettingsTorFragment : Fragment() {
+
+    companion object {
+        const val AUTO = "Auto"
+        const val DISABLED = "Disabled"
+        const val CUSTOM = "Custom"
+    }
+
+    private lateinit var serviceTorSettings: ServiceTorSettings
+    private lateinit var socksPortOption: SocksPortOption
+    private lateinit var httpPortOption: HttpPortOption
+    private lateinit var dnsPortOption: DnsPortOption
+//    private lateinit var transPortOption: TransPortOption
+
+    private lateinit var buttonSocksFlags: Button
+    private lateinit var buttonHttpFlags: Button
+    private lateinit var buttonDnsFlags: Button
+//    private lateinit var buttonTransFlags: Button
+    private var saveButtonHeight = 0
+
+    private lateinit var buttonSave: Button
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        serviceTorSettings = TorServiceController.getServiceTorSettings(inflater.context)
         return inflater.inflate(R.layout.fragment_settings_tor, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        socksPortOption = SocksPortOption(view, serviceTorSettings)
+        httpPortOption = HttpPortOption(view, serviceTorSettings)
+        dnsPortOption = DnsPortOption(view, serviceTorSettings)
+//        transPortOption = TransPortOption(view, serviceTorSettings)
+
+        findNavController().addOnDestinationChangedListener(CloseKeyBoardNavListener(view))
+
+        findViews(view)
+        setButtonClickListener(view)
+        initIsolationFlags()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+    }
+
+    private val socksIsolationFlags = mutableListOf<@IsolationFlag String>()
+    private val httpIsolationFlags = mutableListOf<@IsolationFlag String>()
+    private val dnsIsolationFlags = mutableListOf<@IsolationFlag String>()
+//    private val transIsolationFlags = mutableListOf<@IsolationFlag String>()
+
+    fun setIsolationFlags(portType: String, selectedList: List<@IsolationFlag String>) {
+        when (portType) {
+            IsolationFlagsFragment.SOCKS_FLAGS -> {
+                socksIsolationFlags.clear()
+                socksIsolationFlags.addAll(selectedList)
+            }
+            IsolationFlagsFragment.HTTP_FLAGS -> {
+                httpIsolationFlags.clear()
+                httpIsolationFlags.addAll(selectedList)
+            }
+            IsolationFlagsFragment.DNS_FLAGS -> {
+                dnsIsolationFlags.clear()
+                dnsIsolationFlags.addAll(selectedList)
+            }
+//            IsolationFlagsFragment.TRANS_FLAGS -> {
+//                transIsolationFlags.clear()
+//                transIsolationFlags.addAll(selectedList)
+//            }
+        }
+    }
+
+    private fun initIsolationFlags() {
+        serviceTorSettings.socksPortIsolationFlags?.let {
+            setIsolationFlags(IsolationFlagsFragment.SOCKS_FLAGS, it)
+        }
+        serviceTorSettings.httpTunnelPortIsolationFlags?.let {
+            setIsolationFlags(IsolationFlagsFragment.HTTP_FLAGS, it)
+        }
+        serviceTorSettings.dnsPortIsolationFlags?.let {
+            setIsolationFlags(IsolationFlagsFragment.DNS_FLAGS, it)
+        }
+//        serviceTorSettings.transPortIsolationFlags?.let {
+//            setIsolationFlags(IsolationFlagsFragment.TRANS_FLAGS, it)
+//        }
+    }
+
+    private fun findViews(view: View) {
+        buttonSocksFlags = view.findViewById(R.id.settings_tor_button_socks_isolation_flags)
+        buttonHttpFlags = view.findViewById(R.id.settings_tor_button_http_isolation_flags)
+        buttonDnsFlags = view.findViewById(R.id.settings_tor_button_dns_isolation_flags)
+//        buttonTransFlags = view.findViewById(R.id.settings_tor_button_trans_isolation_flags)
+
+        buttonSave = view.findViewById(R.id.settings_tor_button_save)
+
+        val viewTreeObserver = view.viewTreeObserver
+        if (viewTreeObserver.isAlive) {
+            viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    view.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                    saveButtonHeight = buttonSave.height + buttonSave.marginBottom
+                }
+            })
+        }
+    }
+
+    private fun setButtonClickListener(view: View) {
+        buttonSave.setOnClickListener {
+            CloseKeyBoardNavListener.closeKeyboard(view)
+            socksPortOption.saveSocksPort() ?: return@setOnClickListener
+            httpPortOption.saveHttpPort() ?: return@setOnClickListener
+            dnsPortOption.saveDnsPort() ?: return@setOnClickListener
+//            transPortOption.saveTransPort() ?: return@setOnClickListener
+
+            serviceTorSettings.socksPortIsolationFlagsSave(socksIsolationFlags)
+            serviceTorSettings.httpPortIsolationFlagsSave(httpIsolationFlags)
+            serviceTorSettings.dnsPortIsolationFlagsSave(dnsIsolationFlags)
+//            serviceTorSettings.transPortIsolationFlagsSave(transIsolationFlags)
+
+            DashboardFragment.showMessage(
+                DashMessage("Settings Saved\nTor may need to be restarted", R.drawable.dash_message_color_green, 4_000L)
+            )
+        }
+        buttonSocksFlags.setOnClickListener {
+            openIsolationFlagsFragment(IsolationFlagsFragment.SOCKS_FLAGS)
+        }
+        buttonHttpFlags.setOnClickListener {
+            openIsolationFlagsFragment(IsolationFlagsFragment.HTTP_FLAGS)
+        }
+        buttonDnsFlags.setOnClickListener {
+            openIsolationFlagsFragment(IsolationFlagsFragment.DNS_FLAGS)
+        }
+//        buttonTransFlags.setOnClickListener {
+//            openIsolationFlagsFragment(IsolationFlagsFragment.TRANS_FLAGS)
+//        }
+    }
+
+    private fun openIsolationFlagsFragment(portType: String) {
+        childFragmentManager.beginTransaction().apply {
+            add(
+                R.id.settings_tor_fragment_container,
+                IsolationFlagsFragment(
+                    saveButtonHeight,
+                    portType,
+                    serviceTorSettings.defaultTorSettings,
+                    when (portType) {
+                        IsolationFlagsFragment.SOCKS_FLAGS -> socksIsolationFlags.toMutableSet()
+                        IsolationFlagsFragment.HTTP_FLAGS -> httpIsolationFlags.toMutableSet()
+                        IsolationFlagsFragment.DNS_FLAGS -> dnsIsolationFlags.toMutableSet()
+//                        IsolationFlagsFragment.TRANS_FLAGS -> transIsolationFlags.toMutableSet()
+                        else -> return
+                    }
+                )
+            )
+            commit()
+        }
     }
 }
