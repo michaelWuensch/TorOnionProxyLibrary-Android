@@ -88,4 +88,8 @@
     <string name="settings_tor_button_trans_isolation_flags">Trans Isolation Flags</string>
 
     <!-- IsolationFlagsFragment -->
+    <string name="isolation_fragment_reset_socks">Reset Socks Flags</string>
+    <string name="isolation_fragment_reset_http">Reset HTTP Flags</string>
+    <string name="isolation_fragment_reset_dns">Reset DNS Flags</string>
+    <string name="isolation_fragment_reset_trans">Reset Trans Flags</string>
 </resources>
