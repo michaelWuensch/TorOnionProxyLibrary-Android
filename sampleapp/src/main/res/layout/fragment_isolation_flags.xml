@@ -128,6 +128,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <Button
+            android:id="@+id/isolation_flags_button_reset"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/button_color_grey"
+            android:text="@string/isolation_fragment_reset_socks"
+            android:textAllCaps="false"
+            app:layout_constraintEnd_toEndOf="@+id/recycler_view_isolation_flags"
+            app:layout_constraintStart_toStartOf="@+id/recycler_view_isolation_flags"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_isolation_flags"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="4dp"
+            android:fadeScrollbars="false"
+            android:scrollbars="vertical"
+            app:layout_constraintBottom_toBottomOf="@+id/isolation_flags_layout_constraint_inner"
+            app:layout_constraintEnd_toEndOf="@+id/isolation_flags_layout_constraint_inner"
+            app:layout_constraintStart_toStartOf="@+id/isolation_flags_layout_constraint_inner"
+            app:layout_constraintTop_toBottomOf="@id/isolation_flags_button_reset" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
