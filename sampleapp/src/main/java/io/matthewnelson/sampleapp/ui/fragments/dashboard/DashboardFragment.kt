@@ -13,7 +13,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
@@ -146,7 +145,13 @@ class DashboardFragment : Fragment() {
             buttonAppRestart.isEnabled = false
             HomeFragment.appIsBeingKilled()
 
-            Toast.makeText(context, "Killing Application", Toast.LENGTH_LONG).show()
+            showMessage(
+                DashMessage(
+                    "Application is being killed",
+                    R.drawable.dash_message_color_red,
+                    10_000
+                )
+            )
 
             TorServiceController.appEventBroadcaster?.let {
                 (it as MyEventBroadcaster).liveTorState.observe(owner, Observer { data ->
