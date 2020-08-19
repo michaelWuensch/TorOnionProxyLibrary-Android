@@ -177,6 +177,10 @@ class SettingsLibraryFragment : Fragment() {
             DashboardFragment.showMessage(
                 DashMessage("Settings Saved", R.drawable.dash_message_color_green, 3_000L)
             )
+        } else {
+            DashboardFragment.showMessage(
+                DashMessage("No Changes", R.drawable.dash_message_color_secondary_light, 2_000)
+            )
         }
     }
 }
