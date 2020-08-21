@@ -318,6 +318,27 @@ class TorSettingsBuilder internal constructor(
         else
             this
 
+    fun dormantClientTimetout(minutes: Int): TorSettingsBuilder {
+        val value = if (minutes < 10)
+            10
+        else
+            minutes
+        buffer.append("DormantClientTimeout $value minutes\n")
+        return this
+    }
+
+    @SettingsConfig
+    fun dormantClientTimeoutFromSettings(): TorSettingsBuilder {
+        return when (val minutes = torSettings.dormantClientTimeout) {
+            null -> {
+                this
+            }
+            else -> {
+                dormantClientTimetout(minutes)
+            }
+        }
+    }
+
     fun disableNetwork(disable: Boolean): TorSettingsBuilder {
         val disableNetwork = if (disable) "1" else "0"
         buffer.append("DisableNetwork $disableNetwork\n")
