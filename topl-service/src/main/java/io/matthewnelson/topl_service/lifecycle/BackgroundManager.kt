@@ -67,7 +67,6 @@
 package io.matthewnelson.topl_service.lifecycle
 
 import android.content.Context
-import android.os.Process
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -77,6 +76,7 @@ import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts
+import kotlin.system.exitProcess
 
 /**
  * When your application is sent to the background (the Recent App's tray or lock screen), the
@@ -290,7 +290,7 @@ class BackgroundManager internal constructor(
          * */
         internal fun killAppProcess() {
             if (backgroundManager.killAppIfTaskIsRemoved && taskIsRemovedFromRecentApps) {
-                Process.killProcess(Process.myPid())
+                exitProcess(0)
             }
         }
     }
