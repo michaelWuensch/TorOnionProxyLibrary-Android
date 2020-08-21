@@ -90,8 +90,13 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
             private set
 
         fun initialize(restartMilliseconds: Long, stopServiceMilliseconds: Long) {
-            restartTorDelayTime = restartMilliseconds
-            stopServiceDelayTime = stopServiceMilliseconds
+            // Only initialize it once.
+            try {
+                BaseService.getAppContext()
+            } catch (e: RuntimeException) {
+                restartTorDelayTime = restartMilliseconds
+                stopServiceDelayTime = stopServiceMilliseconds
+            }
         }
 
         //////////////////////////
