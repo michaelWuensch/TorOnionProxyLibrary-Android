@@ -224,7 +224,7 @@ class BackgroundManager internal constructor(
         class Policy internal constructor (private val policyBuilder: Builder) {
 
             internal fun configurationIsCompliant(stopServiceOnTaskRemoved: Boolean): Boolean {
-                return if (stopServiceOnTaskRemoved) {
+                return if (!stopServiceOnTaskRemoved) {
                     policyBuilder.chosenPolicy == BackgroundPolicy.RUN_IN_FOREGROUND &&
                             policyBuilder.killAppIfTaskIsRemoved
                 } else {
