@@ -114,27 +114,26 @@ internal abstract class BaseService: Service() {
         var stopServiceOnTaskRemoved: Boolean = true
             private set
 
-        fun initializTorSettings(settings: TorSettings) {
-            if (!::torSettings.isInitialized)
-                torSettings = settings
-        }
-
         fun initialize(
             application: Application,
             buildConfigVersionCode: Int,
+            torSettings: TorSettings,
             buildConfigDebug: Boolean,
             geoipAssetPath: String,
             geoip6AssetPath: String,
             torConfigFiles: TorConfigFiles,
             stopServiceOnTaskRemoved: Boolean
         ) {
-            this.application = application
-            this.buildConfigVersionCode = buildConfigVersionCode
-            this.buildConfigDebug = buildConfigDebug
-            this.geoipAssetPath = geoipAssetPath
-            this.geoip6AssetPath = geoip6AssetPath
-            this.torConfigFiles = torConfigFiles
-            this.stopServiceOnTaskRemoved = stopServiceOnTaskRemoved
+            if (this.application == null) {
+                this.application = application
+                this.buildConfigVersionCode = buildConfigVersionCode
+                this.torSettings = torSettings
+                this.buildConfigDebug = buildConfigDebug
+                this.geoipAssetPath = geoipAssetPath
+                this.geoip6AssetPath = geoip6AssetPath
+                this.torConfigFiles = torConfigFiles
+                this.stopServiceOnTaskRemoved = stopServiceOnTaskRemoved
+            }
         }
 
         @Throws(RuntimeException::class)
