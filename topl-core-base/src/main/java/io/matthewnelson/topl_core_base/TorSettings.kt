@@ -110,6 +110,7 @@ abstract class TorSettings: BaseConsts() {
      * things up if you're simply looking to use a Socks5 Proxy to connect to.
      * */
     companion object {
+        const val DEFAULT__DORMANT_CLIENT_TIMEOUT = 10
         const val DEFAULT__DISABLE_NETWORK = true
         const val DEFAULT__ENTRY_NODES = ""
         const val DEFAULT__EXCLUDED_NODES = ""
@@ -149,6 +150,16 @@ abstract class TorSettings: BaseConsts() {
      * Default [java.null]
      * */
     abstract val customTorrc: String?
+
+    /**
+     * Adds to the torrc file "DormantClientTimeout <your value> minutes"
+     *
+     * Minimum value 10. Any value less than or equal to 9 will fall back to using the value of 10
+     * when writing the config to the torrc file. Set `null` to disable
+     *
+     * See [DEFAULT__DORMANT_CLIENT_TIMEOUT]
+     * */
+    abstract val dormantClientTimeout: Int?
 
     /**
      * OnionProxyManager will enable this on startup using the TorControlConnection based off
