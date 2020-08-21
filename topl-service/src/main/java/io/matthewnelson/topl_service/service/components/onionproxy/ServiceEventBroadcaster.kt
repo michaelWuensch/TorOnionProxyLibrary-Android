@@ -217,6 +217,14 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
     @Volatile
     private var transPort: String? = null
 
+    private fun setAllPortsNull() {
+        controlPort = null
+        dnsPort = null
+        httpTunnelPort = null
+        socksPort = null
+        transPort = null
+    }
+
     override fun broadcastNotice(msg: String) {
 
         when {
@@ -401,11 +409,7 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
     override fun broadcastTorState(@TorState state: String, @TorNetworkState networkState: String) {
         if (torState == TorState.ON && state != torState) {
             bootstrapProgress = ""
-            controlPort = null
-            dnsPort = null
-            httpTunnelPort = null
-            socksPort = null
-            transPort = null
+            setAllPortsNull()
             updateAppEventBroadcasterWithPortInfo()
             torService.removeNotificationActions()
         }
@@ -417,13 +421,20 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
         torState = state
 
         if (networkState == TorNetworkState.DISABLED) {
+            if (isBootstrappingComplete()) {
+                setAllPortsNull()
+                updateAppEventBroadcasterWithPortInfo()
+            }
+
             // Update torNetworkState _before_ setting the icon to `disabled` so bandwidth won't
             // overwrite the icon with an update
             torNetworkState = networkState
             torService.updateNotificationIcon(NotificationImage.DISABLED)
         } else {
-            if (isBootstrappingComplete())
+            if (isBootstrappingComplete()) {
+                updateAppEventBroadcasterWithPortInfo()
                 torService.updateNotificationIcon(NotificationImage.ENABLED)
+            }
 
             // Update torNetworkState _after_ setting the icon to `enabled` so bandwidth changes
             // occur afterwards and this won't overwrite ImageState.DATA
