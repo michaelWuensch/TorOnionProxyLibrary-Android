@@ -266,7 +266,7 @@ class BackgroundManager internal constructor(
 
         @JvmStatic
         @Volatile
-        var taskIsInForeground = true
+        var taskIsInForeground = false
             private set
 
         @JvmStatic
