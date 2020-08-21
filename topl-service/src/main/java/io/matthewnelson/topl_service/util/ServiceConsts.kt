@@ -210,6 +210,7 @@ abstract class ServiceConsts: BaseConsts() {
     }
 
     @StringDef(
+        PrefKeyInt.DORMANT_CLIENT_TIMEOUT,
         PrefKeyInt.PROXY_PORT,
         PrefKeyInt.PROXY_SOCKS5_SERVER_PORT
     )
@@ -217,6 +218,7 @@ abstract class ServiceConsts: BaseConsts() {
     annotation class PrefKeyInt {
         companion object {
             // Keys for returning Ints
+            const val DORMANT_CLIENT_TIMEOUT = "DORMANT_CLIENT_TIMEOUT"
             const val PROXY_PORT = "PROXY_PORT"
             const val PROXY_SOCKS5_SERVER_PORT = "PROXY_SOCKS5_SERVER_PORT"
         }
