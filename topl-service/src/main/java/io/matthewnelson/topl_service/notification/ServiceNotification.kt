@@ -339,8 +339,14 @@ class ServiceNotification internal constructor(
          * [io.matthewnelson.topl_service.TorServiceController.Builder.build]
          * */
         internal fun build(context: Context) {
-            Companion.serviceNotification = this.serviceNotification
-            Companion.serviceNotification.setupNotificationChannel(context)
+            // Only initialize it once. Reflection has issues here
+            // as it's in a Companion object.
+            try {
+                Companion.serviceNotification.hashCode()
+            } catch (e: UninitializedPropertyAccessException) {
+                Companion.serviceNotification = this.serviceNotification
+                Companion.serviceNotification.setupNotificationChannel(context)
+            }
         }
 
     }

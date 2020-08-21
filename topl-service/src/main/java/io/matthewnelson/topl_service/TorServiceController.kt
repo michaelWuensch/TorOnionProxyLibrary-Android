@@ -131,18 +131,11 @@ class TorServiceController private constructor(): ServiceConsts() {
         private val torServiceNotificationBuilder: ServiceNotification.Builder,
         private val backgroundManagerPolicy: BackgroundManager.Builder.Policy,
         private val buildConfigVersionCode: Int,
-        torSettings: TorSettings,
+        private val torSettings: TorSettings,
         private val geoipAssetPath: String,
         private val geoip6AssetPath: String
     ) {
 
-        init {
-            // Ensure TorSettings gets initialized no matter if exceptions are thrown
-            // elsewhere in the builder
-            BaseService.initializTorSettings(torSettings)
-        }
-
-        private var appEventBroadcaster: TorServiceEventBroadcaster? = Companion.appEventBroadcaster
 //        private var heartbeatTime = BackgroundManager.heartbeatTime
         private var restartTorDelayTime = ServiceActionProcessor.restartTorDelayTime
         private var stopServiceDelayTime = ServiceActionProcessor.stopServiceDelayTime
@@ -203,24 +196,10 @@ class TorServiceController private constructor(): ServiceConsts() {
          * When your task is removed from the Recent App's tray, [TorService.onTaskRemoved] is
          * triggered. Default behaviour is to stop Tor, and then [TorService]. Electing this
          * option will inhibit the default behaviour from being carried out.
-         *
-         * @throws [IllegalArgumentException] If your selected [BackgroundManager.Builder.Policy]
-         *   is *not* [ServiceConsts.BackgroundPolicy.RUN_IN_FOREGROUND], or if
-         *   [BackgroundManager.Builder.killAppIfTaskIsRemoved] is *not* `true`
          * */
         @JvmOverloads
-        @Throws(IllegalArgumentException::class)
         fun disableStopServiceOnTaskRemoved(disable: Boolean = true): Builder {
-            if (disable) {
-                val policy = backgroundManagerPolicy.policyBuilder.chosenPolicy
-                val killApp = backgroundManagerPolicy.policyBuilder.killAppIfTaskIsRemoved
-                require(policy == BackgroundPolicy.RUN_IN_FOREGROUND && killApp) {
-                    "BackgroundManager's selected Policy must be " +
-                            "${BackgroundPolicy.RUN_IN_FOREGROUND}, and killAppIfTaskIsRemoved must " +
-                            "be set to true."
-                }
-                stopServiceOnTaskRemoved = !disable
-            }
+            stopServiceOnTaskRemoved = !disable
             return this
         }
 
@@ -275,7 +254,8 @@ class TorServiceController private constructor(): ServiceConsts() {
          * class actually is.
          * */
         fun setEventBroadcaster(eventBroadcaster: TorServiceEventBroadcaster): Builder {
-            this.appEventBroadcaster = eventBroadcaster
+            if (Companion.appEventBroadcaster == null)
+                appEventBroadcaster = eventBroadcaster
             return this
         }
 
@@ -302,19 +282,21 @@ class TorServiceController private constructor(): ServiceConsts() {
          * [Companion] object w/o throwing exceptions.
          *
          * See [Builder] for code samples.
+         *
+         * @throws [IllegalArgumentException] If [disableStopServiceOnTaskRemoved] was elected
+         *   and your selected [BackgroundManager.Builder.Policy] is **not**
+         *   [ServiceConsts.BackgroundPolicy.RUN_IN_FOREGROUND] and/or
+         *   [BackgroundManager.Builder.killAppIfTaskIsRemoved] is **not** `true`
          * */
         fun build() {
 
-            // If `BaseService.application` has been initialized
-            // already, return as to not overwrite things.
-            try {
-                BaseService.getAppContext()
-                return
-            } catch (e: RuntimeException) {}
+            // Must be called before application gets set
+            ServiceActionProcessor.initialize(restartTorDelayTime, stopServiceDelayTime)
 
             BaseService.initialize(
                 application,
                 buildConfigVersionCode,
+                torSettings,
                 buildConfigDebug,
                 geoipAssetPath,
                 geoip6AssetPath,
@@ -323,13 +305,16 @@ class TorServiceController private constructor(): ServiceConsts() {
             )
 
 //            BackgroundManager.initialize(heartbeatTime)
-            ServiceActionProcessor.initialize(restartTorDelayTime, stopServiceDelayTime)
-
-            Companion.appEventBroadcaster = this.appEventBroadcaster
-
             torServiceNotificationBuilder.build(application.applicationContext)
 
-            backgroundManagerPolicy.build()
+            if (backgroundManagerPolicy.configurationIsCompliant(stopServiceOnTaskRemoved))
+                backgroundManagerPolicy.build()
+            else
+                throw IllegalArgumentException(
+                    "disableStopServiceOnTaskRemoved requires a BackgroundManager Policy of " +
+                            "${BackgroundPolicy.RUN_IN_FOREGROUND}, and " +
+                            "killAppIfTaskIsRemoved must be set to true."
+                )
         }
     }
 
@@ -345,6 +330,9 @@ class TorServiceController private constructor(): ServiceConsts() {
         /**
          * Get the [TorConfigFiles] that have been set after calling [Builder.build]
          *
+         * This method will *never* throw the [RuntimeException] if you call it after
+         * [Builder.build].
+         *
          * @return Instance of [TorConfigFiles] that are being used throughout TOPL-Android
          * @throws [RuntimeException] if called before [Builder.build]
          * */
@@ -359,15 +347,13 @@ class TorServiceController private constructor(): ServiceConsts() {
         }
 
         /**
-         * Get the [TorSettings] that have been set after instantiating [Builder]. These are
-         * the [TorSettings] you initialized [TorServiceController.Builder] with.
+         * Get the [TorSettings] that have been set after calling [Builder.build].
          *
          * This method will *never* throw the [RuntimeException] if you call it after
-         * you have instantiated the [Builder] object, as [TorSettings] are set immediately
-         * via [BaseService.initializTorSettings].
+         * [Builder.build].
          *
          * @return Instance of [TorSettings] that are being used throughout TOPL-Android
-         * @throws [RuntimeException] if called before [Builder] is instantiated
+         * @throws [RuntimeException] if called before [Builder.build]
          * */
         @JvmStatic
         @Throws(RuntimeException::class)
