@@ -163,8 +163,8 @@ class App: Application() {
             stopServiceTimeDelay: Long,
             stopServiceOnTaskRemoved: Boolean,
             buildConfigDebug: Boolean
-        ) {
-            TorServiceController.Builder(
+        ): TorServiceController.Builder {
+            return TorServiceController.Builder(
                 application = application,
                 torServiceNotificationBuilder = serviceNotificationBuilder,
                 backgroundManagerPolicy = backgroundManagerPolicy,
@@ -178,7 +178,6 @@ class App: Application() {
                 .disableStopServiceOnTaskRemoved(stopServiceOnTaskRemoved)
                 .setBuildConfigDebug(buildConfigDebug)
                 .setEventBroadcaster(eventBroadcaster = MyEventBroadcaster())
-                .build()
         }
     }
 
@@ -196,8 +195,8 @@ class App: Application() {
 
         stopTorDelaySettingAtAppStartup = LibraryPrefs.getControllerStopDelaySetting(prefs).toString()
 
-        try {
-            setupTorServices(
+
+        val builder = setupTorServices(
                 this,
                 serviceNotificationBuilder,
                 generateBackgroundManagerPolicy(prefs),
@@ -206,20 +205,36 @@ class App: Application() {
                 LibraryPrefs.getControllerDisableStopServiceOnTaskRemovedSetting(prefs),
                 LibraryPrefs.getControllerBuildConfigDebugSetting(prefs)
             )
-
-            TorServiceController.appEventBroadcaster?.let {
-                (it as MyEventBroadcaster).broadcastLogMessage(
-                    "SampleApp|Application|Process ID: ${Process.myPid()}"
-                )
-            }
+        try {
+            builder.build()
         } catch (e: Exception) {
             e.message?.let {
                 DashboardFragment.showMessage(
                     DashMessage(
-                        "${DashMessage.EXCEPTION}$it", R.drawable.dash_message_color_red, 5_000
+                        "${DashMessage.EXCEPTION}$it",
+                        R.drawable.dash_message_color_red,
+                        5_000
                     )
                 )
             }
+
+            // Would not normally need any of this, but b/c the sample application allows for
+            // modifying these settings to show off capabilities, it's necessary.
+            setupTorServices(
+                this,
+                serviceNotificationBuilder,
+                generateBackgroundManagerPolicy(prefs, BackgroundPolicy.RUN_IN_FOREGROUND, true),
+                LibraryPrefs.getControllerRestartDelaySetting(prefs),
+                stopTorDelaySettingAtAppStartup.toLong(),
+                LibraryPrefs.getControllerDisableStopServiceOnTaskRemovedSetting(prefs),
+                LibraryPrefs.getControllerBuildConfigDebugSetting(prefs)
+            ).build()
+        }
+
+        TorServiceController.appEventBroadcaster?.let {
+            (it as MyEventBroadcaster).broadcastLogMessage(
+                "SampleApp|Application|Process ID: ${Process.myPid()}"
+            )
         }
     }
 }

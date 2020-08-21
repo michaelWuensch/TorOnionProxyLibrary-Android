@@ -152,7 +152,7 @@ class SettingsLibraryFragment : Fragment() {
                 controllerOptions.getStopDelayTime(),
                 controllerOptions.disableStopServiceOnTaskRemoved,
                 controllerOptions.buildConfigDebug
-            )
+            ).build()
         } catch (e: Exception) {
             e.message?.let {
                 val msg = if (it.contains(BackgroundPolicy.RUN_IN_FOREGROUND))
