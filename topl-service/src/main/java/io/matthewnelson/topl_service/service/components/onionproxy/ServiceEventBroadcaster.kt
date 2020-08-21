@@ -217,6 +217,14 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
     @Volatile
     private var transPort: String? = null
 
+    private fun setAllPortsNull() {
+        controlPort = null
+        dnsPort = null
+        httpTunnelPort = null
+        socksPort = null
+        transPort = null
+    }
+
     override fun broadcastNotice(msg: String) {
 
         when {
@@ -401,11 +409,7 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
     override fun broadcastTorState(@TorState state: String, @TorNetworkState networkState: String) {
         if (torState == TorState.ON && state != torState) {
             bootstrapProgress = ""
-            controlPort = null
-            dnsPort = null
-            httpTunnelPort = null
-            socksPort = null
-            transPort = null
+            setAllPortsNull()
             updateAppEventBroadcasterWithPortInfo()
             torService.removeNotificationActions()
         }
