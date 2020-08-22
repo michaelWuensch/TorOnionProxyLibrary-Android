@@ -82,6 +82,7 @@ internal class NetworkStateReceiver(
     private val broadcastLogger =
         onionProxyManager.getBroadcastLogger(NetworkStateReceiver::class.java)
 
+    @Volatile
     var networkConnectivity = true
         private set
 
