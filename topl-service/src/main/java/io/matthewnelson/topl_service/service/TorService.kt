@@ -223,6 +223,9 @@ internal class TorService: BaseService() {
     override fun isTorOff(): Boolean {
         return onionProxyManager.torStateMachine.isOff
     }
+    override fun isTorOn(): Boolean {
+        return onionProxyManager.torStateMachine.isOn
+    }
     override fun refreshBroadcastLoggersHasDebugLogsVar() {
         onionProxyManager.refreshBroadcastLoggersHasDebugLogsVar()
     }

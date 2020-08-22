@@ -216,6 +216,9 @@ internal class TestTorService(
     override fun isTorOff(): Boolean {
         return getSimulatedTorStates().first == TorState.OFF
     }
+    override fun isTorOn(): Boolean {
+        return hasControlConnection()
+    }
 
     var refreshBroadcastLoggerWasCalled = false
     override fun refreshBroadcastLoggersHasDebugLogsVar() {

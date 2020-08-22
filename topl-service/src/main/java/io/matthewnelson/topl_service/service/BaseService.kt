@@ -348,6 +348,7 @@ internal abstract class BaseService: Service() {
     abstract fun getBroadcastLogger(clazz: Class<*>): BroadcastLogger
     abstract fun hasControlConnection(): Boolean
     abstract fun isTorOff(): Boolean
+    abstract fun isTorOn(): Boolean
     abstract fun refreshBroadcastLoggersHasDebugLogsVar()
     @WorkerThread
     abstract fun signalControlConnection(torControlCommand: String): Boolean
