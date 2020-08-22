@@ -232,6 +232,11 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
             msg.contains(ServiceActionProcessor::class.java.simpleName) -> {
                 handleServiceActionProcessorMsg(msg)
             }
+            // WARN|OnionProxyManager|No Network Connectivity. Foregoing enabling of Tor Network.
+            msg.contains("No Network Connectivity. Foregoing enabling of Tor Network.") -> {
+                torService.updateNotificationProgress(false, null)
+                torService.updateNotificationContentText("No Network Connectivity. Waiting...")
+            }
             // BOOTSTRAPPED
             msg.contains("Bootstrapped") -> {
                 handleBootstrappedMsg(msg)
