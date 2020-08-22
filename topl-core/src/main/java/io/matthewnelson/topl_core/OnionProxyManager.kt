@@ -414,10 +414,10 @@ class OnionProxyManager(
      *
      * @param [disable] Sets Tor config DisableNetwork (1 if `true`, 0 if `false`)
      * @throws [IOException] if having issues with TorControlConnection#setConf
-     * @throws [KotlinNullPointerException] if [controlConnection] is null even after checking.
+     * @throws [NullPointerException] if [controlConnection] is null even after checking.
      */
     @Synchronized
-    @Throws(IOException::class, KotlinNullPointerException::class)
+    @Throws(IOException::class, NullPointerException::class)
     fun disableNetwork(disable: Boolean) {
         synchronized(disableNetworkLock) {
             if (!hasControlConnection) return
