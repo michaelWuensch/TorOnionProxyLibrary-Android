@@ -127,6 +127,38 @@ internal sealed class ServiceActions {
         open val updateLastAction: Boolean = true
     }
 
+    class SetDisableNetwork(
+        override val name: String,
+        private val updateLastServiceAction: Boolean = false
+    ): ServiceAction() {
+
+        override val commands: Array<String>
+            get() = when (name) {
+                ServiceActionName.DISABLE_NETWORK -> {
+                    arrayOf(
+                        ServiceActionCommand.DELAY,
+                        ServiceActionCommand.SET_DISABLE_NETWORK
+                    )
+                }
+                ServiceActionName.ENABLE_NETWORK -> {
+                    arrayOf(
+                        ServiceActionCommand.SET_DISABLE_NETWORK
+                    )
+                }
+                else -> {
+                    arrayOf(
+                        ServiceActionCommand.DELAY
+                    )
+                }
+            }
+
+
+        override val delayLengthQueue = mutableListOf(ServiceActionProcessor.disableNetworkDelay)
+
+        override val updateLastAction: Boolean
+            get() = updateLastServiceAction
+    }
+
     class NewId: ServiceAction() {
 
         @ServiceActionName
