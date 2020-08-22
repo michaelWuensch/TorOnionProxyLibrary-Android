@@ -183,6 +183,11 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
         }
     }
 
+    private fun getActionQueueElementAtOrNull(element: Int): ServiceAction? =
+        synchronized(actionQueueLock) {
+            actionQueue.elementAtOrNull(element)
+        }
+
     private fun removeActionFromQueue(serviceAction: ServiceAction) {
         synchronized(actionQueueLock) {
             if (actionQueue.remove(serviceAction))
@@ -222,11 +227,13 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
 
     private fun launchProcessQueueJob() {
         if (processQueueJob?.isActive == true) return
+
         processQueueJob = torService.getScopeIO().launch {
+
             broadcastDebugMsgWithObjectDetails("Processing Queue: ", this)
 
             while (actionQueue.isNotEmpty() && isActive) {
-                val serviceAction = actionQueue.elementAtOrNull(0)
+                val serviceAction = getActionQueueElementAtOrNull(0)
                 if (serviceAction == null) {
                     return@launch
                 } else {
@@ -235,7 +242,7 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
 
                         // Check if the current actionObject being executed has been
                         // removed from the queue before executing it's next command.
-                        if (actionQueue.elementAtOrNull(0) != serviceAction) {
+                        if (getActionQueueElementAtOrNull(0) != serviceAction) {
                             broadcastDebugMsgWithObjectDetails(
                                 "Interrupting execution of: ServiceAction.", serviceAction
                             )
