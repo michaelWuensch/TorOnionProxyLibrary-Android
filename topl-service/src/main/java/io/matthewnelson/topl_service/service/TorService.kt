@@ -74,13 +74,10 @@ import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core.util.FileUtilities
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
-import io.matthewnelson.topl_service.prefs.TorServicePrefs
 import io.matthewnelson.topl_service.service.components.binding.TorServiceBinder
-import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceEventBroadcaster
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceEventListener
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorInstaller
-import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.service.components.receiver.TorServiceReceiver
 import kotlinx.coroutines.*
 import java.io.File
@@ -214,8 +211,16 @@ internal class TorService: BaseService() {
             throw IOException("Failed copying asset from $assetPath", e)
         }
     }
+    @WorkerThread
+    @Throws(IOException::class, NullPointerException::class)
+    override fun disableNetwork(disable: Boolean) {
+        onionProxyManager.disableNetwork(disable)
+    }
     override fun getBroadcastLogger(clazz: Class<*>): BroadcastLogger {
         return onionProxyManager.getBroadcastLogger(clazz)
+    }
+    override fun hasNetworkConnectivity(): Boolean {
+        return onionProxyManager.hasNetworkConnectivity()
     }
     override fun hasControlConnection(): Boolean {
         return onionProxyManager.hasControlConnection

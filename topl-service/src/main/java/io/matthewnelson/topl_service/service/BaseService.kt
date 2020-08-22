@@ -345,7 +345,11 @@ internal abstract class BaseService: Service() {
     @WorkerThread
     @Throws(IOException::class)
     abstract fun copyAsset(assetPath: String, file: File)
+    @WorkerThread
+    @Throws(IOException::class, NullPointerException::class)
+    abstract fun disableNetwork(disable: Boolean)
     abstract fun getBroadcastLogger(clazz: Class<*>): BroadcastLogger
+    abstract fun hasNetworkConnectivity(): Boolean
     abstract fun hasControlConnection(): Boolean
     abstract fun isTorOff(): Boolean
     abstract fun isTorOn(): Boolean
