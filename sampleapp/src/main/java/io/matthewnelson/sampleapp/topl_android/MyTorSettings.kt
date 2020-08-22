@@ -74,6 +74,9 @@ import io.matthewnelson.topl_core_base.TorSettings
  * */
 class MyTorSettings: TorSettings() {
 
+    override val dormantClientTimeout: Int?
+        get() = DEFAULT__DORMANT_CLIENT_TIMEOUT
+
     override val disableNetwork: Boolean
         get() = DEFAULT__DISABLE_NETWORK
 

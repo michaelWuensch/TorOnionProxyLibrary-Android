@@ -98,6 +98,16 @@ class ServiceTorSettings internal constructor(
     val defaultTorSettings: TorSettings
 ): TorSettings() {
 
+    override val dormantClientTimeout: Int?
+        get() = servicePrefs.getInt(PrefKeyInt.DORMANT_CLIENT_TIMEOUT, defaultTorSettings.dormantClientTimeout)
+
+    fun dormantClientTimeoutSave(minutes: Int?) {
+        if (minutes == defaultTorSettings.dormantClientTimeout)
+            servicePrefs.remove(PrefKeyInt.DORMANT_CLIENT_TIMEOUT)
+        else
+            servicePrefs.putInt(PrefKeyInt.DORMANT_CLIENT_TIMEOUT, minutes)
+    }
+
     override val disableNetwork: Boolean
         get() = servicePrefs.getBoolean(PrefKeyBoolean.DISABLE_NETWORK, defaultTorSettings.disableNetwork)
 
