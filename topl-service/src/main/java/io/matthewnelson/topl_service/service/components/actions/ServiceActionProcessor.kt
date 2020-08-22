@@ -159,6 +159,15 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
             }
         }
 
+    private fun clearActionQueue() {
+        synchronized(actionQueueLock) {
+            if (!actionQueue.isNullOrEmpty()) {
+                actionQueue.clear()
+                broadcastLogger.debug("Queue cleared")
+            }
+        }
+    }
+
     private fun removeActionFromQueue(serviceAction: ServiceAction) {
         synchronized(actionQueueLock) {
             if (actionQueue.remove(serviceAction))
@@ -168,11 +177,24 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
         }
     }
 
-    private fun clearActionQueue() {
+    private fun removeActionFromQueueByName(serviceActionNames: Array<@ServiceActionName String>) {
         synchronized(actionQueueLock) {
-            if (!actionQueue.isNullOrEmpty()) {
-                actionQueue.clear()
-                broadcastLogger.debug("Queue cleared")
+            if (!serviceActionNames.isNullOrEmpty() && !actionQueue.isNullOrEmpty()) {
+                val queueIterator = actionQueue.iterator()
+                while (queueIterator.hasNext()) {
+                    val next = queueIterator.next()
+                    var removed = false
+
+                    serviceActionNames.forEach { serviceActionName ->
+                        if (!removed && next.name == serviceActionName) {
+                            queueIterator.remove()
+                            broadcastDebugMsgWithObjectDetails(
+                                "Removed from queue: ServiceAction.", next
+                            )
+                            removed = true
+                        }
+                    }
+                }
             }
         }
     }
