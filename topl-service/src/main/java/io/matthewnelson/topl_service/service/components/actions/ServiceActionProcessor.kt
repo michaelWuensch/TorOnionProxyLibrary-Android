@@ -251,9 +251,20 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
 
                         when (command) {
                             ServiceActionCommand.DELAY -> {
-                                val delayLength = serviceAction.consumeDelayLength()
-                                if (delayLength > 0L)
-                                    delay(delayLength)
+                                var delayLength = serviceAction.consumeDelayLength()
+                                broadcastLogger.debug("${command}: ${delayLength}L")
+
+                                while (delayLength > 0) {
+                                    if (getActionQueueElementAtOrNull(0) != serviceAction)
+                                        break
+
+                                    if (delayLength in 1..499)
+                                        delay(delayLength)
+                                    else
+                                        delay(500L)
+
+                                    delayLength -= 500L
+                                }
                             }
                             ServiceActionCommand.SET_DISABLE_NETWORK -> {
                                 torService.disableNetwork(
