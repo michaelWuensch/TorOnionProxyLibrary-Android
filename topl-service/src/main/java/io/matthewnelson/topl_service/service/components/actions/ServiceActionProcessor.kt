@@ -84,16 +84,23 @@ import kotlinx.coroutines.*
 internal class ServiceActionProcessor(private val torService: BaseService): ServiceConsts() {
 
     companion object {
+        var disableNetworkDelay = 6_000L
+            private set
         var restartTorDelayTime = 500L
             private set
         var stopServiceDelayTime = 100L
             private set
 
-        fun initialize(restartMilliseconds: Long, stopServiceMilliseconds: Long) {
+        fun initialize(
+            disableNetworkMilliseconds: Long,
+            restartMilliseconds: Long,
+            stopServiceMilliseconds: Long
+        ) {
             // Only initialize it once.
             try {
                 BaseService.getAppContext()
             } catch (e: RuntimeException) {
+                disableNetworkDelay = disableNetworkMilliseconds
                 restartTorDelayTime = restartMilliseconds
                 stopServiceDelayTime = stopServiceMilliseconds
             }
