@@ -69,6 +69,7 @@ package io.matthewnelson.topl_service.util
 import androidx.annotation.IntDef
 import androidx.annotation.StringDef
 import io.matthewnelson.topl_core_base.BaseConsts
+import io.matthewnelson.topl_service.service.components.actions.ServiceActions
 
 abstract class ServiceConsts: BaseConsts() {
 
@@ -127,6 +128,7 @@ abstract class ServiceConsts: BaseConsts() {
     @StringDef(
         ServiceActionCommand.DELAY,
         ServiceActionCommand.NEW_ID,
+        ServiceActionCommand.SET_DISABLE_NETWORK,
         ServiceActionCommand.START_TOR,
         ServiceActionCommand.STOP_SERVICE,
         ServiceActionCommand.STOP_TOR
@@ -137,6 +139,7 @@ abstract class ServiceConsts: BaseConsts() {
             private const val ACTION_COMMAND = "Command_"
             const val DELAY = "${ACTION_COMMAND}DELAY"
             const val NEW_ID = "${ACTION_COMMAND}NEW_ID"
+            const val SET_DISABLE_NETWORK = "${ACTION_COMMAND}SET_DISABLE_NETWORK"
             const val START_TOR = "${ACTION_COMMAND}START_TOR"
             const val STOP_SERVICE = "${ACTION_COMMAND}STOP_SERVICE"
             const val STOP_TOR = "${ACTION_COMMAND}STOP_TOR"
@@ -150,6 +153,8 @@ abstract class ServiceConsts: BaseConsts() {
         AnnotationTarget.PROPERTY
     )
     @StringDef(
+        ServiceActionName.DISABLE_NETWORK,
+        ServiceActionName.ENABLE_NETWORK,
         ServiceActionName.NEW_ID,
         ServiceActionName.RESTART_TOR,
         ServiceActionName.START,
@@ -159,6 +164,8 @@ abstract class ServiceConsts: BaseConsts() {
     internal annotation class ServiceActionName {
         companion object {
             private const val ACTION_NAME = "Action_"
+            const val DISABLE_NETWORK = "${ACTION_NAME}DISABLE_NETWORK"
+            const val ENABLE_NETWORK = "${ACTION_NAME}ENABLE_NETWORK"
             const val NEW_ID = "${ACTION_NAME}NEW_ID"
             const val RESTART_TOR = "${ACTION_NAME}RESTART_TOR"
             const val START = "${ACTION_NAME}START"
