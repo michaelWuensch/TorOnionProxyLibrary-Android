@@ -183,10 +183,10 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
 
     private fun clearActionQueue() {
         synchronized(actionQueueLock) {
-            if (!actionQueue.isNullOrEmpty()) {
-                actionQueue.clear()
-                broadcastLogger.debug("Queue cleared")
-            }
+            if (actionQueue.isNullOrEmpty()) return
+
+            actionQueue.clear()
+            broadcastLogger.debug("Queue cleared")
         }
     }
 
@@ -206,20 +206,20 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
 
     private fun removeActionFromQueueByName(serviceActionNames: Array<@ServiceActionName String>) {
         synchronized(actionQueueLock) {
-            if (!serviceActionNames.isNullOrEmpty() && !actionQueue.isNullOrEmpty()) {
-                val queueIterator = actionQueue.iterator()
-                while (queueIterator.hasNext()) {
-                    val next = queueIterator.next()
-                    var removed = false
+            if (serviceActionNames.isNullOrEmpty() || actionQueue.isNullOrEmpty()) return
 
-                    serviceActionNames.forEach { serviceActionName ->
-                        if (!removed && next.name == serviceActionName) {
-                            queueIterator.remove()
-                            broadcastDebugMsgWithObjectDetails(
-                                "Removed from queue: ServiceAction.", next
-                            )
-                            removed = true
-                        }
+            val queueIterator = actionQueue.iterator()
+            while (queueIterator.hasNext()) {
+                val next = queueIterator.next()
+                var removed = false
+
+                serviceActionNames.forEach { serviceActionName ->
+                    if (!removed && next.name == serviceActionName) {
+                        queueIterator.remove()
+                        broadcastDebugMsgWithObjectDetails(
+                            "Removed from queue: ServiceAction.", next
+                        )
+                        removed = true
                     }
                 }
             }
