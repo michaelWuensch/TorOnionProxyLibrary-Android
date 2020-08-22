@@ -255,6 +255,11 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
                                 if (delayLength > 0L)
                                     delay(delayLength)
                             }
+                            ServiceActionCommand.SET_DISABLE_NETWORK -> {
+                                torService.disableNetwork(
+                                    serviceAction.name == ServiceActionName.DISABLE_NETWORK
+                                )
+                            }
                             ServiceActionCommand.NEW_ID -> {
                                 torService.signalNewNym()
                             }
