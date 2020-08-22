@@ -114,6 +114,21 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
 
     fun processServiceAction(serviceAction: ServiceAction) {
         when (serviceAction) {
+            is ServiceActions.NewId -> {
+                removeActionFromQueueByName(
+                    arrayOf(ServiceActionName.NEW_ID)
+                )
+            }
+            is ServiceActions.RestartTor -> {
+                removeActionFromQueueByName(
+                    arrayOf(ServiceActionName.DISABLE_NETWORK)
+                )
+            }
+            is ServiceActions.SetDisableNetwork -> {
+                removeActionFromQueueByName(
+                    arrayOf(ServiceActionName.DISABLE_NETWORK, ServiceActionName.ENABLE_NETWORK)
+                )
+            }
             is ServiceActions.Stop -> {
                 torService.unbindTorService()
                 torService.unregisterReceiver()
