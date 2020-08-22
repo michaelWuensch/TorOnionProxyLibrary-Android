@@ -240,26 +240,36 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
             // NOTICE|OnionProxyManager|Successfully connected to Control Port: 44201
             msg.contains("Successfully connected to Control Port:") -> {
                 controlPort = getPortFromMsg(msg)
+                if (isBootstrappingComplete())
+                    updateAppEventBroadcasterWithPortInfo()
             }
             // Dns Port
             // NOTICE|OnionProxyManager|Opened DNS listener on 127.0.0.1:5400
             msg.contains("Opened DNS listener on ") -> {
                 dnsPort = getPortFromMsg(msg)
+                if (isBootstrappingComplete())
+                    updateAppEventBroadcasterWithPortInfo()
             }
             // Http Tunnel Port
             // NOTICE|BaseEventListener|Opened HTTP tunnel listener on 127.0.0.1:8118
             msg.contains("Opened HTTP tunnel listener on ") -> {
                 httpTunnelPort = getPortFromMsg(msg)
+                if (isBootstrappingComplete())
+                    updateAppEventBroadcasterWithPortInfo()
             }
             // Socks Port
             // NOTICE|BaseEventListener|Opened Socks listener on 127.0.0.1:9050
             msg.contains("Opened Socks listener on ") -> {
                 socksPort = getPortFromMsg(msg)
+                if (isBootstrappingComplete())
+                    updateAppEventBroadcasterWithPortInfo()
             }
             // Trans Port
             // NOTICE|BaseEventListener|Opened Transparent pf/netfilter listener on 127.0.0.1:9040
             msg.contains("Opened Transparent pf/netfilter listener on ") -> {
                 transPort = getPortFromMsg(msg)
+                if (isBootstrappingComplete())
+                    updateAppEventBroadcasterWithPortInfo()
             }
             // NEWNYM
             msg.contains(TorControlCommands.SIGNAL_NEWNYM) -> {
@@ -358,9 +368,14 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
         }
     }
 
+    private var broadcastPortInfoJob: Job? = null
     private fun updateAppEventBroadcasterWithPortInfo() {
+        if (broadcastPortInfoJob?.isActive == true)
+            broadcastPortInfoJob?.cancel()
+
         TorServiceController.appEventBroadcaster?.let {
-            scopeMain.launch {
+            broadcastPortInfoJob = scopeMain.launch {
+                delay(100L)
                 it.broadcastPortInformation(
                     TorPortInfo(
                         controlPort,
@@ -431,10 +446,8 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
             torNetworkState = networkState
             torService.updateNotificationIcon(NotificationImage.DISABLED)
         } else {
-            if (isBootstrappingComplete()) {
-                updateAppEventBroadcasterWithPortInfo()
+            if (isBootstrappingComplete())
                 torService.updateNotificationIcon(NotificationImage.ENABLED)
-            }
 
             // Update torNetworkState _after_ setting the icon to `enabled` so bandwidth changes
             // occur afterwards and this won't overwrite ImageState.DATA
