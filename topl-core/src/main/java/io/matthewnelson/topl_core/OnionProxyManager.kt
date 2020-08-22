@@ -90,11 +90,9 @@
 package io.matthewnelson.topl_core
 
 import android.content.Context
-import android.content.IntentFilter
 import android.net.ConnectivityManager
 import io.matthewnelson.topl_core_base.EventBroadcaster
 import io.matthewnelson.topl_core.listener.BaseEventListener
-import io.matthewnelson.topl_core.receiver.NetworkStateReceiver
 import io.matthewnelson.topl_core.settings.TorSettingsBuilder
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core.broadcaster.BroadcastLoggerHelper
@@ -220,8 +218,6 @@ class OnionProxyManager(
         broadcastLogger.warn("TorControlConnection is not responding properly to $methodCall")
     }
 
-    @Volatile
-    private var networkStateReceiver: NetworkStateReceiver? = null
     @Volatile
     private var controlSocket: Socket? = null
     // If controlConnection is not null then this means that a connection exists and the Tor OP
@@ -384,21 +380,6 @@ class OnionProxyManager(
             }
 
             torStateMachine.setTorState(TorState.OFF)
-
-            if (networkStateReceiver == null) return
-
-            try {
-                appContext.unregisterReceiver(networkStateReceiver)
-            } catch (e: IllegalArgumentException) {
-                // There is a race condition where if someone calls stop before
-                // installAndStartTorOp is done then we could get an exception because
-                // the network state receiver might not be properly registered.
-                broadcastLogger.exception(
-                    IllegalArgumentException(
-                        "Someone tried calling stop before registering of NetworkStateReceiver", e
-                    )
-                )
-            }
         }
     }
 
@@ -416,6 +397,13 @@ class OnionProxyManager(
             false
         }
 
+    @Suppress("DEPRECATION")
+    fun hasNetworkConnectivity(): Boolean {
+        val connectivityManager = appContext
+            .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+        return connectivityManager?.activeNetworkInfo?.isConnected ?: false
+    }
+
     private val disableNetworkLock = Object()
     /**
      * Tells the Tor OP if it should accept network connections.
@@ -424,10 +412,11 @@ class OnionProxyManager(
      * such that [torStateMachine] will reflect the proper
      * [io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState].
      *
-     * @param [disable] If true then the Tor OP will **not** accept SOCKS connections, otherwise yes.
+     * @param [disable] Sets Tor config DisableNetwork (1 if `true`, 0 if `false`)
      * @throws [IOException] if having issues with TorControlConnection#setConf
      * @throws [KotlinNullPointerException] if [controlConnection] is null even after checking.
      */
+    @Synchronized
     @Throws(IOException::class, KotlinNullPointerException::class)
     fun disableNetwork(disable: Boolean) {
         synchronized(disableNetworkLock) {
@@ -518,6 +507,11 @@ class OnionProxyManager(
     /**
      * Starts tor control service if it isn't already running.
      *
+     * If the device does not have connectivity, [disableNetwork] will not be called to set
+     * Tor's config for DisableNetwork to false (0). Handling connectivity changes should be done
+     * via your own [android.content.BroadcastReceiver] and by calling [disableNetwork] when
+     * appropriate.
+     *
      * @throws [IOException] File errors
      * @throws [SecurityException] Unauthorized access to file/directory.
      * @throws [IllegalArgumentException] if [onionProxyContext] methods are passed incorrect
@@ -589,7 +583,13 @@ class OnionProxyManager(
                 controlConnection.setEvents(listOf(*eventListener.CONTROL_COMMAND_EVENTS))
             }
 
-            disableNetwork(false)
+            if (hasNetworkConnectivity())
+                disableNetwork(false)
+            else
+                broadcastLogger.warn(
+                    "No Network Connectivity. Foregoing enabling of Tor Network."
+                )
+
         } catch (e: Exception) {
             torProcess?.destroy()
             this.controlConnection = null
@@ -599,12 +599,6 @@ class OnionProxyManager(
         }
 
         torStateMachine.setTorState(TorState.ON)
-
-        networkStateReceiver = NetworkStateReceiver(this)
-
-        @Suppress("DEPRECATION")
-        val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
-        appContext.registerReceiver(networkStateReceiver, filter)
         broadcastLogger.notice("Completed starting of Tor")
     }
 
@@ -894,7 +888,7 @@ class OnionProxyManager(
     @Synchronized
     suspend fun signalNewNym() {
         if (!hasControlConnection || !isBootstrapped) return
-        if (networkStateReceiver?.networkConnectivity != true) {
+        if (!hasNetworkConnectivity()) {
             broadcastLogger.notice("NEWNYM: $NEWNYM_NO_NETWORK")
             return
         }
