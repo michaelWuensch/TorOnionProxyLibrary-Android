@@ -88,6 +88,7 @@ object LibraryPrefs {
 
     // Controller Keys
     const val CONTROLLER_BUILD_CONFIG_DEBUG = "CONTROLLER_BUILD_CONFIG_DEBUG"
+    const val CONTROLLER_DISABLE_NETWORK_DELAY = "CONTROLLER_DISABLE_NETWORK_DELAY"
     const val CONTROLLER_RESTART_DELAY = "CONTROLLER_RESTART_DELAY"
     const val CONTROLLER_STOP_DELAY = "CONTROLLER_STOP_DELAY"
     const val CONTROLLER_DISABLE_STOP_SERVICE_TASK_REMOVED = "CONTROLLER_DISABLE_STOP_SERVICE_TASK_REMOVED"
@@ -119,6 +120,9 @@ object LibraryPrefs {
         prefs.read(BACKGROUND_MANAGER_KILL_APP, true)
 
     // Controller Settings
+    fun getControllerDisableNetworkDelay(prefs: Prefs): Long =
+        prefs.read(CONTROLLER_DISABLE_NETWORK_DELAY, 0L)
+
     fun getControllerRestartDelaySetting(prefs: Prefs): Long =
         prefs.read(CONTROLLER_RESTART_DELAY, 100L)
 

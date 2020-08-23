@@ -84,16 +84,23 @@ import kotlinx.coroutines.*
 internal class ServiceActionProcessor(private val torService: BaseService): ServiceConsts() {
 
     companion object {
+        var disableNetworkDelay = 6_000L
+            private set
         var restartTorDelayTime = 500L
             private set
         var stopServiceDelayTime = 100L
             private set
 
-        fun initialize(restartMilliseconds: Long, stopServiceMilliseconds: Long) {
+        fun initialize(
+            disableNetworkMilliseconds: Long,
+            restartMilliseconds: Long,
+            stopServiceMilliseconds: Long
+        ) {
             // Only initialize it once.
             try {
                 BaseService.getAppContext()
             } catch (e: RuntimeException) {
+                disableNetworkDelay = disableNetworkMilliseconds
                 restartTorDelayTime = restartMilliseconds
                 stopServiceDelayTime = stopServiceMilliseconds
             }
@@ -114,6 +121,21 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
 
     fun processServiceAction(serviceAction: ServiceAction) {
         when (serviceAction) {
+            is ServiceActions.NewId -> {
+                removeActionFromQueueByName(
+                    arrayOf(ServiceActionName.NEW_ID)
+                )
+            }
+            is ServiceActions.RestartTor -> {
+                removeActionFromQueueByName(
+                    arrayOf(ServiceActionName.DISABLE_NETWORK)
+                )
+            }
+            is ServiceActions.SetDisableNetwork -> {
+                removeActionFromQueueByName(
+                    arrayOf(ServiceActionName.DISABLE_NETWORK, ServiceActionName.ENABLE_NETWORK)
+                )
+            }
             is ServiceActions.Stop -> {
                 torService.unbindTorService()
                 torService.unregisterReceiver()
@@ -159,6 +181,20 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
             }
         }
 
+    private fun clearActionQueue() {
+        synchronized(actionQueueLock) {
+            if (actionQueue.isNullOrEmpty()) return
+
+            actionQueue.clear()
+            broadcastLogger.debug("Queue cleared")
+        }
+    }
+
+    private fun getActionQueueElementAtOrNull(element: Int): ServiceAction? =
+        synchronized(actionQueueLock) {
+            actionQueue.elementAtOrNull(element)
+        }
+
     private fun removeActionFromQueue(serviceAction: ServiceAction) {
         synchronized(actionQueueLock) {
             if (actionQueue.remove(serviceAction))
@@ -168,11 +204,24 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
         }
     }
 
-    private fun clearActionQueue() {
+    private fun removeActionFromQueueByName(serviceActionNames: Array<@ServiceActionName String>) {
         synchronized(actionQueueLock) {
-            if (!actionQueue.isNullOrEmpty()) {
-                actionQueue.clear()
-                broadcastLogger.debug("Queue cleared")
+            if (serviceActionNames.isNullOrEmpty() || actionQueue.isNullOrEmpty()) return
+
+            val queueIterator = actionQueue.iterator()
+            while (queueIterator.hasNext()) {
+                val next = queueIterator.next()
+                var removed = false
+
+                serviceActionNames.forEach { serviceActionName ->
+                    if (!removed && next.name == serviceActionName) {
+                        queueIterator.remove()
+                        broadcastDebugMsgWithObjectDetails(
+                            "Removed from queue: ServiceAction.", next
+                        )
+                        removed = true
+                    }
+                }
             }
         }
     }
@@ -185,11 +234,13 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
 
     private fun launchProcessQueueJob() {
         if (processQueueJob?.isActive == true) return
+
         processQueueJob = torService.getScopeIO().launch {
+
             broadcastDebugMsgWithObjectDetails("Processing Queue: ", this)
 
             while (actionQueue.isNotEmpty() && isActive) {
-                val serviceAction = actionQueue.elementAtOrNull(0)
+                val serviceAction = getActionQueueElementAtOrNull(0)
                 if (serviceAction == null) {
                     return@launch
                 } else {
@@ -198,7 +249,7 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
 
                         // Check if the current actionObject being executed has been
                         // removed from the queue before executing it's next command.
-                        if (actionQueue.elementAtOrNull(0) != serviceAction) {
+                        if (getActionQueueElementAtOrNull(0) != serviceAction) {
                             broadcastDebugMsgWithObjectDetails(
                                 "Interrupting execution of: ServiceAction.", serviceAction
                             )
@@ -207,9 +258,25 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
 
                         when (command) {
                             ServiceActionCommand.DELAY -> {
-                                val delayLength = serviceAction.consumeDelayLength()
-                                if (delayLength > 0L)
-                                    delay(delayLength)
+                                var delayLength = serviceAction.consumeDelayLength()
+                                broadcastLogger.debug("${command}: ${delayLength}L")
+
+                                while (delayLength > 0) {
+                                    if (getActionQueueElementAtOrNull(0) != serviceAction)
+                                        break
+
+                                    if (delayLength in 1..499)
+                                        delay(delayLength)
+                                    else
+                                        delay(500L)
+
+                                    delayLength -= 500L
+                                }
+                            }
+                            ServiceActionCommand.SET_DISABLE_NETWORK -> {
+                                torService.disableNetwork(
+                                    serviceAction.name == ServiceActionName.DISABLE_NETWORK
+                                )
                             }
                             ServiceActionCommand.NEW_ID -> {
                                 torService.signalNewNym()

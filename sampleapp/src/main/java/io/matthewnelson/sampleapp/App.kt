@@ -159,6 +159,7 @@ class App: Application() {
             application: Application,
             serviceNotificationBuilder: ServiceNotification.Builder,
             backgroundManagerPolicy: BackgroundManager.Builder.Policy,
+            disableNetworkDelay: Long,
             restartTimeDelay: Long,
             stopServiceTimeDelay: Long,
             stopServiceOnTaskRemoved: Boolean,
@@ -173,6 +174,7 @@ class App: Application() {
                 geoipAssetPath = "common/geoip",
                 geoip6AssetPath = "common/geoip6"
             )
+                .addTimeToDisableNetworkDelay(disableNetworkDelay)
                 .addTimeToRestartTorDelay(restartTimeDelay)
                 .addTimeToStopServiceDelay(stopServiceTimeDelay)
                 .disableStopServiceOnTaskRemoved(stopServiceOnTaskRemoved)
@@ -200,6 +202,7 @@ class App: Application() {
                 this,
                 serviceNotificationBuilder,
                 generateBackgroundManagerPolicy(prefs),
+                LibraryPrefs.getControllerDisableNetworkDelay(prefs),
                 LibraryPrefs.getControllerRestartDelaySetting(prefs),
                 stopTorDelaySettingAtAppStartup.toLong(),
                 LibraryPrefs.getControllerDisableStopServiceOnTaskRemovedSetting(prefs),
@@ -224,6 +227,7 @@ class App: Application() {
                 this,
                 serviceNotificationBuilder,
                 generateBackgroundManagerPolicy(prefs, BackgroundPolicy.RUN_IN_FOREGROUND, true),
+                LibraryPrefs.getControllerDisableNetworkDelay(prefs),
                 LibraryPrefs.getControllerRestartDelaySetting(prefs),
                 stopTorDelaySettingAtAppStartup.toLong(),
                 LibraryPrefs.getControllerDisableStopServiceOnTaskRemovedSetting(prefs),

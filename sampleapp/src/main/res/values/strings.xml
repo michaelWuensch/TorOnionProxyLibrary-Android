@@ -65,9 +65,11 @@
         implementing the Library into your own application</string>
 
     <string name="settings_library_button_save">Save Settings</string>
-    <string name="settings_library_text_view_controller_restart_delay">Restart Delay (ms):</string>
+    <string name="settings_library_text_view_controller_disable_network_delay">Disable Net Delay:</string>
+    <string name="settings_library_edit_text_controller_disable_network_delay">6_000ms + your value</string>
+    <string name="settings_library_text_view_controller_restart_delay">Restart Delay:</string>
     <string name="settings_library_edit_text_controller_restart_delay">500ms + your value</string>
-    <string name="settings_library_text_view_controller_stop_delay">Stop Delay (ms):</string>
+    <string name="settings_library_text_view_controller_stop_delay">Stop Delay:</string>
     <string name="settings_library_edit_text_controller_stop_delay">100ms + your value</string>
     <string name="settings_library_text_view_controller_stop_on_task_removed">On Task Removed:</string>
     <string name="settings_library_text_view_controller_build_config">Build Config:</string>

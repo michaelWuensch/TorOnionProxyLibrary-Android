@@ -148,6 +148,7 @@ class SettingsLibraryFragment : Fragment() {
                 view.context.applicationContext as Application,
                 notificationBuilder,
                 backgroundManagerPolicy,
+                controllerOptions.getDisableNetworkDelayValue(),
                 controllerOptions.getRestartDelayValue(),
                 controllerOptions.getStopDelayTime(),
                 controllerOptions.disableStopServiceOnTaskRemoved,

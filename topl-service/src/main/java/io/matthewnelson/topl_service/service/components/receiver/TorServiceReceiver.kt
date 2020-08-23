@@ -71,6 +71,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.ConnectivityManager
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.service.components.actions.ServiceActions
@@ -105,6 +106,9 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
 
     fun register() {
         val filter = IntentFilter(SERVICE_INTENT_FILTER)
+        @Suppress("DEPRECATION")
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
+
         if (torService.doesReceiverNeedToListenForLockScreen()) {
             filter.addAction(Intent.ACTION_SCREEN_OFF)
             filter.addAction(Intent.ACTION_SCREEN_ON)
@@ -145,28 +149,42 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context != null && intent != null) {
-            when (val serviceAction = intent.getStringExtra(SERVICE_INTENT_FILTER)) {
-                ServiceActionName.NEW_ID -> {
-                    torService.processServiceAction(ServiceActions.NewId())
-                }
-                ServiceActionName.RESTART_TOR -> {
-                    torService.processServiceAction(ServiceActions.RestartTor())
-                }
-                ServiceActionName.STOP -> {
-                    torService.processServiceAction(ServiceActions.Stop())
-                }
-                else -> {
+            when (val action = intent.action) {
+                @Suppress("DEPRECATION")
+                ConnectivityManager.CONNECTIVITY_ACTION -> {
+                    if (!torService.isTorOn()) return
 
-                    when (intent.action) {
-                        Intent.ACTION_SCREEN_OFF,
-                        Intent.ACTION_SCREEN_ON,
-                        Intent.ACTION_USER_PRESENT -> {
-                            val locked = checkIfDeviceIsLocked()
-                            if (locked != deviceIsLocked) {
-                                setDeviceIsLocked(locked)
-                                broadcastLogger.debug("Device is locked: $deviceIsLocked")
-                                torService.refreshNotificationActions()
-                            }
+                    val connectivity = torService.hasNetworkConnectivity()
+                    broadcastLogger.notice("Network connectivity: $connectivity")
+
+                    val actionObject = if (connectivity)
+                        ServiceActions.SetDisableNetwork(ServiceActionName.ENABLE_NETWORK)
+                    else
+                        ServiceActions.SetDisableNetwork(ServiceActionName.DISABLE_NETWORK)
+
+                    torService.processServiceAction(actionObject)
+                }
+                Intent.ACTION_SCREEN_OFF,
+                Intent.ACTION_SCREEN_ON,
+                Intent.ACTION_USER_PRESENT -> {
+                    val locked = checkIfDeviceIsLocked()
+                    if (locked != deviceIsLocked) {
+                        setDeviceIsLocked(locked)
+                        broadcastLogger.notice("Device is locked: $deviceIsLocked")
+                        torService.refreshNotificationActions()
+                    }
+                }
+                SERVICE_INTENT_FILTER -> {
+
+                    when (val serviceAction = intent.getStringExtra(SERVICE_INTENT_FILTER)) {
+                        ServiceActionName.NEW_ID -> {
+                            torService.processServiceAction(ServiceActions.NewId())
+                        }
+                        ServiceActionName.RESTART_TOR -> {
+                            torService.processServiceAction(ServiceActions.RestartTor())
+                        }
+                        ServiceActionName.STOP -> {
+                            torService.processServiceAction(ServiceActions.Stop())
                         }
                         else -> {
                             broadcastLogger.warn(

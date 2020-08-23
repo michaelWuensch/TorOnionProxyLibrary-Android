@@ -207,14 +207,27 @@ internal class TestTorService(
             throw IOException("Failed copying asset from $assetPath", e)
         }
     }
+    override fun disableNetwork(disable: Boolean) {
+        val networkState = if (disable)
+            TorNetworkState.DISABLED
+        else
+            TorNetworkState.ENABLED
+        serviceEventBroadcaster.broadcastTorState(TorState.ON, networkState)
+    }
     override fun getBroadcastLogger(clazz: Class<*>): BroadcastLogger {
         return onionProxyManager.getBroadcastLogger(clazz)
+    }
+    override fun hasNetworkConnectivity(): Boolean {
+        return onionProxyManager.hasNetworkConnectivity()
     }
     override fun hasControlConnection(): Boolean {
         return getSimulatedTorStates().first == TorState.ON
     }
     override fun isTorOff(): Boolean {
         return getSimulatedTorStates().first == TorState.OFF
+    }
+    override fun isTorOn(): Boolean {
+        return hasControlConnection()
     }
 
     var refreshBroadcastLoggerWasCalled = false

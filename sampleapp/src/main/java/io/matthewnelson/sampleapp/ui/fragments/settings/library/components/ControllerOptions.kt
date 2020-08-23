@@ -87,32 +87,34 @@ class ControllerOptions(view: View, prefs: Prefs) {
         const val RELEASE = "Release"
     }
 
+    private var initialDisableNetworkDelayTime: Long =
+        LibraryPrefs.getControllerDisableNetworkDelay(prefs)
+
     private var initialRestartDelayTime: Long =
-        LibraryPrefs.getControllerRestartDelaySetting(
-            prefs
-        )
+        LibraryPrefs.getControllerRestartDelaySetting(prefs)
 
     private var initialStopDelayTime: Long =
-        LibraryPrefs.getControllerStopDelaySetting(
-            prefs
-        )
+        LibraryPrefs.getControllerStopDelaySetting(prefs)
 
     private var initialDisableStopServiceOnTaskRemoved: Boolean =
-        LibraryPrefs.getControllerDisableStopServiceOnTaskRemovedSetting(
-            prefs
-        )
+        LibraryPrefs.getControllerDisableStopServiceOnTaskRemovedSetting(prefs)
+
     var disableStopServiceOnTaskRemoved: Boolean = initialDisableStopServiceOnTaskRemoved
         private set
 
     private var initialBuildConfigDebug: Boolean =
-        LibraryPrefs.getControllerBuildConfigDebugSetting(
-            prefs
-        )
+        LibraryPrefs.getControllerBuildConfigDebugSetting(prefs)
+
     var buildConfigDebug: Boolean = initialBuildConfigDebug
         private set
 
     fun saveSettings(prefs: Prefs): Boolean {
         var somethingChanged = false
+        if (getDisableNetworkDelayValue() != initialDisableNetworkDelayTime) {
+            prefs.write(LibraryPrefs.CONTROLLER_DISABLE_NETWORK_DELAY, getDisableNetworkDelayValue())
+            initialDisableNetworkDelayTime = getDisableNetworkDelayValue()
+            somethingChanged = true
+        }
         if (getRestartDelayValue() != initialRestartDelayTime) {
             prefs.write(LibraryPrefs.CONTROLLER_RESTART_DELAY, getRestartDelayValue())
             initialRestartDelayTime = getRestartDelayValue()
@@ -136,6 +138,9 @@ class ControllerOptions(view: View, prefs: Prefs) {
         return somethingChanged
     }
 
+    fun getDisableNetworkDelayValue(): Long =
+        getEditTextValueLong(editTextDisableNetworkDelay)
+
     fun getRestartDelayValue(): Long =
         getEditTextValueLong(editTextRestartDelay)
 
@@ -150,6 +155,7 @@ class ControllerOptions(view: View, prefs: Prefs) {
         }
     }
 
+    private lateinit var editTextDisableNetworkDelay: EditText
     private lateinit var editTextRestartDelay: EditText
     private lateinit var editTextStopDelay: EditText
     private lateinit var spinnerDisableStopOnTaskRemoved: Spinner
@@ -165,6 +171,7 @@ class ControllerOptions(view: View, prefs: Prefs) {
     }
 
     private fun findViews(view: View) {
+        editTextDisableNetworkDelay = view.findViewById(R.id.settings_library_edit_text_controller_disable_network_delay)
         editTextRestartDelay = view.findViewById(R.id.settings_library_edit_text_controller_restart_delay)
         editTextStopDelay = view.findViewById(R.id.settings_library_edit_text_controller_stop_delay)
         spinnerDisableStopOnTaskRemoved = view.findViewById(R.id.settings_library_spinner_controller_stop_on_task_removed)
@@ -172,11 +179,17 @@ class ControllerOptions(view: View, prefs: Prefs) {
     }
 
     private fun initEditTextViews() {
+        editTextDisableNetworkDelay.filters = arrayOf(InputFilter.LengthFilter(4))
+        if (initialDisableNetworkDelayTime > 0L)
+            editTextDisableNetworkDelay.setText(initialDisableNetworkDelayTime.toString())
+
         editTextRestartDelay.filters = arrayOf(InputFilter.LengthFilter(4))
-        editTextRestartDelay.setText(initialRestartDelayTime.toString())
+        if (initialRestartDelayTime > 0L)
+            editTextRestartDelay.setText(initialRestartDelayTime.toString())
 
         editTextStopDelay.filters = arrayOf(InputFilter.LengthFilter(4))
-        editTextStopDelay.setText(initialStopDelayTime.toString())
+        if (initialStopDelayTime > 0L)
+            editTextStopDelay.setText(initialStopDelayTime.toString())
     }
 
     private fun initSpinnerControllerDisableStopOnTaskRemoved(context: Context) {
