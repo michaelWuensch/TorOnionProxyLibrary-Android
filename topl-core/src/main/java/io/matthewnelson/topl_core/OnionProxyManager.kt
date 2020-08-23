@@ -556,7 +556,7 @@ class OnionProxyManager(
                 waitForFileCreation(ConfigFile.CONTROL_PORT_FILE)
                 connectToTorControlSocket()
             } catch (e: Exception) {
-                torProcess.destroy()
+                torProcess?.destroy()
                 torStateMachine.setTorState(TorState.OFF)
                 throw IOException(e)
             }

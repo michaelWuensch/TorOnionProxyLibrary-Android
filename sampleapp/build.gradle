@@ -107,7 +107,7 @@ dependencies {
     implementation deps.kotlin.stdlib
 
     implementation 'io.matthewnelson.encrypted-storage:encrypted-storage:2.0.0'
-    implementation 'io.matthewnelson.topl-android:tor-binary:0.4.3.5a'
+    implementation 'io.matthewnelson.topl-android:tor-binary:0.4.3.6'
 
     testImplementation deps.junit
 
