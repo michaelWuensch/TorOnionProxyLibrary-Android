@@ -400,7 +400,29 @@
 <p><code>abstract fun setup():</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><code>Unit</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/util/TorInstaller.kt#L126">(source)</a></p>
 <p>Sets up and installs any files needed to run tor. If the tor files are already on
 the system this does not need to be invoked.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">//Unresolved: io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller.setup</span>
+<div class="highlight"><pre><span></span><code><span class="k">if</span> <span class="p">(!</span><span class="n">torConfigFiles</span><span class="p">.</span><span class="n">geoIpFile</span><span class="p">.</span><span class="n">exists</span><span class="p">())</span> <span class="p">{</span>
+    <span class="n">copyGeoIpAsset</span><span class="p">()</span>
+    <span class="n">geoIpFileCopied</span> <span class="p">=</span> <span class="k">true</span>
+<span class="p">}</span>
+<span class="k">if</span> <span class="p">(!</span><span class="n">torConfigFiles</span><span class="p">.</span><span class="n">geoIpv6File</span><span class="p">.</span><span class="n">exists</span><span class="p">())</span> <span class="p">{</span>
+    <span class="n">copyGeoIpv6Asset</span><span class="p">()</span>
+    <span class="n">geoIpv6FileCopied</span> <span class="p">=</span> <span class="k">true</span>
+<span class="p">}</span>
+
+<span class="c1">// If the app version has been increased, or if this is a debug build, copy over</span>
+<span class="c1">// geoip assets then update SharedPreferences with the new version code. This</span>
+<span class="c1">// mitigates copying to be done only if a version upgrade is had.</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">BaseService</span><span class="p">.</span><span class="n">buildConfigDebug</span> <span class="p">||</span>
+    <span class="n">BaseService</span><span class="p">.</span><span class="n">buildConfigVersionCode</span> <span class="p">&gt;</span> <span class="n">localPrefs</span><span class="p">.</span><span class="n">getInt</span><span class="p">(</span><span class="n">APP_VERSION_CODE</span><span class="p">,</span> <span class="p">-</span><span class="m">1</span><span class="p">)</span>
+<span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(!</span><span class="n">geoIpFileCopied</span><span class="p">)</span>
+        <span class="n">copyGeoIpAsset</span><span class="p">()</span>
+    <span class="k">if</span> <span class="p">(!</span><span class="n">geoIpv6FileCopied</span><span class="p">)</span>
+        <span class="n">copyGeoIpv6Asset</span><span class="p">()</span>
+    <span class="n">localPrefs</span><span class="p">.</span><span class="n">edit</span><span class="p">()</span>
+        <span class="p">.</span><span class="n">putInt</span><span class="p">(</span><span class="n">APP_VERSION_CODE</span><span class="p">,</span> <span class="n">BaseService</span><span class="p">.</span><span class="n">buildConfigVersionCode</span><span class="p">)</span>
+        <span class="p">.</span><span class="n">apply</span><span class="p">()</span>
+<span class="p">}</span>
 </code></pre></div>
 
 <p><strong>Return</strong>

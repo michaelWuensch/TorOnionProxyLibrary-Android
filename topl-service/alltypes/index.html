@@ -413,8 +413,22 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#iomatthewnelsontopl_serviceservicecomponentsonionproxyservicetorsettings" class="md-nav__link">
+    io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#iomatthewnelsontopl_serviceutilserviceutilities" class="md-nav__link">
     io.matthewnelson.topl_service.util.ServiceUtilities
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iomatthewnelsontopl_serviceservicecomponentsonionproxymodeltorportinfo" class="md-nav__link">
+    io.matthewnelson.topl_service.service.components.onionproxy.model.TorPortInfo
   </a>
   
 </li>
@@ -427,8 +441,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#iomatthewnelsontopl_serviceservicecomponentsonionproxytorserviceeventbroadcaster" class="md-nav__link">
-    io.matthewnelson.topl_service.service.components.onionproxy.TorServiceEventBroadcaster
+  <a href="#iomatthewnelsontopl_serviceservicecomponentsonionproxymodeltorserviceeventbroadcaster" class="md-nav__link">
+    io.matthewnelson.topl_service.service.components.onionproxy.model.TorServiceEventBroadcaster
   </a>
   
 </li>
@@ -484,28 +498,36 @@
 </table>
 <h5 id="iomatthewnelsontopl_servicelifecyclebackgroundmanager"><a href="../io.matthewnelson.topl_service.lifecycle/-background-manager/">io.matthewnelson.topl_service.lifecycle.BackgroundManager</a><a class="headerlink" href="#iomatthewnelsontopl_servicelifecyclebackgroundmanager" title="Permanent link">&para;</a></h5>
 <p>When your application is sent to the background (the Recent App&rsquo;s tray or lock screen), the
-chosen <a href="../io.matthewnelson.topl_service.lifecycle/-background-manager/-builder/-policy/">BackgroundManager.Builder.Policy</a> will be executed after the number of seconds you&rsquo;ve
-declared.</p>
+chosen <a href="../io.matthewnelson.topl_service.lifecycle/-background-manager/-builder/-policy/">BackgroundManager.Builder.Policy</a> will be triggered.</p>
 <p>|</p>
 <h5 id="iomatthewnelsontopl_serviceutilserviceconsts"><a href="../io.matthewnelson.topl_service.util/-service-consts/">io.matthewnelson.topl_service.util.ServiceConsts</a><a class="headerlink" href="#iomatthewnelsontopl_serviceutilserviceconsts" title="Permanent link">&para;</a></h5>
 <p>|</p>
 <h5 id="iomatthewnelsontopl_servicenotificationservicenotification"><a href="../io.matthewnelson.topl_service.notification/-service-notification/">io.matthewnelson.topl_service.notification.ServiceNotification</a><a class="headerlink" href="#iomatthewnelsontopl_servicenotificationservicenotification" title="Permanent link">&para;</a></h5>
 <p>Everything to do with <a href="#">TorService</a>&lsquo;s notification.</p>
 <p>|</p>
+<h5 id="iomatthewnelsontopl_serviceservicecomponentsonionproxyservicetorsettings"><a href="../io.matthewnelson.topl_service.service.components.onionproxy/-service-tor-settings/">io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings</a><a class="headerlink" href="#iomatthewnelsontopl_serviceservicecomponentsonionproxyservicetorsettings" title="Permanent link">&para;</a></h5>
+<p>This class enables the querying of <a href="../io.matthewnelson.topl_service.prefs/-tor-service-prefs/">TorServicePrefs</a> to obtain values potentially set by
+the User such that they are <em>preferred</em> over static/default values you may have set in the
+<a href="../io.matthewnelson.topl_service/-tor-service-controller/-builder/">io.matthewnelson.topl_service.TorServiceController.Builder</a>&lsquo;s constructor argument for
+<a href="../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/">TorSettings</a>.</p>
+<p>|</p>
 <h5 id="iomatthewnelsontopl_serviceutilserviceutilities"><a href="../io.matthewnelson.topl_service.util/-service-utilities/">io.matthewnelson.topl_service.util.ServiceUtilities</a><a class="headerlink" href="#iomatthewnelsontopl_serviceutilserviceutilities" title="Permanent link">&para;</a></h5>
+<p>|</p>
+<h5 id="iomatthewnelsontopl_serviceservicecomponentsonionproxymodeltorportinfo"><a href="../io.matthewnelson.topl_service.service.components.onionproxy.model/-tor-port-info/">io.matthewnelson.topl_service.service.components.onionproxy.model.TorPortInfo</a><a class="headerlink" href="#iomatthewnelsontopl_serviceservicecomponentsonionproxymodeltorportinfo" title="Permanent link">&para;</a></h5>
+<p>Contains information regarding what ports Tor is operating on.</p>
 <p>|</p>
 <h5 id="iomatthewnelsontopl_servicetorservicecontroller"><a href="../io.matthewnelson.topl_service/-tor-service-controller/">io.matthewnelson.topl_service.TorServiceController</a><a class="headerlink" href="#iomatthewnelsontopl_servicetorservicecontroller" title="Permanent link">&para;</a></h5>
 <p>|</p>
-<h5 id="iomatthewnelsontopl_serviceservicecomponentsonionproxytorserviceeventbroadcaster"><a href="../io.matthewnelson.topl_service.service.components.onionproxy/-tor-service-event-broadcaster/">io.matthewnelson.topl_service.service.components.onionproxy.TorServiceEventBroadcaster</a><a class="headerlink" href="#iomatthewnelsontopl_serviceservicecomponentsonionproxytorserviceeventbroadcaster" title="Permanent link">&para;</a></h5>
-<p>Adds broadcasting methods to the <a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md">EventBroadcaster</a> to update you with information about
+<h5 id="iomatthewnelsontopl_serviceservicecomponentsonionproxymodeltorserviceeventbroadcaster"><a href="../io.matthewnelson.topl_service.service.components.onionproxy.model/-tor-service-event-broadcaster/">io.matthewnelson.topl_service.service.components.onionproxy.model.TorServiceEventBroadcaster</a><a class="headerlink" href="#iomatthewnelsontopl_serviceservicecomponentsonionproxymodeltorserviceeventbroadcaster" title="Permanent link">&para;</a></h5>
+<p>Adds broadcasting methods to the <a href="../../topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/">EventBroadcaster</a> to update you with information about
 what addresses Tor is operating on. Very helpful when choosing &ldquo;auto&rdquo; in your
-<a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md">io.matthewnelson.topl_core_base.TorSettings</a> to easily identifying what addresses to
+<a href="../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/">io.matthewnelson.topl_core_base.TorSettings</a> to easily identify what addresses to
 use for making network calls, as well as being notified when Tor is ready to be used.</p>
 <p>|</p>
 <h5 id="iomatthewnelsontopl_serviceprefstorserviceprefs"><a href="../io.matthewnelson.topl_service.prefs/-tor-service-prefs/">io.matthewnelson.topl_service.prefs.TorServicePrefs</a><a class="headerlink" href="#iomatthewnelsontopl_serviceprefstorserviceprefs" title="Permanent link">&para;</a></h5>
 <p>This class provides a standardized way for library users to change settings used
 by <a href="#">io.matthewnelson.topl_service.service.TorService</a> such that the values expressed
-as default <a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md">io.matthewnelson.topl_core_base.TorSettings</a> when initializing things via
+as default <a href="../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/">io.matthewnelson.topl_core_base.TorSettings</a> when initializing things via
 the <a href="../io.matthewnelson.topl_service/-tor-service-controller/-builder/">io.matthewnelson.topl_service.TorServiceController.Builder</a> can be updated. The
 values saved to <a href="../io.matthewnelson.topl_service.prefs/-tor-service-prefs/">TorServicePrefs</a> are always preferred over the defaults declared.</p>
                 

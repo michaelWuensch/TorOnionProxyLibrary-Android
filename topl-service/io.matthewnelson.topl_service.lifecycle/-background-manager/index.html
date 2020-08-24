@@ -399,6 +399,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#companion-object-properties" class="md-nav__link">
+    Companion Object Properties
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -421,10 +428,11 @@
                 
                 <p><a href="../../">topl-service</a> / <a href="../">io.matthewnelson.topl_service.lifecycle</a> / <a href="./">BackgroundManager</a></p>
 <h1 id="backgroundmanager">BackgroundManager<a class="headerlink" href="#backgroundmanager" title="Permanent link">&para;</a></h1>
-<p><code>class BackgroundManager :</code><a href="../../io.matthewnelson.topl_service.util/-service-consts/"><code>ServiceConsts</code></a><code>, LifecycleObserver</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/lifecycle/BackgroundManager.kt#L125">(source)</a></p>
+<p><code>class BackgroundManager :</code><a href="../../io.matthewnelson.topl_service.util/-service-consts/"><code>ServiceConsts</code></a><code>, LifecycleObserver</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/lifecycle/BackgroundManager.kt#L130">(source)</a></p>
 <p>When your application is sent to the background (the Recent App&rsquo;s tray or lock screen), the
-chosen <a href="-builder/-policy/">BackgroundManager.Builder.Policy</a> will be executed after the number of seconds you&rsquo;ve
-declared.</p>
+chosen <a href="-builder/-policy/">BackgroundManager.Builder.Policy</a> will be triggered.</p>
+<p>Additionally, there are 2 values for you to query if needed to give you context surrounding
+your application&rsquo;s background state; <a href="task-is-in-foreground/">taskIsInForeground</a> and <a href="#">taskIsRemovedFromRecentApps</a>.</p>
 <p>If brought back into the foreground by the user:</p>
 <ul>
 <li>
@@ -433,12 +441,12 @@ was <strong>not</strong> <a href="#">ServiceConsts.ServiceActionName.STOP</a>, a
 started.</p>
 </li>
 <li>
-<p><strong>After Policy execution</strong>: If <a href="#">BaseService.lastAcceptedServiceAction</a>
-was <strong>not</strong> <a href="#">ServiceConsts.ServiceActionName.STOP</a>, a startService call is made to ensure it&rsquo;s
-started.</p>
+<p><strong>After Policy execution</strong>: If <a href="#">BaseService.lastAcceptedServiceAction</a> was <strong>not</strong>
+<a href="#">ServiceConsts.ServiceActionName.STOP</a>, a startService call is made to ensure it&rsquo;s started.</p>
 </li>
 <li>
-<p>See <a href="#">BaseService.updateLastAcceptedServiceAction</a> and <a href="#">TorService.onTaskRemoved</a> for
+<p>See <a href="#">io.matthewnelson.topl_service.service.components.binding.BaseServiceBinder</a>,
+<a href="#">BaseService.updateLastAcceptedServiceAction</a>, and <a href="#">TorService.onTaskRemoved</a> for
 more information.</p>
 </li>
 </ul>
@@ -449,15 +457,17 @@ The OS will not kill a service started using <code>Context.startService</code> &
 <code>Context.bindService</code> (how <a href="#">TorService</a> is started) while in the foreground.</p>
 <p>When the user sends your application to the Recent App&rsquo;s tray though, to recoup resources
 the OS will kill your app after being idle for a period of time (random AF&hellip; typically
-0.75m to 1.25m). This is not an issue if the user removes the task before the OS
-kills the app, as Tor will be able to shutdown properly and the service will stop.</p>
+0.75m to 1.25m if the device&rsquo;s memory is being used heavily) if the service is not moved to
+the Foreground to inhibit this. This is not an issue if the user removes the task before the
+OS kills the app, as Tor will be able to shutdown properly and the service will stop.</p>
 <p>This is where Services get sketchy (especially when trying to implement an always
 running service for networking), and is the purpose of the <a href="./">BackgroundManager</a> class.</p>
 <p>This class starts your chosen <a href="-builder/-policy/">BackgroundManager.Builder.Policy</a> as soon as your
-application is sent to the background, waits for the time you declared, and then executes.</p>
+application is sent to the background. It facilitates a more declarative, flexible
+operation to fit Library users&rsquo; needs.</p>
 <p>See the <a href="-builder/">BackgroundManager.Builder</a> for more detail.</p>
 <h3 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h3>
-<p><code>policy</code> - The chosen <a href="#">ServiceConsts.BackgroundPolicy</a> to be executed.</p>
+<p><code>policy</code> - The chosen <a href="../../io.matthewnelson.topl_service.util/-service-consts/-background-policy/">ServiceConsts.BackgroundPolicy</a> to be executed.</p>
 <p><code>executionDelay</code> - Length of time before the policy gets executed <em>after</em> the application
 is sent to the background.</p>
 <p><code>serviceClass</code> - The Service class being managed</p>
@@ -477,6 +487,25 @@ is sent to the background.</p>
 <tr>
 <td><a href="-builder/">Builder</a></td>
 <td>This <a href="-builder/">BackgroundManager.Builder</a> sets how you want the service to operate while your app is in the background (the Recent App&rsquo;s tray or lock screen), such that things run reliably based off of your application&rsquo;s needs.<code>class Builder</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="companion-object-properties">Companion Object Properties<a class="headerlink" href="#companion-object-properties" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="task-is-in-foreground/">taskIsInForeground</a></td>
+<td><code>var taskIsInForeground:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
+</tr>
+<tr>
+<td><a href="task-is-removed-from-recent-apps/">taskIsRemovedFromRecentApps</a></td>
+<td><code>var taskIsRemovedFromRecentApps:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
 </tr>
 </tbody>
 </table>

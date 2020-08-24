@@ -534,7 +534,7 @@ that you supply upon initialization of <code>TorServiceController.Builder</code>
     no unnecessary classes or resources; just the binaries. Android API 29+ no longer supports 
     execution of executable files from your application&rsquo;s <code>/data/data/</code> directory, and must now be
     installed in the <code>context.applicationInfo.nativeLibraryDir</code> directory (aka, <code>/data/app/...</code>) 
-    to execute.
+    to execute.<br />
         - Nothing more is needed in terms of configuring initialization via the 
         <code>TorServiceController.Builder</code>, as files will be installed in the correct directory, and 
         named to match what <code>topl-service</code> looks for.</li>
@@ -568,7 +568,7 @@ down. See the <code>sampleapp</code>&lsquo;s <code>build.gradle</code> file for 
 <ul>
 <li>
 <p>In your Application module&rsquo;s <code>build.gradle</code> file, add the following to the <code>dependencies</code> block:
-     <div class="highlight"><pre><span></span><code><span class="kt">def</span> <span class="n">topl_android_version</span> <span class="o">=</span> <span class="s2">&quot;1.0.0-alpha02&quot;</span>
+     <div class="highlight"><pre><span></span><code><span class="kt">def</span> <span class="n">topl_android_version</span> <span class="o">=</span> <span class="s2">&quot;1.0.0-beta01&quot;</span>
 <span class="n">implementation</span> <span class="s2">&quot;io.matthewnelson.topl-android:topl-core-base:$topl_android_version&quot;</span>
 <span class="n">implementation</span> <span class="s2">&quot;io.matthewnelson.topl-android:topl-service:$topl_android_version&quot;</span>
 </code></pre></div></p>
@@ -605,7 +605,7 @@ class for help.</li>
 </li>
 <li>
 <p>In your Application module&rsquo;s <code>build.gradle</code> file, add (or modify) the following in the <code>dependencies</code> block:
-     <div class="highlight"><pre><span></span><code><span class="kt">def</span> <span class="n">topl_android_version</span> <span class="o">=</span> <span class="s2">&quot;1.0.0-beta01-SNAPSHOT&quot;</span>
+     <div class="highlight"><pre><span></span><code><span class="kt">def</span> <span class="n">topl_android_version</span> <span class="o">=</span> <span class="s2">&quot;1.0.0-beta02-SNAPSHOT&quot;</span>
 <span class="n">implementation</span> <span class="s1">&#39;io.matthewnelson.topl-android:topl-core-base:$topl_android_version&#39;</span>
 <span class="n">implementation</span> <span class="s1">&#39;io.matthewnelson.topl-android:topl-service:$topl_android_version&#39;</span>
 </code></pre></div></p>

@@ -397,16 +397,18 @@
                 
                 <p><a href="../../../">topl-core-base</a> / <a href="../../">io.matthewnelson.topl_core_base</a> / <a href="../">TorSettings</a> / <a href="./">relayPort</a></p>
 <h1 id="relayport">relayPort<a class="headerlink" href="#relayport" title="Permanent link">&para;</a></h1>
-<p><code>abstract val relayPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>?</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorSettings.kt#L264">(source)</a></p>
+<p><code>abstract val relayPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorSettings.kt#L456">(source)</a></p>
 <p>TorBrowser and Orbot use 9001 by default. It may be wise to pick something
 that won&rsquo;t conflict.</p>
+<p>Adds to the torrc file &ldquo;ORPort &lt;<a href="./">relayPort</a>&gt;&ldquo;</p>
 <p>This only gets used if you declare the following settings set as:
 <a href="../has-reachable-address/">hasReachableAddress</a> false
 <a href="../has-bridges/">hasBridges</a> false
 <a href="../is-relay/">isRelay</a> true
 <a href="../relay-nickname/">relayNickname</a> &ldquo;your nickname&rdquo;
-<a href="./">relayPort</a> some Int value</p>
-<p>Default = <a href="#">java.null</a></p>
+<a href="./">relayPort</a> &ldquo;auto&rdquo;, or a port between &ldquo;1024&rdquo; and &ldquo;65535&rdquo;</p>
+<p><strong>Docs:</strong> <a href="https://2019.www.torproject.org/docs/tor-manual.html.en#ORPort">https://2019.www.torproject.org/docs/tor-manual.html.en#ORPort</a></p>
+<p>See <a href="../../-base-consts/-port-option/-d-i-s-a-b-l-e-d/">BaseConsts.PortOption.DISABLED</a></p>
                 
               
               

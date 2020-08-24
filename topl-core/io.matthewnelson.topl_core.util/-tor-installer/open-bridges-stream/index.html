@@ -403,7 +403,39 @@
 <p>if first byte is 1, the the stream will have the form</p>
 <p><code>($bridge_info \r\n)*</code></p>
 <p>The second form is used for custom bridges from the user.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">//Unresolved: io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller.openBridgesStream</span>
+<div class="highlight"><pre><span></span><code><span class="cm">/*</span>
+<span class="cm">    BridgesList is an overloaded field, which can cause some confusion.</span>
+
+<span class="cm">    The list can be:</span>
+<span class="cm">      1) a filter like obfs4, meek, or snowflake OR</span>
+<span class="cm">      2) it can be a custom bridge</span>
+
+<span class="cm">    For (1), we just pass back all bridges, the filter will occur</span>
+<span class="cm">      elsewhere in the library.</span>
+<span class="cm">    For (2) we return the bridge list as a raw stream.</span>
+
+<span class="cm">    If length is greater than 9, then we know this is a custom bridge</span>
+<span class="cm">* */</span>
+<span class="c1">// TODO: Completely refactor how bridges work.</span>
+<span class="k">val</span> <span class="py">userDefinedBridgeList</span><span class="p">:</span> <span class="n">String</span> <span class="p">=</span>
+    <span class="n">torServicePrefs</span><span class="p">.</span><span class="n">getList</span><span class="p">(</span><span class="n">PrefKeyList</span><span class="p">.</span><span class="n">USER_DEFINED_BRIDGES</span><span class="p">,</span> <span class="n">arrayListOf</span><span class="p">()).</span><span class="n">joinToString</span><span class="p">()</span>
+<span class="k">var</span> <span class="py">bridgeType</span> <span class="p">=</span> <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="n">userDefinedBridgeList</span><span class="p">.</span><span class="n">length</span> <span class="p">&gt;</span> <span class="m">9</span><span class="p">)</span> <span class="m">1</span> <span class="k">else</span> <span class="m">0</span><span class="p">).</span><span class="n">toByte</span><span class="p">()</span>
+<span class="c1">// Terrible hack. Must keep in sync with topl::addBridgesFromResources.</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">bridgeType</span><span class="p">.</span><span class="n">toInt</span><span class="p">()</span> <span class="p">==</span> <span class="m">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">when</span> <span class="p">(</span><span class="n">userDefinedBridgeList</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">SupportedBridgeType</span><span class="p">.</span><span class="n">OBFS4</span> <span class="p">-&gt;</span> <span class="n">bridgeType</span> <span class="p">=</span> <span class="m">2</span>
+        <span class="n">SupportedBridgeType</span><span class="p">.</span><span class="n">MEEK</span> <span class="p">-&gt;</span> <span class="n">bridgeType</span> <span class="p">=</span> <span class="m">3</span>
+        <span class="n">SupportedBridgeType</span><span class="p">.</span><span class="n">SNOWFLAKE</span> <span class="p">-&gt;</span> <span class="n">bridgeType</span> <span class="p">=</span> <span class="m">4</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">val</span> <span class="py">bridgeTypeStream</span> <span class="p">=</span> <span class="n">ByteArrayInputStream</span><span class="p">(</span><span class="n">byteArrayOf</span><span class="p">(</span><span class="n">bridgeType</span><span class="p">))</span>
+<span class="k">val</span> <span class="py">bridgeStream</span> <span class="p">=</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">bridgeType</span><span class="p">.</span><span class="n">toInt</span><span class="p">()</span> <span class="p">==</span> <span class="m">1</span><span class="p">)</span>
+        <span class="n">ByteArrayInputStream</span><span class="p">(</span><span class="n">userDefinedBridgeList</span><span class="p">.</span><span class="n">toByteArray</span><span class="p">())</span>
+    <span class="k">else</span>
+        <span class="n">torService</span><span class="p">.</span><span class="n">context</span><span class="p">.</span><span class="n">resources</span><span class="p">.</span><span class="n">openRawResource</span><span class="p">(</span><span class="n">R</span><span class="p">.</span><span class="n">raw</span><span class="p">.</span><span class="n">bridges</span><span class="p">)</span>
+<span class="k">return</span> <span class="n">SequenceInputStream</span><span class="p">(</span><span class="n">bridgeTypeStream</span><span class="p">,</span> <span class="n">bridgeStream</span><span class="p">)</span>
 </code></pre></div>
                 
               

@@ -428,7 +428,7 @@
                 
                 <p><a href="../../">topl-service</a> / <a href="../">io.matthewnelson.topl_service</a> / <a href="./">TorServiceController</a></p>
 <h1 id="torservicecontroller">TorServiceController<a class="headerlink" href="#torservicecontroller" title="Permanent link">&para;</a></h1>
-<p><code>class TorServiceController :</code><a href="../../io.matthewnelson.topl_service.util/-service-consts/"><code>ServiceConsts</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L84">(source)</a></p>
+<p><code>class TorServiceController :</code><a href="../../io.matthewnelson.topl_service.util/-service-consts/"><code>ServiceConsts</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L86">(source)</a></p>
 <h3 id="types">Types<a class="headerlink" href="#types" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -455,7 +455,7 @@
 <tbody>
 <tr>
 <td><a href="app-event-broadcaster/">appEventBroadcaster</a></td>
-<td><code>var appEventBroadcaster:</code><a href="../../io.matthewnelson.topl_service.service.components.onionproxy/-tor-service-event-broadcaster/"><code>TorServiceEventBroadcaster</code></a><code>?</code></td>
+<td><code>var appEventBroadcaster:</code><a href="../../io.matthewnelson.topl_service.service.components.onionproxy.model/-tor-service-event-broadcaster/"><code>TorServiceEventBroadcaster</code></a><code>?</code></td>
 </tr>
 </tbody>
 </table>
@@ -469,20 +469,24 @@
 </thead>
 <tbody>
 <tr>
+<td><a href="get-service-tor-settings/">getServiceTorSettings</a></td>
+<td>Helper method for easily obtaining <a href="../../io.matthewnelson.topl_service.service.components.onionproxy/-service-tor-settings/">ServiceTorSettings</a>.<code>fun getServiceTorSettings(context:</code><a href="https://developer.android.com/reference/android/content/Context.html"><code>Context</code></a><code>):</code><a href="../../io.matthewnelson.topl_service.service.components.onionproxy/-service-tor-settings/"><code>ServiceTorSettings</code></a></td>
+</tr>
+<tr>
 <td><a href="get-tor-config-files/">getTorConfigFiles</a></td>
 <td>Get the <a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/">TorConfigFiles</a> that have been set after calling <a href="-builder/build/">Builder.build</a><code>fun getTorConfigFiles():</code><a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/"><code>TorConfigFiles</code></a></td>
 </tr>
 <tr>
 <td><a href="get-tor-settings/">getTorSettings</a></td>
-<td>Get the <a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/">TorSettings</a> that have been set after calling <a href="-builder/build/">Builder.build</a>. These are the <a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/">TorSettings</a> you initialized <a href="-builder/">TorServiceController.Builder</a> with.<code>fun getTorSettings():</code><a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/"><code>TorSettings</code></a></td>
+<td>Get the <a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/">TorSettings</a> that have been set after calling <a href="-builder/build/">Builder.build</a>.<code>fun getTorSettings():</code><a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/"><code>TorSettings</code></a></td>
 </tr>
 <tr>
 <td><a href="new-identity/">newIdentity</a></td>
-<td>Changes identities.<code>fun newIdentity():</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><code>Unit</code></a><code>?</code></td>
+<td>Changes identities.<code>fun newIdentity():</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><code>Unit</code></a></td>
 </tr>
 <tr>
 <td><a href="restart-tor/">restartTor</a></td>
-<td>Restarts Tor.<code>fun restartTor():</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><code>Unit</code></a><code>?</code></td>
+<td>Restarts Tor.<code>fun restartTor():</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><code>Unit</code></a></td>
 </tr>
 <tr>
 <td><a href="start-tor/">startTor</a></td>
@@ -490,7 +494,7 @@
 </tr>
 <tr>
 <td><a href="stop-tor/">stopTor</a></td>
-<td>Stops <a href="#">TorService</a>.<code>fun stopTor():</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><code>Unit</code></a><code>?</code></td>
+<td>Stops <a href="#">TorService</a>.<code>fun stopTor():</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><code>Unit</code></a></td>
 </tr>
 </tbody>
 </table>

@@ -553,9 +553,21 @@ allows for easier separation of messages based on the type, process or class.</p
     <span class="n">@Volatile</span>
     <span class="k">private</span> <span class="k">var</span> <span class="py">controlPort</span><span class="p">:</span> <span class="n">String</span><span class="p">?</span> <span class="p">=</span> <span class="k">null</span>
     <span class="n">@Volatile</span>
+    <span class="k">private</span> <span class="k">var</span> <span class="py">dnsPort</span><span class="p">:</span> <span class="n">String</span><span class="p">?</span> <span class="p">=</span> <span class="k">null</span>
+    <span class="n">@Volatile</span>
     <span class="k">private</span> <span class="k">var</span> <span class="py">httpTunnelPort</span><span class="p">:</span> <span class="n">String</span><span class="p">?</span> <span class="p">=</span> <span class="k">null</span>
     <span class="n">@Volatile</span>
     <span class="k">private</span> <span class="k">var</span> <span class="py">socksPort</span><span class="p">:</span> <span class="n">String</span><span class="p">?</span> <span class="p">=</span> <span class="k">null</span>
+    <span class="n">@Volatile</span>
+    <span class="k">private</span> <span class="k">var</span> <span class="py">transPort</span><span class="p">:</span> <span class="n">String</span><span class="p">?</span> <span class="p">=</span> <span class="k">null</span>
+
+    <span class="k">private</span> <span class="k">fun</span> <span class="nf">setAllPortsNull</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">controlPort</span> <span class="p">=</span> <span class="k">null</span>
+        <span class="n">dnsPort</span> <span class="p">=</span> <span class="k">null</span>
+        <span class="n">httpTunnelPort</span> <span class="p">=</span> <span class="k">null</span>
+        <span class="n">socksPort</span> <span class="p">=</span> <span class="k">null</span>
+        <span class="n">transPort</span> <span class="p">=</span> <span class="k">null</span>
+    <span class="p">}</span>
 
     <span class="k">override</span> <span class="k">fun</span> <span class="nf">broadcastNotice</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
 
@@ -564,21 +576,49 @@ allows for easier separation of messages based on the type, process or class.</p
             <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="n">ServiceActionProcessor</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">.</span><span class="n">simpleName</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
                 <span class="n">handleServiceActionProcessorMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="p">}</span>
+            <span class="c1">// WARN|OnionProxyManager|No Network Connectivity. Foregoing enabling of Tor Network.</span>
+            <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&quot;No Network Connectivity. Foregoing enabling of Tor Network.&quot;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
+                <span class="n">torService</span><span class="p">.</span><span class="n">updateNotificationProgress</span><span class="p">(</span><span class="k">false</span><span class="p">,</span> <span class="k">null</span><span class="p">)</span>
+                <span class="n">torService</span><span class="p">.</span><span class="n">updateNotificationContentText</span><span class="p">(</span><span class="s">&quot;No Network Connectivity. Waiting...&quot;</span><span class="p">)</span>
+            <span class="p">}</span>
             <span class="c1">// BOOTSTRAPPED</span>
             <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&quot;Bootstrapped&quot;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
                 <span class="n">handleBootstrappedMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="p">}</span>
             <span class="c1">// Control Port</span>
+            <span class="c1">// NOTICE|OnionProxyManager|Successfully connected to Control Port: 44201</span>
             <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&quot;Successfully connected to Control Port:&quot;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
-                <span class="n">handleControlPortMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="n">controlPort</span> <span class="p">=</span> <span class="n">getPortFromMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">isBootstrappingComplete</span><span class="p">())</span>
+                    <span class="n">updateAppEventBroadcasterWithPortInfo</span><span class="p">()</span>
+            <span class="p">}</span>
+            <span class="c1">// Dns Port</span>
+            <span class="c1">// NOTICE|OnionProxyManager|Opened DNS listener on 127.0.0.1:5400</span>
+            <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&quot;Opened DNS listener on &quot;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
+                <span class="n">dnsPort</span> <span class="p">=</span> <span class="n">getPortFromMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">isBootstrappingComplete</span><span class="p">())</span>
+                    <span class="n">updateAppEventBroadcasterWithPortInfo</span><span class="p">()</span>
             <span class="p">}</span>
             <span class="c1">// Http Tunnel Port</span>
+            <span class="c1">// NOTICE|BaseEventListener|Opened HTTP tunnel listener on 127.0.0.1:8118</span>
             <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&quot;Opened HTTP tunnel listener on &quot;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
-                <span class="n">handleHttpTunnelPortMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="n">httpTunnelPort</span> <span class="p">=</span> <span class="n">getPortFromMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">isBootstrappingComplete</span><span class="p">())</span>
+                    <span class="n">updateAppEventBroadcasterWithPortInfo</span><span class="p">()</span>
             <span class="p">}</span>
             <span class="c1">// Socks Port</span>
+            <span class="c1">// NOTICE|BaseEventListener|Opened Socks listener on 127.0.0.1:9050</span>
             <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&quot;Opened Socks listener on &quot;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
-                <span class="n">handleSocksPortMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="n">socksPort</span> <span class="p">=</span> <span class="n">getPortFromMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">isBootstrappingComplete</span><span class="p">())</span>
+                    <span class="n">updateAppEventBroadcasterWithPortInfo</span><span class="p">()</span>
+            <span class="p">}</span>
+            <span class="c1">// Trans Port</span>
+            <span class="c1">// NOTICE|BaseEventListener|Opened Transparent pf/netfilter listener on 127.0.0.1:9040</span>
+            <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&quot;Opened Transparent pf/netfilter listener on &quot;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
+                <span class="n">transPort</span> <span class="p">=</span> <span class="n">getPortFromMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">isBootstrappingComplete</span><span class="p">())</span>
+                    <span class="n">updateAppEventBroadcasterWithPortInfo</span><span class="p">()</span>
             <span class="p">}</span>
             <span class="c1">// NEWNYM</span>
             <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="n">TorControlCommands</span><span class="p">.</span><span class="n">SIGNAL_NEWNYM</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
@@ -622,23 +662,8 @@ allows for easier separation of messages based on the type, process or class.</p
         <span class="p">}</span>
     <span class="p">}</span>
 
-    <span class="c1">// NOTICE|OnionProxyManager|Successfully connected to Control Port: 44201</span>
-    <span class="k">private</span> <span class="k">fun</span> <span class="nf">handleControlPortMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">val</span> <span class="py">port</span> <span class="p">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;:&quot;</span><span class="p">)[</span><span class="m">1</span><span class="p">].</span><span class="n">trim</span><span class="p">()</span>
-        <span class="n">controlPort</span> <span class="p">=</span> <span class="s">&quot;127.0.0.1:$port&quot;</span>
-    <span class="p">}</span>
-
-    <span class="c1">// NOTICE|BaseEventListener|Opened HTTP tunnel listener on 127.0.0.1:37397</span>
-    <span class="k">private</span> <span class="k">fun</span> <span class="nf">handleHttpTunnelPortMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">val</span> <span class="py">port</span> <span class="p">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;:&quot;</span><span class="p">)[</span><span class="m">1</span><span class="p">].</span><span class="n">trim</span><span class="p">()</span>
-        <span class="n">httpTunnelPort</span> <span class="p">=</span> <span class="s">&quot;127.0.0.1:$port&quot;</span>
-    <span class="p">}</span>
-
-    <span class="c1">// NOTICE|BaseEventListener|Opened Socks listener on 127.0.0.1:9051</span>
-    <span class="k">private</span> <span class="k">fun</span> <span class="nf">handleSocksPortMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">val</span> <span class="py">port</span> <span class="p">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;:&quot;</span><span class="p">)[</span><span class="m">1</span><span class="p">].</span><span class="n">trim</span><span class="p">()</span>
-        <span class="n">socksPort</span> <span class="p">=</span> <span class="s">&quot;127.0.0.1:$port&quot;</span>
-    <span class="p">}</span>
+    <span class="k">private</span> <span class="k">fun</span> <span class="nf">getPortFromMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="n">String</span><span class="p">):</span> <span class="n">String</span> <span class="p">=</span>
+        <span class="s">&quot;127.0.0.1:${msg.split(&quot;</span><span class="p">:</span><span class="s">&quot;)[1].trim()}&quot;</span>
 
     <span class="k">private</span> <span class="k">fun</span> <span class="nf">handleNewNymMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">val</span> <span class="py">msgToShow</span><span class="p">:</span> <span class="n">String</span><span class="p">?</span> <span class="p">=</span>
@@ -670,6 +695,15 @@ allows for easier separation of messages based on the type, process or class.</p
                 <span class="n">ServiceActionName</span><span class="p">.</span><span class="n">RESTART_TOR</span> <span class="p">-&gt;</span> <span class="p">{</span>
                     <span class="s">&quot;Restarting Tor...&quot;</span>
                 <span class="p">}</span>
+                <span class="n">ServiceActionName</span><span class="p">.</span><span class="n">START</span> <span class="p">-&gt;</span> <span class="p">{</span>
+                    <span class="c1">// Need to check here if Tor is already on, as startTor can be called</span>
+                    <span class="c1">// anytime which would overwrite the contentText already showing and</span>
+                    <span class="c1">// then stay there until something else updates it.</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">torState</span> <span class="p">!=</span> <span class="n">TorState</span><span class="p">.</span><span class="n">ON</span><span class="p">)</span>
+                        <span class="s">&quot;Starting Tor...&quot;</span>
+                    <span class="k">else</span>
+                        <span class="k">null</span>
+                <span class="p">}</span>
                 <span class="n">ServiceActionName</span><span class="p">.</span><span class="n">STOP</span> <span class="p">-&gt;</span> <span class="p">{</span>
                     <span class="s">&quot;Stopping Service...&quot;</span>
                 <span class="p">}</span>
@@ -683,12 +717,23 @@ allows for easier separation of messages based on the type, process or class.</p
         <span class="p">}</span>
     <span class="p">}</span>
 
+    <span class="k">private</span> <span class="k">var</span> <span class="py">broadcastPortInfoJob</span><span class="p">:</span> <span class="n">Job</span><span class="p">?</span> <span class="p">=</span> <span class="k">null</span>
     <span class="k">private</span> <span class="k">fun</span> <span class="nf">updateAppEventBroadcasterWithPortInfo</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">broadcastPortInfoJob</span><span class="o">?.</span><span class="n">isActive</span> <span class="p">==</span> <span class="k">true</span><span class="p">)</span>
+            <span class="n">broadcastPortInfoJob</span><span class="o">?.</span><span class="n">cancel</span><span class="p">()</span>
+
         <span class="n">TorServiceController</span><span class="p">.</span><span class="n">appEventBroadcaster</span><span class="o">?.</span><span class="n">let</span> <span class="p">{</span>
-            <span class="n">scopeMain</span><span class="p">.</span><span class="n">launch</span> <span class="p">{</span>
-                <span class="n">it</span><span class="p">.</span><span class="n">broadcastControlPortAddress</span><span class="p">(</span><span class="n">controlPort</span><span class="p">)</span>
-                <span class="n">it</span><span class="p">.</span><span class="n">broadcastHttpPortAddress</span><span class="p">(</span><span class="n">httpTunnelPort</span><span class="p">)</span>
-                <span class="n">it</span><span class="p">.</span><span class="n">broadcastSocksPortAddress</span><span class="p">(</span><span class="n">socksPort</span><span class="p">)</span>
+            <span class="n">broadcastPortInfoJob</span> <span class="p">=</span> <span class="n">scopeMain</span><span class="p">.</span><span class="n">launch</span> <span class="p">{</span>
+                <span class="n">delay</span><span class="p">(</span><span class="m">100L</span><span class="p">)</span>
+                <span class="n">it</span><span class="p">.</span><span class="n">broadcastPortInformation</span><span class="p">(</span>
+                    <span class="n">TorPortInfo</span><span class="p">(</span>
+                        <span class="n">controlPort</span><span class="p">,</span>
+                        <span class="n">dnsPort</span><span class="p">,</span>
+                        <span class="n">httpTunnelPort</span><span class="p">,</span>
+                        <span class="n">socksPort</span><span class="p">,</span>
+                        <span class="n">transPort</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
             <span class="p">}</span>
         <span class="p">}</span>
     <span class="p">}</span>
@@ -728,9 +773,7 @@ allows for easier separation of messages based on the type, process or class.</p
     <span class="k">override</span> <span class="k">fun</span> <span class="nf">broadcastTorState</span><span class="p">(</span><span class="n">@TorState</span> <span class="n">state</span><span class="p">:</span> <span class="n">String</span><span class="p">,</span> <span class="n">@TorNetworkState</span> <span class="n">networkState</span><span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">torState</span> <span class="p">==</span> <span class="n">TorState</span><span class="p">.</span><span class="n">ON</span> <span class="p">&amp;&amp;</span> <span class="n">state</span> <span class="p">!=</span> <span class="n">torState</span><span class="p">)</span> <span class="p">{</span>
             <span class="n">bootstrapProgress</span> <span class="p">=</span> <span class="s">&quot;&quot;</span>
-            <span class="n">controlPort</span> <span class="p">=</span> <span class="k">null</span>
-            <span class="n">httpTunnelPort</span> <span class="p">=</span> <span class="k">null</span>
-            <span class="n">socksPort</span> <span class="p">=</span> <span class="k">null</span>
+            <span class="n">setAllPortsNull</span><span class="p">()</span>
             <span class="n">updateAppEventBroadcasterWithPortInfo</span><span class="p">()</span>
             <span class="n">torService</span><span class="p">.</span><span class="n">removeNotificationActions</span><span class="p">()</span>
         <span class="p">}</span>
@@ -742,6 +785,11 @@ allows for easier separation of messages based on the type, process or class.</p
         <span class="n">torState</span> <span class="p">=</span> <span class="n">state</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="n">networkState</span> <span class="p">==</span> <span class="n">TorNetworkState</span><span class="p">.</span><span class="n">DISABLED</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">isBootstrappingComplete</span><span class="p">())</span> <span class="p">{</span>
+                <span class="n">setAllPortsNull</span><span class="p">()</span>
+                <span class="n">updateAppEventBroadcasterWithPortInfo</span><span class="p">()</span>
+            <span class="p">}</span>
+
             <span class="c1">// Update torNetworkState _before_ setting the icon to `disabled` so bandwidth won&#39;t</span>
             <span class="c1">// overwrite the icon with an update</span>
             <span class="n">torNetworkState</span> <span class="p">=</span> <span class="n">networkState</span>

@@ -407,8 +407,10 @@ startup command is issued to bring it back to the started state no matter if it 
 running or not.</p>
 <div class="highlight"><pre><span></span><code><span class="c1">//  private fun generateBackgroundManagerPolicy(): BackgroundManager.Builder.Policy {</span>
         <span class="k">return</span> <span class="n">BackgroundManager</span><span class="p">.</span><span class="n">Builder</span><span class="p">()</span>
-            <span class="p">.</span><span class="n">respectResourcesWhileInBackground</span><span class="p">(</span><span class="n">secondsFrom5To45</span> <span class="p">=</span> <span class="m">20</span><span class="p">)</span>
 
+            <span class="c1">// All available options present. Only 1 is able to be chosen.</span>
+            <span class="p">.</span><span class="n">respectResourcesWhileInBackground</span><span class="p">(</span><span class="n">secondsFrom5To45</span> <span class="p">=</span> <span class="m">20</span><span class="p">)</span>
+            <span class="c1">//.runServiceInForeground(killAppIfTaskIsRemoved = true)</span>
 <span class="c1">//  }</span>
 </code></pre></div>
                 

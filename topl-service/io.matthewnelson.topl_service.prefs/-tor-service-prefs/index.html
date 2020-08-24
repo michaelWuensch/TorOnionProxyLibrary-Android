@@ -434,7 +434,7 @@ by <a href="#">io.matthewnelson.topl_service.service.TorService</a> such that th
 as default <a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/">io.matthewnelson.topl_core_base.TorSettings</a> when initializing things via
 the <a href="../../io.matthewnelson.topl_service/-tor-service-controller/-builder/">io.matthewnelson.topl_service.TorServiceController.Builder</a> can be updated. The
 values saved to <a href="./">TorServicePrefs</a> are always preferred over the defaults declared.</p>
-<p>See <a href="#">io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings</a></p>
+<p>See <a href="../../io.matthewnelson.topl_service.service.components.onionproxy/-service-tor-settings/">io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings</a></p>
 <h3 id="constructors">Constructors<a class="headerlink" href="#constructors" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -460,8 +460,16 @@ values saved to <a href="./">TorServicePrefs</a> are always preferred over the d
 </thead>
 <tbody>
 <tr>
+<td><a href="clear/">clear</a></td>
+<td><code>fun clear():</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><code>Unit</code></a></td>
+</tr>
+<tr>
 <td><a href="contains/">contains</a></td>
 <td>Checks if the SharedPreference contains a value for the supplied <a href="contains/#io.matthewnelson.topl_service.prefs.TorServicePrefs$contains(kotlin.String)/prefsKey">prefsKey</a>. Accepts the following annotation type String values:<code>fun contains(prefsKey:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>):</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
+</tr>
+<tr>
+<td><a href="get-all/">getAll</a></td>
+<td><code>fun getAll():</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html"><code>Map</code></a><code>&lt;</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>, *&gt;</code></td>
 </tr>
 <tr>
 <td><a href="get-boolean/">getBoolean</a></td>

@@ -414,9 +414,10 @@
                 
                 <p><a href="../../../">topl-service</a> / <a href="../../">io.matthewnelson.topl_service</a> / <a href="../">TorServiceController</a> / <a href="./">getTorSettings</a></p>
 <h1 id="gettorsettings">getTorSettings<a class="headerlink" href="#gettorsettings" title="Permanent link">&para;</a></h1>
-<p><code>fun getTorSettings():</code><a href="../../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/"><code>TorSettings</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L329">(source)</a></p>
-<p>Get the <a href="../../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/">TorSettings</a> that have been set after calling <a href="../-builder/build/">Builder.build</a>. These are
-the <a href="../../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/">TorSettings</a> you initialized <a href="../-builder/">TorServiceController.Builder</a> with.</p>
+<p><code>@JvmStatic fun getTorSettings():</code><a href="../../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/"><code>TorSettings</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L390">(source)</a></p>
+<p>Get the <a href="../../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/">TorSettings</a> that have been set after calling <a href="../-builder/build/">Builder.build</a>.</p>
+<p>This method will <em>never</em> throw the <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-runtime-exception/index.html">RuntimeException</a> if you call it after
+<a href="../-builder/build/">Builder.build</a>.</p>
 <h3 id="exceptions">Exceptions<a class="headerlink" href="#exceptions" title="Permanent link">&para;</a></h3>
 <p><code>RuntimeException</code> - if called before <a href="../-builder/build/">Builder.build</a></p>
 <p><strong>Return</strong>

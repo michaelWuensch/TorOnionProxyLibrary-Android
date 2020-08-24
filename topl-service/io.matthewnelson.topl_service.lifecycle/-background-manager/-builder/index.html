@@ -428,7 +428,7 @@
                 
                 <p><a href="../../../">topl-service</a> / <a href="../../">io.matthewnelson.topl_service.lifecycle</a> / <a href="../">BackgroundManager</a> / <a href="./">Builder</a></p>
 <h1 id="builder">Builder<a class="headerlink" href="#builder" title="Permanent link">&para;</a></h1>
-<p><code>class Builder</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/lifecycle/BackgroundManager.kt#L145">(source)</a></p>
+<p><code>class Builder</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/lifecycle/BackgroundManager.kt#L151">(source)</a></p>
 <p>This <a href="./">BackgroundManager.Builder</a> sets how you want the service to operate while your
 app is in the background (the Recent App&rsquo;s tray or lock screen), such that things run
 reliably based off of your application&rsquo;s needs.</p>
@@ -438,8 +438,10 @@ startup command is issued to bring it back to the started state no matter if it 
 running or not.</p>
 <div class="highlight"><pre><span></span><code><span class="c1">//  private fun generateBackgroundManagerPolicy(): BackgroundManager.Builder.Policy {</span>
         <span class="k">return</span> <span class="n">BackgroundManager</span><span class="p">.</span><span class="n">Builder</span><span class="p">()</span>
-            <span class="p">.</span><span class="n">respectResourcesWhileInBackground</span><span class="p">(</span><span class="n">secondsFrom5To45</span> <span class="p">=</span> <span class="m">20</span><span class="p">)</span>
 
+            <span class="c1">// All available options present. Only 1 is able to be chosen.</span>
+            <span class="p">.</span><span class="n">respectResourcesWhileInBackground</span><span class="p">(</span><span class="n">secondsFrom5To45</span> <span class="p">=</span> <span class="m">20</span><span class="p">)</span>
+            <span class="c1">//.runServiceInForeground(killAppIfTaskIsRemoved = true)</span>
 <span class="c1">//  }</span>
 </code></pre></div>
 
@@ -485,6 +487,10 @@ running or not.</p>
 <tr>
 <td><a href="respect-resources-while-in-background/">respectResourcesWhileInBackground</a></td>
 <td>Stops <a href="#">TorService</a> after being in the background for the declared <a href="respect-resources-while-in-background/#io.matthewnelson.topl_service.lifecycle.BackgroundManager.Builder$respectResourcesWhileInBackground(kotlin.Int)/secondsFrom5To45">secondsFrom5To45</a>.<code>fun respectResourcesWhileInBackground(secondsFrom5To45:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>? = null): Policy</code></td>
+</tr>
+<tr>
+<td><a href="run-service-in-foreground/">runServiceInForeground</a></td>
+<td>Electing this option will, when your application is sent to the background, immediately move <a href="#">TorService</a> to the Foreground. If the user returns to your application, <a href="#">TorService</a> will then be backgrounded.<code>fun runServiceInForeground(killAppIfTaskIsRemoved:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a><code>= false): Policy</code></td>
 </tr>
 </tbody>
 </table>

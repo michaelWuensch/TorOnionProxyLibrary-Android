@@ -397,12 +397,10 @@
                 
                 <p><a href="../../../">topl-core</a> / <a href="../../">io.matthewnelson.topl_core.settings</a> / <a href="../">TorSettingsBuilder</a> / <a href="./">proxyWithAuthentication</a></p>
 <h1 id="proxywithauthentication">proxyWithAuthentication<a class="headerlink" href="#proxywithauthentication" title="Permanent link">&para;</a></h1>
-<p><code>fun proxyWithAuthentication(proxyType:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?, proxyHost:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?, proxyPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>?, proxyUser:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?, proxyPass:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?):</code><a href="../"><code>TorSettingsBuilder</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/settings/TorSettingsBuilder.kt#L490">(source)</a></p>
-<p>Sets proxyWithAuthentication information. If proxyType, proxyHost or proxyPort is
-empty/null, then this method does nothing.</p>
-<p>HTTPProxyAuthenticator is deprecated as of 0.3.1.0-alpha, <em>use HTTPS/Socks5</em> authentication.</p>
-<p>TODO: Remove support for HTTPProxyAuthenticator
-TODO: Re-work this mess with annotation types and when statements&hellip;</p>
+<p><code>fun proxyWithAuthentication(proxyType:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?, proxyHost:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?, proxyPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>?, proxyUser:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?, proxyPass:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?):</code><a href="../"><code>TorSettingsBuilder</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/settings/TorSettingsBuilder.kt#L545">(source)</a></p>
+<p>Sets proxyWithAuthentication information.</p>
+<p>requires that <a href="../../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/use-socks5/">TorSettings.useSocks5</a> &amp;&amp; <a href="../../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/has-bridges/">TorSettings.hasBridges</a> are set to <code>false</code></p>
+<p>NOTE: Only supports Socks5 or HTTPS</p>
                 
               
               

@@ -442,16 +442,13 @@
                 
                 <p><a href="../../">topl-core</a> / <a href="../">io.matthewnelson.topl_core</a> / <a href="./">OnionProxyManager</a></p>
 <h1 id="onionproxymanager">OnionProxyManager<a class="headerlink" href="#onionproxymanager" title="Permanent link">&para;</a></h1>
-<p><code>class OnionProxyManager :</code><a href="../../io.matthewnelson.topl_core.util/-core-consts/"><code>CoreConsts</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/OnionProxyManager.kt#L136">(source)</a></p>
+<p><code>class OnionProxyManager :</code><a href="../../io.matthewnelson.topl_core.util/-core-consts/"><code>CoreConsts</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/OnionProxyManager.kt#L133">(source)</a></p>
 <p>This is where all the fun is, this is the class which acts as a gateway into the <code>topl-core</code>
 module, and ensures synchronicity is had.</p>
 <p>This class is thread safe but that&rsquo;s mostly because we hit everything over the head
 with &lsquo;synchronized&rsquo;. Given the way this class is used there shouldn&rsquo;t be any performance
 implications of this.</p>
 <p>This class began life as TorPlugin from the Briar Project</p>
-<div class="highlight"><pre><span></span><code><span class="c1">//Unresolved: io.matthewnelson.topl_service.service.TorService.initTOPLCore</span>
-</code></pre></div>
-
 <h3 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h3>
 <p><code>context</code> - Context.</p>
 <p><code>torConfigFiles</code> - <a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/">TorConfigFiles</a> For setting up <a href="#">OnionProxyContext</a></p>
@@ -552,6 +549,10 @@ broadcast to the provided <a href="../../../topl-core-base/io.matthewnelson.topl
 <tr>
 <td><a href="get-new-settings-builder/">getNewSettingsBuilder</a></td>
 <td><code>fun getNewSettingsBuilder():</code><a href="../../io.matthewnelson.topl_core.settings/-tor-settings-builder/"><code>TorSettingsBuilder</code></a></td>
+</tr>
+<tr>
+<td><a href="has-network-connectivity/">hasNetworkConnectivity</a></td>
+<td><code>fun hasNetworkConnectivity():</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
 </tr>
 <tr>
 <td><a href="kill-tor-process/">killTorProcess</a></td>

@@ -524,7 +524,7 @@ built for you to write to the
 </tr>
 <tr>
 <td><a href="dns-port/">dnsPort</a></td>
-<td><code>fun dnsPort(dnsPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>):</code><a href="./"><code>TorSettingsBuilder</code></a></td>
+<td><code>fun dnsPort(dnsPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>, isolationFlags:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><code>List</code></a><code>&lt;</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>&gt;?):</code><a href="./"><code>TorSettingsBuilder</code></a></td>
 </tr>
 <tr>
 <td><a href="dns-port-from-settings/">dnsPortFromSettings</a></td>
@@ -537,6 +537,14 @@ built for you to write to the
 <tr>
 <td><a href="dormant-canceled-by-startup-from-settings/">dormantCanceledByStartupFromSettings</a></td>
 <td><code>fun dormantCanceledByStartupFromSettings():</code><a href="./"><code>TorSettingsBuilder</code></a></td>
+</tr>
+<tr>
+<td><a href="dormant-client-timeout-from-settings/">dormantClientTimeoutFromSettings</a></td>
+<td><code>fun dormantClientTimeoutFromSettings():</code><a href="./"><code>TorSettingsBuilder</code></a></td>
+</tr>
+<tr>
+<td><a href="dormant-client-timetout/">dormantClientTimetout</a></td>
+<td><code>fun dormantClientTimetout(minutes:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>):</code><a href="./"><code>TorSettingsBuilder</code></a></td>
 </tr>
 <tr>
 <td><a href="entry-nodes/">entryNodes</a></td>
@@ -568,7 +576,7 @@ built for you to write to the
 </tr>
 <tr>
 <td><a href="http-tunnel-port/">httpTunnelPort</a></td>
-<td><code>fun httpTunnelPort(port:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>, isolationFlags:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?):</code><a href="./"><code>TorSettingsBuilder</code></a></td>
+<td><code>fun httpTunnelPort(port:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>, isolationFlags:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><code>List</code></a><code>&lt;</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>&gt;?):</code><a href="./"><code>TorSettingsBuilder</code></a></td>
 </tr>
 <tr>
 <td><a href="http-tunnel-port-from-settings/">httpTunnelPortFromSettings</a></td>
@@ -576,7 +584,7 @@ built for you to write to the
 </tr>
 <tr>
 <td><a href="make-non-exit-relay/">makeNonExitRelay</a></td>
-<td><code>fun makeNonExitRelay(dnsFile:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>, orPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>, nickname:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>):</code><a href="./"><code>TorSettingsBuilder</code></a></td>
+<td><code>fun makeNonExitRelay(dnsFile:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>, orPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>, nickname:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>):</code><a href="./"><code>TorSettingsBuilder</code></a></td>
 </tr>
 <tr>
 <td><a href="nodes-from-settings/">nodesFromSettings</a></td>
@@ -604,7 +612,7 @@ built for you to write to the
 </tr>
 <tr>
 <td><a href="proxy-with-authentication/">proxyWithAuthentication</a></td>
-<td>Sets proxyWithAuthentication information. If proxyType, proxyHost or proxyPort is empty/null, then this method does nothing.<code>fun proxyWithAuthentication(proxyType:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?, proxyHost:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?, proxyPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>?, proxyUser:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?, proxyPass:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?):</code><a href="./"><code>TorSettingsBuilder</code></a></td>
+<td>Sets proxyWithAuthentication information.<code>fun proxyWithAuthentication(proxyType:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?, proxyHost:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?, proxyPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>?, proxyUser:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?, proxyPass:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?):</code><a href="./"><code>TorSettingsBuilder</code></a></td>
 </tr>
 <tr>
 <td><a href="proxy-with-authentication-from-settings/">proxyWithAuthenticationFromSettings</a></td>
@@ -652,7 +660,7 @@ built for you to write to the
 </tr>
 <tr>
 <td><a href="socks-port/">socksPort</a></td>
-<td><code>fun socksPort(socksPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>, isolationFlag:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?):</code><a href="./"><code>TorSettingsBuilder</code></a></td>
+<td><code>fun socksPort(socksPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>, isolationFlags:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><code>List</code></a><code>&lt;</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>&gt;?):</code><a href="./"><code>TorSettingsBuilder</code></a></td>
 </tr>
 <tr>
 <td><a href="socks-port-from-settings/">socksPortFromSettings</a></td>
@@ -680,7 +688,7 @@ built for you to write to the
 </tr>
 <tr>
 <td><a href="trans-port/">transPort</a></td>
-<td><code>fun transPort(transPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>):</code><a href="./"><code>TorSettingsBuilder</code></a></td>
+<td><code>fun transPort(transPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>, isolationFlags:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><code>List</code></a><code>&lt;</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>&gt;?):</code><a href="./"><code>TorSettingsBuilder</code></a></td>
 </tr>
 <tr>
 <td><a href="trans-port-from-settings/">transPortFromSettings</a></td>

@@ -377,6 +377,23 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#exceptions" class="md-nav__link">
+    Exceptions
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -397,10 +414,15 @@
                 
                 <p><a href="../../../../">topl-service</a> / <a href="../../../">io.matthewnelson.topl_service</a> / <a href="../../">TorServiceController</a> / <a href="../">Builder</a> / <a href="./">build</a></p>
 <h1 id="build">build<a class="headerlink" href="#build" title="Permanent link">&para;</a></h1>
-<p><code>fun build():</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><code>Unit</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L272">(source)</a></p>
+<p><code>fun build():</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><code>Unit</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L319">(source)</a></p>
 <p>Initializes <a href="#">TorService</a> setup and enables the ability to call methods from the
 <a href="#">Companion</a> object w/o throwing exceptions.</p>
 <p>See <a href="../">Builder</a> for code samples.</p>
+<h3 id="exceptions">Exceptions<a class="headerlink" href="#exceptions" title="Permanent link">&para;</a></h3>
+<p><code>IllegalArgumentException</code> - If <a href="../disable-stop-service-on-task-removed/">disableStopServiceOnTaskRemoved</a> was elected
+and your selected <a href="../../../../io.matthewnelson.topl_service.lifecycle/-background-manager/-builder/-policy/">BackgroundManager.Builder.Policy</a> is <strong>not</strong>
+<a href="../../../../io.matthewnelson.topl_service.util/-service-consts/-background-policy/-r-u-n_-i-n_-f-o-r-e-g-r-o-u-n-d/">ServiceConsts.BackgroundPolicy.RUN_IN_FOREGROUND</a> and/or
+<a href="#">BackgroundManager.Builder.killAppIfTaskIsRemoved</a> is <strong>not</strong> <code>true</code></p>
                 
               
               

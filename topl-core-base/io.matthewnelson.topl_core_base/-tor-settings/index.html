@@ -466,79 +466,87 @@ running, nothing more.</p>
 <tbody>
 <tr>
 <td><a href="connection-padding/">connectionPadding</a></td>
-<td>See <a href="-d-e-f-a-u-l-t__-h-a-s_-c-o-n-n-e-c-t-i-o-n_-p-a-d-d-i-n-g/">DEFAULT__HAS_CONNECTION_PADDING</a><code>abstract val connectionPadding:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a></td>
+<td>Adds to the torrc file &ldquo;ConnectionPadding &lt;0, 1, or auto&gt;&ldquo;<code>abstract val connectionPadding:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a></td>
 </tr>
 <tr>
 <td><a href="custom-torrc/">customTorrc</a></td>
-<td>Default <a href="#">java.null</a><code>abstract val customTorrc:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?</code></td>
+<td>If not null/not empty, will add the string value to the torrc file<code>abstract val customTorrc:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?</code></td>
 </tr>
 <tr>
 <td><a href="disable-network/">disableNetwork</a></td>
-<td>See <a href="-d-e-f-a-u-l-t__-d-i-s-a-b-l-e_-n-e-t-w-o-r-k/">DEFAULT__DISABLE_NETWORK</a><code>abstract val disableNetwork:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
+<td>OnionProxyManager will enable this on startup using the TorControlConnection based off of the device&rsquo;s network state. Setting this to <code>true</code> is highly recommended.<code>abstract val disableNetwork:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
 </tr>
 <tr>
 <td><a href="dns-port/">dnsPort</a></td>
 <td>TorBrowser and Orbot use &ldquo;5400&rdquo; by default. It may be wise to pick something that won&rsquo;t conflict.<code>abstract val dnsPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a></td>
 </tr>
 <tr>
+<td><a href="dns-port-isolation-flags/">dnsPortIsolationFlags</a></td>
+<td>Express isolation flags to be added when enabling the <a href="dns-port/">dnsPort</a><code>abstract val dnsPortIsolationFlags:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><code>List</code></a><code>&lt;</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>&gt;?</code></td>
+</tr>
+<tr>
+<td><a href="dormant-client-timeout/">dormantClientTimeout</a></td>
+<td>Adds to the torrc file &ldquo;DormantClientTimeout  minutes&rdquo;<code>abstract val dormantClientTimeout:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>?</code></td>
+</tr>
+<tr>
 <td><a href="entry-nodes/">entryNodes</a></td>
-<td>See <a href="-d-e-f-a-u-l-t__-e-n-t-r-y_-n-o-d-e-s/">DEFAULT__ENTRY_NODES</a><code>abstract val entryNodes:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?</code></td>
+<td>Set with a comma separated list of Entry Nodes.<code>abstract val entryNodes:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?</code></td>
 </tr>
 <tr>
 <td><a href="exclude-nodes/">excludeNodes</a></td>
-<td>See <a href="-d-e-f-a-u-l-t__-e-x-c-l-u-d-e-d_-n-o-d-e-s/">DEFAULT__EXCLUDED_NODES</a><code>abstract val excludeNodes:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?</code></td>
+<td>Set with a comma separated list of Exit Nodes to be excluded.<code>abstract val excludeNodes:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?</code></td>
 </tr>
 <tr>
 <td><a href="exit-nodes/">exitNodes</a></td>
-<td>See <a href="-d-e-f-a-u-l-t__-e-x-i-t_-n-o-d-e-s/">DEFAULT__EXIT_NODES</a><code>abstract val exitNodes:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?</code></td>
+<td>Set with a comma separated list of Exit Nodes to use.<code>abstract val exitNodes:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?</code></td>
 </tr>
 <tr>
 <td><a href="has-bridges/">hasBridges</a></td>
-<td>See <a href="-d-e-f-a-u-l-t__-h-a-s_-b-r-i-d-g-e-s/">DEFAULT__HAS_BRIDGES</a><code>abstract val hasBridges:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
+<td>If <code>true</code>, adds to the torrc file &ldquo;UseBridges 1&rdquo; and will proc the adding of bridges.<code>abstract val hasBridges:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
 </tr>
 <tr>
 <td><a href="has-cookie-authentication/">hasCookieAuthentication</a></td>
-<td>See <a href="-d-e-f-a-u-l-t__-h-a-s_-c-o-o-k-i-e_-a-u-t-h-e-n-t-i-c-a-t-i-o-n/">DEFAULT__HAS_COOKIE_AUTHENTICATION</a><code>abstract val hasCookieAuthentication:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
+<td><strong>Highly</strong> recommended to be set to <code>true</code> for securing the ControlPort<code>abstract val hasCookieAuthentication:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
 </tr>
 <tr>
 <td><a href="has-debug-logs/">hasDebugLogs</a></td>
-<td>See <a href="-d-e-f-a-u-l-t__-h-a-s_-d-e-b-u-g_-l-o-g-s/">DEFAULT__HAS_DEBUG_LOGS</a><code>abstract val hasDebugLogs:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
+<td>Adds to the torrc file:<code>abstract val hasDebugLogs:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
 </tr>
 <tr>
 <td><a href="has-dormant-canceled-by-startup/">hasDormantCanceledByStartup</a></td>
-<td>See <a href="-d-e-f-a-u-l-t__-h-a-s_-d-o-r-m-a-n-t_-c-a-n-c-e-l-e-d_-b-y_-s-t-a-r-t-u-p/">DEFAULT__HAS_DORMANT_CANCELED_BY_STARTUP</a><code>abstract val hasDormantCanceledByStartup:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
-</tr>
-<tr>
-<td><a href="has-isolation-address-flag-for-tunnel/">hasIsolationAddressFlagForTunnel</a></td>
-<td>See <a href="-d-e-f-a-u-l-t__-h-a-s_-i-s-o-l-a-t-i-o-n_-a-d-d-r-e-s-s_-f-l-a-g_-f-o-r_-t-u-n-n-e-l/">DEFAULT__HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL</a><code>abstract val hasIsolationAddressFlagForTunnel:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
+<td><strong>Highly</strong> recommended to be set to <code>true</code> for Android applications.<code>abstract val hasDormantCanceledByStartup:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
 </tr>
 <tr>
 <td><a href="has-open-proxy-on-all-interfaces/">hasOpenProxyOnAllInterfaces</a></td>
-<td>See <a href="-d-e-f-a-u-l-t__-h-a-s_-o-p-e-n_-p-r-o-x-y_-o-n_-a-l-l_-i-n-t-e-r-f-a-c-e-s/">DEFAULT__HAS_OPEN_PROXY_ON_ALL_INTERFACES</a><code>abstract val hasOpenProxyOnAllInterfaces:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
+<td>If true, adds to the torrc file &ldquo;SocksListenAddress 0.0.0.0&rdquo;<code>abstract val hasOpenProxyOnAllInterfaces:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
 </tr>
 <tr>
 <td><a href="has-reachable-address/">hasReachableAddress</a></td>
-<td>See <a href="-d-e-f-a-u-l-t__-h-a-s_-r-e-a-c-h-a-b-l-e_-a-d-d-r-e-s-s/">DEFAULT__HAS_REACHABLE_ADDRESS</a><code>abstract val hasReachableAddress:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
+<td>If true, adds to the torrc file &ldquo;ReachableAddresses &lt;<a href="reachable-address-ports/">reachableAddressPorts</a>&gt;&ldquo;<code>abstract val hasReachableAddress:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
 </tr>
 <tr>
 <td><a href="has-reduced-connection-padding/">hasReducedConnectionPadding</a></td>
-<td>See <a href="-d-e-f-a-u-l-t__-h-a-s_-r-e-d-u-c-e-d_-c-o-n-n-e-c-t-i-o-n_-p-a-d-d-i-n-g/">DEFAULT__HAS_REDUCED_CONNECTION_PADDING</a><code>abstract val hasReducedConnectionPadding:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
+<td>If true, adds to the torrc file &ldquo;ReducedConnectionPadding 1&rdquo;<code>abstract val hasReducedConnectionPadding:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
 </tr>
 <tr>
 <td><a href="has-safe-socks/">hasSafeSocks</a></td>
-<td>See <a href="-d-e-f-a-u-l-t__-h-a-s_-s-a-f-e_-s-o-c-k-s/">DEFAULT__HAS_SAFE_SOCKS</a><code>abstract val hasSafeSocks:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
+<td>If true, adds to the torrc file &ldquo;SafeSocks 1&rdquo;<code>abstract val hasSafeSocks:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
 </tr>
 <tr>
 <td><a href="has-strict-nodes/">hasStrictNodes</a></td>
-<td>See <a href="-d-e-f-a-u-l-t__-h-a-s_-s-t-r-i-c-t_-n-o-d-e-s/">DEFAULT__HAS_STRICT_NODES</a><code>abstract val hasStrictNodes:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
+<td>If true, adds to the torrc file &ldquo;StrictNodes 1&rdquo;<code>abstract val hasStrictNodes:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
 </tr>
 <tr>
 <td><a href="has-test-socks/">hasTestSocks</a></td>
-<td>See <a href="-d-e-f-a-u-l-t__-h-a-s_-t-e-s-t_-s-o-c-k-s/">DEFAULT__HAS_TEST_SOCKS</a><code>abstract val hasTestSocks:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
+<td>If true, adds to the torrc file &ldquo;TestSocks 1&rdquo;<code>abstract val hasTestSocks:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
 </tr>
 <tr>
 <td><a href="http-tunnel-port/">httpTunnelPort</a></td>
 <td>Could be &ldquo;auto&rdquo; or a specific port, such as &ldquo;8288&rdquo;.<code>abstract val httpTunnelPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a></td>
+</tr>
+<tr>
+<td><a href="http-tunnel-port-isolation-flags/">httpTunnelPortIsolationFlags</a></td>
+<td>Express isolation flags to be added when enabling the <a href="http-tunnel-port/">httpTunnelPort</a><code>abstract val httpTunnelPortIsolationFlags:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><code>List</code></a><code>&lt;</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>&gt;?</code></td>
 </tr>
 <tr>
 <td><a href="is-auto-map-hosts-on-resolve/">isAutoMapHostsOnResolve</a></td>
@@ -566,15 +574,15 @@ running, nothing more.</p>
 </tr>
 <tr>
 <td><a href="proxy-socks5-host/">proxySocks5Host</a></td>
-<td>See <a href="-d-e-f-a-u-l-t__-p-r-o-x-y_-s-o-c-k-s5_-h-o-s-t/">DEFAULT__PROXY_SOCKS5_HOST</a><code>abstract val proxySocks5Host:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?</code></td>
+<td>Adds to the torrc file &ldquo;Socks5Proxy <a href="proxy-socks5-host/">proxySocks5Host</a>:<a href="proxy-socks5-server-port/">proxySocks5ServerPort</a>&ldquo;<code>abstract val proxySocks5Host:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?</code></td>
 </tr>
 <tr>
 <td><a href="proxy-socks5-server-port/">proxySocks5ServerPort</a></td>
-<td>Default = <a href="#">java.null</a><code>abstract val proxySocks5ServerPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>?</code></td>
+<td>Adds to the torrc file &ldquo;Socks5Proxy <a href="proxy-socks5-host/">proxySocks5Host</a>:<a href="proxy-socks5-server-port/">proxySocks5ServerPort</a>&ldquo;<code>abstract val proxySocks5ServerPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>?</code></td>
 </tr>
 <tr>
 <td><a href="proxy-type/">proxyType</a></td>
-<td>See <a href="-d-e-f-a-u-l-t__-p-r-o-x-y_-t-y-p-e/">DEFAULT__PROXY_TYPE</a><code>abstract val proxyType:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?</code></td>
+<td>Depending on the <a href="../-base-consts/-proxy-type/">BaseConsts.ProxyType</a>, will add authenticated Socks5 or HTTPS proxy, if other settings are configured properly.<code>abstract val proxyType:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a></td>
 </tr>
 <tr>
 <td><a href="proxy-user/">proxyUser</a></td>
@@ -582,7 +590,7 @@ running, nothing more.</p>
 </tr>
 <tr>
 <td><a href="reachable-address-ports/">reachableAddressPorts</a></td>
-<td>See <a href="-d-e-f-a-u-l-t__-r-e-a-c-h-a-b-l-e_-a-d-d-r-e-s-s_-p-o-r-t-s/">DEFAULT__REACHABLE_ADDRESS_PORTS</a><code>abstract val reachableAddressPorts:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a></td>
+<td>Adds to the torrc file &ldquo;ReachableAddresses &lt;<a href="reachable-address-ports/">reachableAddressPorts</a>&gt;&ldquo;<code>abstract val reachableAddressPorts:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a></td>
 </tr>
 <tr>
 <td><a href="relay-nickname/">relayNickname</a></td>
@@ -590,19 +598,27 @@ running, nothing more.</p>
 </tr>
 <tr>
 <td><a href="relay-port/">relayPort</a></td>
-<td>TorBrowser and Orbot use 9001 by default. It may be wise to pick something that won&rsquo;t conflict.<code>abstract val relayPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>?</code></td>
+<td>TorBrowser and Orbot use 9001 by default. It may be wise to pick something that won&rsquo;t conflict.<code>abstract val relayPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a></td>
 </tr>
 <tr>
 <td><a href="run-as-daemon/">runAsDaemon</a></td>
-<td>See <a href="-d-e-f-a-u-l-t__-r-u-n_-a-s_-d-a-e-m-o-n/">DEFAULT__RUN_AS_DAEMON</a><code>abstract val runAsDaemon:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
+<td>If <code>true</code>, adds to the torrc file &ldquo;RunAsDaemon 1&rdquo; See <a href="-d-e-f-a-u-l-t__-r-u-n_-a-s_-d-a-e-m-o-n/">DEFAULT__RUN_AS_DAEMON</a><code>abstract val runAsDaemon:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
 </tr>
 <tr>
 <td><a href="socks-port/">socksPort</a></td>
 <td>Could be &ldquo;auto&rdquo; or a specific port, such as &ldquo;9051&rdquo;.<code>abstract val socksPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a></td>
 </tr>
 <tr>
+<td><a href="socks-port-isolation-flags/">socksPortIsolationFlags</a></td>
+<td>Express isolation flags to be added when enabling the <a href="socks-port/">socksPort</a><code>abstract val socksPortIsolationFlags:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><code>List</code></a><code>&lt;</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>&gt;?</code></td>
+</tr>
+<tr>
 <td><a href="trans-port/">transPort</a></td>
 <td>Can be &ldquo;auto&rdquo;, or a specified port such as &ldquo;9141&rdquo;<code>abstract val transPort:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a></td>
+</tr>
+<tr>
+<td><a href="trans-port-isolation-flags/">transPortIsolationFlags</a></td>
+<td>Express isolation flags to be added when enabling the <a href="trans-port/">transPort</a><code>abstract val transPortIsolationFlags:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html"><code>List</code></a><code>&lt;</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>&gt;?</code></td>
 </tr>
 <tr>
 <td><a href="use-socks5/">useSocks5</a></td>
@@ -628,8 +644,8 @@ running, nothing more.</p>
 <td><code>const val DEFAULT__DISABLE_NETWORK:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
 </tr>
 <tr>
-<td><a href="-d-e-f-a-u-l-t__-d-n-s_-p-o-r-t/">DEFAULT__DNS_PORT</a></td>
-<td><code>const val DEFAULT__DNS_PORT:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a></td>
+<td><a href="-d-e-f-a-u-l-t__-d-o-r-m-a-n-t_-c-l-i-e-n-t_-t-i-m-e-o-u-t/">DEFAULT__DORMANT_CLIENT_TIMEOUT</a></td>
+<td><code>const val DEFAULT__DORMANT_CLIENT_TIMEOUT:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a></td>
 </tr>
 <tr>
 <td><a href="-d-e-f-a-u-l-t__-e-n-t-r-y_-n-o-d-e-s/">DEFAULT__ENTRY_NODES</a></td>
@@ -648,10 +664,6 @@ running, nothing more.</p>
 <td><code>const val DEFAULT__HAS_BRIDGES:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
 </tr>
 <tr>
-<td><a href="-d-e-f-a-u-l-t__-h-a-s_-c-o-n-n-e-c-t-i-o-n_-p-a-d-d-i-n-g/">DEFAULT__HAS_CONNECTION_PADDING</a></td>
-<td><code>const val DEFAULT__HAS_CONNECTION_PADDING:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a></td>
-</tr>
-<tr>
 <td><a href="-d-e-f-a-u-l-t__-h-a-s_-c-o-o-k-i-e_-a-u-t-h-e-n-t-i-c-a-t-i-o-n/">DEFAULT__HAS_COOKIE_AUTHENTICATION</a></td>
 <td><code>const val DEFAULT__HAS_COOKIE_AUTHENTICATION:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
 </tr>
@@ -662,10 +674,6 @@ running, nothing more.</p>
 <tr>
 <td><a href="-d-e-f-a-u-l-t__-h-a-s_-d-o-r-m-a-n-t_-c-a-n-c-e-l-e-d_-b-y_-s-t-a-r-t-u-p/">DEFAULT__HAS_DORMANT_CANCELED_BY_STARTUP</a></td>
 <td><code>const val DEFAULT__HAS_DORMANT_CANCELED_BY_STARTUP:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
-</tr>
-<tr>
-<td><a href="-d-e-f-a-u-l-t__-h-a-s_-i-s-o-l-a-t-i-o-n_-a-d-d-r-e-s-s_-f-l-a-g_-f-o-r_-t-u-n-n-e-l/">DEFAULT__HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL</a></td>
-<td><code>const val DEFAULT__HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
 </tr>
 <tr>
 <td><a href="-d-e-f-a-u-l-t__-h-a-s_-o-p-e-n_-p-r-o-x-y_-o-n_-a-l-l_-i-n-t-e-r-f-a-c-e-s/">DEFAULT__HAS_OPEN_PROXY_ON_ALL_INTERFACES</a></td>
@@ -692,10 +700,6 @@ running, nothing more.</p>
 <td><code>const val DEFAULT__HAS_TEST_SOCKS:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
 </tr>
 <tr>
-<td><a href="-d-e-f-a-u-l-t__-h-t-t-p_-t-u-n-n-e-l_-p-o-r-t/">DEFAULT__HTTP_TUNNEL_PORT</a></td>
-<td><code>const val DEFAULT__HTTP_TUNNEL_PORT:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a></td>
-</tr>
-<tr>
 <td><a href="-d-e-f-a-u-l-t__-i-s_-a-u-t-o_-m-a-p_-h-o-s-t-s_-o-n_-r-e-s-o-l-v-e/">DEFAULT__IS_AUTO_MAP_HOSTS_ON_RESOLVE</a></td>
 <td><code>const val DEFAULT__IS_AUTO_MAP_HOSTS_ON_RESOLVE:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
 </tr>
@@ -716,10 +720,6 @@ running, nothing more.</p>
 <td><code>const val DEFAULT__PROXY_SOCKS5_HOST:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a></td>
 </tr>
 <tr>
-<td><a href="-d-e-f-a-u-l-t__-p-r-o-x-y_-t-y-p-e/">DEFAULT__PROXY_TYPE</a></td>
-<td><code>const val DEFAULT__PROXY_TYPE:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a></td>
-</tr>
-<tr>
 <td><a href="-d-e-f-a-u-l-t__-p-r-o-x-y_-u-s-e-r/">DEFAULT__PROXY_USER</a></td>
 <td><code>const val DEFAULT__PROXY_USER:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a></td>
 </tr>
@@ -734,10 +734,6 @@ running, nothing more.</p>
 <tr>
 <td><a href="-d-e-f-a-u-l-t__-r-u-n_-a-s_-d-a-e-m-o-n/">DEFAULT__RUN_AS_DAEMON</a></td>
 <td><code>const val DEFAULT__RUN_AS_DAEMON:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><code>Boolean</code></a></td>
-</tr>
-<tr>
-<td><a href="-d-e-f-a-u-l-t__-t-r-a-n-s_-p-o-r-t/">DEFAULT__TRANS_PORT</a></td>
-<td><code>const val DEFAULT__TRANS_PORT:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a></td>
 </tr>
 <tr>
 <td><a href="-d-e-f-a-u-l-t__-u-s-e_-s-o-c-k-s5/">DEFAULT__USE_SOCKS5</a></td>

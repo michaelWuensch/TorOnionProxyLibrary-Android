@@ -397,8 +397,17 @@
                 
                 <p><a href="../../../">topl-core-base</a> / <a href="../../">io.matthewnelson.topl_core_base</a> / <a href="../">TorSettings</a> / <a href="./">proxyType</a></p>
 <h1 id="proxytype">proxyType<a class="headerlink" href="#proxytype" title="Permanent link">&para;</a></h1>
-<p><code>abstract val proxyType:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorSettings.kt#L231">(source)</a></p>
-<p>See <a href="../-d-e-f-a-u-l-t__-p-r-o-x-y_-t-y-p-e/">DEFAULT__PROXY_TYPE</a></p>
+<p><code>abstract val proxyType:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorSettings.kt#L418">(source)</a></p>
+<p>Depending on the <a href="../../-base-consts/-proxy-type/">BaseConsts.ProxyType</a>, will add authenticated Socks5 or HTTPS proxy,
+if other settings are configured properly.</p>
+<p>This only gets used if you declare the following settings set as:</p>
+<p><a href="../use-socks5/">useSocks5</a> is set to <code>false</code>
+<a href="../has-bridges/">hasBridges</a> is set to <code>false</code>
+<a href="./">proxyType</a> is <a href="../../-base-consts/-proxy-type/-s-o-c-k-s_5/">BaseConsts.ProxyType.SOCKS_5</a> or <a href="../proxy-host/">BaseConsts.ProxyType.HTTPS</a> is set (eg. 127.0.0.1)
+<a href="../proxy-port/">proxyPort</a> is <code>null</code>, or a port between 1024 and 65535
+<a href="../proxy-user/">proxyUser</a> is set
+<a href="../proxy-password/">proxyPassword</a> is set</p>
+<p>See <a href="../../-base-consts/-proxy-type/-d-i-s-a-b-l-e-d/">BaseConsts.ProxyType.DISABLED</a></p>
                 
               
               
