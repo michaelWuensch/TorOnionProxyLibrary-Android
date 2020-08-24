@@ -31,7 +31,7 @@ Get Started
         no unnecessary classes or resources; just the binaries. Android API 29+ no longer supports 
         execution of executable files from your application's `/data/data/` directory, and must now be
         installed in the `context.applicationInfo.nativeLibraryDir` directory (aka, `/data/app/...`) 
-        to execute.
+        to execute.  
             - Nothing more is needed in terms of configuring initialization via the 
             `TorServiceController.Builder`, as files will be installed in the correct directory, and 
             named to match what `topl-service` looks for.
