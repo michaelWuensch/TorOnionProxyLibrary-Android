@@ -2,7 +2,11 @@
 
 # hasBridges
 
-`abstract val hasBridges: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorSettings.kt#L285)
+`abstract val hasBridges: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorSettings.kt#L236)
+
+If `true`, adds to the torrc file "UseBridges 1" and will proc the adding of bridges.
+
+**Docs:** https://2019.www.torproject.org/docs/tor-manual.html.en#UseBridges
 
 See [DEFAULT__HAS_BRIDGES](-d-e-f-a-u-l-t__-h-a-s_-b-r-i-d-g-e-s.md)
 

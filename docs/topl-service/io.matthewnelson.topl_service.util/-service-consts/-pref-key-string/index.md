@@ -2,7 +2,7 @@
 
 # PrefKeyString
 
-`annotation class PrefKeyString` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/util/ServiceConsts.kt#L260)
+`annotation class PrefKeyString` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/util/ServiceConsts.kt#L274)
 
 ### Constructors
 
@@ -28,6 +28,7 @@
 | [PROXY_USER](-p-r-o-x-y_-u-s-e-r.md) | `const val PROXY_USER: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
 | [REACHABLE_ADDRESS_PORTS](-r-e-a-c-h-a-b-l-e_-a-d-d-r-e-s-s_-p-o-r-t-s.md) | `const val REACHABLE_ADDRESS_PORTS: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
 | [RELAY_NICKNAME](-r-e-l-a-y_-n-i-c-k-n-a-m-e.md) | `const val RELAY_NICKNAME: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
+| [RELAY_PORT](-r-e-l-a-y_-p-o-r-t.md) | `const val RELAY_PORT: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
 | [SOCKS_PORT](-s-o-c-k-s_-p-o-r-t.md) | `const val SOCKS_PORT: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
 | [TRANS_PORT](-t-r-a-n-s_-p-o-r-t.md) | `const val TRANS_PORT: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
 | [VIRTUAL_ADDRESS_NETWORK](-v-i-r-t-u-a-l_-a-d-d-r-e-s-s_-n-e-t-w-o-r-k.md) | `const val VIRTUAL_ADDRESS_NETWORK: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |

@@ -2,7 +2,7 @@
 
 # Builder
 
-`class Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L136)
+`class Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L139)
 
 Where you get to customize how your notification will look and function.
 
@@ -14,9 +14,9 @@ in order to properly shut down Tor and clean up w/o being killed by the OS.
 ``` kotlin
 //  private fun generateTorServiceNotificationBuilder(): ServiceNotification.Builder {
         return ServiceNotification.Builder(
-            channelName = "TorService Channel",
-            channelDescription = "Tor Channel",
-            channelID = "My Sample Application",
+            channelName = "TOPL-Android Demo",
+            channelDescription = "TorOnionProxyLibrary-Android Demo",
+            channelID = "TOPL-Android Demo",
             notificationID = 615
         )
             .setActivityToBeOpenedOnTap(
@@ -29,7 +29,6 @@ in order to properly shut down Tor and clean up w/o being killed by the OS.
             .setImageTorNetworkingDisabled(drawableRes = R.drawable.tor_stat_network_disabled)
             .setImageTorDataTransfer(drawableRes = R.drawable.tor_stat_network_dataxfer)
             .setImageTorErrors(drawableRes = R.drawable.tor_stat_notifyerr)
-            .setCustomColor(colorRes = R.color.tor_service_white)
             .setVisibility(visibility = NotificationCompat.VISIBILITY_PRIVATE)
             .setCustomColor(colorRes = R.color.primaryColor)
             .enableTorRestartButton(enable = true)

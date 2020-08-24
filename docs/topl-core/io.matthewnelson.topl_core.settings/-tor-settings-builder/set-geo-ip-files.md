@@ -2,7 +2,7 @@
 
 # setGeoIpFiles
 
-`fun setGeoIpFiles(): `[`TorSettingsBuilder`](index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/settings/TorSettingsBuilder.kt#L588)
+`fun setGeoIpFiles(): `[`TorSettingsBuilder`](index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/settings/TorSettingsBuilder.kt#L650)
 
 Ensure that you have setup [io.matthewnelson.topl_core.util.TorInstaller](../../io.matthewnelson.topl_core.util/-tor-installer/index.md)
 such that you've copied the geoip/geoip6 files over prior to calling this.

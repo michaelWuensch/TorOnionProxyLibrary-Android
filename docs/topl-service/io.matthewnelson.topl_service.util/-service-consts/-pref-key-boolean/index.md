@@ -2,7 +2,7 @@
 
 # PrefKeyBoolean
 
-`annotation class PrefKeyBoolean` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/util/ServiceConsts.kt#L192)
+`annotation class PrefKeyBoolean` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/util/ServiceConsts.kt#L198)
 
 ### Constructors
 
@@ -19,7 +19,6 @@
 | [HAS_COOKIE_AUTHENTICATION](-h-a-s_-c-o-o-k-i-e_-a-u-t-h-e-n-t-i-c-a-t-i-o-n.md) | `const val HAS_COOKIE_AUTHENTICATION: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
 | [HAS_DEBUG_LOGS](-h-a-s_-d-e-b-u-g_-l-o-g-s.md) | `const val HAS_DEBUG_LOGS: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
 | [HAS_DORMANT_CANCELED_BY_STARTUP](-h-a-s_-d-o-r-m-a-n-t_-c-a-n-c-e-l-e-d_-b-y_-s-t-a-r-t-u-p.md) | `const val HAS_DORMANT_CANCELED_BY_STARTUP: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
-| [HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL](-h-a-s_-i-s-o-l-a-t-i-o-n_-a-d-d-r-e-s-s_-f-l-a-g_-f-o-r_-t-u-n-n-e-l.md) | `const val HAS_ISOLATION_ADDRESS_FLAG_FOR_TUNNEL: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
 | [HAS_OPEN_PROXY_ON_ALL_INTERFACES](-h-a-s_-o-p-e-n_-p-r-o-x-y_-o-n_-a-l-l_-i-n-t-e-r-f-a-c-e-s.md) | `const val HAS_OPEN_PROXY_ON_ALL_INTERFACES: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
 | [HAS_REACHABLE_ADDRESS](-h-a-s_-r-e-a-c-h-a-b-l-e_-a-d-d-r-e-s-s.md) | `const val HAS_REACHABLE_ADDRESS: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
 | [HAS_REDUCED_CONNECTION_PADDING](-h-a-s_-r-e-d-u-c-e-d_-c-o-n-n-e-c-t-i-o-n_-p-a-d-d-i-n-g.md) | `const val HAS_REDUCED_CONNECTION_PADDING: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |

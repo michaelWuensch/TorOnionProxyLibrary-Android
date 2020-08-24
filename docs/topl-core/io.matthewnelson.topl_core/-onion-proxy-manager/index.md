@@ -2,7 +2,7 @@
 
 # OnionProxyManager
 
-`class OnionProxyManager : `[`CoreConsts`](../../io.matthewnelson.topl_core.util/-core-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/OnionProxyManager.kt#L136)
+`class OnionProxyManager : `[`CoreConsts`](../../io.matthewnelson.topl_core.util/-core-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/OnionProxyManager.kt#L133)
 
 This is where all the fun is, this is the class which acts as a gateway into the `topl-core`
 module, and ensures synchronicity is had.
@@ -13,33 +13,29 @@ implications of this.
 
 This class began life as TorPlugin from the Briar Project
 
-``` kotlin
-//Unresolved: io.matthewnelson.topl_service.service.TorService.initTOPLCore
-```
-
 ### Parameters
 
 `context` - Context.
 
-`torConfigFiles` - [TorConfigFiles](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md) For setting up [OnionProxyContext](#)
+`torConfigFiles` - [TorConfigFiles](../../..//topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md) For setting up [OnionProxyContext](#)
 
 `torInstaller` - [TorInstaller](../../io.matthewnelson.topl_core.util/-tor-installer/index.md) For setting up [OnionProxyContext](#)
 
-`torSettings` - [TorSettings](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) For setting up [OnionProxyContext](#)
+`torSettings` - [TorSettings](../../..//topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) For setting up [OnionProxyContext](#)
 
 `eventListener` - [BaseEventListener](../../io.matthewnelson.topl_core.listener/-base-event-listener/index.md) For processing Tor OP messages.
 
-`eventBroadcaster` - Your own broadcaster which extends [EventBroadcaster](../../../topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md)
+`eventBroadcaster` - Your own broadcaster which extends [EventBroadcaster](../../..//topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md)
 
 `buildConfigDebug` - Send [BuildConfig.DEBUG](#) which will show Logcat messages for this
 module on Debug builds of your Application. If `null`, all the messages will still be
-broadcast to the provided [EventBroadcaster](../../../topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md) and you can handle them there how you'd like.
+broadcast to the provided [EventBroadcaster](../../..//topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md) and you can handle them there how you'd like.
 
 ### Constructors
 
 | Name | Summary |
 |---|---|
-| [&lt;init&gt;](-init-.md) | This is where all the fun is, this is the class which acts as a gateway into the `topl-core` module, and ensures synchronicity is had.`OnionProxyManager(context: `[`Context`](https://developer.android.com/reference/android/content/Context.html)`, torConfigFiles: `[`TorConfigFiles`](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md)`, torInstaller: `[`TorInstaller`](../../io.matthewnelson.topl_core.util/-tor-installer/index.md)`, torSettings: `[`TorSettings`](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md)`, eventListener: `[`BaseEventListener`](../../io.matthewnelson.topl_core.listener/-base-event-listener/index.md)`, eventBroadcaster: `[`EventBroadcaster`](../../../topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md)`, buildConfigDebug: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)`? = null)` |
+| [&lt;init&gt;](-init-.md) | This is where all the fun is, this is the class which acts as a gateway into the `topl-core` module, and ensures synchronicity is had.`OnionProxyManager(context: `[`Context`](https://developer.android.com/reference/android/content/Context.html)`, torConfigFiles: `[`TorConfigFiles`](../../..//topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md)`, torInstaller: `[`TorInstaller`](../../io.matthewnelson.topl_core.util/-tor-installer/index.md)`, torSettings: `[`TorSettings`](../../..//topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md)`, eventListener: `[`BaseEventListener`](../../io.matthewnelson.topl_core.listener/-base-event-listener/index.md)`, eventBroadcaster: `[`EventBroadcaster`](../../..//topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md)`, buildConfigDebug: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)`? = null)` |
 
 ### Properties
 
@@ -50,10 +46,10 @@ broadcast to the provided [EventBroadcaster](../../../topl-core-base/io.matthewn
 | [isIPv4LocalHostSocksPortOpen](is-i-pv4-local-host-socks-port-open.md) | `val isIPv4LocalHostSocksPortOpen: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) |
 | [isRunning](is-running.md) | Checks to see if the Tor OP is running (e.g. fully bootstrapped) and open to network connections.`val isRunning: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) |
 | [processId](process-id.md) | `val processId: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
-| [torConfigFiles](tor-config-files.md) | `val torConfigFiles: `[`TorConfigFiles`](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md) |
+| [torConfigFiles](tor-config-files.md) | `val torConfigFiles: `[`TorConfigFiles`](../../..//topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md) |
 | [torInstaller](tor-installer.md) | `val torInstaller: `[`TorInstaller`](../../io.matthewnelson.topl_core.util/-tor-installer/index.md) |
 | [torPid](tor-pid.md) | `val torPid: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html) |
-| [torSettings](tor-settings.md) | `val torSettings: `[`TorSettings`](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) |
+| [torSettings](tor-settings.md) | `val torSettings: `[`TorSettings`](../../..//topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) |
 | [torStateMachine](tor-state-machine.md) | `val torStateMachine: `[`TorStateMachine`](../../io.matthewnelson.topl_core.broadcaster/-tor-state-machine/index.md) |
 
 ### Functions
@@ -64,6 +60,7 @@ broadcast to the provided [EventBroadcaster](../../../topl-core-base/io.matthewn
 | [getBroadcastLogger](get-broadcast-logger.md) | See [BroadcastLoggerHelper.getBroadcastLogger](#)`fun getBroadcastLogger(clazz: `[`Class`](https://docs.oracle.com/javase/6/docs/api/java/lang/Class.html)`<*>): `[`BroadcastLogger`](../../io.matthewnelson.topl_core.broadcaster/-broadcast-logger/index.md)<br>`fun getBroadcastLogger(tagName: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`): `[`BroadcastLogger`](../../io.matthewnelson.topl_core.broadcaster/-broadcast-logger/index.md) |
 | [getInfo](get-info.md) | See the torspec for accepted queries:`fun getInfo(queryCommand: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`): `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?` |
 | [getNewSettingsBuilder](get-new-settings-builder.md) | `fun getNewSettingsBuilder(): `[`TorSettingsBuilder`](../../io.matthewnelson.topl_core.settings/-tor-settings-builder/index.md) |
+| [hasNetworkConnectivity](has-network-connectivity.md) | `fun hasNetworkConnectivity(): `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) |
 | [killTorProcess](kill-tor-process.md) | `fun killTorProcess(): `[`Unit`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html) |
 | [publishHiddenService](publish-hidden-service.md) | Publishes a hidden service`fun publishHiddenService(hiddenServicePort: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`, localPort: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`): `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
 | [refreshBroadcastLoggersHasDebugLogsVar](refresh-broadcast-loggers-has-debug-logs-var.md) | See [BroadcastLoggerHelper.refreshBroadcastLoggersHasDebugLogsVar](#)`fun refreshBroadcastLoggersHasDebugLogsVar(): `[`Unit`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html) |

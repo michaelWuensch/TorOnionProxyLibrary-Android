@@ -2,4 +2,4 @@
 
 # resolvConfFileLock
 
-`val resolvConfFileLock: `[`Object`](https://docs.oracle.com/javase/6/docs/api/java/lang/Object.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorConfigFiles.kt#L191)
+`val resolvConfFileLock: `[`Object`](https://docs.oracle.com/javase/6/docs/api/java/lang/Object.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorConfigFiles.kt#L194)

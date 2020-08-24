@@ -6,9 +6,9 @@
 
 This class provides a standardized way for library users to change settings used
 by [io.matthewnelson.topl_service.service.TorService](#) such that the values expressed
-as default [io.matthewnelson.topl_core_base.TorSettings](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) when initializing things via
+as default [io.matthewnelson.topl_core_base.TorSettings](../../..//topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) when initializing things via
 the [io.matthewnelson.topl_service.TorServiceController.Builder](../../io.matthewnelson.topl_service/-tor-service-controller/-builder/index.md) can be updated. The
 values saved to [TorServicePrefs](index.md) are always preferred over the defaults declared.
 
-See [io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings](#)
+See [io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings](../../io.matthewnelson.topl_service.service.components.onionproxy/-service-tor-settings/index.md)
 
