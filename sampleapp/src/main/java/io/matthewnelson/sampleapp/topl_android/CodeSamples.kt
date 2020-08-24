@@ -139,6 +139,7 @@ class CodeSamples {
             geoipAssetPath = "common/geoip",
             geoip6AssetPath = "common/geoip6"
         )
+            .addTimeToDisableNetworkDelay(milliseconds = 1_000L)
             .addTimeToRestartTorDelay(milliseconds = 100L)
             .addTimeToStopServiceDelay(milliseconds = 100L)
             .disableStopServiceOnTaskRemoved(disable = false)
