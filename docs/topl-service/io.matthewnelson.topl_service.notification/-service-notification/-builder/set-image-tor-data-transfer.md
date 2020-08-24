@@ -2,7 +2,7 @@
 
 # setImageTorDataTransfer
 
-`fun setImageTorDataTransfer(@DrawableRes drawableRes: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L227)
+`fun setImageTorDataTransfer(@DrawableRes drawableRes: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L230)
 
 Defaults to Orbot/TorBrowser's icon [R.drawable.tor_stat_network_dataxfer](#).
 

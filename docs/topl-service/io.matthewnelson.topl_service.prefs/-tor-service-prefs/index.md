@@ -6,23 +6,25 @@
 
 This class provides a standardized way for library users to change settings used
 by [io.matthewnelson.topl_service.service.TorService](#) such that the values expressed
-as default [io.matthewnelson.topl_core_base.TorSettings](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) when initializing things via
+as default [io.matthewnelson.topl_core_base.TorSettings](../../..//topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) when initializing things via
 the [io.matthewnelson.topl_service.TorServiceController.Builder](../../io.matthewnelson.topl_service/-tor-service-controller/-builder/index.md) can be updated. The
 values saved to [TorServicePrefs](./index.md) are always preferred over the defaults declared.
 
-See [io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings](#)
+See [io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings](../../io.matthewnelson.topl_service.service.components.onionproxy/-service-tor-settings/index.md)
 
 ### Constructors
 
 | Name | Summary |
 |---|---|
-| [&lt;init&gt;](-init-.md) | This class provides a standardized way for library users to change settings used by [io.matthewnelson.topl_service.service.TorService](#) such that the values expressed as default [io.matthewnelson.topl_core_base.TorSettings](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) when initializing things via the [io.matthewnelson.topl_service.TorServiceController.Builder](../../io.matthewnelson.topl_service/-tor-service-controller/-builder/index.md) can be updated. The values saved to [TorServicePrefs](./index.md) are always preferred over the defaults declared.`TorServicePrefs(context: `[`Context`](https://developer.android.com/reference/android/content/Context.html)`)` |
+| [&lt;init&gt;](-init-.md) | This class provides a standardized way for library users to change settings used by [io.matthewnelson.topl_service.service.TorService](#) such that the values expressed as default [io.matthewnelson.topl_core_base.TorSettings](../../..//topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) when initializing things via the [io.matthewnelson.topl_service.TorServiceController.Builder](../../io.matthewnelson.topl_service/-tor-service-controller/-builder/index.md) can be updated. The values saved to [TorServicePrefs](./index.md) are always preferred over the defaults declared.`TorServicePrefs(context: `[`Context`](https://developer.android.com/reference/android/content/Context.html)`)` |
 
 ### Functions
 
 | Name | Summary |
 |---|---|
+| [clear](clear.md) | `fun clear(): `[`Unit`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html) |
 | [contains](contains.md) | Checks if the SharedPreference contains a value for the supplied [prefsKey](contains.md#io.matthewnelson.topl_service.prefs.TorServicePrefs$contains(kotlin.String)/prefsKey). Accepts the following annotation type String values:`fun contains(prefsKey: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`): `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) |
+| [getAll](get-all.md) | `fun getAll(): `[`Map`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html)`<`[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`, *>` |
 | [getBoolean](get-boolean.md) | Returns a Boolean value for the provided [ServiceConsts.PrefKeyBoolean](../../io.matthewnelson.topl_service.util/-service-consts/-pref-key-boolean/index.md). If no value is stored in the SharedPreference, [defValue](get-boolean.md#io.matthewnelson.topl_service.prefs.TorServicePrefs$getBoolean(kotlin.String, kotlin.Boolean)/defValue) will be returned.`fun getBoolean(booleanKey: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`, defValue: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)`): `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) |
 | [getInt](get-int.md) | Returns an Int value for the provided [ServiceConsts.PrefKeyInt](../../io.matthewnelson.topl_service.util/-service-consts/-pref-key-int/index.md). If no value is stored in the SharedPreference, [defValue](get-int.md#io.matthewnelson.topl_service.prefs.TorServicePrefs$getInt(kotlin.String, kotlin.Int)/defValue) will be returned.`fun getInt(intKey: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`, defValue: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`?): `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`?` |
 | [getList](get-list.md) | Returns a List of Strings for the provided [ServiceConsts.PrefKeyList](../../io.matthewnelson.topl_service.util/-service-consts/-pref-key-list/index.md). If no value is stored in the SharedPreference, [defValue](get-list.md#io.matthewnelson.topl_service.prefs.TorServicePrefs$getList(kotlin.String, kotlin.collections.List((kotlin.String)))/defValue) will be returned.`fun getList(listKey: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`, defValue: `[`List`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)`<`[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`>): `[`List`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)`<`[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`>` |

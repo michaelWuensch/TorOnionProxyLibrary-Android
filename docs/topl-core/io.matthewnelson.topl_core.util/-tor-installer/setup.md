@@ -8,7 +8,29 @@ Sets up and installs any files needed to run tor. If the tor files are already o
 the system this does not need to be invoked.
 
 ``` kotlin
-//Unresolved: io.matthewnelson.topl_service.onionproxy.ServiceTorInstaller.setup
+if (!torConfigFiles.geoIpFile.exists()) {
+    copyGeoIpAsset()
+    geoIpFileCopied = true
+}
+if (!torConfigFiles.geoIpv6File.exists()) {
+    copyGeoIpv6Asset()
+    geoIpv6FileCopied = true
+}
+
+// If the app version has been increased, or if this is a debug build, copy over
+// geoip assets then update SharedPreferences with the new version code. This
+// mitigates copying to be done only if a version upgrade is had.
+if (BaseService.buildConfigDebug ||
+    BaseService.buildConfigVersionCode > localPrefs.getInt(APP_VERSION_CODE, -1)
+) {
+    if (!geoIpFileCopied)
+        copyGeoIpAsset()
+    if (!geoIpv6FileCopied)
+        copyGeoIpv6Asset()
+    localPrefs.edit()
+        .putInt(APP_VERSION_CODE, BaseService.buildConfigVersionCode)
+        .apply()
+}
 ```
 
 **Return**

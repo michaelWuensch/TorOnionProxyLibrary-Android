@@ -2,4 +2,4 @@
 
 # HAS_OPEN_PROXY_ON_ALL_INTERFACES
 
-`const val HAS_OPEN_PROXY_ON_ALL_INTERFACES: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/util/ServiceConsts.kt#L201)
+`const val HAS_OPEN_PROXY_ON_ALL_INTERFACES: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/util/ServiceConsts.kt#L206)

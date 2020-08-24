@@ -10,8 +10,8 @@ should **never** make it to a release build.
 
 To enable Logcat messages, [buildConfigDebug](#) must be `true` (w/e you have sent
 [io.matthewnelson.topl_core.OnionProxyManager](../../io.matthewnelson.topl_core/-onion-proxy-manager/index.md) upon instantiation), and
-[TorSettings.hasDebugLogs](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/has-debug-logs.md) must also be `true`. This way if your implementation of the
-Library is causing problems in your App you need only set [TorSettings.hasDebugLogs](../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/has-debug-logs.md) to
+[TorSettings.hasDebugLogs](../../..//topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/has-debug-logs.md) must also be `true`. This way if your implementation of the
+Library is causing problems in your App you need only set [TorSettings.hasDebugLogs](../../..//topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/has-debug-logs.md) to
 `true` for a Debug build of your App.
 
 See helper method [io.matthewnelson.topl_core.OnionProxyManager.getBroadcastLogger](../../io.matthewnelson.topl_core/-onion-proxy-manager/get-broadcast-logger.md) to
@@ -31,7 +31,7 @@ instantiate.
 
 | Name | Summary |
 |---|---|
-| [eventBroadcaster](event-broadcaster.md) | For broadcasting the info`val eventBroadcaster: `[`EventBroadcaster`](../../../topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md) |
+| [eventBroadcaster](event-broadcaster.md) | For broadcasting the info`val eventBroadcaster: `[`EventBroadcaster`](../../..//topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md) |
 | [TAG](-t-a-g.md) | Typically, the class name, but able to be set to whatever you wish`val TAG: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
 
 ### Functions

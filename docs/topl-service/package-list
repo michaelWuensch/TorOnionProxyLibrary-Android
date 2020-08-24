@@ -6,4 +6,5 @@ io.matthewnelson.topl_service.lifecycle
 io.matthewnelson.topl_service.notification
 io.matthewnelson.topl_service.prefs
 io.matthewnelson.topl_service.service.components.onionproxy
+io.matthewnelson.topl_service.service.components.onionproxy.model
 io.matthewnelson.topl_service.util

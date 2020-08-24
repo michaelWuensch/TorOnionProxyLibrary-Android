@@ -2,7 +2,7 @@
 
 # BaseConsts
 
-`abstract class BaseConsts` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/BaseConsts.kt#L72)
+`abstract class BaseConsts` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/BaseConsts.kt#L71)
 
 ### Annotations
 
@@ -11,7 +11,10 @@
 | [BroadcastType](-broadcast-type/index.md) | `annotation class BroadcastType` |
 | [ConfigFileName](-config-file-name/index.md) | `annotation class ConfigFileName` |
 | [ConnectionPadding](-connection-padding/index.md) | `annotation class ConnectionPadding` |
-| [SupportedBridges](-supported-bridges/index.md) | `annotation class SupportedBridges` |
+| [IsolationFlag](-isolation-flag/index.md) | `annotation class IsolationFlag` |
+| [PortOption](-port-option/index.md) | `annotation class PortOption` |
+| [ProxyType](-proxy-type/index.md) | `annotation class ProxyType` |
+| [SupportedBridgeType](-supported-bridge-type/index.md) | `annotation class SupportedBridgeType` |
 | [TorNetworkState](-tor-network-state/index.md) | `annotation class TorNetworkState` |
 | [TorState](-tor-state/index.md) | `annotation class TorState` |
 

@@ -2,7 +2,7 @@
 
 # respectResourcesWhileInBackground
 
-`fun respectResourcesWhileInBackground(secondsFrom5To45: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`? = null): Policy` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/lifecycle/BackgroundManager.kt#L195)
+`@JvmOverloads fun respectResourcesWhileInBackground(secondsFrom5To45: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`? = null): Policy` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/lifecycle/BackgroundManager.kt#L180)
 
 Stops [TorService](#) after being in the background for the declared [secondsFrom5To45](respect-resources-while-in-background.md#io.matthewnelson.topl_service.lifecycle.BackgroundManager.Builder$respectResourcesWhileInBackground(kotlin.Int)/secondsFrom5To45).
 
@@ -21,10 +21,10 @@ this will be re-instantiated when going through `Application.onCreate` again, an
 
 ### Parameters
 
-`secondsFrom5To45` - ? Seconds before the [Policy](-policy/index.md) is executed after the
+`secondsFrom5To45` - ? Seconds before the [Policy](-policy.md) is executed after the
 Application goes to the background. Sending null will use the default (30s)
 
 **Return**
-[BackgroundManager.Builder.Policy](-policy/index.md) To use when initializing
+[BackgroundManager.Builder.Policy](-policy.md) To use when initializing
 [io.matthewnelson.topl_service.TorServiceController.Builder](../../../io.matthewnelson.topl_service/-tor-service-controller/-builder/index.md)
 

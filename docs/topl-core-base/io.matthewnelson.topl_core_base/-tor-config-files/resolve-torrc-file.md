@@ -2,7 +2,7 @@
 
 # resolveTorrcFile
 
-`fun resolveTorrcFile(): `[`File`](https://docs.oracle.com/javase/6/docs/api/java/io/File.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorConfigFiles.kt#L204)
+`fun resolveTorrcFile(): `[`File`](https://docs.oracle.com/javase/6/docs/api/java/io/File.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorConfigFiles.kt#L207)
 
 Resolves the tor configuration file. If the torrc file hasn't been set, then
 this method will attempt to resolve the config file by looking in the root of

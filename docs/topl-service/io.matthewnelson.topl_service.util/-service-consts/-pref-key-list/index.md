@@ -2,7 +2,7 @@
 
 # PrefKeyList
 
-`annotation class PrefKeyList` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/util/ServiceConsts.kt#L233)
+`annotation class PrefKeyList` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/util/ServiceConsts.kt#L242)
 
 ### Constructors
 
@@ -14,4 +14,8 @@
 
 | Name | Summary |
 |---|---|
-| [LIST_OF_SUPPORTED_BRIDGES](-l-i-s-t_-o-f_-s-u-p-p-o-r-t-e-d_-b-r-i-d-g-e-s.md) | `const val LIST_OF_SUPPORTED_BRIDGES: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
+| [DNS_PORT_ISOLATION_FLAGS](-d-n-s_-p-o-r-t_-i-s-o-l-a-t-i-o-n_-f-l-a-g-s.md) | `const val DNS_PORT_ISOLATION_FLAGS: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
+| [HTTP_TUNNEL_PORT_ISOLATION_FLAGS](-h-t-t-p_-t-u-n-n-e-l_-p-o-r-t_-i-s-o-l-a-t-i-o-n_-f-l-a-g-s.md) | `const val HTTP_TUNNEL_PORT_ISOLATION_FLAGS: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
+| [SOCKS_PORT_ISOLATION_FLAGS](-s-o-c-k-s_-p-o-r-t_-i-s-o-l-a-t-i-o-n_-f-l-a-g-s.md) | `const val SOCKS_PORT_ISOLATION_FLAGS: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
+| [TRANS_PORT_ISOLATION_FLAGS](-t-r-a-n-s_-p-o-r-t_-i-s-o-l-a-t-i-o-n_-f-l-a-g-s.md) | `const val TRANS_PORT_ISOLATION_FLAGS: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
+| [USER_DEFINED_BRIDGES](-u-s-e-r_-d-e-f-i-n-e-d_-b-r-i-d-g-e-s.md) | `const val USER_DEFINED_BRIDGES: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
