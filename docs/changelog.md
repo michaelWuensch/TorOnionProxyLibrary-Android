@@ -3,7 +3,7 @@
 ## Version 1.0.0-alpha02 (2020-08-03)
  - API breaking changes were made to `TorServiceController.Builder`. See the following to update:
      - [TorServiceController.Builder](./topl-service/io.matthewnelson.topl_service/-tor-service-controller/-builder/index.md)
-     - [TorServiceEventBroadcaster](./topl-service/io.matthewnelson.topl_service.service.components.onionproxy/-tor-service-event-broadcaster/index.md)
+     - [TorServiceEventBroadcaster](./topl-service/io.matthewnelson.topl_service.service.components.onionproxy.model/-tor-service-event-broadcaster/index.md)
  - Added ability to hide the notification
      - NOTE: Will be shown when user swipes the application out of recent's tray (required).
  - Service now starts via `Context.startService` + `Context.bindService` instead of starting
