@@ -72,8 +72,35 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 # Find all file paths within projectDir/docs/ that contains http:FIX_DOKKA_LINKDS/
 mapfile -t INPUT_FILES < <(grep -rnwl "$DIR/../docs/" -e "(http://FIX_DOKKA_LINKS/.*)")
 
-# Replace the urls with appropriate file path for Mkdocs to generate proper urls
+# Replace the static string we're looking for with appropriate file path for Mkdocs to
+# generate proper links to files located in different modules.
 for INPUT_FILE in ${INPUT_FILES[*]}; do
-  echo "Fixing line in $INPUT_FILE"
-  sed -i 's+http://FIX_DOKKA_LINKS+../../..+gI' $INPUT_FILE
+  echo "Fixing line in: $INPUT_FILE"
+
+  # Det depth of the file location to determine number of directories needed to
+  # traverse back to get to "../docs/<this directory>/"
+  START_COUNTING=false
+  FILE_DEPTH=-1
+  IFS='/' read -ra DIRECTORY_ARRAY <<< "$INPUT_FILE"
+  for DIRECTORY_NAME in "${DIRECTORY_ARRAY[@]}"; do
+    if $START_COUNTING; then
+      (( FILE_DEPTH++ ))
+    fi
+
+    if [ "$DIRECTORY_NAME" == "docs" ]; then
+      START_COUNTING=true
+    fi
+
+  done
+
+  # Build string with number of directories needed to get back to the desired dir
+  FILE_DEPTH_STRING=
+  for (( i = 0; i < "$FILE_DEPTH"; i++ )); do
+      FILE_DEPTH_STRING+="../"
+  done
+
+  # Replace our static string with the proper directory location of the Dokka doc
+  sed -i "s+http://FIX_DOKKA_LINKS+$FILE_DEPTH_STRING+gI" "$INPUT_FILE"
 done
+
+exit 0
