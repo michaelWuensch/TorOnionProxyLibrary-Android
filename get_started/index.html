@@ -534,10 +534,12 @@ that you supply upon initialization of <code>TorServiceController.Builder</code>
     no unnecessary classes or resources; just the binaries. Android API 29+ no longer supports 
     execution of executable files from your application&rsquo;s <code>/data/data/</code> directory, and must now be
     installed in the <code>context.applicationInfo.nativeLibraryDir</code> directory (aka, <code>/data/app/...</code>) 
-    to execute.<br />
-        - Nothing more is needed in terms of configuring initialization via the 
-        <code>TorServiceController.Builder</code>, as files will be installed in the correct directory, and 
-        named to match what <code>topl-service</code> looks for.</li>
+    to execute.  <ul>
+<li>Nothing more is needed in terms of configuring initialization via the 
+<code>TorServiceController.Builder</code>, as files will be installed in the correct directory, and 
+named to match what <code>topl-service</code> looks for.</li>
+</ul>
+</li>
 <li>If you wish to use GuardianProject&rsquo;s binaries, see 
 <a href="https://github.com/guardianproject/tor-android" target="_blank">tor-android</a>.<ul>
 <li>You&rsquo;ll need to use their <code>NativeResouceInstaller</code> to install the binaries.</li>
@@ -578,8 +580,8 @@ down. See the <code>sampleapp</code>&lsquo;s <code>build.gradle</code> file for 
    and apply your own default settings.</p>
 <ul>
 <li>See the SampleApp&rsquo;s 
-<a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/sampleapp/src/main/java/io/matthewnelson/sampleapp/MyTorSettings.kt">MyTorSettings</a> 
-class for help.</li>
+<a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/sampleapp/src/main/java/io/matthewnelson/sampleapp/topl_android/MyTorSettings.kt" target="_blank">MyTorSettings</a> 
+class for help.  </li>
 <li>Also checkout the documentation in the <code>TorSettings</code> class for more of a breakdown and help.</li>
 </ul>
 </li>
