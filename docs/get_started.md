@@ -32,9 +32,9 @@ Get Started
         execution of executable files from your application's `/data/data/` directory, and must now be
         installed in the `context.applicationInfo.nativeLibraryDir` directory (aka, `/data/app/...`) 
         to execute.  
-            - Nothing more is needed in terms of configuring initialization via the 
-            `TorServiceController.Builder`, as files will be installed in the correct directory, and 
-            named to match what `topl-service` looks for.
+        - Nothing more is needed in terms of configuring initialization via the 
+        `TorServiceController.Builder`, as files will be installed in the correct directory, and 
+        named to match what `topl-service` looks for.
     - If you wish to use GuardianProject's binaries, see 
     <a href="https://github.com/guardianproject/tor-android" target="_blank">tor-android</a>.
         - You'll need to use their `NativeResouceInstaller` to install the binaries.
@@ -64,8 +64,8 @@ Get Started
  - Create a new class which extends [TorSettings](./topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md)
    and apply your own default settings.
     - See the SampleApp's 
-    <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/sampleapp/src/main/java/io/matthewnelson/sampleapp/MyTorSettings.kt">MyTorSettings</a> 
-    class for help.
+    <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/sampleapp/src/main/java/io/matthewnelson/sampleapp/topl_android/MyTorSettings.kt" target="_blank">MyTorSettings</a> 
+    class for help.  
     - Also checkout the documentation in the `TorSettings` class for more of a breakdown and help.
    
  - In your Application class' `onCreate` implement, and customize as desired, the
