@@ -111,6 +111,8 @@ internal class ServiceTorInstaller(private val torService: BaseService): TorInst
             copyGeoIpv6Asset()
             geoIpv6FileCopied = true
         }
+        if (!torConfigFiles.v3AuthPrivateDir.exists())
+            torConfigFiles.v3AuthPrivateDir.mkdirs()
 
         // If the app version has been increased, or if this is a debug build, copy over
         // geoip assets then update SharedPreferences with the new version code. This

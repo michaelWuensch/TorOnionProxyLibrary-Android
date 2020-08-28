@@ -97,6 +97,7 @@ import io.matthewnelson.topl_core.util.CoreConsts
 import io.matthewnelson.topl_core.util.TorInstaller
 import io.matthewnelson.topl_core.util.WriteObserver
 import io.matthewnelson.topl_core_base.TorConfigFiles
+import io.matthewnelson.topl_core_base.createNewFileIfDoesNotExist
 import io.matthewnelson.topl_core_base.readTorConfigFile
 import java.io.*
 
@@ -187,24 +188,38 @@ internal class OnionProxyContext(
     @Throws(IllegalArgumentException::class, SecurityException::class)
     fun createNewFileIfDoesNotExist(@ConfigFile configFileReference: String): Boolean {
         broadcastLogger.debug("Creating $configFileReference if DNE")
-        return when (configFileReference) {
+        val created = when (configFileReference) {
             ConfigFile.CONTROL_PORT_FILE -> {
                 synchronized(controlPortFileLock) {
-                    createNewFileIfDoesNotExist(torConfigFiles.controlPortFile)
+                    torConfigFiles.controlPortFile.createNewFileIfDoesNotExist()
                 }
             }
             ConfigFile.COOKIE_AUTH_FILE -> {
                 synchronized(cookieAuthFileLock) {
-                    createNewFileIfDoesNotExist(torConfigFiles.cookieAuthFile)
+                    torConfigFiles.cookieAuthFile.createNewFileIfDoesNotExist()
                 }
             }
             ConfigFile.HOSTNAME_FILE -> {
                 synchronized(hostnameFileLock) {
-                    createNewFileIfDoesNotExist(torConfigFiles.hostnameFile)
+                    torConfigFiles.hostnameFile.createNewFileIfDoesNotExist()
                 }
             }
             else -> {
                 throw IllegalArgumentException("$configFileReference is not a valid argument")
+            }
+        }
+
+        return when (created) {
+            null -> {
+                broadcastLogger.warn("Could not create $configFileReference parent directories")
+                false
+            }
+            false -> {
+                broadcastLogger.warn("Could not create $configFileReference file")
+                false
+            }
+            else -> {
+                true
             }
         }
     }
@@ -300,12 +315,13 @@ internal class OnionProxyContext(
      * @throws [SecurityException] Unauthorized access to file/directory.
      */
     @Throws(RuntimeException::class, SecurityException::class)
-    fun deleteDataDirExceptHiddenService() {
+    fun deleteDataDirExceptHiddenServiceAndAuthPrivate() {
         synchronized(dataDirLock) {
             val listFiles = torConfigFiles.dataDir.listFiles() ?: return
             for (file in listFiles)
                 if (file.isDirectory)
-                    if (file.absolutePath != torConfigFiles.hiddenServiceDir.absolutePath)
+                    if (file.absolutePath != torConfigFiles.hiddenServiceDir.absolutePath &&
+                        file.absolutePath != torConfigFiles.v3AuthPrivateDir.absolutePath)
                         FileUtilities.recursiveFileDelete(file)
                     else
                         if (!file.delete())
@@ -351,20 +367,4 @@ internal class OnionProxyContext(
      */
     val processId: String
         get() = Process.myPid().toString()
-
-    @Throws(SecurityException::class)
-    private fun createNewFileIfDoesNotExist(file: File): Boolean {
-        if (file.parentFile?.exists() != true && file.parentFile?.mkdirs() != true) {
-            broadcastLogger.warn("Could not create ${file.nameWithoutExtension} parent directory")
-            return false
-        }
-
-        return try {
-            val exists = if (file.exists()) true else file.createNewFile()
-            exists
-        } catch (e: IOException) {
-            broadcastLogger.warn("Could not create ${file.nameWithoutExtension}")
-            false
-        }
-    }
 }

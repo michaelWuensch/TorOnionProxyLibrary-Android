@@ -77,7 +77,7 @@ import java.io.IOException
  * @return a [ByteArray] of the contents of the [File]
  * @throws [IOException] File errors
  * @throws [EOFException] File errors
- * @throws [SecurityException] Unauthorized access to file/directory.
+ * @throws [SecurityException] Unauthorized access to file/directory
  * */
 @Throws(IOException::class, EOFException::class, SecurityException::class)
 fun File.readTorConfigFile(): ByteArray {
@@ -94,5 +94,27 @@ fun File.readTorConfigFile(): ByteArray {
         }
 
         b
+    }
+}
+
+/**
+ * Creates the file and the necessary parent directories if it does not exist. Be sure
+ * to acquire the proper lock from
+ * [io.matthewnelson.topl_core_base.TorConfigFiles] when utilizing this method.
+ *
+ * @return `null` if the parent directories of that File could not be created, `false` if
+ *   the File was not able to be created, `true` if the file exists/was created.
+ * @throws [SecurityException] Unauthorized access to file/directory
+ * */
+@Throws(SecurityException::class)
+fun File.createNewFileIfDoesNotExist(): Boolean? {
+    if (this.parentFile?.exists() != true && this.parentFile?.mkdirs() != true)
+        return null
+
+    return try {
+        val exists = if (this.exists()) true else this.createNewFile()
+        exists
+    } catch (e: IOException) {
+        false
     }
 }

@@ -655,6 +655,17 @@ class TorSettingsBuilder internal constructor(
         return this
     }
 
+    /**
+     * Will add to the torrc file "ClientOnionAuthDir </data/data/path/to/directory>, so
+     * be sure to create the directory if it does not exist in [TorInstaller.setup] prior
+     * to utilizing this method when building your torrc file.
+     * */
+    fun setV3AuthPrivateDir(): TorSettingsBuilder {
+        if (torConfigFiles.v3AuthPrivateDir.exists())
+            v3AuthPrivateDir(torConfigFiles.v3AuthPrivateDir.canonicalPath)
+        return this
+    }
+
     fun socksPort(socksPort: String, isolationFlags: List<@IsolationFlag String>?): TorSettingsBuilder {
         if (socksPort.isEmpty()) return this
 
@@ -758,6 +769,12 @@ class TorSettingsBuilder internal constructor(
             useBridges(true)
         else
             this
+
+    fun v3AuthPrivateDir(path: String?): TorSettingsBuilder {
+        if (!path.isNullOrEmpty())
+            buffer.append("ClientOnionAuthDir $path\n")
+        return this
+    }
 
     fun virtualAddressNetwork(address: String?): TorSettingsBuilder {
         if (!address.isNullOrEmpty())

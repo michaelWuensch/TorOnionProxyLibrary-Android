@@ -275,6 +275,7 @@ internal class TorService: BaseService() {
         onionProxyManager.getNewSettingsBuilder()
             .updateTorSettings()
             .setGeoIpFiles()
+            .setV3AuthPrivateDir()
             .finishAndWriteToTorrcFile()
     }
 

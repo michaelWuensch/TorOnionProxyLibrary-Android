@@ -137,6 +137,8 @@ class TorConfigFiles private constructor(
     val controlPortFile: File,
     val installDir: File,
 
+    val v3AuthPrivateDir: File,
+
     /**
      * When tor starts it waits for the control port and cookie auth files to be created
      * before it proceeds to the next step in startup. If these files are not created
@@ -193,6 +195,7 @@ class TorConfigFiles private constructor(
     val geoIpv6FileLock = Object()
     val resolvConfFileLock = Object()
     val hostnameFileLock = Object()
+    val v3AuthPrivateDirLock = Object()
 
     /**
      * Resolves the tor configuration file. If the torrc file hasn't been set, then
@@ -262,6 +265,7 @@ class TorConfigFiles private constructor(
         private lateinit var mHostnameFile: File
         private lateinit var mResolveConf: File
         private lateinit var mControlPortFile: File
+        private lateinit var mV3AuthPrivateDir: File
         private var mFileCreationTimeout = 0
 
         fun torExecutable(file: File): Builder {
@@ -365,6 +369,11 @@ class TorConfigFiles private constructor(
             return this
         }
 
+        fun v3AuthPrivateDir(directory: File): Builder {
+            mV3AuthPrivateDir = directory
+            return this
+        }
+
         /**
          * When tor starts it waits for the control port and cookie auth files to be
          * created before it proceeds to the next step in startup. If these files are
@@ -422,6 +431,9 @@ class TorConfigFiles private constructor(
             if (!::mControlPortFile.isInitialized)
                 mControlPortFile = File(mDataDir, ConfigFileName.CONTROL_PORT)
 
+            if (!::mV3AuthPrivateDir.isInitialized)
+                mV3AuthPrivateDir = File(configDir, ConfigFileName.V3_AUTH_PRIVATE_DIR)
+
             if (mFileCreationTimeout <= 0)
                 mFileCreationTimeout = 15
 
@@ -439,6 +451,7 @@ class TorConfigFiles private constructor(
                 mResolveConf,
                 mControlPortFile,
                 installDir,
+                mV3AuthPrivateDir,
                 mFileCreationTimeout
             )
         }

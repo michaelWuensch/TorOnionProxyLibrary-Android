@@ -7,6 +7,7 @@ android {
     compileSdkVersion versions.compileSdk
     buildToolsVersion versions.buildTools
 
+    testOptions.unitTests.includeAndroidResources = true
     defaultConfig {
         minSdkVersion versions.minSdk
         targetSdkVersion versions.compileSdk
@@ -70,9 +71,12 @@ dependencies {
     implementation deps.kotlin.coroutinesCore
     implementation deps.kotlin.stdlib
 
+    testImplementation deps.androidx.test.core
     testImplementation deps.junit
+    testImplementation deps.kotlin.coroutinesTest
+    testImplementation deps.robolectric
 
     androidTestImplementation deps.androidx.test.core
-    androidTestImplementation deps.androidx.test.junit
     androidTestImplementation deps.androidx.test.espresso
+    androidTestImplementation deps.androidx.test.junit
 }

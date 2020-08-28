@@ -345,7 +345,8 @@ abstract class BaseConsts {
         ConfigFileName.HIDDEN_SERVICE,
         ConfigFileName.RESOLVE_CONF,
         ConfigFileName.TOR_EXECUTABLE,
-        ConfigFileName.TORRC
+        ConfigFileName.TORRC,
+        ConfigFileName.V3_AUTH_PRIVATE_DIR
     )
     @Retention(AnnotationRetention.SOURCE)
     annotation class ConfigFileName {
@@ -360,6 +361,7 @@ abstract class BaseConsts {
             const val RESOLVE_CONF = "resolv.conf"
             const val TOR_EXECUTABLE = "libTor.so"
             const val TORRC = "torrc"
+            const val V3_AUTH_PRIVATE_DIR = "auth_private_files"
         }
     }
 }
