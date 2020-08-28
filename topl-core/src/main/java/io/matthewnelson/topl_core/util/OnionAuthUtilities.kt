@@ -4,8 +4,12 @@ import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.createNewFileIfDoesNotExist
 import java.io.File
+import java.io.FileFilter
+import java.io.FilenameFilter
 
 object OnionAuthUtilities {
+
+    private const val FILE_EXTENSION = ".auth_private"
 
 
     ///////////////////////////////////
@@ -78,7 +82,7 @@ object OnionAuthUtilities {
             throw IllegalArgumentException("Client Authorization Key Exception:\n${e.message}")
         }
 
-        val file = File(torConfigFiles.v3AuthPrivateDir, "${name}.auth_private")
+        val file = File(torConfigFiles.v3AuthPrivateDir, "$name$FILE_EXTENSION")
 
         if (file.exists())
             throw IllegalStateException(
@@ -187,5 +191,52 @@ object OnionAuthUtilities {
             throw  IllegalArgumentException(
                 "Length was $length but must be between $minLength and $maxLength characters"
             )
+    }
+
+    /////////////////
+    /// Retrieval ///
+    /////////////////
+    /**
+     * Retrieve a v3 client authentication file by the nickname, whether the file
+     * extension ".auth_private" is included or not.
+     *
+     * @param [nickname] The pre file extension name
+     * @param [torConfigFiles]
+     * */
+    fun getFileByNickname(nickname: String, torConfigFiles: TorConfigFiles): File? {
+        val file = if (nickname.contains(FILE_EXTENSION))
+            File(torConfigFiles.v3AuthPrivateDir, nickname)
+        else
+            File(torConfigFiles.v3AuthPrivateDir, "$nickname$FILE_EXTENSION")
+
+        return if (file.exists())
+            file
+        else
+            null
+    }
+
+    /**
+     * All files within the v3 Client Authentication directory are returned. If
+     * the directory is empty, returns `null`.
+     *
+     * @param [torConfigFiles]
+     * */
+    fun getAllFiles(torConfigFiles: TorConfigFiles): Array<File>? =
+        torConfigFiles.v3AuthPrivateDir.listFiles()
+
+    /**
+     * From the v3 Client Authentication directory, all files that contain the
+     * ".auth_private" extension will have their name w/o the extension returned
+     * in an array. If the directory is empty, returns `null`.
+     *
+     * @param [torConfigFiles]
+     * */
+    fun getAllFileNicknames(torConfigFiles: TorConfigFiles): Array<String>? {
+        val fileNames = mutableListOf<String>()
+        for (file in torConfigFiles.v3AuthPrivateDir.listFiles() ?: return null) {
+            if (!file.isDirectory && file.name.contains(FILE_EXTENSION))
+                fileNames.add(file.nameWithoutExtension)
+        }
+        return fileNames.toTypedArray()
     }
 }

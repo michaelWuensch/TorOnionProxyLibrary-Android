@@ -178,4 +178,89 @@ class OnionAuthUtilitiesUnitTest {
         Assert.assertEquals(file?.parentFile, torConfigFiles.v3AuthPrivateDir)
         Assert.assertEquals(expectedFileContent, file?.readText())
     }
+
+
+    /////////////////
+    /// Retrieval ///
+    /////////////////
+    @Test
+    fun `getAllFiles returns null when none exist`() {
+        val files = OnionAuthUtilities.getAllFiles(torConfigFiles)
+        Assert.assertNull(files)
+    }
+
+    @Test
+    fun `getAllFiles returns list of files`() {
+        val name1 = "name1"
+        val name2 = "name2"
+        val name3 = "name3"
+        val file1 = addV3AuthenticationPrivateKey(name1)
+        val file2 = addV3AuthenticationPrivateKey(name2)
+        val file3 = addV3AuthenticationPrivateKey(name3)
+        checkAddAuthPrivateAssertions(file1)
+        checkAddAuthPrivateAssertions(file2)
+        checkAddAuthPrivateAssertions(file3)
+
+        val expectedArray = arrayOf(file1, file2, file3)
+
+        val resultArray = OnionAuthUtilities.getAllFiles(torConfigFiles)
+        Assert.assertNotNull(resultArray)
+
+        expectedArray.forEach { file ->
+            Assert.assertTrue(resultArray?.contains(file) == true)
+        }
+    }
+
+    @Test
+    fun `getFileByNickname returns file if exists`() {
+        val file = addV3AuthenticationPrivateKey()
+        checkAddAuthPrivateAssertions(file)
+
+        val fileResult = OnionAuthUtilities.getFileByNickname(validNickname, torConfigFiles)
+
+        Assert.assertEquals(file, fileResult)
+    }
+
+    @Test
+    fun `getFileByNickname returns null if does not exist`() {
+        val file = addV3AuthenticationPrivateKey()
+        checkAddAuthPrivateAssertions(file)
+
+        var fileResult = OnionAuthUtilities.getFileByNickname("${validNickname}_does_not_exist", torConfigFiles)
+        Assert.assertNotEquals(file, fileResult)
+        Assert.assertNull(fileResult)
+
+        fileResult = OnionAuthUtilities.getFileByNickname(validNickname, torConfigFiles)
+        Assert.assertEquals(file, fileResult)
+    }
+
+    @Test
+    fun `getAllFileNicknames returns null if no files exist`() {
+        val nicknames = OnionAuthUtilities.getAllFileNicknames(torConfigFiles)
+        Assert.assertNull(nicknames)
+    }
+
+    @Test
+    fun `getAllFileNicknames returns list of nicknames only without file extension`() {
+        val name1 = "name1"
+        val name2 = "name2"
+        val name3 = "name3"
+        val file1 = addV3AuthenticationPrivateKey(name1)
+        val file2 = addV3AuthenticationPrivateKey(name2)
+        val file3 = addV3AuthenticationPrivateKey(name3)
+        checkAddAuthPrivateAssertions(file1)
+        checkAddAuthPrivateAssertions(file2)
+        checkAddAuthPrivateAssertions(file3)
+
+        val expectedNicknames = arrayOf(name1, name2, name3)
+
+        val nicknames = OnionAuthUtilities.getAllFileNicknames(torConfigFiles)
+        Assert.assertEquals(3, nicknames?.size)
+
+        for (nickname in nicknames!!) {
+            Assert.assertTrue(expectedNicknames.contains(nickname))
+            Assert.assertFalse(expectedNicknames.contains(".auth_private"))
+            Assert.assertFalse(nickname.contains(".auth_private"))
+        }
+    }
 }
