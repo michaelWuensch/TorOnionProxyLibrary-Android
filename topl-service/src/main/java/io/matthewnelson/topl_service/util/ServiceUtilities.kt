@@ -78,6 +78,7 @@ object ServiceUtilities {
      * @param [download] Long value associated with download (bytesRead)
      * @param [upload] Long value associated with upload (bytesWritten)
      * */
+    @JvmStatic
     fun getFormattedBandwidthString(download: Long, upload: Long): String =
         "${formatBandwidth(download)} ↓ / ${formatBandwidth(upload)} ↑"
 
