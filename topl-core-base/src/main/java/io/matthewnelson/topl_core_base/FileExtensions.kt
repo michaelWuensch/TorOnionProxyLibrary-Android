@@ -77,7 +77,7 @@ import java.io.IOException
  * @return a [ByteArray] of the contents of the [File]
  * @throws [IOException] File errors
  * @throws [EOFException] File errors
- * @throws [SecurityException] Unauthorized access to file/directory.
+ * @throws [SecurityException] Unauthorized access to file/directory
  * */
 @Throws(IOException::class, EOFException::class, SecurityException::class)
 fun File.readTorConfigFile(): ByteArray {
@@ -104,6 +104,7 @@ fun File.readTorConfigFile(): ByteArray {
  *
  * @return `null` if the parent directories of that File could not be created, `false` if
  *   the File was not able to be created, `true` if the file exists/was created.
+ * @throws [SecurityException] Unauthorized access to file/directory
  * */
 @Throws(SecurityException::class)
 fun File.createNewFileIfDoesNotExist(): Boolean? {
