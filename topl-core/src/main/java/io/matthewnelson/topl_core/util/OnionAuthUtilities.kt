@@ -220,7 +220,9 @@ object OnionAuthUtilities {
      * @param [torConfigFiles]
      * */
     fun getAllFiles(torConfigFiles: TorConfigFiles): Array<File>? =
-        torConfigFiles.v3AuthPrivateDir.listFiles()
+        synchronized(torConfigFiles.v3AuthPrivateDirLock) {
+            torConfigFiles.v3AuthPrivateDir.listFiles()
+        }
 
     /**
      * From the v3 Client Authentication directory, all files that contain the
@@ -231,9 +233,12 @@ object OnionAuthUtilities {
      * */
     fun getAllFileNicknames(torConfigFiles: TorConfigFiles): Array<String>? {
         val fileNames = mutableListOf<String>()
-        for (file in torConfigFiles.v3AuthPrivateDir.listFiles() ?: return null) {
-            if (!file.isDirectory && file.name.contains(FILE_EXTENSION))
-                fileNames.add(file.nameWithoutExtension)
+
+        synchronized(torConfigFiles.v3AuthPrivateDirLock) {
+            for (file in torConfigFiles.v3AuthPrivateDir.listFiles() ?: return null) {
+                if (!file.isDirectory && file.name.contains(FILE_EXTENSION))
+                    fileNames.add(file.nameWithoutExtension)
+            }
         }
         return fileNames.toTypedArray()
     }
