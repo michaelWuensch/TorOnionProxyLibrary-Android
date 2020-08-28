@@ -263,4 +263,47 @@ class OnionAuthUtilitiesUnitTest {
             Assert.assertFalse(nickname.contains(".auth_private"))
         }
     }
+
+
+    ////////////////
+    /// Deletion ///
+    ////////////////
+    @Test
+    fun `deleteFile returns null if file does not exist`() {
+        val result = OnionAuthUtilities.deleteFile(validNickname, torConfigFiles)
+        Assert.assertNull(result)
+    }
+
+    @Test
+    fun `deleteFile returns null if file is directory`() {
+        val result = OnionAuthUtilities.deleteFile(torConfigFiles.v3AuthPrivateDir, torConfigFiles)
+        Assert.assertNull(result)
+    }
+
+    @Test
+    fun `deleteFile by sending file works properly`() {
+        val file = addV3ClientAuthenticationPrivateKey()
+        Assert.assertNotNull(file)
+
+        val result = OnionAuthUtilities.deleteFile(file!!, torConfigFiles)
+        Assert.assertTrue(result == true)
+    }
+
+    @Test
+    fun `deleteFile by sending nickname with extension works properly`() {
+        val file = addV3ClientAuthenticationPrivateKey()
+        Assert.assertNotNull(file)
+
+        val result = OnionAuthUtilities.deleteFile(file!!.name, torConfigFiles)
+        Assert.assertTrue(result == true)
+    }
+
+    @Test
+    fun `deleteFile by sending nickname without extension works properly`() {
+        val file = addV3ClientAuthenticationPrivateKey()
+        Assert.assertNotNull(file)
+
+        val result = OnionAuthUtilities.deleteFile(file!!.nameWithoutExtension, torConfigFiles)
+        Assert.assertTrue(result == true)
+    }
 }

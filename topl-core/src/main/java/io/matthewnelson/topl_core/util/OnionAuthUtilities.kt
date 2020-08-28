@@ -237,4 +237,21 @@ object OnionAuthUtilities {
         }
         return fileNames.toTypedArray()
     }
+
+
+    ////////////////
+    /// Deletion ///
+    ////////////////
+    fun deleteFile(nickname: String, torConfigFiles: TorConfigFiles): Boolean? {
+        val file = getFileByNickname(nickname, torConfigFiles) ?: return null
+        synchronized(torConfigFiles.v3AuthPrivateDirLock) {
+            return if (!file.isDirectory)
+                file.delete()
+            else
+                null
+        }
+    }
+
+    fun deleteFile(file: File, torConfigFiles: TorConfigFiles): Boolean? =
+        deleteFile(file.nameWithoutExtension, torConfigFiles)
 }
