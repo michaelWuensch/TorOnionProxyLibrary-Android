@@ -82,6 +82,7 @@ import io.matthewnelson.topl_service.service.components.binding.TorServiceConnec
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.service.components.onionproxy.model.TorServiceEventBroadcaster
 import io.matthewnelson.topl_service.util.ServiceConsts
+import io.matthewnelson.topl_service.util.V3ClientAuthManager
 
 class TorServiceController private constructor(): ServiceConsts() {
 
@@ -394,6 +395,17 @@ class TorServiceController private constructor(): ServiceConsts() {
                 throw RuntimeException(e.message)
             }
         }
+
+        /**
+         * Returns an instance of [V3ClientAuthManager] for adding, querying, and removing
+         * v3 Client Authorization private key files.
+         *
+         * @throws [RuntimeException] if called before [Builder.build]
+         * */
+        @JvmStatic
+        @Throws(RuntimeException::class)
+        fun getV3ClientAuthManager(): V3ClientAuthManager =
+            V3ClientAuthManager(getTorConfigFiles())
 
         /**
          * Helper method for easily obtaining [ServiceTorSettings].
