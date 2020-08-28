@@ -4,8 +4,6 @@ import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.createNewFileIfDoesNotExist
 import java.io.File
-import java.io.FileFilter
-import java.io.FilenameFilter
 
 object OnionAuthUtilities {
 
@@ -17,7 +15,7 @@ object OnionAuthUtilities {
     ///////////////////////////////////
     /**
      * Creates a file containing v3 Client Authorization for a Hidden Service in the format of:
-     *  - Filename: [nickName].auth_private
+     *  - Filename: [nickname].auth_private
      *  - File Contents:  <56-char-onion-addr-without-.onion-part>:descriptor:x25519:<x25519 private key in base32>
      *
      * Exceptions are thrown for you with adequate messages if the values passed
@@ -25,8 +23,8 @@ object OnionAuthUtilities {
      *
      * **Docs:** https://2019.www.torproject.org/docs/tor-onion-service.html.en#ClientAuthorization
      *
-     * @param [nickName] The nickname for the file. Is appended with `.auth_private` and used as the File name
-     *   [nickName] requirements are:
+     * @param [nickname] The nickname for the file. Is appended with `.auth_private` and used as the File name
+     *   [nickname] requirements are:
      *   - between 1 and 75 characters
      *   - alpha-numeric values (0-9, a-z, A-Z) (capitalization does not matter)
      *   - may contain periods (.), **but** cannot be fist/last character or be used consecutively (..)
@@ -51,13 +49,13 @@ object OnionAuthUtilities {
         IllegalStateException::class,
         SecurityException::class
     )
-    fun addV3AuthenticationPrivateKey(
-        nickName: String,
+    fun addV3ClientAuthenticationPrivateKey(
+        nickname: String,
         onionAddress: String,
         base32EncodedPrivateKey: String,
         torConfigFiles: TorConfigFiles
     ): File? {
-        val name = nickName.trim()
+        val name = nickname.trim()
         val onion = if (onionAddress.contains(".onion"))
             onionAddress.split(".onion")[0].trim()
         else

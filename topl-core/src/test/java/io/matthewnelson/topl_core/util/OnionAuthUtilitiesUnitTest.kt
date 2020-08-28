@@ -43,12 +43,12 @@ class OnionAuthUtilitiesUnitTest {
 
     @Test(expected = IllegalArgumentException::class)
     fun `empty nickname throws exception`() {
-        addV3AuthenticationPrivateKey("")
+        addV3ClientAuthenticationPrivateKey("")
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `nickname over 75 chars throws exception`() {
-        addV3AuthenticationPrivateKey("${validOnion}${validOnion}")
+        addV3ClientAuthenticationPrivateKey("${validOnion}${validOnion}")
     }
 
     @Test
@@ -64,7 +64,7 @@ class OnionAuthUtilitiesUnitTest {
 
         unacceptableCharacters.forEach { char ->
             val wasThrown = try {
-                addV3AuthenticationPrivateKey("$validNickname${char}p")
+                addV3ClientAuthenticationPrivateKey("$validNickname${char}p")
                 false
             } catch (e: IllegalArgumentException) {
                 e.message?.contains("at position ${validNickname.length}") == true
@@ -75,50 +75,50 @@ class OnionAuthUtilitiesUnitTest {
 
     @Test(expected = IllegalArgumentException::class)
     fun `nickname last character cannot be a period`() {
-        addV3AuthenticationPrivateKey("${validNickname}.")
+        addV3ClientAuthenticationPrivateKey("${validNickname}.")
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `nickname cannot contain consecutive periods`() {
-        addV3AuthenticationPrivateKey("${validNickname}..p")
+        addV3ClientAuthenticationPrivateKey("${validNickname}..p")
     }
 
     @Test
     fun `nickname with period and character after is valid`() {
         val name = "${validNickname}.p"
-        val file = addV3AuthenticationPrivateKey(name)
+        val file = addV3ClientAuthenticationPrivateKey(name)
         Assert.assertEquals(file?.name, "${name}.auth_private")
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `nickname with spaces throws exception`() {
-        addV3AuthenticationPrivateKey("test file name")
+        addV3ClientAuthenticationPrivateKey("test file name")
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `empty onion address throws exception`() {
-        addV3AuthenticationPrivateKey(validNickname, "")
+        addV3ClientAuthenticationPrivateKey(validNickname, "")
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `short onion address throws exception`() {
-        addV3AuthenticationPrivateKey(validNickname, validOnion.dropLast(1))
+        addV3ClientAuthenticationPrivateKey(validNickname, validOnion.dropLast(1))
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `long onion address throws exception`() {
-        addV3AuthenticationPrivateKey(validNickname, "${validOnion}asdfk")
+        addV3ClientAuthenticationPrivateKey(validNickname, "${validOnion}asdfk")
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `onion address with spaces throws exception`() {
-        addV3AuthenticationPrivateKey(validNickname, validOnion.dropLast(5) + " ldo3")
+        addV3ClientAuthenticationPrivateKey(validNickname, validOnion.dropLast(5) + " ldo3")
     }
 
     @Test(expected = IllegalStateException::class)
     fun `file already exists throws exception`() {
-        addV3AuthenticationPrivateKey()
-        addV3AuthenticationPrivateKey()
+        addV3ClientAuthenticationPrivateKey()
+        addV3ClientAuthenticationPrivateKey()
     }
 
     @Test(expected = AssertionError::class)
@@ -128,48 +128,48 @@ class OnionAuthUtilitiesUnitTest {
 
     @Test
     fun `file creation successful with proper parameters`() {
-        val file = addV3AuthenticationPrivateKey()
+        val file = addV3ClientAuthenticationPrivateKey()
 
         checkAddAuthPrivateAssertions(file)
     }
 
     @Test
     fun `file creation successful with dot_onion appended to onionAddress field`() {
-        val file = addV3AuthenticationPrivateKey(validNickname, "${validOnion}.onion")
+        val file = addV3ClientAuthenticationPrivateKey(validNickname, "${validOnion}.onion")
 
         checkAddAuthPrivateAssertions(file)
     }
 
     @Test
     fun `arguments are trimmed prior to being checked for compliance`() {
-        var file = addV3AuthenticationPrivateKey(
+        var file = addV3ClientAuthenticationPrivateKey(
             "$validNickname ", "$validOnion .onion", "$validClientAuthKey "
         )
 
         checkAddAuthPrivateAssertions(file)
 
         file?.delete()
-        file = addV3AuthenticationPrivateKey(
+        file = addV3ClientAuthenticationPrivateKey(
             " $validNickname", " $validOnion", " $validClientAuthKey"
         )
 
         checkAddAuthPrivateAssertions(file)
 
         file?.delete()
-        file = addV3AuthenticationPrivateKey(
+        file = addV3ClientAuthenticationPrivateKey(
             validNickname, " $validOnion .onion  ", validClientAuthKey
         )
 
         checkAddAuthPrivateAssertions(file)
     }
 
-    private fun addV3AuthenticationPrivateKey(
+    private fun addV3ClientAuthenticationPrivateKey(
         name: String = validNickname,
         onionAddress: String = validOnion,
         privateKey: String = validClientAuthKey,
         configFiles: TorConfigFiles = torConfigFiles
     ): File? {
-        return OnionAuthUtilities.addV3AuthenticationPrivateKey(name, onionAddress, privateKey, configFiles)
+        return OnionAuthUtilities.addV3ClientAuthenticationPrivateKey(name, onionAddress, privateKey, configFiles)
     }
 
     @Throws(AssertionError::class)
@@ -194,9 +194,9 @@ class OnionAuthUtilitiesUnitTest {
         val name1 = "name1"
         val name2 = "name2"
         val name3 = "name3"
-        val file1 = addV3AuthenticationPrivateKey(name1)
-        val file2 = addV3AuthenticationPrivateKey(name2)
-        val file3 = addV3AuthenticationPrivateKey(name3)
+        val file1 = addV3ClientAuthenticationPrivateKey(name1)
+        val file2 = addV3ClientAuthenticationPrivateKey(name2)
+        val file3 = addV3ClientAuthenticationPrivateKey(name3)
         checkAddAuthPrivateAssertions(file1)
         checkAddAuthPrivateAssertions(file2)
         checkAddAuthPrivateAssertions(file3)
@@ -213,7 +213,7 @@ class OnionAuthUtilitiesUnitTest {
 
     @Test
     fun `getFileByNickname returns file if exists`() {
-        val file = addV3AuthenticationPrivateKey()
+        val file = addV3ClientAuthenticationPrivateKey()
         checkAddAuthPrivateAssertions(file)
 
         val fileResult = OnionAuthUtilities.getFileByNickname(validNickname, torConfigFiles)
@@ -223,7 +223,7 @@ class OnionAuthUtilitiesUnitTest {
 
     @Test
     fun `getFileByNickname returns null if does not exist`() {
-        val file = addV3AuthenticationPrivateKey()
+        val file = addV3ClientAuthenticationPrivateKey()
         checkAddAuthPrivateAssertions(file)
 
         var fileResult = OnionAuthUtilities.getFileByNickname("${validNickname}_does_not_exist", torConfigFiles)
@@ -245,9 +245,9 @@ class OnionAuthUtilitiesUnitTest {
         val name1 = "name1"
         val name2 = "name2"
         val name3 = "name3"
-        val file1 = addV3AuthenticationPrivateKey(name1)
-        val file2 = addV3AuthenticationPrivateKey(name2)
-        val file3 = addV3AuthenticationPrivateKey(name3)
+        val file1 = addV3ClientAuthenticationPrivateKey(name1)
+        val file2 = addV3ClientAuthenticationPrivateKey(name2)
+        val file3 = addV3ClientAuthenticationPrivateKey(name3)
         checkAddAuthPrivateAssertions(file1)
         checkAddAuthPrivateAssertions(file2)
         checkAddAuthPrivateAssertions(file3)
