@@ -5,6 +5,13 @@ import io.matthewnelson.topl_core.util.OnionAuthUtilities
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import java.io.File
 
+/**
+ * This class provides methods necessary for adding, querying, deleting, and reading
+ * files regarding v3 Client Authentication.
+ *
+ * Use [io.matthewnelson.topl_service.TorServiceController.getV3ClientAuthManager] to
+ * instantiate an instance of the Manager.
+ * */
 class V3ClientAuthManager internal constructor(
     private val torConfigFiles: TorConfigFiles
 ) {
