@@ -191,6 +191,7 @@ object OnionAuthUtilities {
             )
     }
 
+
     /////////////////
     /// Retrieval ///
     /////////////////
@@ -201,6 +202,8 @@ object OnionAuthUtilities {
      * @param [nickname] The pre file extension name
      * @param [torConfigFiles]
      * */
+    @WorkerThread
+    @JvmStatic
     fun getFileByNickname(nickname: String, torConfigFiles: TorConfigFiles): File? {
         val file = if (nickname.contains(FILE_EXTENSION))
             File(torConfigFiles.v3AuthPrivateDir, nickname)
@@ -219,6 +222,8 @@ object OnionAuthUtilities {
      *
      * @param [torConfigFiles]
      * */
+    @WorkerThread
+    @JvmStatic
     fun getAllFiles(torConfigFiles: TorConfigFiles): Array<File>? =
         synchronized(torConfigFiles.v3AuthPrivateDirLock) {
             torConfigFiles.v3AuthPrivateDir.listFiles()
@@ -231,6 +236,8 @@ object OnionAuthUtilities {
      *
      * @param [torConfigFiles]
      * */
+    @WorkerThread
+    @JvmStatic
     fun getAllFileNicknames(torConfigFiles: TorConfigFiles): Array<String>? {
         val fileNames = mutableListOf<String>()
 
@@ -247,6 +254,8 @@ object OnionAuthUtilities {
     ////////////////
     /// Deletion ///
     ////////////////
+    @WorkerThread
+    @JvmStatic
     fun deleteFile(nickname: String, torConfigFiles: TorConfigFiles): Boolean? {
         val file = getFileByNickname(nickname, torConfigFiles) ?: return null
         synchronized(torConfigFiles.v3AuthPrivateDirLock) {
@@ -257,6 +266,8 @@ object OnionAuthUtilities {
         }
     }
 
+    @WorkerThread
+    @JvmStatic
     fun deleteFile(file: File, torConfigFiles: TorConfigFiles): Boolean? =
         deleteFile(file.nameWithoutExtension, torConfigFiles)
 }
