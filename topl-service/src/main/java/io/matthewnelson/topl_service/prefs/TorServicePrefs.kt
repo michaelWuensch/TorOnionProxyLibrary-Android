@@ -68,6 +68,7 @@ package io.matthewnelson.topl_service.prefs
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_service.util.ServiceConsts
 
 /**
@@ -126,9 +127,11 @@ class TorServicePrefs(context: Context): ServiceConsts() {
      *  @return True if the SharedPreference contains a value for the associated
      *   [prefsKey], false if not
      *  * */
+    @WorkerThread
     fun contains(prefsKey: String): Boolean =
         prefs.contains(prefsKey)
 
+    @WorkerThread
     @Throws(NullPointerException::class)
     fun getAll(): Map<String, *> =
         prefs.all
@@ -142,6 +145,7 @@ class TorServicePrefs(context: Context): ServiceConsts() {
      *  associated with the [booleanKey].
      * @return The Boolean value associated with the [booleanKey], otherwise [defValue]
      * */
+    @WorkerThread
     fun getBoolean(@PrefKeyBoolean booleanKey: String, defValue: Boolean): Boolean =
         prefs.getBoolean(booleanKey, defValue)
 
@@ -154,6 +158,7 @@ class TorServicePrefs(context: Context): ServiceConsts() {
      *  associated with the [intKey].
      * @return The Int value associated with [intKey], otherwise [defValue]
      * */
+    @WorkerThread
     fun getInt(@PrefKeyInt intKey: String, defValue: Int?): Int? {
         val value = prefs.getInt(intKey, defValue ?: NULL_INT_VALUE)
         return if (value == NULL_INT_VALUE) {
@@ -172,6 +177,7 @@ class TorServicePrefs(context: Context): ServiceConsts() {
      *  associated with the [listKey].
      * @return The List of Strings associated with the [listKey], otherwise [defValue]
      * */
+    @WorkerThread
     fun getList(@PrefKeyList listKey: String, defValue: List<String>): List<String> {
         val csv: String = prefs.getString(listKey, defValue.joinToString()) ?: defValue.joinToString()
         return if (csv.trim().isEmpty()) {
@@ -190,6 +196,7 @@ class TorServicePrefs(context: Context): ServiceConsts() {
      *  associated with the [stringKey].
      * @return The String value associated with [stringKey], otherwise [defValue]
      * */
+    @WorkerThread
     fun getString(@PrefKeyString stringKey: String, defValue: String?): String? {
         val value = prefs.getString(stringKey, defValue ?: NULL_STRING_VALUE)
         return if (value == NULL_STRING_VALUE) {
@@ -204,6 +211,7 @@ class TorServicePrefs(context: Context): ServiceConsts() {
     /// Modify ///
     //////////////
 
+    @WorkerThread
     fun clear() {
         val editor = prefs.edit().clear()
         if (!editor.commit())
@@ -220,6 +228,7 @@ class TorServicePrefs(context: Context): ServiceConsts() {
      *
      *  @param [prefsKey] String of type ServiceConsts.PrefKey*
      *  * */
+    @WorkerThread
     fun remove(prefsKey: String) {
         val editor = prefs.edit().remove(prefsKey)
         if (!editor.commit())
@@ -232,6 +241,7 @@ class TorServicePrefs(context: Context): ServiceConsts() {
      * @param [booleanKey] String of type [ServiceConsts.PrefKeyBoolean]
      * @param [value] Your Boolean value
      * */
+    @WorkerThread
     fun putBoolean(@PrefKeyBoolean booleanKey: String, value: Boolean) {
         val editor = prefs.edit().putBoolean(booleanKey, value)
         if (!editor.commit())
@@ -244,6 +254,7 @@ class TorServicePrefs(context: Context): ServiceConsts() {
      * @param [intKey] String of type [ServiceConsts.PrefKeyInt]
      * @param [value] Your Int? value
      * */
+    @WorkerThread
     fun putInt(@PrefKeyInt intKey: String, value: Int?) {
         val editor = prefs.edit().putInt(intKey, value ?: NULL_INT_VALUE)
         if (!editor.commit())
@@ -257,6 +268,7 @@ class TorServicePrefs(context: Context): ServiceConsts() {
      * @param [listKey] String of type [ServiceConsts.PrefKeyList]
      * @param [value] Your List<String> value
      * */
+    @WorkerThread
     fun putList(@PrefKeyList listKey: String, value: List<String>) {
         val editor = prefs.edit().putString(listKey, value.joinToString())
         if (!editor.commit())
@@ -269,6 +281,7 @@ class TorServicePrefs(context: Context): ServiceConsts() {
      * @param [stringKey] String of type [ServiceConsts.PrefKeyString]
      * @param [value] Your String value
      * */
+    @WorkerThread
     fun putString(@PrefKeyString stringKey: String, value: String?) {
         val editor = prefs.edit().putString(stringKey, value ?: NULL_STRING_VALUE)
         if (!editor.commit())
