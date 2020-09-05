@@ -66,10 +66,7 @@
 * */
 package io.matthewnelson.topl_service.service.components.binding
 
-import android.app.Activity
-import android.app.Application
 import android.os.Binder
-import android.os.Bundle
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
@@ -78,9 +75,7 @@ import io.matthewnelson.topl_service.service.components.actions.ServiceActions.S
 import io.matthewnelson.topl_service.util.ServiceConsts.BackgroundPolicy
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import net.freehaven.tor.control.TorControlCommands
 
 
 internal abstract class BaseServiceBinder(private val torService: BaseService): Binder() {

@@ -69,7 +69,6 @@ package io.matthewnelson.topl_service.util
 import androidx.annotation.IntDef
 import androidx.annotation.StringDef
 import io.matthewnelson.topl_core_base.BaseConsts
-import io.matthewnelson.topl_service.service.components.actions.ServiceActions
 
 abstract class ServiceConsts: BaseConsts() {
 
