@@ -106,44 +106,47 @@ object OnionAuthUtilities {
         }
     }
 
-    private val FILE_NAME_CHARS = charArrayOf(
-        '0', '1', '2', '3', '4', '5',
-        '6', '7', '8', '9', '_', '.',
-        'a', 'b', 'c', 'd', 'e', 'f',
-        'g', 'h', 'i', 'j', 'k', 'l',
-        'm', 'n', 'o', 'p', 'q', 'r',
-        's', 't', 'u', 'v', 'w', 'x',
-        'y', 'z', 'A', 'B', 'C', 'D',
-        'E', 'F', 'G', 'H', 'I', 'J',
-        'K', 'L', 'M', 'N', 'O', 'P',
-        'Q', 'R', 'S', 'T', 'U', 'V',
-        'W', 'X', 'Y', 'Z'
-    )
+    private val FILE_NAME_CHARS: CharArray
+        get() = charArrayOf(
+            '0', '1', '2', '3', '4', '5',
+            '6', '7', '8', '9', '_', '.',
+            'a', 'b', 'c', 'd', 'e', 'f',
+            'g', 'h', 'i', 'j', 'k', 'l',
+            'm', 'n', 'o', 'p', 'q', 'r',
+            's', 't', 'u', 'v', 'w', 'x',
+            'y', 'z', 'A', 'B', 'C', 'D',
+            'E', 'F', 'G', 'H', 'I', 'J',
+            'K', 'L', 'M', 'N', 'O', 'P',
+            'Q', 'R', 'S', 'T', 'U', 'V',
+            'W', 'X', 'Y', 'Z'
+        )
 
     private fun isV3ClientAuthNicknameCompliant(nickname: String): String =
         checkStringCompliance(nickname, FILE_NAME_CHARS, 1, 75)
 
-    private val BASE32_ED25519_CHARS = charArrayOf(
-        '2', '3', '4', '5', '6', '7',
-        'a', 'b', 'c', 'd', 'e', 'f',
-        'g', 'h', 'i', 'j', 'k', 'l',
-        'm', 'n', 'o', 'p', 'q', 'r',
-        's', 't', 'u', 'v', 'w', 'x',
-        'y', 'z'
-    )
+    private val BASE32_ED25519_CHARS: CharArray
+        get() = charArrayOf(
+            '2', '3', '4', '5', '6', '7',
+            'a', 'b', 'c', 'd', 'e', 'f',
+            'g', 'h', 'i', 'j', 'k', 'l',
+            'm', 'n', 'o', 'p', 'q', 'r',
+            's', 't', 'u', 'v', 'w', 'x',
+            'y', 'z'
+        )
 
     @Throws(IllegalArgumentException::class)
     private fun isV3OnionAddressBase32ed25519Compliant(onionAddress: String): String =
         checkStringCompliance(onionAddress, BASE32_ED25519_CHARS, 56, 56)
 
-    private val BASE32_X25519_CHARS = charArrayOf(
-        '2', '3', '4', '5', '6', '7',
-        'A', 'B', 'C', 'D', 'E', 'F',
-        'G', 'H', 'I', 'J', 'K', 'L',
-        'M', 'N', 'O', 'P', 'Q', 'R',
-        'S', 'T', 'U', 'V', 'W', 'X',
-        'Y', 'Z'
-    )
+    private val BASE32_X25519_CHARS: CharArray
+        get() = charArrayOf(
+            '2', '3', '4', '5', '6', '7',
+            'A', 'B', 'C', 'D', 'E', 'F',
+            'G', 'H', 'I', 'J', 'K', 'L',
+            'M', 'N', 'O', 'P', 'Q', 'R',
+            'S', 'T', 'U', 'V', 'W', 'X',
+            'Y', 'Z'
+        )
 
     @Throws(IllegalArgumentException::class)
     private fun isV3ClientAuthKeyBase32x25519Compliant(v3ClientAuthorizationKey: String): String =
