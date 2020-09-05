@@ -99,15 +99,15 @@ class V3ClientAuthManager internal constructor(
     fun getFileContent(nickname: String): V3ClientAuthContent? {
         val v3ClientAuthFile = getFileByNickname(nickname) ?: return null
         val content = v3ClientAuthFile.readText().split(':')
-        return V3ClientAuthContent(content[0], content[3])
+        return if (content.size != 4)
+            null
+        else
+            V3ClientAuthContent(content[0], content[3])
     }
 
     @WorkerThread
-    fun getFileContent(file: File): V3ClientAuthContent? {
-        val v3ClientAuthFile = getFileByNickname(file.nameWithoutExtension) ?: return null
-        val content = v3ClientAuthFile.readText().split(':')
-        return V3ClientAuthContent(content[0], content[3])
-    }
+    fun getFileContent(file: File): V3ClientAuthContent? =
+        getFileContent(file.nameWithoutExtension)
 
 
     ////////////////
