@@ -302,7 +302,7 @@ internal class TorService: BaseService() {
     override fun onTaskRemoved(rootIntent: Intent?) {
         // Cancel the BackgroundManager's coroutine if it's active so it doesn't execute
         torServiceBinder.cancelExecuteBackgroundPolicyJob()
-        broadcastLogger.debug("Task has been removed")
+        broadcastLogger.notice("Task has been removed")
         super.onTaskRemoved(rootIntent)
     }
 }
