@@ -149,7 +149,7 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context != null && intent != null) {
-            when (val action = intent.action) {
+            when (intent.action) {
                 @Suppress("DEPRECATION")
                 ConnectivityManager.CONNECTIVITY_ACTION -> {
                     if (!torService.isTorOn()) return

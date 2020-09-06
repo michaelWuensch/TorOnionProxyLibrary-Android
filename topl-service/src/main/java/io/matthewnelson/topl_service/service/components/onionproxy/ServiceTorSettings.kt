@@ -66,6 +66,7 @@
 * */
 package io.matthewnelson.topl_service.service.components.onionproxy
 
+import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyString
 import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyList
@@ -99,8 +100,10 @@ class ServiceTorSettings internal constructor(
 ): TorSettings() {
 
     override val dormantClientTimeout: Int?
+        @WorkerThread
         get() = servicePrefs.getInt(PrefKeyInt.DORMANT_CLIENT_TIMEOUT, defaultTorSettings.dormantClientTimeout)
 
+    @WorkerThread
     fun dormantClientTimeoutSave(minutes: Int?) {
         if (minutes == defaultTorSettings.dormantClientTimeout)
             servicePrefs.remove(PrefKeyInt.DORMANT_CLIENT_TIMEOUT)
@@ -109,6 +112,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val disableNetwork: Boolean
+        @WorkerThread
         get() = servicePrefs.getBoolean(PrefKeyBoolean.DISABLE_NETWORK, defaultTorSettings.disableNetwork)
 
     /**
@@ -119,6 +123,7 @@ class ServiceTorSettings internal constructor(
      * @param [boolean]
      * @see [TorSettings.disableNetwork]
      * */
+    @WorkerThread
     fun disableNetworkSave(boolean: Boolean) {
         if (boolean == defaultTorSettings.disableNetwork)
             servicePrefs.remove(PrefKeyBoolean.DISABLE_NETWORK)
@@ -127,6 +132,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val dnsPort: String
+        @WorkerThread
         get() = servicePrefs.getString(PrefKeyString.DNS_PORT, defaultTorSettings.dnsPort)
             ?: defaultTorSettings.dnsPort
 
@@ -140,6 +146,7 @@ class ServiceTorSettings internal constructor(
      * @see [TorSettings.dnsPort]
      * @throws [IllegalArgumentException] if the value is not 0, auto, or between 1024 and 65535
      * */
+    @WorkerThread
     @Throws(IllegalArgumentException::class)
     fun dnsPortSave(dnsPort: String) {
         when {
@@ -158,6 +165,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val dnsPortIsolationFlags: List<@IsolationFlag String>?
+        @WorkerThread
         get() = servicePrefs.getList(
             PrefKeyList.DNS_PORT_ISOLATION_FLAGS,
             defaultTorSettings.dnsPortIsolationFlags ?: arrayListOf()
@@ -173,6 +181,7 @@ class ServiceTorSettings internal constructor(
      * @see [io.matthewnelson.topl_core_base.BaseConsts.IsolationFlag]
      * @see [TorSettings.dnsPortIsolationFlags]
      * */
+    @WorkerThread
     fun dnsPortIsolationFlagsSave(isolationFlags: List<@IsolationFlag String>) {
         if (isolationFlags == defaultTorSettings.dnsPortIsolationFlags) {
             servicePrefs.remove(PrefKeyList.DNS_PORT_ISOLATION_FLAGS)
@@ -182,6 +191,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val customTorrc: String?
+        @WorkerThread
         get() = servicePrefs.getString(PrefKeyString.CUSTOM_TORRC, defaultTorSettings.customTorrc)
 
     /**
@@ -192,6 +202,7 @@ class ServiceTorSettings internal constructor(
      * @param [customTorrc] A String of values to be added to the torrc file
      * @see [TorSettings.customTorrc]
      * */
+    @WorkerThread
     fun customTorrcSave(customTorrc: String?) {
         if (customTorrc == defaultTorSettings.customTorrc)
             servicePrefs.remove(PrefKeyString.CUSTOM_TORRC)
@@ -200,6 +211,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val entryNodes: String?
+        @WorkerThread
         get() = servicePrefs.getString(PrefKeyString.ENTRY_NODES, defaultTorSettings.entryNodes)
 
     /**
@@ -210,6 +222,7 @@ class ServiceTorSettings internal constructor(
      * @param [entryNodes] A comma separated list of nodes
      * @see [TorSettings.entryNodes]
      * */
+    @WorkerThread
     fun entryNodesSave(entryNodes: String?) {
         if (entryNodes == defaultTorSettings.entryNodes)
             servicePrefs.remove(PrefKeyString.ENTRY_NODES)
@@ -218,6 +231,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val excludeNodes: String?
+        @WorkerThread
         get() = servicePrefs.getString(PrefKeyString.EXCLUDED_NODES, defaultTorSettings.excludeNodes)
 
     /**
@@ -228,6 +242,7 @@ class ServiceTorSettings internal constructor(
      * @param [excludeNodes] A comma separated list of nodes
      * @see [TorSettings.excludeNodes]
      * */
+    @WorkerThread
     fun excludeNodesSave(excludeNodes: String?) {
         if (excludeNodes == defaultTorSettings.excludeNodes)
             servicePrefs.remove(PrefKeyString.EXCLUDED_NODES)
@@ -236,6 +251,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val exitNodes: String?
+        @WorkerThread
         get() = servicePrefs.getString(PrefKeyString.EXIT_NODES, defaultTorSettings.exitNodes)
 
     /**
@@ -246,6 +262,7 @@ class ServiceTorSettings internal constructor(
      * @param [exitNodes] A comma separated list of nodes
      * @see [TorSettings.exitNodes]
      * */
+    @WorkerThread
     fun exitNodesSave(exitNodes: String?) {
         if (exitNodes == defaultTorSettings.exitNodes)
             servicePrefs.remove(PrefKeyString.EXIT_NODES)
@@ -254,6 +271,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val httpTunnelPort: String
+        @WorkerThread
         get() = servicePrefs.getString(PrefKeyString.HTTP_TUNNEL_PORT, defaultTorSettings.httpTunnelPort)
             ?: defaultTorSettings.httpTunnelPort
 
@@ -267,6 +285,7 @@ class ServiceTorSettings internal constructor(
      * @see [TorSettings.httpTunnelPort]
      * @throws [IllegalArgumentException] if the value is not 0, auto, or between 1024 and 65535
      * */
+    @WorkerThread
     @Throws(IllegalArgumentException::class)
     fun httpTunnelPortSave(httpPort: String) {
         when {
@@ -285,6 +304,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val httpTunnelPortIsolationFlags: List<@IsolationFlag String>?
+        @WorkerThread
         get() = servicePrefs.getList(
             PrefKeyList.HTTP_TUNNEL_PORT_ISOLATION_FLAGS,
             defaultTorSettings.httpTunnelPortIsolationFlags ?: arrayListOf()
@@ -300,6 +320,7 @@ class ServiceTorSettings internal constructor(
      * @see [io.matthewnelson.topl_core_base.BaseConsts.IsolationFlag]
      * @see [TorSettings.httpTunnelPortIsolationFlags]
      * */
+    @WorkerThread
     fun httpPortIsolationFlagsSave(isolationFlags: List<@IsolationFlag String>) {
         if (isolationFlags == defaultTorSettings.httpTunnelPortIsolationFlags) {
             servicePrefs.remove(PrefKeyList.HTTP_TUNNEL_PORT_ISOLATION_FLAGS)
@@ -314,6 +335,7 @@ class ServiceTorSettings internal constructor(
     // TODO: write a save method after refactor
 
     override val proxyHost: String?
+        @WorkerThread
         get() = servicePrefs.getString(PrefKeyString.PROXY_HOST, defaultTorSettings.proxyHost)
 
     /**
@@ -324,6 +346,7 @@ class ServiceTorSettings internal constructor(
      * @param [proxyHost]
      * @see [TorSettings.proxyHost]
      * */
+    @WorkerThread
     fun proxyHostSave(proxyHost: String?) {
         if (proxyHost == defaultTorSettings.proxyHost)
             servicePrefs.remove(PrefKeyString.PROXY_HOST)
@@ -332,6 +355,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val proxyPassword: String?
+        @WorkerThread
         get() = servicePrefs.getString(PrefKeyString.PROXY_PASSWORD, defaultTorSettings.proxyPassword)
 
     /**
@@ -342,6 +366,7 @@ class ServiceTorSettings internal constructor(
      * @param [proxyPassword]
      * @see [TorSettings.proxyPassword]
      * */
+    @WorkerThread
     fun proxyPasswordSave(proxyPassword: String?) {
         if (proxyPassword == defaultTorSettings.proxyPassword)
             servicePrefs.remove(PrefKeyString.PROXY_PASSWORD)
@@ -350,6 +375,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val proxyPort: Int?
+        @WorkerThread
         get() = servicePrefs.getInt(PrefKeyInt.PROXY_PORT, defaultTorSettings.proxyPort)
 
     /**
@@ -362,6 +388,7 @@ class ServiceTorSettings internal constructor(
      * @see [TorSettings.proxyPort]
      * @throws [IllegalArgumentException] if the value is not `null`, or between 1024 and 65535
      * */
+    @WorkerThread
     @Throws(IllegalArgumentException::class)
     fun proxyPortSave(proxyPort: Int?) {
         when {
@@ -381,6 +408,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val proxySocks5Host: String?
+        @WorkerThread
         get() = servicePrefs.getString(PrefKeyString.PROXY_SOCKS5_HOST, defaultTorSettings.proxySocks5Host)
 
     /**
@@ -391,6 +419,7 @@ class ServiceTorSettings internal constructor(
      * @param [proxySocks5Host]
      * @see [TorSettings.proxySocks5Host]
      * */
+    @WorkerThread
     fun proxySocks5HostSave(proxySocks5Host: String?) {
         if (proxySocks5Host == defaultTorSettings.proxySocks5Host)
             servicePrefs.remove(PrefKeyString.PROXY_SOCKS5_HOST)
@@ -399,6 +428,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val proxySocks5ServerPort: Int?
+        @WorkerThread
         get() = servicePrefs.getInt(PrefKeyInt.PROXY_SOCKS5_SERVER_PORT, defaultTorSettings.proxySocks5ServerPort)
 
     /**
@@ -411,6 +441,7 @@ class ServiceTorSettings internal constructor(
      * @see [TorSettings.proxySocks5ServerPort]
      * @throws [IllegalArgumentException] if the value is not `null`, or between 1024 and 65535
      * */
+    @WorkerThread
     @Throws(IllegalArgumentException::class)
     fun proxySocks5ServerPortSave(proxySocks5ServerPort: Int?) {
         when {
@@ -430,6 +461,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val proxyType: @ProxyType String
+        @WorkerThread
         get() = servicePrefs.getString(PrefKeyString.PROXY_TYPE, defaultTorSettings.proxyType) ?: defaultTorSettings.proxyType
 
     /**
@@ -442,6 +474,7 @@ class ServiceTorSettings internal constructor(
      * @see [TorSettings.proxyType]
      * @throws [IllegalArgumentException] if the value is not empty (disabled), HTTPS, or Socks5
      * */
+    @WorkerThread
     @Throws(IllegalArgumentException::class)
     fun proxyTypeSave(@ProxyType proxyType: String) {
         when (proxyType) {
@@ -462,6 +495,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val proxyUser: String?
+        @WorkerThread
         get() = servicePrefs.getString(PrefKeyString.PROXY_USER, defaultTorSettings.proxyUser)
 
     /**
@@ -472,6 +506,7 @@ class ServiceTorSettings internal constructor(
      * @param [proxyUser]
      * @see [TorSettings.proxyUser]
      * */
+    @WorkerThread
     fun proxyUserSave(proxyUser: String?) {
         if (proxyUser == defaultTorSettings.proxyUser)
             servicePrefs.remove(PrefKeyString.PROXY_USER)
@@ -480,6 +515,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val reachableAddressPorts: String
+        @WorkerThread
         get() = servicePrefs.getString(PrefKeyString.REACHABLE_ADDRESS_PORTS, defaultTorSettings.reachableAddressPorts)
             ?: defaultTorSettings.reachableAddressPorts
 
@@ -491,6 +527,7 @@ class ServiceTorSettings internal constructor(
      * @param [reachableAddressPorts]
      * @see [TorSettings.reachableAddressPorts]
      * */
+    @WorkerThread
     fun reachableAddressPortsSave(reachableAddressPorts: String) {
         if (reachableAddressPorts == defaultTorSettings.reachableAddressPorts)
             servicePrefs.remove(PrefKeyString.REACHABLE_ADDRESS_PORTS)
@@ -499,6 +536,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val relayNickname: String?
+        @WorkerThread
         get() = servicePrefs.getString(PrefKeyString.RELAY_NICKNAME, defaultTorSettings.relayNickname)
 
     /**
@@ -509,6 +547,7 @@ class ServiceTorSettings internal constructor(
      * @param [relayNickname]
      * @see [TorSettings.relayNickname]
      * */
+    @WorkerThread
     fun relayNicknameSave(relayNickname: String) {
         if (relayNickname == defaultTorSettings.relayNickname)
             servicePrefs.remove(PrefKeyString.RELAY_NICKNAME)
@@ -517,6 +556,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val relayPort: String
+        @WorkerThread
         get() = servicePrefs.getString(PrefKeyString.RELAY_PORT, defaultTorSettings.relayPort)
             ?: defaultTorSettings.relayPort
 
@@ -530,6 +570,7 @@ class ServiceTorSettings internal constructor(
      * @see [TorSettings.relayPort]
      * @throws [IllegalArgumentException] if the value is not 0, auto, or between 1024 and 65535
      * */
+    @WorkerThread
     @Throws(IllegalArgumentException::class)
     fun relayPortSave(relayPort: String) {
         when {
@@ -548,6 +589,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val socksPort: String
+        @WorkerThread
         get() = servicePrefs.getString(PrefKeyString.SOCKS_PORT, defaultTorSettings.socksPort)
             ?: defaultTorSettings.socksPort
 
@@ -561,6 +603,7 @@ class ServiceTorSettings internal constructor(
      * @see [TorSettings.socksPort]
      * @throws [IllegalArgumentException] if the value is not 0, auto, or between 1024 and 65535
      * */
+    @WorkerThread
     @Throws(IllegalArgumentException::class)
     fun socksPortSave(socksPort: String) {
         when {
@@ -579,6 +622,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val socksPortIsolationFlags: List<@IsolationFlag String>?
+        @WorkerThread
         get() = servicePrefs.getList(
             PrefKeyList.SOCKS_PORT_ISOLATION_FLAGS,
             defaultTorSettings.socksPortIsolationFlags ?: arrayListOf()
@@ -594,6 +638,7 @@ class ServiceTorSettings internal constructor(
      * @see [io.matthewnelson.topl_core_base.BaseConsts.IsolationFlag]
      * @see [TorSettings.socksPortIsolationFlags]
      * */
+    @WorkerThread
     fun socksPortIsolationFlagsSave(isolationFlags: List<@IsolationFlag String>) {
         if (isolationFlags == defaultTorSettings.socksPortIsolationFlags) {
             servicePrefs.remove(PrefKeyList.SOCKS_PORT_ISOLATION_FLAGS)
@@ -603,6 +648,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val virtualAddressNetwork: String?
+        @WorkerThread
         get() = servicePrefs.getString(PrefKeyString.VIRTUAL_ADDRESS_NETWORK, defaultTorSettings.virtualAddressNetwork)
 
     /**
@@ -613,6 +659,7 @@ class ServiceTorSettings internal constructor(
      * @param [virtualAddressNetwork]
      * @see [TorSettings.virtualAddressNetwork]
      * */
+    @WorkerThread
     fun virtualAddressNetworkSave(virtualAddressNetwork: String) {
         if (virtualAddressNetwork == defaultTorSettings.virtualAddressNetwork)
             servicePrefs.remove(PrefKeyString.VIRTUAL_ADDRESS_NETWORK)
@@ -621,6 +668,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val hasBridges: Boolean
+        @WorkerThread
         get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_BRIDGES, defaultTorSettings.hasBridges)
 
     /**
@@ -631,6 +679,7 @@ class ServiceTorSettings internal constructor(
      * @param [boolean] to enable/disable
      * @see [TorSettings.hasBridges]
      * */
+    @WorkerThread
     fun hasBridgesSave(boolean: Boolean) {
         if (boolean == defaultTorSettings.hasBridges)
             servicePrefs.remove(PrefKeyBoolean.HAS_BRIDGES)
@@ -639,6 +688,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val connectionPadding: String
+        @WorkerThread
         get() = servicePrefs.getString(PrefKeyString.HAS_CONNECTION_PADDING, defaultTorSettings.connectionPadding)
             ?: defaultTorSettings.connectionPadding
 
@@ -652,6 +702,7 @@ class ServiceTorSettings internal constructor(
      * @see [TorSettings.connectionPadding]
      * @throws [IllegalArgumentException] if the value is not 0 (Off), 1 (On), or auto
      * */
+    @WorkerThread
     @Throws(IllegalArgumentException::class)
     fun connectionPaddingSave(@ConnectionPadding connectionPadding: String) {
         when (connectionPadding) {
@@ -672,6 +723,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val hasCookieAuthentication: Boolean
+        @WorkerThread
         get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_COOKIE_AUTHENTICATION, defaultTorSettings.hasCookieAuthentication)
 
     /**
@@ -682,6 +734,7 @@ class ServiceTorSettings internal constructor(
      * @param [boolean] to enable/disable
      * @see [TorSettings.hasCookieAuthentication]
      * */
+    @WorkerThread
     fun hasCookieAuthenticationSave(boolean: Boolean) {
         if (boolean == defaultTorSettings.hasCookieAuthentication)
             servicePrefs.remove(PrefKeyBoolean.HAS_COOKIE_AUTHENTICATION)
@@ -690,6 +743,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val hasDebugLogs: Boolean
+        @WorkerThread
         get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_DEBUG_LOGS, defaultTorSettings.hasDebugLogs)
 
     /**
@@ -700,6 +754,7 @@ class ServiceTorSettings internal constructor(
      * @param [boolean] to enable/disable
      * @see [TorSettings.hasDebugLogs]
      * */
+    @WorkerThread
     fun hasDebugLogsSave(boolean: Boolean) {
         if (boolean == defaultTorSettings.hasDebugLogs)
             servicePrefs.remove(PrefKeyBoolean.HAS_DEBUG_LOGS)
@@ -708,6 +763,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val hasDormantCanceledByStartup: Boolean
+        @WorkerThread
         get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_DORMANT_CANCELED_BY_STARTUP, defaultTorSettings.hasDormantCanceledByStartup)
 
     /**
@@ -718,6 +774,7 @@ class ServiceTorSettings internal constructor(
      * @param [boolean] to enable/disable
      * @see [TorSettings.hasDormantCanceledByStartup]
      * */
+    @WorkerThread
     fun hasDormantCanceledByStartupSave(boolean: Boolean) {
         if (boolean == defaultTorSettings.hasDormantCanceledByStartup)
             servicePrefs.remove(PrefKeyBoolean.HAS_DORMANT_CANCELED_BY_STARTUP)
@@ -726,6 +783,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val hasOpenProxyOnAllInterfaces: Boolean
+        @WorkerThread
         get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_OPEN_PROXY_ON_ALL_INTERFACES, defaultTorSettings.hasOpenProxyOnAllInterfaces)
 
     /**
@@ -736,6 +794,7 @@ class ServiceTorSettings internal constructor(
      * @param [boolean] to enable/disable
      * @see [TorSettings.hasOpenProxyOnAllInterfaces]
      * */
+    @WorkerThread
     fun hasOpenProxyOnAllInterfacesSave(boolean: Boolean) {
         if (boolean == defaultTorSettings.hasOpenProxyOnAllInterfaces)
             servicePrefs.remove(PrefKeyBoolean.HAS_OPEN_PROXY_ON_ALL_INTERFACES)
@@ -744,6 +803,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val hasReachableAddress: Boolean
+        @WorkerThread
         get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_REACHABLE_ADDRESS, defaultTorSettings.hasReachableAddress)
 
     /**
@@ -754,6 +814,7 @@ class ServiceTorSettings internal constructor(
      * @param [boolean] to enable/disable
      * @see [TorSettings.hasReachableAddress]
      * */
+    @WorkerThread
     fun hasReachableAddressSave(boolean: Boolean) {
         if (boolean == defaultTorSettings.hasReachableAddress)
             servicePrefs.remove(PrefKeyBoolean.HAS_REACHABLE_ADDRESS)
@@ -762,6 +823,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val hasReducedConnectionPadding: Boolean
+        @WorkerThread
         get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_REDUCED_CONNECTION_PADDING, defaultTorSettings.hasReducedConnectionPadding)
 
     /**
@@ -772,6 +834,7 @@ class ServiceTorSettings internal constructor(
      * @param [boolean] to enable/disable
      * @see [TorSettings.hasReducedConnectionPadding]
      * */
+    @WorkerThread
     fun hasReducedConnectionPaddingSave(boolean: Boolean) {
         if (boolean == defaultTorSettings.hasReducedConnectionPadding)
             servicePrefs.remove(PrefKeyBoolean.HAS_REDUCED_CONNECTION_PADDING)
@@ -780,6 +843,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val hasSafeSocks: Boolean
+        @WorkerThread
         get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_SAFE_SOCKS, defaultTorSettings.hasSafeSocks)
 
     /**
@@ -790,6 +854,7 @@ class ServiceTorSettings internal constructor(
      * @param [boolean] to enable/disable
      * @see [TorSettings.hasSafeSocks]
      * */
+    @WorkerThread
     fun hasSafeSocksSave(boolean: Boolean) {
         if (boolean == defaultTorSettings.hasSafeSocks)
             servicePrefs.remove(PrefKeyBoolean.HAS_SAFE_SOCKS)
@@ -798,6 +863,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val hasStrictNodes: Boolean
+        @WorkerThread
         get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_STRICT_NODES, defaultTorSettings.hasStrictNodes)
 
     /**
@@ -808,6 +874,7 @@ class ServiceTorSettings internal constructor(
      * @param [boolean] to enable/disable
      * @see [TorSettings.hasStrictNodes]
      * */
+    @WorkerThread
     fun hasStrictNodesSave(boolean: Boolean) {
         if (boolean == defaultTorSettings.hasStrictNodes)
             servicePrefs.remove(PrefKeyBoolean.HAS_STRICT_NODES)
@@ -816,6 +883,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val hasTestSocks: Boolean
+        @WorkerThread
         get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_TEST_SOCKS, defaultTorSettings.hasTestSocks)
 
     /**
@@ -826,6 +894,7 @@ class ServiceTorSettings internal constructor(
      * @param [boolean] to enable/disable
      * @see [TorSettings.hasTestSocks]
      * */
+    @WorkerThread
     fun hasTestSocksSave(boolean: Boolean) {
         if (boolean == defaultTorSettings.hasTestSocks)
             servicePrefs.remove(PrefKeyBoolean.HAS_TEST_SOCKS)
@@ -834,6 +903,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val isAutoMapHostsOnResolve: Boolean
+        @WorkerThread
         get() = servicePrefs.getBoolean(PrefKeyBoolean.IS_AUTO_MAP_HOSTS_ON_RESOLVE, defaultTorSettings.isAutoMapHostsOnResolve)
 
     /**
@@ -844,6 +914,7 @@ class ServiceTorSettings internal constructor(
      * @param [boolean] to enable/disable
      * @see [TorSettings.isAutoMapHostsOnResolve]
      * */
+    @WorkerThread
     fun isAutoMapHostsOnResolveSave(boolean: Boolean) {
         if (boolean == defaultTorSettings.isAutoMapHostsOnResolve)
             servicePrefs.remove(PrefKeyBoolean.IS_AUTO_MAP_HOSTS_ON_RESOLVE)
@@ -852,6 +923,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val isRelay: Boolean
+        @WorkerThread
         get() = servicePrefs.getBoolean(PrefKeyBoolean.IS_RELAY, defaultTorSettings.isRelay)
 
     /**
@@ -862,6 +934,7 @@ class ServiceTorSettings internal constructor(
      * @param [boolean] to enable/disable
      * @see [TorSettings.isRelay]
      * */
+    @WorkerThread
     fun isRelaySave(boolean: Boolean) {
         if (boolean == defaultTorSettings.isRelay)
             servicePrefs.remove(PrefKeyBoolean.IS_RELAY)
@@ -870,6 +943,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val runAsDaemon: Boolean
+        @WorkerThread
         get() = servicePrefs.getBoolean(PrefKeyBoolean.RUN_AS_DAEMON, defaultTorSettings.runAsDaemon)
 
     /**
@@ -880,6 +954,7 @@ class ServiceTorSettings internal constructor(
      * @param [boolean] to enable/disable
      * @see [TorSettings.runAsDaemon]
      * */
+    @WorkerThread
     fun runAsDaemonSave(boolean: Boolean) {
         if (boolean == defaultTorSettings.runAsDaemon)
             servicePrefs.remove(PrefKeyBoolean.RUN_AS_DAEMON)
@@ -888,6 +963,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val transPort: String
+        @WorkerThread
         get() = servicePrefs.getString(PrefKeyString.TRANS_PORT, defaultTorSettings.transPort) ?: defaultTorSettings.transPort
 
     /**
@@ -900,6 +976,7 @@ class ServiceTorSettings internal constructor(
      * @see [TorSettings.transPort]
      * @throws [IllegalArgumentException] if the value is not 0, auto, or between 1024 and 65535
      * */
+    @WorkerThread
     @Throws(IllegalArgumentException::class)
     fun transPortSave(transPort: String) {
         when {
@@ -918,6 +995,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val transPortIsolationFlags: List<@IsolationFlag String>?
+        @WorkerThread
         get() = servicePrefs.getList(
             PrefKeyList.TRANS_PORT_ISOLATION_FLAGS,
             defaultTorSettings.transPortIsolationFlags ?: arrayListOf()
@@ -933,6 +1011,7 @@ class ServiceTorSettings internal constructor(
      * @see [io.matthewnelson.topl_core_base.BaseConsts.IsolationFlag]
      * @see [TorSettings.transPortIsolationFlags]
      * */
+    @WorkerThread
     fun transPortIsolationFlagsSave(isolationFlags: List<@IsolationFlag String>) {
         if (isolationFlags == defaultTorSettings.transPortIsolationFlags) {
             servicePrefs.remove(PrefKeyList.TRANS_PORT_ISOLATION_FLAGS)
@@ -942,6 +1021,7 @@ class ServiceTorSettings internal constructor(
     }
 
     override val useSocks5: Boolean
+        @WorkerThread
         get() = servicePrefs.getBoolean(PrefKeyBoolean.USE_SOCKS5, defaultTorSettings.useSocks5)
 
     /**
@@ -952,6 +1032,7 @@ class ServiceTorSettings internal constructor(
      * @param [boolean] to enable/disable
      * @see [TorSettings.useSocks5]
      * */
+    @WorkerThread
     fun useSocks5Save(boolean: Boolean) {
         if (boolean == defaultTorSettings.useSocks5)
             servicePrefs.remove(PrefKeyBoolean.USE_SOCKS5)
