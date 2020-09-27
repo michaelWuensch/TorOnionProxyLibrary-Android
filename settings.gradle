@@ -1,3 +1,4 @@
+include ':topl-service-base'
 rootProject.name = 'TorOnionProxyLibrary-Android'
 include ':sampleapp'
 include ':topl-core'

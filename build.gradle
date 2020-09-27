@@ -2,6 +2,9 @@ apply plugin: 'org.jetbrains.dokka'
 
 buildscript {
     apply from: "$rootDir/gradle/dependencies.gradle"
+    ext {
+        kotlin_version = '1.4.10'
+    }
 
     repositories {
         google()
