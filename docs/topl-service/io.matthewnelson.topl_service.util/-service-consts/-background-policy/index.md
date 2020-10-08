@@ -2,7 +2,7 @@
 
 # BackgroundPolicy
 
-`@Target([AnnotationTarget.CLASS, AnnotationTarget.PROPERTY, AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.TYPE]) annotation class BackgroundPolicy` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/util/ServiceConsts.kt#L91)
+`@Target([AnnotationTarget.CLASS, AnnotationTarget.PROPERTY, AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.TYPE]) annotation class BackgroundPolicy` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/util/ServiceConsts.kt#L90)
 
 ### Constructors
 

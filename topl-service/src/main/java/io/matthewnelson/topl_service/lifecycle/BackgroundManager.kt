@@ -320,14 +320,16 @@ class BackgroundManager internal constructor(
     private fun applicationMovedToBackground() {
         taskIsInForeground = false
         if (!ServiceActionProcessor.wasLastAcceptedServiceActionStop()) {
-            // System automatically unbinds when app is sent to the background. This prevents
-            // it so that we maintain a started, bound service.
-            BaseService.bindService(
-                BaseService.getAppContext(),
-                serviceClass,
-                bindServiceFlag = bindServiceFlag
-            )
-            TorServiceConnection.serviceBinder?.executeBackgroundPolicyJob(policy, executionDelay)
+            TorServiceConnection.serviceBinder?.let { binder ->
+                // System automatically unbinds when app is sent to the background. This prevents
+                // it so that we maintain a started, bound service.
+                BaseService.bindService(
+                    BaseService.getAppContext(),
+                    serviceClass,
+                    bindServiceFlag = bindServiceFlag
+                )
+                binder.executeBackgroundPolicyJob(policy, executionDelay)
+            }
         }
     }
 }
