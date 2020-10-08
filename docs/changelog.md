@@ -1,5 +1,9 @@
 # Change Log
 
+## Version 1.0.0-beta02 (2020-10-08)
+ - Bug Fix: Service re-binding when application sent to background inhibiting call to stopSelf in 
+ some instances [a544c73](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/pull/85/commits/a544c73a7c28211c75063df6af30001f2ec1c071)
+
 ## Version 1.0.0-beta01 (2020-08-24)
  - Bug Fix: remove use of `=` operator from kotlin methods where `java.void` is expected as a return value.
  - Adds JvmOverloads/JvmStatic to methods/variables for making use of Library for Java users more convenient.

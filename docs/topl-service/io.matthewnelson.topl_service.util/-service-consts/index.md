@@ -2,7 +2,7 @@
 
 # ServiceConsts
 
-`abstract class ServiceConsts : `[`BaseConsts`](../../..//topl-core-base/io.matthewnelson.topl_core_base/-base-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/util/ServiceConsts.kt#L74)
+`abstract class ServiceConsts : `[`BaseConsts`](../../..//topl-core-base/io.matthewnelson.topl_core_base/-base-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/util/ServiceConsts.kt#L73)
 
 ### Annotations
 
