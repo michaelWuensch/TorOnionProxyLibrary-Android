@@ -102,6 +102,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Adapted from the Briar WriteObserver code
  */
+@Suppress("DEPRECATION")
 class WriteObserver(file: File) : FileObserver(file.absolutePath, CLOSE_WRITE) {
 
     private val countDownLatch = CountDownLatch(1)
