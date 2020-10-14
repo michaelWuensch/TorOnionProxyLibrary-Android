@@ -2,7 +2,7 @@
 
 # TAG
 
-`val TAG: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/broadcaster/BroadcastLogger.kt#L94)
+`val TAG: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/broadcaster/BroadcastLogger.kt#L99)
 
 Typically, the class name, but able to be set to whatever you wish
 

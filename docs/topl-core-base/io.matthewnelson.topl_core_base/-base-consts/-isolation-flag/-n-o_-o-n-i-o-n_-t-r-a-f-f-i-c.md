@@ -2,4 +2,4 @@
 
 # NO_ONION_TRAFFIC
 
-`const val NO_ONION_TRAFFIC: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/BaseConsts.kt#L290)
+`const val NO_ONION_TRAFFIC: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/BaseConsts.kt#L295)

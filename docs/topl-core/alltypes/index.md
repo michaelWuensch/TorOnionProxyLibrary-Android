@@ -32,6 +32,11 @@ should **never** make it to a release build.
 
 |
 
+##### [io.matthewnelson.topl_core.util.OnionAuthUtilities](../io.matthewnelson.topl_core.util/-onion-auth-utilities/index.md)
+
+
+|
+
 ##### [io.matthewnelson.topl_core.OnionProxyManager](../io.matthewnelson.topl_core/-onion-proxy-manager/index.md)
 
 This is where all the fun is, this is the class which acts as a gateway into the `topl-core`

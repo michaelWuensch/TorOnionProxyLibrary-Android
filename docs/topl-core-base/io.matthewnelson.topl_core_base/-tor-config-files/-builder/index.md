@@ -2,7 +2,7 @@
 
 # Builder
 
-`class Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorConfigFiles.kt#L252)
+`class Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorConfigFiles.kt#L261)
 
 Builder for TorConfig.
 
@@ -63,3 +63,4 @@ See also [Companion.createConfig](../create-config.md) for convenience methods.
 | [resolveConf](resolve-conf.md) | `fun resolveConf(resolveConf: `[`File`](https://docs.oracle.com/javase/6/docs/api/java/io/File.html)`): Builder` |
 | [torExecutable](tor-executable.md) | `fun torExecutable(file: `[`File`](https://docs.oracle.com/javase/6/docs/api/java/io/File.html)`): Builder` |
 | [torrc](torrc.md) | The configuration file, which contains "option value" pairs.`fun torrc(file: `[`File`](https://docs.oracle.com/javase/6/docs/api/java/io/File.html)`): Builder` |
+| [v3AuthPrivateDir](v3-auth-private-dir.md) | `fun v3AuthPrivateDir(directory: `[`File`](https://docs.oracle.com/javase/6/docs/api/java/io/File.html)`): Builder` |

@@ -2,7 +2,7 @@
 
 # proxySocks5ServerPort
 
-`abstract val proxySocks5ServerPort: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`?` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorSettings.kt#L400)
+`abstract val proxySocks5ServerPort: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`?` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorSettings.kt#L405)
 
 Adds to the torrc file "Socks5Proxy [proxySocks5Host](proxy-socks5-host.md):[proxySocks5ServerPort](./proxy-socks5-server-port.md)"
 

@@ -2,7 +2,7 @@
 
 # respectResourcesWhileInBackground
 
-`@JvmOverloads fun respectResourcesWhileInBackground(secondsFrom5To45: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`? = null): Policy` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/lifecycle/BackgroundManager.kt#L180)
+`@JvmOverloads fun respectResourcesWhileInBackground(secondsFrom5To45: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`? = null): Policy` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/lifecycle/BackgroundManager.kt#L186)
 
 Stops [TorService](#) after being in the background for the declared [secondsFrom5To45](respect-resources-while-in-background.md#io.matthewnelson.topl_service.lifecycle.BackgroundManager.Builder$respectResourcesWhileInBackground(kotlin.Int)/secondsFrom5To45).
 

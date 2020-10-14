@@ -2,7 +2,7 @@
 
 # disableStopServiceOnTaskRemoved
 
-`@JvmOverloads fun disableStopServiceOnTaskRemoved(disable: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)` = true): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L229)
+`@JvmOverloads fun disableStopServiceOnTaskRemoved(disable: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)` = true): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L218)
 
 When your task is removed from the Recent App's tray, [TorService.onTaskRemoved](#) is
 triggered. Default behaviour is to stop Tor, and then [TorService](#). Electing this

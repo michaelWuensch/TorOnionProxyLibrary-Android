@@ -2,10 +2,15 @@
 
 # getServiceTorSettings
 
-`@JvmStatic fun getServiceTorSettings(context: `[`Context`](https://developer.android.com/reference/android/content/Context.html)`): `[`ServiceTorSettings`](../../io.matthewnelson.topl_service.service.components.onionproxy/-service-tor-settings/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L405)
+`@JvmStatic fun getServiceTorSettings(): `[`BaseServiceTorSettings`](../../..//topl-service-base/io.matthewnelson.topl_service_base/-base-service-tor-settings/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L385)
 
-Helper method for easily obtaining [ServiceTorSettings](../../io.matthewnelson.topl_service.service.components.onionproxy/-service-tor-settings/index.md).
+This method will *never* throw the [RuntimeException](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-runtime-exception/index.html) if you call it after
+[Builder.build](-builder/build.md).
 
 ### Exceptions
 
-`RuntimeException` - See [getTorSettings](get-tor-settings.md)
+`RuntimeException` - if called before [Builder.build](-builder/build.md)
+
+**Return**
+[BaseServiceTorSettings](../../..//topl-service-base/io.matthewnelson.topl_service_base/-base-service-tor-settings/index.md)
+

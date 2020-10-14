@@ -2,7 +2,7 @@
 
 # ConfigFileName
 
-`@Target([AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.PROPERTY]) annotation class ConfigFileName` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/BaseConsts.kt#L351)
+`@Target([AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.PROPERTY]) annotation class ConfigFileName` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/BaseConsts.kt#L357)
 
 ### Constructors
 
@@ -24,3 +24,4 @@
 | [RESOLVE_CONF](-r-e-s-o-l-v-e_-c-o-n-f.md) | `const val RESOLVE_CONF: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
 | [TOR_EXECUTABLE](-t-o-r_-e-x-e-c-u-t-a-b-l-e.md) | `const val TOR_EXECUTABLE: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
 | [TORRC](-t-o-r-r-c.md) | `const val TORRC: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
+| [V3_AUTH_PRIVATE_DIR](-v3_-a-u-t-h_-p-r-i-v-a-t-e_-d-i-r.md) | `const val V3_AUTH_PRIVATE_DIR: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |

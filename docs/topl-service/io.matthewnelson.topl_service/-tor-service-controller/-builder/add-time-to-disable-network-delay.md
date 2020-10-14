@@ -2,7 +2,7 @@
 
 # addTimeToDisableNetworkDelay
 
-`fun addTimeToDisableNetworkDelay(milliseconds: `[`Long`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html)`): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L170)
+`fun addTimeToDisableNetworkDelay(milliseconds: `[`Long`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html)`): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L156)
 
 Default is set to 6_000ms, (what this method adds time to).
 
@@ -26,7 +26,7 @@ regained within the delay period and ports will not be cycled (if using "auto").
 
 **See Also**
 
-[io.matthewnelson.topl_service.service.components.actions.ServiceActions.SetDisableNetwork](#)
+[io.matthewnelson.topl_service.service.components.actions.ServiceAction.SetDisableNetwork](#)
 
 [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor.processServiceAction](#)
 

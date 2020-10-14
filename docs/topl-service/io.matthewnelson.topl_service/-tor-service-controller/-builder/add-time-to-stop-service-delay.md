@@ -2,7 +2,7 @@
 
 # addTimeToStopServiceDelay
 
-`fun addTimeToStopServiceDelay(milliseconds: `[`Long`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html)`): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L217)
+`fun addTimeToStopServiceDelay(milliseconds: `[`Long`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html)`): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L205)
 
 Default is set to 100ms (what this method adds time to).
 
@@ -22,7 +22,7 @@ The call to [stopTor](../stop-tor.md) executes individual commands to:
 
 **See Also**
 
-[io.matthewnelson.topl_service.service.components.actions.ServiceActions.Stop](#)
+[io.matthewnelson.topl_service.service.components.actions.ServiceAction.Stop](#)
 
 [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor.processServiceAction](#)
 
