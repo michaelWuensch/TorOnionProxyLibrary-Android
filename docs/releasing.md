@@ -32,7 +32,7 @@ extra:
 - Generate the Dokka docs
 ```
 rm -rf docs/topl-core docs/topl-core-base docs/topl-service
-./gradlew topl-core-base:dokka topl-core:dokka topl-service:dokka
+./gradlew topl-core-base:dokka topl-service-base:dokka topl-core:dokka topl-service:dokka
 ```
 
 - Fix Dokka doc links

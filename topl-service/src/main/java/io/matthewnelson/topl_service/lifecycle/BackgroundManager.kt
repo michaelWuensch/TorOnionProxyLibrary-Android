@@ -81,6 +81,7 @@ import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts
+import io.matthewnelson.topl_service_base.BaseServiceConsts.BackgroundPolicy
 import kotlin.system.exitProcess
 
 /**
@@ -124,7 +125,7 @@ import kotlin.system.exitProcess
  *
  * See the [BackgroundManager.Builder] for more detail.
  *
- * @param [policy] The chosen [ServiceConsts.BackgroundPolicy] to be executed.
+ * @param [policy] The chosen [BackgroundPolicy] to be executed.
  * @param [executionDelay] Length of time before the policy gets executed *after* the application
  *   is sent to the background.
  * @param [serviceClass] The Service class being managed

@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply from: rootProject.file('gradle/maven-publish.gradle')
 
 android {
     compileSdkVersion versions.compileSdk
@@ -36,6 +37,31 @@ android {
                 '-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi',
         ]
     }
+}
+
+dokka {
+    configuration {
+        moduleName = 'topl-service-base'
+        subProjects = [ 'topl-core-base' ]
+        reportUndocumented = false
+        includeNonPublic = false
+        skipEmptyPackages = true
+        samples = [
+                "$rootDir/sampleapp/src/main/java/io/matthewnelson/sampleapp/topl_android/MyEventBroadcaster.kt".toString()
+        ]
+        sourceLink {
+            url = "https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/"
+            lineSuffix = "#L"
+        }
+        externalDocumentationLink {
+            // Dokka plugin requires a protocol (http/https/etc.) here, so we have to repair the
+            // links after building the docs by running `./gradlew fixDokkaDocLinks`.
+            url = new URL("http://FIX_DOKKA_LINKS/topl-core-base/")
+            packageListUrl = new URL("file://$rootDir/docs/topl-core-base/package-list")
+        }
+    }
+    outputFormat = 'gfm'
+    outputDirectory = "$rootDir/docs/"
 }
 
 dependencies {
