@@ -80,7 +80,6 @@ dokka {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation project(path: ':topl-core')
-    api project(path: ':topl-core-base')
     api project(path: ':topl-service-base')
     implementation deps.androidx.core
     implementation deps.androidx.lifecycle.runtime
