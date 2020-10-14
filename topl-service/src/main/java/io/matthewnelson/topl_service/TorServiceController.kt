@@ -77,7 +77,7 @@ import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
 import io.matthewnelson.topl_service.prefs.TorServicePrefs
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
-import io.matthewnelson.topl_service.service.components.actions.ServiceActions
+import io.matthewnelson.topl_service.service.components.actions.ServiceAction
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.service.components.onionproxy.model.TorServiceEventBroadcaster
@@ -165,7 +165,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * regained within the delay period and ports will not be cycled (if using "auto").
          *
          * @param [milliseconds] A value greater than 0
-         * @see [io.matthewnelson.topl_service.service.components.actions.ServiceActions.SetDisableNetwork]
+         * @see [io.matthewnelson.topl_service.service.components.actions.ServiceAction.SetDisableNetwork]
          * @see [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor.processServiceAction]
          * */
         fun addTimeToDisableNetworkDelay(milliseconds: Long): Builder {
@@ -189,7 +189,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          *   - start tor + delay (300ms)
          *
          * @param [milliseconds] A value greater than 0
-         * @see [io.matthewnelson.topl_service.service.components.actions.ServiceActions.RestartTor]
+         * @see [io.matthewnelson.topl_service.service.components.actions.ServiceAction.RestartTor]
          * @see [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor.processServiceAction]
          * */
         fun addTimeToRestartTorDelay(milliseconds: Long): Builder {
@@ -212,7 +212,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          *   - stop service
          *
          * @param [milliseconds] A value greater than 0
-         * @see [io.matthewnelson.topl_service.service.components.actions.ServiceActions.Stop]
+         * @see [io.matthewnelson.topl_service.service.components.actions.ServiceAction.Stop]
          * @see [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor.processServiceAction]
          * */
         fun addTimeToStopServiceDelay(milliseconds: Long): Builder {
@@ -314,8 +314,8 @@ class TorServiceController private constructor(): ServiceConsts() {
          *
          * @throws [IllegalArgumentException] If [disableStopServiceOnTaskRemoved] was elected
          *   and your selected [BackgroundManager.Builder.Policy] is **not**
-         *   [ServiceConsts.BackgroundPolicy.RUN_IN_FOREGROUND] and/or
-         *   [BackgroundManager.Builder.killAppIfTaskIsRemoved] is **not** `true`
+         *   [io.matthewnelson.topl_service_base.BaseServiceConsts.BackgroundPolicy.RUN_IN_FOREGROUND]
+         *   and/or [BackgroundManager.Builder.killAppIfTaskIsRemoved] is **not** `true`
          * */
         fun build() {
 
@@ -434,7 +434,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * */
         @JvmStatic
         fun stopTor() {
-            TorServiceConnection.serviceBinder?.submitServiceAction(ServiceActions.Stop())
+            TorServiceConnection.serviceBinder?.submitServiceAction(ServiceAction.Stop())
         }
 
         /**
@@ -442,7 +442,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * */
         @JvmStatic
         fun restartTor() {
-            TorServiceConnection.serviceBinder?.submitServiceAction(ServiceActions.RestartTor())
+            TorServiceConnection.serviceBinder?.submitServiceAction(ServiceAction.RestartTor())
         }
 
         /**
@@ -450,7 +450,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * */
         @JvmStatic
         fun newIdentity() {
-            TorServiceConnection.serviceBinder?.submitServiceAction(ServiceActions.NewId())
+            TorServiceConnection.serviceBinder?.submitServiceAction(ServiceAction.NewId())
         }
     }
 }

@@ -81,8 +81,7 @@ import io.matthewnelson.topl_service.lifecycle.BackgroundManager
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
-import io.matthewnelson.topl_service.service.components.actions.ServiceActions
-import io.matthewnelson.topl_service.service.components.actions.ServiceActions.ServiceAction
+import io.matthewnelson.topl_service.service.components.actions.ServiceAction
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
@@ -176,7 +175,7 @@ internal abstract class BaseService: Service() {
         /**
          * Starts the Service. Setting [includeIntentActionStart] to `false`, will not include
          * [ServiceActionName.START] in the Intent as an action so that [onStartCommand] knows
-         * to set the [ServiceActions.Start.updateLastAction] to false. This allows for
+         * to set the [ServiceAction.Start.updateLastAction] to false. This allows for
          * distinguishing what is coming from the application (either by user input, or how
          * the application has the library implemented), and what is coming from this library.
          * It makes keeping the state of the service in sync with the application's desires.
@@ -401,9 +400,9 @@ internal abstract class BaseService: Service() {
      * */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ServiceActionName.START)
-            processServiceAction(ServiceActions.Start())
+            processServiceAction(ServiceAction.Start())
         else
-            processServiceAction(ServiceActions.Start(updateLastServiceAction = false))
+            processServiceAction(ServiceAction.Start(updateLastServiceAction = false))
 
         return START_NOT_STICKY
     }
@@ -418,6 +417,6 @@ internal abstract class BaseService: Service() {
 
         // Shutdown Tor and stop the Service.
         if (stopServiceOnTaskRemoved)
-            processServiceAction(ServiceActions.Stop(updateLastServiceAction = false))
+            processServiceAction(ServiceAction.Stop(updateLastServiceAction = false))
     }
 }

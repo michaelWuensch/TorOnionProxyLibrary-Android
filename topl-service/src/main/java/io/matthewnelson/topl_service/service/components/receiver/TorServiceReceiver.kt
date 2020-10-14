@@ -74,7 +74,7 @@ import android.content.IntentFilter
 import android.net.ConnectivityManager
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.TorService
-import io.matthewnelson.topl_service.service.components.actions.ServiceActions
+import io.matthewnelson.topl_service.service.components.actions.ServiceAction
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import java.math.BigInteger
 import java.security.SecureRandom
@@ -158,9 +158,9 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
                     broadcastLogger.notice("Network connectivity: $connectivity")
 
                     val actionObject = if (connectivity)
-                        ServiceActions.SetDisableNetwork(ServiceActionName.ENABLE_NETWORK)
+                        ServiceAction.SetDisableNetwork(ServiceActionName.ENABLE_NETWORK)
                     else
-                        ServiceActions.SetDisableNetwork(ServiceActionName.DISABLE_NETWORK)
+                        ServiceAction.SetDisableNetwork(ServiceActionName.DISABLE_NETWORK)
 
                     torService.processServiceAction(actionObject)
                 }
@@ -178,13 +178,13 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
 
                     when (val serviceAction = intent.getStringExtra(SERVICE_INTENT_FILTER)) {
                         ServiceActionName.NEW_ID -> {
-                            torService.processServiceAction(ServiceActions.NewId())
+                            torService.processServiceAction(ServiceAction.NewId())
                         }
                         ServiceActionName.RESTART_TOR -> {
-                            torService.processServiceAction(ServiceActions.RestartTor())
+                            torService.processServiceAction(ServiceAction.RestartTor())
                         }
                         ServiceActionName.STOP -> {
-                            torService.processServiceAction(ServiceActions.Stop())
+                            torService.processServiceAction(ServiceAction.Stop())
                         }
                         else -> {
                             broadcastLogger.warn(

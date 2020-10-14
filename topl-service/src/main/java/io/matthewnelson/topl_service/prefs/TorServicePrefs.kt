@@ -70,6 +70,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_service.util.ServiceConsts
+import io.matthewnelson.topl_service_base.BaseServiceConsts
 
 /**
  * This class provides a standardized way for library users to change settings used
@@ -118,10 +119,10 @@ class TorServicePrefs(context: Context): ServiceConsts() {
     /**
      * Checks if the SharedPreference contains a value for the supplied [prefsKey].
      * Accepts the following annotation type String values:
-     *  - [ServiceConsts.PrefKeyBoolean]
-     *  - [ServiceConsts.PrefKeyInt]
-     *  - [ServiceConsts.PrefKeyList]
-     *  - [ServiceConsts.PrefKeyString]
+     *  - [BaseServiceConsts.PrefKeyBoolean]
+     *  - [BaseServiceConsts.PrefKeyInt]
+     *  - [BaseServiceConsts.PrefKeyList]
+     *  - [BaseServiceConsts.PrefKeyString]
      *
      *  @param [prefsKey] String of type ServiceConsts.PrefKey*
      *  @return True if the SharedPreference contains a value for the associated
@@ -137,10 +138,10 @@ class TorServicePrefs(context: Context): ServiceConsts() {
         prefs.all
 
     /**
-     * Returns a Boolean value for the provided [ServiceConsts.PrefKeyBoolean]. If no
+     * Returns a Boolean value for the provided [BaseServiceConsts.PrefKeyBoolean]. If no
      * value is stored in the SharedPreference, [defValue] will be returned.
      *
-     * @param [booleanKey] String of type [ServiceConsts.PrefKeyBoolean]
+     * @param [booleanKey] String of type [BaseServiceConsts.PrefKeyBoolean]
      * @param [defValue] Use the [io.matthewnelson.topl_core_base.TorSettings] value
      *  associated with the [booleanKey].
      * @return The Boolean value associated with the [booleanKey], otherwise [defValue]
@@ -150,10 +151,10 @@ class TorServicePrefs(context: Context): ServiceConsts() {
         prefs.getBoolean(booleanKey, defValue)
 
     /**
-     * Returns an Int value for the provided [ServiceConsts.PrefKeyInt]. If no
+     * Returns an Int value for the provided [BaseServiceConsts.PrefKeyInt]. If no
      * value is stored in the SharedPreference, [defValue] will be returned.
      *
-     * @param [intKey] String of type [ServiceConsts.PrefKeyInt]
+     * @param [intKey] String of type [BaseServiceConsts.PrefKeyInt]
      * @param [defValue] Use the [io.matthewnelson.topl_core_base.TorSettings] value
      *  associated with the [intKey].
      * @return The Int value associated with [intKey], otherwise [defValue]
@@ -169,10 +170,10 @@ class TorServicePrefs(context: Context): ServiceConsts() {
     }
 
     /**
-     * Returns a List of Strings for the provided [ServiceConsts.PrefKeyList]. If no
+     * Returns a List of Strings for the provided [BaseServiceConsts.PrefKeyList]. If no
      * value is stored in the SharedPreference, [defValue] will be returned.
      *
-     * @param [listKey] String of type [ServiceConsts.PrefKeyList]
+     * @param [listKey] String of type [BaseServiceConsts.PrefKeyList]
      * @param [defValue] Use the [io.matthewnelson.topl_core_base.TorSettings] value
      *  associated with the [listKey].
      * @return The List of Strings associated with the [listKey], otherwise [defValue]
@@ -188,10 +189,10 @@ class TorServicePrefs(context: Context): ServiceConsts() {
     }
 
     /**
-     * Returns a String value for the provided [ServiceConsts.PrefKeyString]. If no
+     * Returns a String value for the provided [BaseServiceConsts.PrefKeyString]. If no
      * value is stored in the SharedPreference, [defValue] will be returned.
      *
-     * @param [stringKey] String of type [ServiceConsts.PrefKeyString]
+     * @param [stringKey] String of type [BaseServiceConsts.PrefKeyString]
      * @param [defValue] Use the [io.matthewnelson.topl_core_base.TorSettings] value
      *  associated with the [stringKey].
      * @return The String value associated with [stringKey], otherwise [defValue]
@@ -221,10 +222,10 @@ class TorServicePrefs(context: Context): ServiceConsts() {
     /**
      * Removes from the SharedPreference the value associated with [prefsKey] if there is one.
      * Accepts the following annotation type String values:
-     *  - [ServiceConsts.PrefKeyBoolean]
-     *  - [ServiceConsts.PrefKeyInt]
-     *  - [ServiceConsts.PrefKeyList]
-     *  - [ServiceConsts.PrefKeyString]
+     *  - [BaseServiceConsts.PrefKeyBoolean]
+     *  - [BaseServiceConsts.PrefKeyInt]
+     *  - [BaseServiceConsts.PrefKeyList]
+     *  - [BaseServiceConsts.PrefKeyString]
      *
      *  @param [prefsKey] String of type ServiceConsts.PrefKey*
      *  * */
@@ -238,7 +239,7 @@ class TorServicePrefs(context: Context): ServiceConsts() {
     /**
      * Inserts a Boolean value into the SharedPreference for the supplied [booleanKey].
      *
-     * @param [booleanKey] String of type [ServiceConsts.PrefKeyBoolean]
+     * @param [booleanKey] String of type [BaseServiceConsts.PrefKeyBoolean]
      * @param [value] Your Boolean value
      * */
     @WorkerThread
@@ -251,7 +252,7 @@ class TorServicePrefs(context: Context): ServiceConsts() {
     /**
      * Inserts an Int value into the SharedPreference for the supplied [intKey].
      *
-     * @param [intKey] String of type [ServiceConsts.PrefKeyInt]
+     * @param [intKey] String of type [BaseServiceConsts.PrefKeyInt]
      * @param [value] Your Int? value
      * */
     @WorkerThread
@@ -265,7 +266,7 @@ class TorServicePrefs(context: Context): ServiceConsts() {
      * Inserts a List of Strings as a comma separated String into the SharedPreference
      * for the supplied [listKey].
      *
-     * @param [listKey] String of type [ServiceConsts.PrefKeyList]
+     * @param [listKey] String of type [BaseServiceConsts.PrefKeyList]
      * @param [value] Your List<String> value
      * */
     @WorkerThread
@@ -278,7 +279,7 @@ class TorServicePrefs(context: Context): ServiceConsts() {
     /**
      * Inserts a String value into the SharedPreference for the supplied [stringKey].
      *
-     * @param [stringKey] String of type [ServiceConsts.PrefKeyString]
+     * @param [stringKey] String of type [BaseServiceConsts.PrefKeyString]
      * @param [value] Your String value
      * */
     @WorkerThread

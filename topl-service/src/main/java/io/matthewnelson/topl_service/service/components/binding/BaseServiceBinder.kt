@@ -70,9 +70,8 @@ import android.os.Binder
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
-import io.matthewnelson.topl_service.service.components.actions.ServiceActions
-import io.matthewnelson.topl_service.service.components.actions.ServiceActions.ServiceAction
-import io.matthewnelson.topl_service.util.ServiceConsts.BackgroundPolicy
+import io.matthewnelson.topl_service.service.components.actions.ServiceAction
+import io.matthewnelson.topl_service_base.BaseServiceConsts.BackgroundPolicy
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -83,11 +82,11 @@ internal abstract class BaseServiceBinder(private val torService: BaseService): 
     abstract fun getTorService(): BaseService?
 
     /**
-     * Accepts all [ServiceActions] except [ServiceActions.Start], which gets issued via
+     * Accepts all [ServiceAction] except [ServiceAction.Start], which gets issued via
      * [io.matthewnelson.topl_service.service.TorService.onStartCommand].
      * */
     fun submitServiceAction(serviceAction: ServiceAction) {
-        if (serviceAction is ServiceActions.Start) return
+        if (serviceAction is ServiceAction.Start) return
         torService.processServiceAction(serviceAction)
     }
 
@@ -120,7 +119,7 @@ internal abstract class BaseServiceBinder(private val torService: BaseService): 
                     delay(executionDelay)
                     bgMgrBroadcastLogger.debug("Executing background management policy")
                     torService.processServiceAction(
-                        ServiceActions.Stop(updateLastServiceAction = false)
+                        ServiceAction.Stop(updateLastServiceAction = false)
                     )
                 }
             }

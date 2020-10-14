@@ -72,60 +72,51 @@ import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 /**
  * There are multiple avenues to interacting with a Service (BroadcastReceiver, Binder,
  * Context.startService). This class provides a standardized way of processing those requests, no
- * matter what avenue or form (Intents). Each [ServiceActions.ServiceAction] has a defined list
- * of commands that are executed by the
- * [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor] so that it
- * breaks up the steps in a manner which can be interrupted for quickly responding to the User's
- * commands.
- *
- * Think, running machine code to grok.
+ * matter what avenue or form (Intents). Each [ServiceAction] has a defined list of commands that
+ * are executed by [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor]
+ * so that it breaks up the steps in a manner which can be interrupted for quickly responding to
+ * User interaction.
  * */
-internal sealed class ServiceActions {
+internal sealed class ServiceAction {
+
+    @ServiceActionName
+    abstract val name: String
 
     /**
-     * The template that all [ServiceActions] use.
+     * Individual [ServiceActionCommand]'s to executed sequentially by
+     * [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor].
      * */
-    abstract class ServiceAction: ServiceActions() {
+    abstract val commands: Array<@ServiceActionCommand String>
 
-        @ServiceActionName
-        abstract val name: String
+    /**
+     * For every [ServiceActionCommand.DELAY] within [commands], a value will be consumed
+     * when executing it.
+     *
+     * Override this to define the values for each DELAY call.
+     * */
+    protected open val delayLengthQueue: MutableList<Long> = mutableListOf()
 
-        /**
-         * Individual [ServiceActionCommand]'s to executed sequentially by
-         * [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor].
-         * */
-        abstract val commands: Array<@ServiceActionCommand String>
+    /**
+     * Removes the 0th element within [delayLengthQueue] then returns it.
+     * If [delayLengthQueue] is empty, returns 0L.
+     *
+     * @return The 0th element within [delayLengthQueue], or 0L if empty
+     * */
+    fun consumeDelayLength(): Long =
+        if (delayLengthQueue.isNotEmpty())
+            delayLengthQueue.removeAt(0)
+        else
+            0L
 
-        /**
-         * For every [ServiceActionCommand.DELAY] within [commands], a value will be consumed
-         * when executing it.
-         *
-         * Override this to define the values for each DELAY call.
-         * */
-        protected open val delayLengthQueue: MutableList<Long> = mutableListOf()
-
-        /**
-         * Removes the 0th element within [delayLengthQueue] then returns it.
-         * If [delayLengthQueue] is empty, returns 0L.
-         *
-         * @return The 0th element within [delayLengthQueue], or 0L if empty
-         * */
-        fun consumeDelayLength(): Long =
-            if (delayLengthQueue.isNotEmpty())
-                delayLengthQueue.removeAt(0)
-            else
-                0L
-
-        /**
-         * Boolean value for providing [ServiceAction]'s the capability of being issued to
-         * the [ServiceActionProcessor] and notifying that the submitter of the [ServiceAction]
-         * wants [ServiceActionProcessor.lastServiceAction] to be updated.
-         *
-         * @see [Start]
-         * @see [Stop]
-         * */
-        open val updateLastAction: Boolean = true
-    }
+    /**
+     * Boolean value for providing [ServiceAction]'s the capability of being issued to
+     * the [ServiceActionProcessor] and notifying that the submitter of the [ServiceAction]
+     * wants [ServiceActionProcessor.lastServiceAction] to be updated.
+     *
+     * @see [Start]
+     * @see [Stop]
+     * */
+    open val updateLastAction: Boolean = true
 
     class SetDisableNetwork(
         override val name: String,

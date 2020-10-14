@@ -93,7 +93,7 @@ abstract class ServiceConsts: BaseServiceConsts() {
 
 
     //////////////////////
-    /// ServiceActions ///
+    /// ServiceAction ///
     //////////////////////
     @Target(
         AnnotationTarget.TYPE,

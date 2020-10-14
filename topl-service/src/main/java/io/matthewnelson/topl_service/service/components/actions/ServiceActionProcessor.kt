@@ -67,7 +67,6 @@
 package io.matthewnelson.topl_service.service.components.actions
 
 import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.service.components.actions.ServiceActions.ServiceAction
 import io.matthewnelson.topl_service.util.ServiceConsts
 import kotlinx.coroutines.*
 
@@ -79,7 +78,7 @@ import kotlinx.coroutines.*
  * to standardize things.
  *
  * @param [torService] [BaseService] for interacting with other components of the Service
- * @see [ServiceActions]
+ * @see [ServiceAction]
  * */
 internal class ServiceActionProcessor(private val torService: BaseService): ServiceConsts() {
 
@@ -121,28 +120,28 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
 
     fun processServiceAction(serviceAction: ServiceAction) {
         when (serviceAction) {
-            is ServiceActions.NewId -> {
+            is ServiceAction.NewId -> {
                 removeActionFromQueueByName(
                     arrayOf(ServiceActionName.NEW_ID)
                 )
             }
-            is ServiceActions.RestartTor -> {
+            is ServiceAction.RestartTor -> {
                 removeActionFromQueueByName(
                     arrayOf(ServiceActionName.DISABLE_NETWORK)
                 )
             }
-            is ServiceActions.SetDisableNetwork -> {
+            is ServiceAction.SetDisableNetwork -> {
                 removeActionFromQueueByName(
                     arrayOf(ServiceActionName.DISABLE_NETWORK, ServiceActionName.ENABLE_NETWORK)
                 )
             }
-            is ServiceActions.Stop -> {
+            is ServiceAction.Stop -> {
                 torService.unbindTorService()
                 torService.unregisterReceiver()
                 clearActionQueue()
                 broadcastLogger.notice(serviceAction.name)
             }
-            is ServiceActions.Start -> {
+            is ServiceAction.Start -> {
                 clearActionQueue()
                 torService.stopForegroundService()
                 torService.registerReceiver()

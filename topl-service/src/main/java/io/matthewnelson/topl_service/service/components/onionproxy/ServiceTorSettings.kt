@@ -68,10 +68,10 @@ package io.matthewnelson.topl_service.service.components.onionproxy
 
 import androidx.annotation.WorkerThread
 import io.matthewnelson.topl_core_base.TorSettings
-import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyString
-import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyList
-import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyInt
-import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyBoolean
+import io.matthewnelson.topl_service_base.BaseServiceConsts.PrefKeyString
+import io.matthewnelson.topl_service_base.BaseServiceConsts.PrefKeyList
+import io.matthewnelson.topl_service_base.BaseServiceConsts.PrefKeyInt
+import io.matthewnelson.topl_service_base.BaseServiceConsts.PrefKeyBoolean
 import io.matthewnelson.topl_service.prefs.TorServicePrefs
 
 /**

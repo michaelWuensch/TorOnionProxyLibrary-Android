@@ -70,9 +70,9 @@ import io.matthewnelson.topl_core.util.TorInstaller
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_service.R
 import io.matthewnelson.topl_service.TorServiceController
-import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyList
 import io.matthewnelson.topl_service.prefs.TorServicePrefs
 import io.matthewnelson.topl_service.service.BaseService
+import io.matthewnelson.topl_service_base.BaseServiceConsts.PrefKeyList
 import java.io.*
 import java.util.concurrent.TimeoutException
 

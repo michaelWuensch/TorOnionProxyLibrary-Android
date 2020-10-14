@@ -69,7 +69,7 @@ package io.matthewnelson.topl_service.prefs
 import android.content.SharedPreferences
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.TorService
-import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyBoolean
+import io.matthewnelson.topl_service_base.BaseServiceConsts.PrefKeyBoolean
 
 /**
  * Listens to [TorServicePrefs] for changes such that while Tor is running, it can
