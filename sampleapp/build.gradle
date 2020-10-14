@@ -81,15 +81,14 @@ android {
     }
 }
 
-//repositories {
-//    maven {
-//        url 'https://oss.sonatype.org/content/repositories/snapshots/'
-//    }
-//}
+repositories {
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+}
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation project(':topl-core-base')
     implementation project(':topl-service')
     implementation deps.androidx.appCompat
     implementation deps.androidx.core
@@ -106,7 +105,7 @@ dependencies {
     implementation deps.kotlin.coroutinesAndroid
     implementation deps.kotlin.stdlib
 
-    implementation 'io.matthewnelson.encrypted-storage:encrypted-storage:2.0.0'
+    implementation 'io.matthewnelson.encrypted-storage:encrypted-storage:2.0.1-SNAPSHOT'
     implementation 'io.matthewnelson.topl-android:tor-binary:0.4.3.6'
 
     testImplementation deps.junit

@@ -203,7 +203,7 @@ internal class TorServiceControllerUnitTest {
             app,
             notificationBuilder,
             BackgroundManager.Builder().respectResourcesWhileInBackground(30),
-            BuildConfig.VERSION_CODE,
+            1,
             torSettings,
             "common/geoip",
             "common/geoip6"
