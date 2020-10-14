@@ -64,7 +64,7 @@ dokka {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation project(':topl-core-base')
+    api project(':topl-core-base')
     implementation deps.androidx.core
     implementation deps.jtorctl
     implementation deps.kotlin.coroutinesAndroid

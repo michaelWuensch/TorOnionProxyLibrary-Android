@@ -27,16 +27,21 @@
 * GNU General Public License, version 3 (“GPLv3”).
 *
 *     "The Interfaces" is henceforth defined as Application Programming Interfaces
-*     that are publicly available classes/functions/etc (ie: do not contain the
-*     visibility modifiers `internal`, `private`, `protected`, or are within
-*     classes/functions/etc that contain the aforementioned visibility modifiers)
-*     to TorOnionProxyLibrary-Android users that are needed to implement
-*     TorOnionProxyLibrary-Android and reside in ONLY the following modules:
+*     needed to implement TorOnionProxyLibrary-Android, as listed below:
 *
-*      - topl-core-base
-*      - topl-service
+*      - From the `topl-core-base` module:
+*          - All Classes/methods/variables
 *
-*     The following are excluded from "The Interfaces":
+*      - From the `topl-service-base` module:
+*          - All Classes/methods/variables
+*
+*      - From the `topl-service` module:
+*          - The TorServiceController class and it's contained classes/methods/variables
+*          - The ServiceNotification.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Companion class and it's contained methods/variables
+*
+*     The following code is excluded from "The Interfaces":
 *
 *       - All other code
 *
@@ -70,9 +75,9 @@ import io.matthewnelson.topl_core.util.TorInstaller
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_service.R
 import io.matthewnelson.topl_service.TorServiceController
-import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyList
-import io.matthewnelson.topl_service.prefs.TorServicePrefs
+import io.matthewnelson.topl_service_base.TorServicePrefs
 import io.matthewnelson.topl_service.service.BaseService
+import io.matthewnelson.topl_service_base.BaseServiceConsts.PrefKeyList
 import java.io.*
 import java.util.concurrent.TimeoutException
 
@@ -92,8 +97,8 @@ internal class ServiceTorInstaller(private val torService: BaseService): TorInst
     private val torConfigFiles: TorConfigFiles
         get() = TorServiceController.getTorConfigFiles()
 
-    private val torServicePrefs = TorServicePrefs(torService.context)
-    private val localPrefs = BaseService.getLocalPrefs(torService.context)
+    private val torServicePrefs by lazy { TorServicePrefs(torService.context) }
+    private val localPrefs by lazy { BaseService.getLocalPrefs(torService.context) }
     private var geoIpFileCopied = false
     private var geoIpv6FileCopied = false
 
@@ -111,8 +116,9 @@ internal class ServiceTorInstaller(private val torService: BaseService): TorInst
             copyGeoIpv6Asset()
             geoIpv6FileCopied = true
         }
-        if (!torConfigFiles.v3AuthPrivateDir.exists())
+        if (!torConfigFiles.v3AuthPrivateDir.exists()) {
             torConfigFiles.v3AuthPrivateDir.mkdirs()
+        }
 
         // If the app version has been increased, or if this is a debug build, copy over
         // geoip assets then update SharedPreferences with the new version code. This
@@ -120,10 +126,12 @@ internal class ServiceTorInstaller(private val torService: BaseService): TorInst
         if (BaseService.buildConfigDebug ||
             BaseService.buildConfigVersionCode > localPrefs.getInt(APP_VERSION_CODE, -1)
         ) {
-            if (!geoIpFileCopied)
+            if (!geoIpFileCopied) {
                 copyGeoIpAsset()
-            if (!geoIpv6FileCopied)
+            }
+            if (!geoIpv6FileCopied) {
                 copyGeoIpv6Asset()
+            }
             localPrefs.edit()
                 .putInt(APP_VERSION_CODE, BaseService.buildConfigVersionCode)
                 .apply()
@@ -183,10 +191,11 @@ internal class ServiceTorInstaller(private val torService: BaseService): TorInst
 
         val bridgeTypeStream = ByteArrayInputStream(byteArrayOf(bridgeType))
         val bridgeStream =
-            if (bridgeType.toInt() == 1)
+            if (bridgeType.toInt() == 1) {
                 ByteArrayInputStream(userDefinedBridgeList.toByteArray())
-            else
+            } else {
                 torService.context.resources.openRawResource(R.raw.bridges)
+            }
         return SequenceInputStream(bridgeTypeStream, bridgeStream)
     }
 

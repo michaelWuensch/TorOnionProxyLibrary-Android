@@ -27,16 +27,21 @@
 * GNU General Public License, version 3 (“GPLv3”).
 *
 *     "The Interfaces" is henceforth defined as Application Programming Interfaces
-*     that are publicly available classes/functions/etc (ie: do not contain the
-*     visibility modifiers `internal`, `private`, `protected`, or are within
-*     classes/functions/etc that contain the aforementioned visibility modifiers)
-*     to TorOnionProxyLibrary-Android users that are needed to implement
-*     TorOnionProxyLibrary-Android and reside in ONLY the following modules:
+*     needed to implement TorOnionProxyLibrary-Android, as listed below:
 *
-*      - topl-core-base
-*      - topl-service
+*      - From the `topl-core-base` module:
+*          - All Classes/methods/variables
 *
-*     The following are excluded from "The Interfaces":
+*      - From the `topl-service-base` module:
+*          - All Classes/methods/variables
+*
+*      - From the `topl-service` module:
+*          - The TorServiceController class and it's contained classes/methods/variables
+*          - The ServiceNotification.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Companion class and it's contained methods/variables
+*
+*     The following code is excluded from "The Interfaces":
 *
 *       - All other code
 *
@@ -148,14 +153,16 @@ object OnionAuthUtilities {
 
         val file = File(torConfigFiles.v3AuthPrivateDir, "$name$FILE_EXTENSION")
 
-        if (file.exists())
+        if (file.exists()) {
             throw IllegalStateException(
                 "A File with $name already exists and must be deleted first"
             )
+        }
 
         synchronized(torConfigFiles.v3AuthPrivateDirLock) {
-            if (file.createNewFileIfDoesNotExist() != true)
+            if (file.createNewFileIfDoesNotExist() != true) {
                 return null
+            }
 
             val string = "${onion}:descriptor:x25519:$key"
 
@@ -163,8 +170,9 @@ object OnionAuthUtilities {
             val goodContent = file.readText() == string
 
             return if (!goodContent) {
-                if (file.exists())
+                if (file.exists()) {
                     file.delete()
+                }
                 null
             } else {
                 file
@@ -252,12 +260,13 @@ object OnionAuthUtilities {
             length++
         }
 
-        return if (length in minLength..maxLength)
+        return if (length in minLength..maxLength) {
             string
-        else
+        } else {
             throw  IllegalArgumentException(
                 "Length was $length but must be between $minLength and $maxLength characters"
             )
+        }
     }
 
 
@@ -274,15 +283,17 @@ object OnionAuthUtilities {
     @WorkerThread
     @JvmStatic
     fun getFileByNickname(nickname: String, torConfigFiles: TorConfigFiles): File? {
-        val file = if (nickname.contains(FILE_EXTENSION))
+        val file = if (nickname.contains(FILE_EXTENSION)) {
             File(torConfigFiles.v3AuthPrivateDir, nickname)
-        else
+        } else {
             File(torConfigFiles.v3AuthPrivateDir, "$nickname$FILE_EXTENSION")
+        }
 
-        return if (file.exists())
+        return if (file.exists()) {
             file
-        else
+        } else {
             null
+        }
     }
 
     /**
@@ -312,8 +323,9 @@ object OnionAuthUtilities {
 
         synchronized(torConfigFiles.v3AuthPrivateDirLock) {
             for (file in torConfigFiles.v3AuthPrivateDir.listFiles() ?: return null) {
-                if (!file.isDirectory && file.name.contains(FILE_EXTENSION))
+                if (!file.isDirectory && file.name.contains(FILE_EXTENSION)) {
                     fileNames.add(file.nameWithoutExtension)
+                }
             }
         }
         return fileNames.toTypedArray()
@@ -328,10 +340,11 @@ object OnionAuthUtilities {
     fun deleteFile(nickname: String, torConfigFiles: TorConfigFiles): Boolean? {
         val file = getFileByNickname(nickname, torConfigFiles) ?: return null
         synchronized(torConfigFiles.v3AuthPrivateDirLock) {
-            return if (!file.isDirectory)
+            return if (!file.isDirectory) {
                 file.delete()
-            else
+            } else {
                 null
+            }
         }
     }
 

@@ -27,16 +27,21 @@
 * GNU General Public License, version 3 (“GPLv3”).
 *
 *     "The Interfaces" is henceforth defined as Application Programming Interfaces
-*     that are publicly available classes/functions/etc (ie: do not contain the
-*     visibility modifiers `internal`, `private`, `protected`, or are within
-*     classes/functions/etc that contain the aforementioned visibility modifiers)
-*     to TorOnionProxyLibrary-Android users that are needed to implement
-*     TorOnionProxyLibrary-Android and reside in ONLY the following modules:
+*     needed to implement TorOnionProxyLibrary-Android, as listed below:
 *
-*      - topl-core-base
-*      - topl-service
+*      - From the `topl-core-base` module:
+*          - All Classes/methods/variables
 *
-*     The following are excluded from "The Interfaces":
+*      - From the `topl-service-base` module:
+*          - All Classes/methods/variables
+*
+*      - From the `topl-service` module:
+*          - The TorServiceController class and it's contained classes/methods/variables
+*          - The ServiceNotification.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Companion class and it's contained methods/variables
+*
+*     The following code is excluded from "The Interfaces":
 *
 *       - All other code
 *
@@ -75,40 +80,19 @@ import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
-import io.matthewnelson.topl_service.prefs.TorServicePrefs
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
-import io.matthewnelson.topl_service.service.components.actions.ServiceActions
+import io.matthewnelson.topl_service.service.components.actions.ServiceAction
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
-import io.matthewnelson.topl_service.service.components.onionproxy.model.TorServiceEventBroadcaster
 import io.matthewnelson.topl_service.util.ServiceConsts
 import io.matthewnelson.topl_service.util.V3ClientAuthManager
+import io.matthewnelson.topl_service_base.*
 
 class TorServiceController private constructor(): ServiceConsts() {
 
     /**
      * The [TorServiceController.Builder] is where you get to customize how [TorService] works
      * for your application. Call it in `Application.onCreate` and follow along.
-     *
-     * A note about the [TorSettings] you send this. Those are the default settings which
-     * [TorService] will fall back on if [io.matthewnelson.topl_service.prefs.TorServicePrefs]
-     * has nothing in it for that particular [ServiceConsts].PrefKey.
-     *
-     * The settings get written to the `torrc` file every time Tor is started (I plan to make
-     * this less sledgehammer-ish in the future).
-     *
-     * To update settings while your application is running you need only to instantiate
-     * [io.matthewnelson.topl_service.prefs.TorServicePrefs] and save the data using the
-     * appropriately annotated method and [ServiceConsts].PrefKey, then
-     * restart Tor (for now... ;-D).
-     *
-     * I plan to implement a
-     * [android.content.SharedPreferences.OnSharedPreferenceChangeListener] that will do this
-     * immediately for the settings that don't require a restart, but a stable release comes first).
-     *
-     * You can see how the [TorSettings] sent here are used in [TorService] by looking at
-     * [io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings] and
-     * [TorService.onionProxyManager].
      *
      * @param [application] [Application], for obtaining context
      * @param [torServiceNotificationBuilder] The [ServiceNotification.Builder] for
@@ -117,7 +101,8 @@ class TorServiceController private constructor(): ServiceConsts() {
      *   while your application is in the background (the Recent App's tray).
      * @param [buildConfigVersionCode] send [BuildConfig.VERSION_CODE]. Mitigates copying of geoip
      *   files to app updates only
-     * @param [torSettings] [TorSettings] used to create your torrc file on start of Tor
+     * @param [defaultTorSettings] [ApplicationDefaultTorSettings] used to create your torrc file
+     *   on start of Tor
      * @param [geoipAssetPath] The path to where you have your geoip file located (ex: in
      *   assets/common directory, send this variable "common/geoip")
      * @param [geoip6AssetPath] The path to where you have your geoip6 file located (ex: in
@@ -132,7 +117,7 @@ class TorServiceController private constructor(): ServiceConsts() {
         private val torServiceNotificationBuilder: ServiceNotification.Builder,
         private val backgroundManagerPolicy: BackgroundManager.Builder.Policy,
         private val buildConfigVersionCode: Int,
-        private val torSettings: TorSettings,
+        private val defaultTorSettings: ApplicationDefaultTorSettings,
         private val geoipAssetPath: String,
         private val geoip6AssetPath: String
     ) {
@@ -165,12 +150,13 @@ class TorServiceController private constructor(): ServiceConsts() {
          * regained within the delay period and ports will not be cycled (if using "auto").
          *
          * @param [milliseconds] A value greater than 0
-         * @see [io.matthewnelson.topl_service.service.components.actions.ServiceActions.SetDisableNetwork]
+         * @see [io.matthewnelson.topl_service.service.components.actions.ServiceAction.SetDisableNetwork]
          * @see [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor.processServiceAction]
          * */
         fun addTimeToDisableNetworkDelay(milliseconds: Long): Builder {
-            if (milliseconds > 0)
+            if (milliseconds > 0) {
                 disableNetworkDelay += milliseconds
+            }
             return this
         }
 
@@ -189,12 +175,13 @@ class TorServiceController private constructor(): ServiceConsts() {
          *   - start tor + delay (300ms)
          *
          * @param [milliseconds] A value greater than 0
-         * @see [io.matthewnelson.topl_service.service.components.actions.ServiceActions.RestartTor]
+         * @see [io.matthewnelson.topl_service.service.components.actions.ServiceAction.RestartTor]
          * @see [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor.processServiceAction]
          * */
         fun addTimeToRestartTorDelay(milliseconds: Long): Builder {
-            if (milliseconds > 0L)
+            if (milliseconds > 0L) {
                 this.restartTorDelayTime += milliseconds
+            }
             return this
         }
 
@@ -212,12 +199,13 @@ class TorServiceController private constructor(): ServiceConsts() {
          *   - stop service
          *
          * @param [milliseconds] A value greater than 0
-         * @see [io.matthewnelson.topl_service.service.components.actions.ServiceActions.Stop]
+         * @see [io.matthewnelson.topl_service.service.components.actions.ServiceAction.Stop]
          * @see [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor.processServiceAction]
          * */
         fun addTimeToStopServiceDelay(milliseconds: Long): Builder {
-            if (milliseconds > 0L)
+            if (milliseconds > 0L) {
                 this.stopServiceDelayTime += milliseconds
+            }
             return this
         }
 
@@ -232,28 +220,6 @@ class TorServiceController private constructor(): ServiceConsts() {
             return this
         }
 
-//        /**
-//         * Default is set to 30_000ms
-//         *
-//         * When the user sends your application to the background (recent app's tray),
-//         * [io.matthewnelson.topl_service.lifecycle.BackgroundManager] begins
-//         * a heartbeat for Tor, as well as cycling [TorService] between foreground and
-//         * background as to keep the OS from killing things due to being idle for too long.
-//         *
-//         * If the user returns the application to the foreground, the heartbeat and
-//         * foreground/background cycling stops.
-//         *
-//         * This method sets the time between each heartbeat.
-//         *
-//         * @param [milliseconds] A Long between 15_000 and 45_000. Will fallback to default
-//         *   value if not between that range
-//         * */
-//        fun setBackgroundHeartbeatTime(milliseconds: Long): Builder {
-//            if (milliseconds in 15_000L..45_000L)
-//                heartbeatTime = milliseconds
-//            return this
-//        }
-
         /**
          * This makes it such that on your Application's **Debug** builds, the `topl-core` and
          * `topl-service` modules will provide you with Logcat messages (when
@@ -265,9 +231,6 @@ class TorServiceController private constructor(): ServiceConsts() {
          *
          * @param [buildConfigDebug] Send [BuildConfig.DEBUG]
          * @see [io.matthewnelson.topl_core.broadcaster.BroadcastLogger]
-         *
-         * TODO: Provide a link to gh-pages that discusses logging and how it work, it's pretty
-         *  complex with everything that is going on.
          * */
         fun setBuildConfigDebug(buildConfigDebug: Boolean): Builder {
             this.buildConfigDebug = buildConfigDebug
@@ -283,8 +246,9 @@ class TorServiceController private constructor(): ServiceConsts() {
          * class actually is.
          * */
         fun setEventBroadcaster(eventBroadcaster: TorServiceEventBroadcaster): Builder {
-            if (Companion.appEventBroadcaster == null)
+            if (Companion.appEventBroadcaster == null) {
                 appEventBroadcaster = eventBroadcaster
+            }
             return this
         }
 
@@ -314,8 +278,8 @@ class TorServiceController private constructor(): ServiceConsts() {
          *
          * @throws [IllegalArgumentException] If [disableStopServiceOnTaskRemoved] was elected
          *   and your selected [BackgroundManager.Builder.Policy] is **not**
-         *   [ServiceConsts.BackgroundPolicy.RUN_IN_FOREGROUND] and/or
-         *   [BackgroundManager.Builder.killAppIfTaskIsRemoved] is **not** `true`
+         *   [io.matthewnelson.topl_service_base.BaseServiceConsts.BackgroundPolicy.RUN_IN_FOREGROUND]
+         *   and/or [BackgroundManager.Builder.killAppIfTaskIsRemoved] is **not** `true`
          * */
         fun build() {
 
@@ -327,7 +291,7 @@ class TorServiceController private constructor(): ServiceConsts() {
             BaseService.initialize(
                 application,
                 buildConfigVersionCode,
-                torSettings,
+                defaultTorSettings,
                 buildConfigDebug,
                 geoipAssetPath,
                 geoip6AssetPath,
@@ -338,14 +302,15 @@ class TorServiceController private constructor(): ServiceConsts() {
 //            BackgroundManager.initialize(heartbeatTime)
             torServiceNotificationBuilder.build(application.applicationContext)
 
-            if (backgroundManagerPolicy.configurationIsCompliant(stopServiceOnTaskRemoved))
+            if (backgroundManagerPolicy.configurationIsCompliant(stopServiceOnTaskRemoved)) {
                 backgroundManagerPolicy.build()
-            else
+            } else {
                 throw IllegalArgumentException(
                     "disableStopServiceOnTaskRemoved requires a BackgroundManager Policy of " +
                             "${BackgroundPolicy.RUN_IN_FOREGROUND}, and " +
                             "killAppIfTaskIsRemoved must be set to true."
                 )
+            }
         }
     }
 
@@ -378,46 +343,54 @@ class TorServiceController private constructor(): ServiceConsts() {
         }
 
         /**
-         * Get the [TorSettings] that have been set after calling [Builder.build].
-         *
          * This method will *never* throw the [RuntimeException] if you call it after
          * [Builder.build].
          *
-         * @return Instance of [TorSettings] that are being used throughout TOPL-Android
+         * @return Instance of [ApplicationDefaultTorSettings] that were used to instantiate
+         *   [TorServiceController.Builder] with
          * @throws [RuntimeException] if called before [Builder.build]
          * */
         @JvmStatic
         @Throws(RuntimeException::class)
-        fun getTorSettings(): TorSettings {
+        fun getDefaultTorSettings(): ApplicationDefaultTorSettings {
             return try {
-                BaseService.torSettings
+                BaseService.defaultTorSettings
             } catch (e: UninitializedPropertyAccessException) {
                 throw RuntimeException(e.message)
             }
         }
 
         /**
-         * Returns an instance of [V3ClientAuthManager] for adding, querying, and removing
-         * v3 Client Authorization private key files.
+         * This method will *never* throw the [RuntimeException] if you call it after
+         * [Builder.build].
          *
+         * @return The implemented [BaseV3ClientAuthManager] for adding, querying, and removing
+         *   v3 Client Authorization private key files
          * @throws [RuntimeException] if called before [Builder.build]
          * */
         @JvmStatic
         @Throws(RuntimeException::class)
-        fun getV3ClientAuthManager(): V3ClientAuthManager =
+        fun getV3ClientAuthManager(): BaseV3ClientAuthManager =
             V3ClientAuthManager(getTorConfigFiles())
 
         /**
-         * Helper method for easily obtaining [ServiceTorSettings].
+         * This method will *never* throw the [RuntimeException] if you call it after
+         * [Builder.build].
          *
-         * @throws [RuntimeException] See [getTorSettings]
+         * @return [BaseServiceTorSettings]
+         * @throws [RuntimeException] if called before [Builder.build]
          * */
         @JvmStatic
         @Throws(RuntimeException::class)
-        fun getServiceTorSettings(context: Context): ServiceTorSettings =
-            ServiceTorSettings(TorServicePrefs(context), getTorSettings())
+        fun getServiceTorSettings(): BaseServiceTorSettings =
+            ServiceTorSettings(
+                TorServicePrefs(BaseService.getAppContext()), getDefaultTorSettings()
+            )
 
         /**
+         * This method will *never* throw the [RuntimeException] if you call it after
+         * [Builder.build].
+         *
          * Starts [TorService] and then Tor. You can call this as much as you want. If
          * the Tor [Process] is already running, it will do nothing.
          *
@@ -434,7 +407,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * */
         @JvmStatic
         fun stopTor() {
-            TorServiceConnection.serviceBinder?.submitServiceAction(ServiceActions.Stop())
+            TorServiceConnection.serviceBinder?.submitServiceAction(ServiceAction.Stop())
         }
 
         /**
@@ -442,7 +415,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * */
         @JvmStatic
         fun restartTor() {
-            TorServiceConnection.serviceBinder?.submitServiceAction(ServiceActions.RestartTor())
+            TorServiceConnection.serviceBinder?.submitServiceAction(ServiceAction.RestartTor())
         }
 
         /**
@@ -450,7 +423,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * */
         @JvmStatic
         fun newIdentity() {
-            TorServiceConnection.serviceBinder?.submitServiceAction(ServiceActions.NewId())
+            TorServiceConnection.serviceBinder?.submitServiceAction(ServiceAction.NewId())
         }
     }
 }

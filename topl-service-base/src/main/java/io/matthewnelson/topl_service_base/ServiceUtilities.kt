@@ -27,16 +27,21 @@
 * GNU General Public License, version 3 (“GPLv3”).
 *
 *     "The Interfaces" is henceforth defined as Application Programming Interfaces
-*     that are publicly available classes/functions/etc (ie: do not contain the
-*     visibility modifiers `internal`, `private`, `protected`, or are within
-*     classes/functions/etc that contain the aforementioned visibility modifiers)
-*     to TorOnionProxyLibrary-Android users that are needed to implement
-*     TorOnionProxyLibrary-Android and reside in ONLY the following modules:
+*     needed to implement TorOnionProxyLibrary-Android, as listed below:
 *
-*      - topl-core-base
-*      - topl-service
+*      - From the `topl-core-base` module:
+*          - All Classes/methods/variables
 *
-*     The following are excluded from "The Interfaces":
+*      - From the `topl-service-base` module:
+*          - All Classes/methods/variables
+*
+*      - From the `topl-service` module:
+*          - The TorServiceController class and it's contained classes/methods/variables
+*          - The ServiceNotification.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Companion class and it's contained methods/variables
+*
+*     The following code is excluded from "The Interfaces":
 *
 *       - All other code
 *
@@ -64,30 +69,42 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.topl_service.service.components.onionproxy.model
+package io.matthewnelson.topl_service_base
 
-import io.matthewnelson.topl_core_base.EventBroadcaster
+import android.annotation.SuppressLint
+import java.text.NumberFormat
+import java.util.*
 
-/**
- * Adds broadcasting methods to the [EventBroadcaster] to update you with information about
- * what addresses Tor is operating on. Very helpful when choosing "auto" in your
- * [io.matthewnelson.topl_core_base.TorSettings] to easily identify what addresses to
- * use for making network calls, as well as being notified when Tor is ready to be used.
- *
- * The addresses will be broadcast to you after Tor has been fully Bootstrapped. If Tor is
- * stopped (ie. it's [io.matthewnelson.topl_core_base.BaseConsts.TorState] changes from **ON**
- * to **OFF**), a [TorPortInfo] object containing 'null' for all fields will be broadcast.
- *
- * All broadcasts to your implementation to this class will occur on the Main Thread.
- *
- * @sample [io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster]
- * */
-abstract class TorServiceEventBroadcaster: EventBroadcaster() {
+object ServiceUtilities {
 
     /**
-     * Override this method to implement receiving of port information pertaining to Tor.
+     * Formats the supplied values to look like: `20KBps ↓ / 85KBps ↑`
      *
-     * @see [TorPortInfo]
+     * @param [download] Long value associated with download (bytesRead)
+     * @param [upload] Long value associated with upload (bytesWritten)
      * */
-    abstract fun broadcastPortInformation(torPortInfo: TorPortInfo)
+    @JvmStatic
+    fun getFormattedBandwidthString(download: Long, upload: Long): String =
+        "${formatBandwidth(download)} ↓ / ${formatBandwidth(upload)} ↑"
+
+    @SuppressLint("ConstantLocale")
+    private val numberFormat = NumberFormat.getInstance(Locale.getDefault())
+
+    /**
+     * Obtained from: https://gitweb.torproject.org/tor-android-service.git/tree/service/
+     *                src/main/java/org/torproject/android/service/TorEventHandler.java
+     *
+     * Original method name: formatCount()
+     * */
+    private fun formatBandwidth(value: Long): String {
+        return if (value < 1e6) {
+            numberFormat.format(
+                Math.round((((value * 10 / 1024).toInt()) / 10).toFloat())
+            ) + "KBps"
+        } else {
+            numberFormat.format(
+                Math.round((((value * 100 / 1024 / 1024).toInt()) / 100).toFloat())
+            ) + "MBps"
+        }
+    }
 }

@@ -27,16 +27,21 @@
 * GNU General Public License, version 3 (“GPLv3”).
 *
 *     "The Interfaces" is henceforth defined as Application Programming Interfaces
-*     that are publicly available classes/functions/etc (ie: do not contain the
-*     visibility modifiers `internal`, `private`, `protected`, or are within
-*     classes/functions/etc that contain the aforementioned visibility modifiers)
-*     to TorOnionProxyLibrary-Android users that are needed to implement
-*     TorOnionProxyLibrary-Android and reside in ONLY the following modules:
+*     needed to implement TorOnionProxyLibrary-Android, as listed below:
 *
-*      - topl-core-base
-*      - topl-service
+*      - From the `topl-core-base` module:
+*          - All Classes/methods/variables
 *
-*     The following are excluded from "The Interfaces":
+*      - From the `topl-service-base` module:
+*          - All Classes/methods/variables
+*
+*      - From the `topl-service` module:
+*          - The TorServiceController class and it's contained classes/methods/variables
+*          - The ServiceNotification.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Companion class and it's contained methods/variables
+*
+*     The following code is excluded from "The Interfaces":
 *
 *       - All other code
 *
@@ -205,8 +210,9 @@ object FileUtilities {
     fun listFilesToLog(f: File) {
         if (f.isDirectory) {
             val listFiles = f.listFiles() ?: return
-            for (child in listFiles)
+            for (child in listFiles) {
                 listFilesToLog(child)
+            }
         }
     }
 
@@ -220,8 +226,9 @@ object FileUtilities {
     @JvmStatic
     @Throws(IOException::class, SecurityException::class)
     fun cleanInstallOneFile(readFrom: InputStream, fileToWriteTo: File) {
-        if (fileToWriteTo.exists() && !fileToWriteTo.delete())
+        if (fileToWriteTo.exists() && !fileToWriteTo.delete()) {
             throw RuntimeException("Could not remove existing file ${fileToWriteTo.name}")
+        }
 
         val out: OutputStream = FileOutputStream(fileToWriteTo)
         copy(readFrom, out)
@@ -232,12 +239,14 @@ object FileUtilities {
     fun recursiveFileDelete(fileOrDirectory: File) {
         if (fileOrDirectory.isDirectory) {
             val listFiles = fileOrDirectory.listFiles() ?: return
-            for (child in listFiles)
+            for (child in listFiles) {
                 recursiveFileDelete(child)
+            }
         }
 
-        if (fileOrDirectory.exists() && !fileOrDirectory.delete())
+        if (fileOrDirectory.exists() && !fileOrDirectory.delete()) {
             throw RuntimeException("Could not delete directory ${fileOrDirectory.absolutePath}")
+        }
     }
 
     /**
@@ -257,18 +266,23 @@ object FileUtilities {
 
             while (zipInputStream.nextEntry.also { zipEntry = it } != null) {
                 val file = File(destinationDirectory, zipEntry.name)
-                if (zipEntry.isDirectory)
-                    if (!file.exists() && !file.mkdirs())
+                if (zipEntry.isDirectory) {
+                    if (!file.exists() && !file.mkdirs()) {
                         throw RuntimeException("Could not create directory $file")
+                    }
+                }
 
                 else
-                    if (file.exists() && !file.delete())
-                        throw RuntimeException("Could not delete file in preparation " +
-                                "for overwriting it. File - ${file.absolutePath}"
+                    if (file.exists() && !file.delete()) {
+                        throw RuntimeException(
+                            "Could not delete file in preparation " +
+                                    "for overwriting it. File - ${file.absolutePath}"
                         )
+                    }
 
-                    if (!file.createNewFile())
+                    if (!file.createNewFile()) {
                         throw RuntimeException("Could not create file $file")
+                    }
 
                     val fileOutputStream: OutputStream = FileOutputStream(file)
                     copyDoNotCloseInput(zipInputStream, fileOutputStream)

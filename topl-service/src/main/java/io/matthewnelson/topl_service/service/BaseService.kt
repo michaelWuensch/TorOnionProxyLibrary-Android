@@ -27,16 +27,21 @@
 * GNU General Public License, version 3 (“GPLv3”).
 *
 *     "The Interfaces" is henceforth defined as Application Programming Interfaces
-*     that are publicly available classes/functions/etc (ie: do not contain the
-*     visibility modifiers `internal`, `private`, `protected`, or are within
-*     classes/functions/etc that contain the aforementioned visibility modifiers)
-*     to TorOnionProxyLibrary-Android users that are needed to implement
-*     TorOnionProxyLibrary-Android and reside in ONLY the following modules:
+*     needed to implement TorOnionProxyLibrary-Android, as listed below:
 *
-*      - topl-core-base
-*      - topl-service
+*      - From the `topl-core-base` module:
+*          - All Classes/methods/variables
 *
-*     The following are excluded from "The Interfaces":
+*      - From the `topl-service-base` module:
+*          - All Classes/methods/variables
+*
+*      - From the `topl-service` module:
+*          - The TorServiceController class and it's contained classes/methods/variables
+*          - The ServiceNotification.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Companion class and it's contained methods/variables
+*
+*     The following code is excluded from "The Interfaces":
 *
 *       - All other code
 *
@@ -63,7 +68,7 @@
 *     exception. If you modify "The Interfaces", this exception does not apply to your
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
- */
+* */
 package io.matthewnelson.topl_service.service
 
 import android.app.Application
@@ -75,17 +80,16 @@ import androidx.annotation.WorkerThread
 import androidx.core.app.NotificationCompat
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core_base.TorConfigFiles
-import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.BuildConfig
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
-import io.matthewnelson.topl_service.service.components.actions.ServiceActions
-import io.matthewnelson.topl_service.service.components.actions.ServiceActions.ServiceAction
+import io.matthewnelson.topl_service.service.components.actions.ServiceAction
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
+import io.matthewnelson.topl_service_base.ApplicationDefaultTorSettings
 import kotlinx.coroutines.CoroutineScope
 import java.io.File
 import java.io.IOException
@@ -109,7 +113,7 @@ internal abstract class BaseService: Service() {
             private set
         lateinit var torConfigFiles: TorConfigFiles
             private set
-        lateinit var torSettings: TorSettings
+        lateinit var defaultTorSettings: ApplicationDefaultTorSettings
             private set
         var stopServiceOnTaskRemoved: Boolean = true
             private set
@@ -117,7 +121,7 @@ internal abstract class BaseService: Service() {
         fun initialize(
             application: Application,
             buildConfigVersionCode: Int,
-            torSettings: TorSettings,
+            torSettings: ApplicationDefaultTorSettings,
             buildConfigDebug: Boolean,
             geoipAssetPath: String,
             geoip6AssetPath: String,
@@ -127,7 +131,7 @@ internal abstract class BaseService: Service() {
             if (this.application == null) {
                 this.application = application
                 this.buildConfigVersionCode = buildConfigVersionCode
-                this.torSettings = torSettings
+                this.defaultTorSettings = torSettings
                 this.buildConfigDebug = buildConfigDebug
                 this.geoipAssetPath = geoipAssetPath
                 this.geoip6AssetPath = geoip6AssetPath
@@ -165,8 +169,6 @@ internal abstract class BaseService: Service() {
         fun updateLastAcceptedServiceAction(@ServiceActionName serviceAction: String) {
             lastAcceptedServiceAction = serviceAction
         }
-        fun wasLastAcceptedServiceActionStop(): Boolean =
-            lastAcceptedServiceAction == ServiceActionName.STOP
 
 
         //////////////////////
@@ -176,7 +178,7 @@ internal abstract class BaseService: Service() {
         /**
          * Starts the Service. Setting [includeIntentActionStart] to `false`, will not include
          * [ServiceActionName.START] in the Intent as an action so that [onStartCommand] knows
-         * to set the [ServiceActions.Start.updateLastAction] to false. This allows for
+         * to set the [ServiceAction.Start.updateLastAction] to false. This allows for
          * distinguishing what is coming from the application (either by user input, or how
          * the application has the library implemented), and what is coming from this library.
          * It makes keeping the state of the service in sync with the application's desires.
@@ -195,8 +197,9 @@ internal abstract class BaseService: Service() {
             bindServiceFlag: Int = Context.BIND_AUTO_CREATE
         ): Boolean {
             val intent = Intent(context.applicationContext, serviceClass)
-            if (includeIntentActionStart)
+            if (includeIntentActionStart) {
                 intent.action = ServiceActionName.START
+            }
 
             // A RuntimeException is thrown if Context.startService is called while
             // the application is in the background. In that case, we do not want to
@@ -400,10 +403,11 @@ internal abstract class BaseService: Service() {
      * @see [Companion.startService]
      * */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent?.action == ServiceActionName.START)
-            processServiceAction(ServiceActions.Start())
-        else
-            processServiceAction(ServiceActions.Start(updateLastServiceAction = false))
+        if (intent?.action == ServiceActionName.START) {
+            processServiceAction(ServiceAction.Start())
+        } else {
+            processServiceAction(ServiceAction.Start(updateLastServiceAction = false))
+        }
 
         return START_NOT_STICKY
     }
@@ -417,7 +421,8 @@ internal abstract class BaseService: Service() {
         startForegroundService()
 
         // Shutdown Tor and stop the Service.
-        if (stopServiceOnTaskRemoved)
-            processServiceAction(ServiceActions.Stop(updateLastServiceAction = false))
+        if (stopServiceOnTaskRemoved) {
+            processServiceAction(ServiceAction.Stop(updateLastServiceAction = false))
+        }
     }
 }

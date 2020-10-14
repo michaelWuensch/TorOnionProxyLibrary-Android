@@ -27,16 +27,21 @@
 * GNU General Public License, version 3 (“GPLv3”).
 *
 *     "The Interfaces" is henceforth defined as Application Programming Interfaces
-*     that are publicly available classes/functions/etc (ie: do not contain the
-*     visibility modifiers `internal`, `private`, `protected`, or are within
-*     classes/functions/etc that contain the aforementioned visibility modifiers)
-*     to TorOnionProxyLibrary-Android users that are needed to implement
-*     TorOnionProxyLibrary-Android and reside in ONLY the following modules:
+*     needed to implement TorOnionProxyLibrary-Android, as listed below:
 *
-*      - topl-core-base
-*      - topl-service
+*      - From the `topl-core-base` module:
+*          - All Classes/methods/variables
 *
-*     The following are excluded from "The Interfaces":
+*      - From the `topl-service-base` module:
+*          - All Classes/methods/variables
+*
+*      - From the `topl-service` module:
+*          - The TorServiceController class and it's contained classes/methods/variables
+*          - The ServiceNotification.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Companion class and it's contained methods/variables
+*
+*     The following code is excluded from "The Interfaces":
 *
 *       - All other code
 *
@@ -82,10 +87,9 @@ import io.matthewnelson.sampleapp.ui.fragments.settings.CloseKeyBoardNavListener
 import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.DnsPortOption
 import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.HttpPortOption
 import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.SocksPortOption
-import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.TransPortOption
 import io.matthewnelson.topl_core_base.BaseConsts.IsolationFlag
 import io.matthewnelson.topl_service.TorServiceController
-import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
+import io.matthewnelson.topl_service_base.BaseServiceTorSettings
 
 class SettingsTorFragment : Fragment() {
 
@@ -95,7 +99,7 @@ class SettingsTorFragment : Fragment() {
         const val CUSTOM = "Custom"
     }
 
-    private lateinit var serviceTorSettings: ServiceTorSettings
+    private lateinit var serviceTorSettings: BaseServiceTorSettings
     private lateinit var socksPortOption: SocksPortOption
     private lateinit var httpPortOption: HttpPortOption
     private lateinit var dnsPortOption: DnsPortOption
@@ -114,7 +118,7 @@ class SettingsTorFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        serviceTorSettings = TorServiceController.getServiceTorSettings(inflater.context)
+        serviceTorSettings = TorServiceController.getServiceTorSettings()
         return inflater.inflate(R.layout.fragment_settings_tor, container, false)
     }
 

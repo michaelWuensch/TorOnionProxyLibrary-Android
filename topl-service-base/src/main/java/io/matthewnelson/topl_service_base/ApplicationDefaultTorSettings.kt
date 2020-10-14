@@ -27,16 +27,21 @@
 * GNU General Public License, version 3 (“GPLv3”).
 *
 *     "The Interfaces" is henceforth defined as Application Programming Interfaces
-*     that are publicly available classes/functions/etc (ie: do not contain the
-*     visibility modifiers `internal`, `private`, `protected`, or are within
-*     classes/functions/etc that contain the aforementioned visibility modifiers)
-*     to TorOnionProxyLibrary-Android users that are needed to implement
-*     TorOnionProxyLibrary-Android and reside in ONLY the following modules:
+*     needed to implement TorOnionProxyLibrary-Android, as listed below:
 *
-*      - topl-core-base
-*      - topl-service
+*      - From the `topl-core-base` module:
+*          - All Classes/methods/variables
 *
-*     The following are excluded from "The Interfaces":
+*      - From the `topl-service-base` module:
+*          - All Classes/methods/variables
+*
+*      - From the `topl-service` module:
+*          - The TorServiceController class and it's contained classes/methods/variables
+*          - The ServiceNotification.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Companion class and it's contained methods/variables
+*
+*     The following code is excluded from "The Interfaces":
 *
 *       - All other code
 *
@@ -64,22 +69,14 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.topl_service.service.components.onionproxy.model
+package io.matthewnelson.topl_service_base
+
+import io.matthewnelson.topl_core_base.TorSettings
 
 /**
- * Contains information regarding what ports Tor is operating on.
+ * Simply extends [TorSettings] so that the `topl-service` module cannot be initialized
+ * with [io.matthewnelson.topl_service_base.BaseServiceTorSettings].
  *
- * Example of what one of the fields will contain:
- *
- *   - "127.0.0.1:33432"
+ * See [TorSettings] for information
  * */
-class TorPortInfo(
-    val controlPort: String?,
-    val dnsPort: String?,
-    val httpPort: String?,
-    // TODO: Add proxyPort after refactor
-    // TODO: Add proxySocks5ServerPort after refactor
-    // TODO: Add relayPort after refactor
-    val socksPort: String?,
-    val transPort: String?
-)
+abstract class ApplicationDefaultTorSettings: TorSettings()

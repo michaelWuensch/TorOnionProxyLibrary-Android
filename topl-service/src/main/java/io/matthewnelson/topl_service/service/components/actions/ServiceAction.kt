@@ -27,16 +27,21 @@
 * GNU General Public License, version 3 (“GPLv3”).
 *
 *     "The Interfaces" is henceforth defined as Application Programming Interfaces
-*     that are publicly available classes/functions/etc (ie: do not contain the
-*     visibility modifiers `internal`, `private`, `protected`, or are within
-*     classes/functions/etc that contain the aforementioned visibility modifiers)
-*     to TorOnionProxyLibrary-Android users that are needed to implement
-*     TorOnionProxyLibrary-Android and reside in ONLY the following modules:
+*     needed to implement TorOnionProxyLibrary-Android, as listed below:
 *
-*      - topl-core-base
-*      - topl-service
+*      - From the `topl-core-base` module:
+*          - All Classes/methods/variables
 *
-*     The following are excluded from "The Interfaces":
+*      - From the `topl-service-base` module:
+*          - All Classes/methods/variables
+*
+*      - From the `topl-service` module:
+*          - The TorServiceController class and it's contained classes/methods/variables
+*          - The ServiceNotification.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Companion class and it's contained methods/variables
+*
+*     The following code is excluded from "The Interfaces":
 *
 *       - All other code
 *
@@ -72,64 +77,55 @@ import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 /**
  * There are multiple avenues to interacting with a Service (BroadcastReceiver, Binder,
  * Context.startService). This class provides a standardized way of processing those requests, no
- * matter what avenue or form (Intents). Each [ServiceActions.ServiceAction] has a defined list
- * of commands that are executed by the
- * [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor] so that it
- * breaks up the steps in a manner which can be interrupted for quickly responding to the User's
- * commands.
- *
- * Think, running machine code to grok.
+ * matter what avenue or form (Intents). Each [ServiceAction] has a defined list of commands that
+ * are executed by [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor]
+ * so that it breaks up the steps in a manner which can be interrupted for quickly responding to
+ * User interaction.
  * */
-internal sealed class ServiceActions {
+internal sealed class ServiceAction {
+
+    @ServiceActionName
+    abstract val name: String
 
     /**
-     * The template that all [ServiceActions] use.
+     * Individual [ServiceActionCommand]'s to be executed sequentially by
+     * [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor].
      * */
-    abstract class ServiceAction: ServiceActions() {
+    abstract val commands: Array<@ServiceActionCommand String>
 
-        @ServiceActionName
-        abstract val name: String
+    /**
+     * For every [ServiceActionCommand.DELAY] within [commands], a value will be consumed
+     * when executing it.
+     *
+     * Override this to define the values for each DELAY call.
+     * */
+    protected open val delayLengthQueue: MutableList<Long> = mutableListOf()
 
-        /**
-         * Individual [ServiceActionCommand]'s to executed sequentially by
-         * [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor].
-         * */
-        abstract val commands: Array<@ServiceActionCommand String>
+    /**
+     * Removes the 0th element within [delayLengthQueue] then returns it.
+     * If [delayLengthQueue] is empty, returns 0L.
+     *
+     * @return The 0th element within [delayLengthQueue], or 0L if empty
+     * */
+    fun consumeDelayLength(): Long =
+        if (delayLengthQueue.isNotEmpty())
+            delayLengthQueue.removeAt(0)
+        else
+            0L
 
-        /**
-         * For every [ServiceActionCommand.DELAY] within [commands], a value will be consumed
-         * when executing it.
-         *
-         * Override this to define the values for each DELAY call.
-         * */
-        protected open val delayLengthQueue: MutableList<Long> = mutableListOf()
-
-        /**
-         * Removes the 0th element within [delayLengthQueue] then returns it.
-         * If [delayLengthQueue] is empty, returns 0L.
-         *
-         * @return The 0th element within [delayLengthQueue], or 0L if empty
-         * */
-        fun consumeDelayLength(): Long =
-            if (delayLengthQueue.isNotEmpty())
-                delayLengthQueue.removeAt(0)
-            else
-                0L
-
-        /**
-         * Boolean value for providing [ServiceAction]'s the capability of being issued to
-         * the [ServiceActionProcessor] and notifying that the submitter of the [ServiceAction]
-         * wants [ServiceActionProcessor.lastServiceAction] to be updated.
-         *
-         * @see [Start]
-         * @see [Stop]
-         * */
-        open val updateLastAction: Boolean = true
-    }
+    /**
+     * Boolean value for providing [ServiceAction]'s the capability of being issued to
+     * the [ServiceActionProcessor] and notifying that the submitter of the [ServiceAction]
+     * wants [ServiceActionProcessor.lastServiceAction] to be updated.
+     *
+     * @see [Start]
+     * @see [Stop]
+     * */
+    open val updateLastAction: Boolean = true
 
     class SetDisableNetwork(
         override val name: String,
-        private val updateLastServiceAction: Boolean = false
+        updateLastServiceAction: Boolean = false
     ): ServiceAction() {
 
         override val commands: Array<String>
@@ -155,8 +151,7 @@ internal sealed class ServiceActions {
 
         override val delayLengthQueue = mutableListOf(ServiceActionProcessor.disableNetworkDelay)
 
-        override val updateLastAction: Boolean
-            get() = updateLastServiceAction
+        override val updateLastAction: Boolean = updateLastServiceAction
     }
 
     class NewId: ServiceAction() {
@@ -185,7 +180,7 @@ internal sealed class ServiceActions {
         override val delayLengthQueue = mutableListOf(ServiceActionProcessor.restartTorDelayTime)
     }
 
-    class Start(private val updateLastServiceAction: Boolean = true): ServiceAction() {
+    class Start(updateLastServiceAction: Boolean = true): ServiceAction() {
 
         @ServiceActionName
         override val name: String = ServiceActionName.START
@@ -195,11 +190,10 @@ internal sealed class ServiceActions {
                 ServiceActionCommand.START_TOR
             )
 
-        override val updateLastAction: Boolean
-            get() = updateLastServiceAction
+        override val updateLastAction: Boolean = updateLastServiceAction
     }
 
-    class Stop(private val updateLastServiceAction: Boolean = true): ServiceAction() {
+    class Stop(updateLastServiceAction: Boolean = true): ServiceAction() {
 
         @ServiceActionName
         override val name: String = ServiceActionName.STOP
@@ -213,7 +207,6 @@ internal sealed class ServiceActions {
 
         override val delayLengthQueue = mutableListOf(ServiceActionProcessor.stopServiceDelayTime)
 
-        override val updateLastAction: Boolean
-            get() = updateLastServiceAction
+        override val updateLastAction: Boolean = updateLastServiceAction
     }
 }
