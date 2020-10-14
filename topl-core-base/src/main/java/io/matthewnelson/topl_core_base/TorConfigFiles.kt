@@ -169,8 +169,9 @@ class TorConfigFiles private constructor(
         fun createConfig(context: Context, configDir: File, dataDir: File? = null): TorConfigFiles {
             val installDir = File(context.applicationInfo.nativeLibraryDir)
             val builder = Builder(installDir, configDir)
-            if (dataDir != null)
+            if (dataDir != null) {
                 builder.dataDir(dataDir)
+            }
             return builder.build()
         }
 
@@ -403,45 +404,45 @@ class TorConfigFiles private constructor(
          * @return [TorConfigFiles]
          */
         fun build(): TorConfigFiles {
-            if (!::mTorExecutableFile.isInitialized)
+            if (!::mTorExecutableFile.isInitialized) {
                 mTorExecutableFile = File(installDir, ConfigFileName.TOR_EXECUTABLE)
-
-            if (!::mGeoIpFile.isInitialized)
+            }
+            if (!::mGeoIpFile.isInitialized) {
                 mGeoIpFile = File(configDir, ConfigFileName.GEO_IP)
-
-            if (!::mGeoIpv6File.isInitialized)
+            }
+            if (!::mGeoIpv6File.isInitialized) {
                 mGeoIpv6File = File(configDir, ConfigFileName.GEO_IPV_6)
-
-            if (!::mTorrcFile.isInitialized)
+            }
+            if (!::mTorrcFile.isInitialized) {
                 mTorrcFile = File(configDir, ConfigFileName.TORRC)
-
-            if (!::mHiddenServiceDir.isInitialized)
+            }
+            if (!::mHiddenServiceDir.isInitialized) {
                 mHiddenServiceDir = File(configDir, ConfigFileName.HIDDEN_SERVICE)
-
-            if (!::mDataDir.isInitialized)
+            }
+            if (!::mDataDir.isInitialized) {
                 mDataDir = File(configDir, ConfigFileName.DATA_DIR)
-
-            if (mLibraryPath == null)
+            }
+            if (mLibraryPath == null) {
                 mLibraryPath = mTorExecutableFile.parentFile
-
-            if (!::mHostnameFile.isInitialized)
+            }
+            if (!::mHostnameFile.isInitialized) {
                 mHostnameFile = File(mDataDir, ConfigFileName.HOST)
-
-            if (!::mCookieAuthFile.isInitialized)
+            }
+            if (!::mCookieAuthFile.isInitialized) {
                 mCookieAuthFile = File(mDataDir, ConfigFileName.COOKIE_AUTH)
-
-            if (!::mResolveConf.isInitialized)
+            }
+            if (!::mResolveConf.isInitialized) {
                 mResolveConf = File(configDir, ConfigFileName.RESOLVE_CONF)
-
-            if (!::mControlPortFile.isInitialized)
+            }
+            if (!::mControlPortFile.isInitialized) {
                 mControlPortFile = File(mDataDir, ConfigFileName.CONTROL_PORT)
-
-            if (!::mV3AuthPrivateDir.isInitialized)
+            }
+            if (!::mV3AuthPrivateDir.isInitialized) {
                 mV3AuthPrivateDir = File(configDir, ConfigFileName.V3_AUTH_PRIVATE_DIR)
-
-            if (mFileCreationTimeout <= 0)
+            }
+            if (mFileCreationTimeout <= 0) {
                 mFileCreationTimeout = 15
-
+            }
             return TorConfigFiles(
                 mGeoIpFile,
                 mGeoIpv6File,

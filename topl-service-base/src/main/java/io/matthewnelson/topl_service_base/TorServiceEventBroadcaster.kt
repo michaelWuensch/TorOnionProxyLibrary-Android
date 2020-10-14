@@ -74,14 +74,17 @@ package io.matthewnelson.topl_service_base
 import io.matthewnelson.topl_core_base.EventBroadcaster
 
 /**
- * Adds broadcasting methods to the [EventBroadcaster] to update you with information about
+ * Adds broadcasting methods to the [EventBroadcaster] for updating you with information about
  * what addresses Tor is operating on. Very helpful when choosing "auto" in your
- * [io.matthewnelson.topl_core_base.TorSettings] to easily identify what addresses to
- * use for making network calls, as well as being notified when Tor is ready to be used.
+ * [io.matthewnelson.topl_service_base.ApplicationDefaultTorSettings] to easily identify what
+ * addresses to use for making network calls, as well as being notified when Tor is ready to be
+ * used.
  *
- * The addresses will be broadcast to you after Tor has been fully Bootstrapped. If Tor is
- * stopped (ie. it's [io.matthewnelson.topl_core_base.BaseConsts.TorState] changes from **ON**
- * to **OFF**), a [TorPortInfo] object containing 'null' for all fields will be broadcast.
+ * The addresses will be broadcast to you after Tor has been fully Bootstrapped.
+ *
+ * If Tor is stopped or connectivity is lost, (ie. it's
+ * [io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState] changes from **ENABLED**
+ * to **DISABLED**), a [TorPortInfo] object containing 'null' for all fields will be broadcast.
  *
  * All broadcasts to your implementation to this class will occur on the Main Thread.
  *

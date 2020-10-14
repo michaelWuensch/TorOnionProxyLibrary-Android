@@ -87,18 +87,20 @@ internal class ServiceTorSettings(
 
     @WorkerThread
     override fun dormantClientTimeoutSave(minutes: Int?) {
-        if (minutes == defaultTorSettings.dormantClientTimeout)
+        if (minutes == defaultTorSettings.dormantClientTimeout) {
             servicePrefs.remove(PrefKeyInt.DORMANT_CLIENT_TIMEOUT)
-        else
+        } else {
             servicePrefs.putInt(PrefKeyInt.DORMANT_CLIENT_TIMEOUT, minutes)
+        }
     }
 
     @WorkerThread
     override fun disableNetworkSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.disableNetwork)
+        if (boolean == defaultTorSettings.disableNetwork) {
             servicePrefs.remove(PrefKeyBoolean.DISABLE_NETWORK)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.DISABLE_NETWORK, boolean)
+        }
     }
 
     @WorkerThread
@@ -130,34 +132,38 @@ internal class ServiceTorSettings(
 
     @WorkerThread
     override fun customTorrcSave(customTorrc: String?) {
-        if (customTorrc == defaultTorSettings.customTorrc)
+        if (customTorrc == defaultTorSettings.customTorrc) {
             servicePrefs.remove(PrefKeyString.CUSTOM_TORRC)
-        else
+        } else {
             servicePrefs.putString(PrefKeyString.CUSTOM_TORRC, customTorrc)
+        }
     }
 
     @WorkerThread
     override fun entryNodesSave(entryNodes: String?) {
-        if (entryNodes == defaultTorSettings.entryNodes)
+        if (entryNodes == defaultTorSettings.entryNodes) {
             servicePrefs.remove(PrefKeyString.ENTRY_NODES)
-        else
+        } else {
             servicePrefs.putString(PrefKeyString.ENTRY_NODES, entryNodes)
+        }
     }
 
     @WorkerThread
     override fun excludeNodesSave(excludeNodes: String?) {
-        if (excludeNodes == defaultTorSettings.excludeNodes)
+        if (excludeNodes == defaultTorSettings.excludeNodes) {
             servicePrefs.remove(PrefKeyString.EXCLUDED_NODES)
-        else
+        } else {
             servicePrefs.putString(PrefKeyString.EXCLUDED_NODES, excludeNodes)
+        }
     }
 
     @WorkerThread
     override fun exitNodesSave(exitNodes: String?) {
-        if (exitNodes == defaultTorSettings.exitNodes)
+        if (exitNodes == defaultTorSettings.exitNodes) {
             servicePrefs.remove(PrefKeyString.EXIT_NODES)
-        else
+        } else {
             servicePrefs.putString(PrefKeyString.EXIT_NODES, exitNodes)
+        }
     }
 
     @WorkerThread
@@ -189,18 +195,20 @@ internal class ServiceTorSettings(
 
     @WorkerThread
     override fun proxyHostSave(proxyHost: String?) {
-        if (proxyHost == defaultTorSettings.proxyHost)
+        if (proxyHost == defaultTorSettings.proxyHost) {
             servicePrefs.remove(PrefKeyString.PROXY_HOST)
-        else
+        } else {
             servicePrefs.putString(PrefKeyString.PROXY_HOST, proxyHost)
+        }
     }
 
     @WorkerThread
     override fun proxyPasswordSave(proxyPassword: String?) {
-        if (proxyPassword == defaultTorSettings.proxyPassword)
+        if (proxyPassword == defaultTorSettings.proxyPassword) {
             servicePrefs.remove(PrefKeyString.PROXY_PASSWORD)
-        else
+        } else {
             servicePrefs.putString(PrefKeyString.PROXY_PASSWORD, proxyPassword)
+        }
     }
 
     @WorkerThread
@@ -210,8 +218,7 @@ internal class ServiceTorSettings(
             proxyPort == defaultTorSettings.proxyPort -> {
                 servicePrefs.remove(PrefKeyInt.PROXY_PORT)
             }
-            proxyPort == null ||
-            checkPortSelection(proxyPort, checkZero = false) -> {
+            proxyPort == null || checkPortSelection(proxyPort, checkZero = false) -> {
                 servicePrefs.putInt(PrefKeyInt.PROXY_PORT, proxyPort)
             }
             else -> {
@@ -224,10 +231,11 @@ internal class ServiceTorSettings(
 
     @WorkerThread
     override fun proxySocks5HostSave(proxySocks5Host: String?) {
-        if (proxySocks5Host == defaultTorSettings.proxySocks5Host)
+        if (proxySocks5Host == defaultTorSettings.proxySocks5Host) {
             servicePrefs.remove(PrefKeyString.PROXY_SOCKS5_HOST)
-        else
+        } else {
             servicePrefs.putString(PrefKeyString.PROXY_SOCKS5_HOST, proxySocks5Host)
+        }
     }
 
     @WorkerThread
@@ -237,8 +245,7 @@ internal class ServiceTorSettings(
             proxySocks5ServerPort == defaultTorSettings.proxySocks5ServerPort -> {
                 servicePrefs.remove(PrefKeyInt.PROXY_SOCKS5_SERVER_PORT)
             }
-            proxySocks5ServerPort == null ||
-            checkPortSelection(proxySocks5ServerPort, checkZero = false) -> {
+            proxySocks5ServerPort == null || checkPortSelection(proxySocks5ServerPort, checkZero = false) -> {
                 servicePrefs.putInt(PrefKeyInt.PROXY_SOCKS5_SERVER_PORT, proxySocks5ServerPort)
             }
             else -> {
@@ -256,10 +263,11 @@ internal class ServiceTorSettings(
             ProxyType.DISABLED,
             ProxyType.HTTPS,
             ProxyType.SOCKS_5 -> {
-                if (proxyType == defaultTorSettings.proxyType)
+                if (proxyType == defaultTorSettings.proxyType) {
                     servicePrefs.remove(PrefKeyString.PROXY_TYPE)
-                else
+                } else {
                     servicePrefs.putString(PrefKeyString.PROXY_TYPE, proxyType)
+                }
             }
             else -> {
                 throw IllegalArgumentException(
@@ -271,26 +279,29 @@ internal class ServiceTorSettings(
 
     @WorkerThread
     override fun proxyUserSave(proxyUser: String?) {
-        if (proxyUser == defaultTorSettings.proxyUser)
+        if (proxyUser == defaultTorSettings.proxyUser) {
             servicePrefs.remove(PrefKeyString.PROXY_USER)
-        else
+        } else {
             servicePrefs.putString(PrefKeyString.PROXY_USER, proxyUser)
+        }
     }
 
     @WorkerThread
     override fun reachableAddressPortsSave(reachableAddressPorts: String) {
-        if (reachableAddressPorts == defaultTorSettings.reachableAddressPorts)
+        if (reachableAddressPorts == defaultTorSettings.reachableAddressPorts) {
             servicePrefs.remove(PrefKeyString.REACHABLE_ADDRESS_PORTS)
-        else
+        } else {
             servicePrefs.putString(PrefKeyString.REACHABLE_ADDRESS_PORTS, reachableAddressPorts)
+        }
     }
 
     @WorkerThread
     override fun relayNicknameSave(relayNickname: String) {
-        if (relayNickname == defaultTorSettings.relayNickname)
+        if (relayNickname == defaultTorSettings.relayNickname) {
             servicePrefs.remove(PrefKeyString.RELAY_NICKNAME)
-        else
+        } else {
             servicePrefs.putString(PrefKeyString.RELAY_NICKNAME, relayNickname)
+        }
     }
 
     @WorkerThread
@@ -340,18 +351,20 @@ internal class ServiceTorSettings(
 
     @WorkerThread
     override fun virtualAddressNetworkSave(virtualAddressNetwork: String) {
-        if (virtualAddressNetwork == defaultTorSettings.virtualAddressNetwork)
+        if (virtualAddressNetwork == defaultTorSettings.virtualAddressNetwork) {
             servicePrefs.remove(PrefKeyString.VIRTUAL_ADDRESS_NETWORK)
-        else
+        } else {
             servicePrefs.putString(PrefKeyString.VIRTUAL_ADDRESS_NETWORK, virtualAddressNetwork)
+        }
     }
 
     @WorkerThread
     override fun hasBridgesSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.hasBridges)
+        if (boolean == defaultTorSettings.hasBridges) {
             servicePrefs.remove(PrefKeyBoolean.HAS_BRIDGES)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.HAS_BRIDGES, boolean)
+        }
     }
 
     @WorkerThread
@@ -361,10 +374,11 @@ internal class ServiceTorSettings(
             ConnectionPadding.AUTO,
             ConnectionPadding.OFF,
             ConnectionPadding.ON -> {
-                if (connectionPadding == defaultTorSettings.connectionPadding)
+                if (connectionPadding == defaultTorSettings.connectionPadding) {
                     servicePrefs.remove(PrefKeyString.HAS_CONNECTION_PADDING)
-                else
+                } else {
                     servicePrefs.putString(PrefKeyString.HAS_CONNECTION_PADDING, connectionPadding)
+                }
             }
             else -> {
                 throw IllegalArgumentException(
@@ -376,98 +390,110 @@ internal class ServiceTorSettings(
 
     @WorkerThread
     override fun hasCookieAuthenticationSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.hasCookieAuthentication)
+        if (boolean == defaultTorSettings.hasCookieAuthentication) {
             servicePrefs.remove(PrefKeyBoolean.HAS_COOKIE_AUTHENTICATION)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.HAS_COOKIE_AUTHENTICATION, boolean)
+        }
     }
 
     @WorkerThread
     override fun hasDebugLogsSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.hasDebugLogs)
+        if (boolean == defaultTorSettings.hasDebugLogs) {
             servicePrefs.remove(PrefKeyBoolean.HAS_DEBUG_LOGS)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.HAS_DEBUG_LOGS, boolean)
+        }
     }
 
     @WorkerThread
     override fun hasDormantCanceledByStartupSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.hasDormantCanceledByStartup)
+        if (boolean == defaultTorSettings.hasDormantCanceledByStartup) {
             servicePrefs.remove(PrefKeyBoolean.HAS_DORMANT_CANCELED_BY_STARTUP)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.HAS_DORMANT_CANCELED_BY_STARTUP, boolean)
+        }
     }
 
     @WorkerThread
     override fun hasOpenProxyOnAllInterfacesSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.hasOpenProxyOnAllInterfaces)
+        if (boolean == defaultTorSettings.hasOpenProxyOnAllInterfaces) {
             servicePrefs.remove(PrefKeyBoolean.HAS_OPEN_PROXY_ON_ALL_INTERFACES)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.HAS_OPEN_PROXY_ON_ALL_INTERFACES, boolean)
+        }
     }
 
     @WorkerThread
     override fun hasReachableAddressSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.hasReachableAddress)
+        if (boolean == defaultTorSettings.hasReachableAddress) {
             servicePrefs.remove(PrefKeyBoolean.HAS_REACHABLE_ADDRESS)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.HAS_REACHABLE_ADDRESS, boolean)
+        }
     }
 
     @WorkerThread
     override fun hasReducedConnectionPaddingSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.hasReducedConnectionPadding)
+        if (boolean == defaultTorSettings.hasReducedConnectionPadding) {
             servicePrefs.remove(PrefKeyBoolean.HAS_REDUCED_CONNECTION_PADDING)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.HAS_REDUCED_CONNECTION_PADDING, boolean)
+        }
     }
 
     @WorkerThread
     override fun hasSafeSocksSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.hasSafeSocks)
+        if (boolean == defaultTorSettings.hasSafeSocks) {
             servicePrefs.remove(PrefKeyBoolean.HAS_SAFE_SOCKS)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.HAS_SAFE_SOCKS, boolean)
+        }
     }
 
     @WorkerThread
     override fun hasStrictNodesSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.hasStrictNodes)
+        if (boolean == defaultTorSettings.hasStrictNodes) {
             servicePrefs.remove(PrefKeyBoolean.HAS_STRICT_NODES)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.HAS_STRICT_NODES, boolean)
+        }
     }
 
     @WorkerThread
     override fun hasTestSocksSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.hasTestSocks)
+        if (boolean == defaultTorSettings.hasTestSocks) {
             servicePrefs.remove(PrefKeyBoolean.HAS_TEST_SOCKS)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.HAS_TEST_SOCKS, boolean)
+        }
     }
 
     @WorkerThread
     override fun isAutoMapHostsOnResolveSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.isAutoMapHostsOnResolve)
+        if (boolean == defaultTorSettings.isAutoMapHostsOnResolve) {
             servicePrefs.remove(PrefKeyBoolean.IS_AUTO_MAP_HOSTS_ON_RESOLVE)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.IS_AUTO_MAP_HOSTS_ON_RESOLVE, boolean)
+        }
     }
 
     @WorkerThread
     override fun isRelaySave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.isRelay)
+        if (boolean == defaultTorSettings.isRelay) {
             servicePrefs.remove(PrefKeyBoolean.IS_RELAY)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.IS_RELAY, boolean)
+        }
     }
 
     @WorkerThread
     override fun runAsDaemonSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.runAsDaemon)
+        if (boolean == defaultTorSettings.runAsDaemon) {
             servicePrefs.remove(PrefKeyBoolean.RUN_AS_DAEMON)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.RUN_AS_DAEMON, boolean)
+        }
     }
 
     @WorkerThread
@@ -499,10 +525,11 @@ internal class ServiceTorSettings(
 
     @WorkerThread
     override fun useSocks5Save(boolean: Boolean) {
-        if (boolean == defaultTorSettings.useSocks5)
+        if (boolean == defaultTorSettings.useSocks5) {
             servicePrefs.remove(PrefKeyBoolean.USE_SOCKS5)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.USE_SOCKS5, boolean)
+        }
     }
 
     private fun checkPortSelection(port: Int, checkZero: Boolean): Boolean =
@@ -513,13 +540,13 @@ internal class ServiceTorSettings(
         checkAuto: Boolean = true,
         checkZero: Boolean = true
     ): Boolean {
-        if (checkAuto && port == PortOption.AUTO)
-            return true
+        if (checkAuto && port == PortOption.AUTO) return true
 
         return try {
             val portInt = port.toInt()
-            if (checkZero && portInt == 0)
+            if (checkZero && portInt == 0) {
                 return true
+            }
             portInt in 1024..65535
         } catch (e: Exception) {
             false

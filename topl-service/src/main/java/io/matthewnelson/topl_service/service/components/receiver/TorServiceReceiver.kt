@@ -96,7 +96,9 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
     companion object {
         // Secures the intent filter at each application startup.
         // Also serves as the key to string extras containing the ServiceAction to be executed.
-        val SERVICE_INTENT_FILTER: String = BigInteger(130, SecureRandom()).toString(32)
+        val SERVICE_INTENT_FILTER: String by lazy {
+            BigInteger(130, SecureRandom()).toString(32)
+        }
 
         @Volatile
         var isRegistered = false
@@ -107,7 +109,9 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
             private set
     }
 
-    private val broadcastLogger = torService.getBroadcastLogger(TorServiceReceiver::class.java)
+    private val broadcastLogger by lazy {
+        torService.getBroadcastLogger(TorServiceReceiver::class.java)
+    }
 
     fun register() {
         val filter = IntentFilter(SERVICE_INTENT_FILTER)
@@ -162,10 +166,11 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
                     val connectivity = torService.hasNetworkConnectivity()
                     broadcastLogger.notice("Network connectivity: $connectivity")
 
-                    val actionObject = if (connectivity)
+                    val actionObject = if (connectivity) {
                         ServiceAction.SetDisableNetwork(ServiceActionName.ENABLE_NETWORK)
-                    else
+                    } else {
                         ServiceAction.SetDisableNetwork(ServiceActionName.DISABLE_NETWORK)
+                    }
 
                     torService.processServiceAction(actionObject)
                 }

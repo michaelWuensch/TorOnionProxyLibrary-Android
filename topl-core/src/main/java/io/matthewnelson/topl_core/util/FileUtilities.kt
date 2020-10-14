@@ -210,8 +210,9 @@ object FileUtilities {
     fun listFilesToLog(f: File) {
         if (f.isDirectory) {
             val listFiles = f.listFiles() ?: return
-            for (child in listFiles)
+            for (child in listFiles) {
                 listFilesToLog(child)
+            }
         }
     }
 
@@ -225,8 +226,9 @@ object FileUtilities {
     @JvmStatic
     @Throws(IOException::class, SecurityException::class)
     fun cleanInstallOneFile(readFrom: InputStream, fileToWriteTo: File) {
-        if (fileToWriteTo.exists() && !fileToWriteTo.delete())
+        if (fileToWriteTo.exists() && !fileToWriteTo.delete()) {
             throw RuntimeException("Could not remove existing file ${fileToWriteTo.name}")
+        }
 
         val out: OutputStream = FileOutputStream(fileToWriteTo)
         copy(readFrom, out)
@@ -237,12 +239,14 @@ object FileUtilities {
     fun recursiveFileDelete(fileOrDirectory: File) {
         if (fileOrDirectory.isDirectory) {
             val listFiles = fileOrDirectory.listFiles() ?: return
-            for (child in listFiles)
+            for (child in listFiles) {
                 recursiveFileDelete(child)
+            }
         }
 
-        if (fileOrDirectory.exists() && !fileOrDirectory.delete())
+        if (fileOrDirectory.exists() && !fileOrDirectory.delete()) {
             throw RuntimeException("Could not delete directory ${fileOrDirectory.absolutePath}")
+        }
     }
 
     /**
@@ -262,18 +266,23 @@ object FileUtilities {
 
             while (zipInputStream.nextEntry.also { zipEntry = it } != null) {
                 val file = File(destinationDirectory, zipEntry.name)
-                if (zipEntry.isDirectory)
-                    if (!file.exists() && !file.mkdirs())
+                if (zipEntry.isDirectory) {
+                    if (!file.exists() && !file.mkdirs()) {
                         throw RuntimeException("Could not create directory $file")
+                    }
+                }
 
                 else
-                    if (file.exists() && !file.delete())
-                        throw RuntimeException("Could not delete file in preparation " +
-                                "for overwriting it. File - ${file.absolutePath}"
+                    if (file.exists() && !file.delete()) {
+                        throw RuntimeException(
+                            "Could not delete file in preparation " +
+                                    "for overwriting it. File - ${file.absolutePath}"
                         )
+                    }
 
-                    if (!file.createNewFile())
+                    if (!file.createNewFile()) {
                         throw RuntimeException("Could not create file $file")
+                    }
 
                     val fileOutputStream: OutputStream = FileOutputStream(file)
                     copyDoNotCloseInput(zipInputStream, fileOutputStream)

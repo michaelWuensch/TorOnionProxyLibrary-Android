@@ -154,8 +154,9 @@ class TorServiceController private constructor(): ServiceConsts() {
          * @see [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor.processServiceAction]
          * */
         fun addTimeToDisableNetworkDelay(milliseconds: Long): Builder {
-            if (milliseconds > 0)
+            if (milliseconds > 0) {
                 disableNetworkDelay += milliseconds
+            }
             return this
         }
 
@@ -178,8 +179,9 @@ class TorServiceController private constructor(): ServiceConsts() {
          * @see [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor.processServiceAction]
          * */
         fun addTimeToRestartTorDelay(milliseconds: Long): Builder {
-            if (milliseconds > 0L)
+            if (milliseconds > 0L) {
                 this.restartTorDelayTime += milliseconds
+            }
             return this
         }
 
@@ -201,8 +203,9 @@ class TorServiceController private constructor(): ServiceConsts() {
          * @see [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor.processServiceAction]
          * */
         fun addTimeToStopServiceDelay(milliseconds: Long): Builder {
-            if (milliseconds > 0L)
+            if (milliseconds > 0L) {
                 this.stopServiceDelayTime += milliseconds
+            }
             return this
         }
 
@@ -243,8 +246,9 @@ class TorServiceController private constructor(): ServiceConsts() {
          * class actually is.
          * */
         fun setEventBroadcaster(eventBroadcaster: TorServiceEventBroadcaster): Builder {
-            if (Companion.appEventBroadcaster == null)
+            if (Companion.appEventBroadcaster == null) {
                 appEventBroadcaster = eventBroadcaster
+            }
             return this
         }
 
@@ -298,14 +302,15 @@ class TorServiceController private constructor(): ServiceConsts() {
 //            BackgroundManager.initialize(heartbeatTime)
             torServiceNotificationBuilder.build(application.applicationContext)
 
-            if (backgroundManagerPolicy.configurationIsCompliant(stopServiceOnTaskRemoved))
+            if (backgroundManagerPolicy.configurationIsCompliant(stopServiceOnTaskRemoved)) {
                 backgroundManagerPolicy.build()
-            else
+            } else {
                 throw IllegalArgumentException(
                     "disableStopServiceOnTaskRemoved requires a BackgroundManager Policy of " +
                             "${BackgroundPolicy.RUN_IN_FOREGROUND}, and " +
                             "killAppIfTaskIsRemoved must be set to true."
                 )
+            }
         }
     }
 

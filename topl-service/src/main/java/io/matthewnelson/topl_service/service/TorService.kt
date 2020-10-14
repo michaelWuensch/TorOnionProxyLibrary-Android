@@ -177,14 +177,16 @@ internal class TorService: BaseService() {
     }
     override fun startForegroundService(): Boolean {
         val wasStarted = super.startForegroundService()
-        if (wasStarted)
+        if (wasStarted) {
             broadcastLogger.debug("Service sent to Foreground")
+        }
         return wasStarted
     }
     override fun stopForegroundService(): Boolean {
         val wasStopped = super.stopForegroundService()
-        if (wasStopped)
+        if (wasStopped) {
             broadcastLogger.debug("Service sent to Background")
+        }
         return wasStopped
     }
 

@@ -99,14 +99,18 @@ abstract class BaseServiceTorSettings(
 
     override val dormantClientTimeout: Int?
         @WorkerThread
-        get() = servicePrefs.getInt(PrefKeyInt.DORMANT_CLIENT_TIMEOUT, defaultTorSettings.dormantClientTimeout)
+        get() = servicePrefs.getInt(
+            PrefKeyInt.DORMANT_CLIENT_TIMEOUT, defaultTorSettings.dormantClientTimeout
+        )
 
     @WorkerThread
     abstract fun dormantClientTimeoutSave(minutes: Int?)
 
     override val disableNetwork: Boolean
         @WorkerThread
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.DISABLE_NETWORK, defaultTorSettings.disableNetwork)
+        get() = servicePrefs.getBoolean(
+            PrefKeyBoolean.DISABLE_NETWORK, defaultTorSettings.disableNetwork
+        )
 
     /**
      * Saves the value for [disableNetwork] to [TorServicePrefs]. If the value is the same as what is
@@ -121,8 +125,9 @@ abstract class BaseServiceTorSettings(
 
     override val dnsPort: String
         @WorkerThread
-        get() = servicePrefs.getString(PrefKeyString.DNS_PORT, defaultTorSettings.dnsPort)
-            ?: defaultTorSettings.dnsPort
+        get() = servicePrefs.getString(
+            PrefKeyString.DNS_PORT, defaultTorSettings.dnsPort
+        ) ?: defaultTorSettings.dnsPort
 
     /**
      * Saves the value for [dnsPort] to [TorServicePrefs]. If the value is the same as what is
@@ -130,7 +135,6 @@ abstract class BaseServiceTorSettings(
      * it exists.
      *
      * @param [dnsPort] A String value of 0, auto, or number between 1024 and 65535
-     * @see [checkPortSelection]
      * @see [TorSettings.dnsPort]
      * @throws [IllegalArgumentException] if the value is not 0, auto, or between 1024 and 65535
      * */
@@ -160,7 +164,9 @@ abstract class BaseServiceTorSettings(
 
     override val customTorrc: String?
         @WorkerThread
-        get() = servicePrefs.getString(PrefKeyString.CUSTOM_TORRC, defaultTorSettings.customTorrc)
+        get() = servicePrefs.getString(
+            PrefKeyString.CUSTOM_TORRC, defaultTorSettings.customTorrc
+        )
 
     /**
      * Saves the value for [customTorrc] to [TorServicePrefs]. If the value is the same as what is
@@ -175,7 +181,9 @@ abstract class BaseServiceTorSettings(
 
     override val entryNodes: String?
         @WorkerThread
-        get() = servicePrefs.getString(PrefKeyString.ENTRY_NODES, defaultTorSettings.entryNodes)
+        get() = servicePrefs.getString(
+            PrefKeyString.ENTRY_NODES, defaultTorSettings.entryNodes
+        )
 
     /**
      * Saves the value for [entryNodes] to [TorServicePrefs]. If the value is the same as what is
@@ -190,7 +198,9 @@ abstract class BaseServiceTorSettings(
 
     override val excludeNodes: String?
         @WorkerThread
-        get() = servicePrefs.getString(PrefKeyString.EXCLUDED_NODES, defaultTorSettings.excludeNodes)
+        get() = servicePrefs.getString(
+            PrefKeyString.EXCLUDED_NODES, defaultTorSettings.excludeNodes
+        )
 
     /**
      * Saves the value for [excludeNodes] to [TorServicePrefs]. If the value is the same as what is
@@ -205,7 +215,9 @@ abstract class BaseServiceTorSettings(
 
     override val exitNodes: String?
         @WorkerThread
-        get() = servicePrefs.getString(PrefKeyString.EXIT_NODES, defaultTorSettings.exitNodes)
+        get() = servicePrefs.getString(
+            PrefKeyString.EXIT_NODES, defaultTorSettings.exitNodes
+        )
 
     /**
      * Saves the value for [exitNodes] to [TorServicePrefs]. If the value is the same as what is
@@ -220,8 +232,9 @@ abstract class BaseServiceTorSettings(
 
     override val httpTunnelPort: String
         @WorkerThread
-        get() = servicePrefs.getString(PrefKeyString.HTTP_TUNNEL_PORT, defaultTorSettings.httpTunnelPort)
-            ?: defaultTorSettings.httpTunnelPort
+        get() = servicePrefs.getString(
+            PrefKeyString.HTTP_TUNNEL_PORT, defaultTorSettings.httpTunnelPort
+        ) ?: defaultTorSettings.httpTunnelPort
 
     /**
      * Saves the value for [httpPort] to [TorServicePrefs]. If the value is the same as what is
@@ -229,7 +242,6 @@ abstract class BaseServiceTorSettings(
      * it exists.
      *
      * @param [httpPort] A String value of 0, auto, or number between 1024 and 65535
-     * @see [checkPortSelection]
      * @see [TorSettings.httpTunnelPort]
      * @throws [IllegalArgumentException] if the value is not 0, auto, or between 1024 and 65535
      * */
@@ -264,7 +276,9 @@ abstract class BaseServiceTorSettings(
 
     override val proxyHost: String?
         @WorkerThread
-        get() = servicePrefs.getString(PrefKeyString.PROXY_HOST, defaultTorSettings.proxyHost)
+        get() = servicePrefs.getString(
+            PrefKeyString.PROXY_HOST, defaultTorSettings.proxyHost
+        )
 
     /**
      * Saves the value for [proxyHost] to [TorServicePrefs]. If the value is the same as what is
@@ -279,7 +293,9 @@ abstract class BaseServiceTorSettings(
 
     override val proxyPassword: String?
         @WorkerThread
-        get() = servicePrefs.getString(PrefKeyString.PROXY_PASSWORD, defaultTorSettings.proxyPassword)
+        get() = servicePrefs.getString(
+            PrefKeyString.PROXY_PASSWORD, defaultTorSettings.proxyPassword
+        )
 
     /**
      * Saves the value for [proxyPassword] to [TorServicePrefs]. If the value is the same as what is
@@ -294,7 +310,9 @@ abstract class BaseServiceTorSettings(
 
     override val proxyPort: Int?
         @WorkerThread
-        get() = servicePrefs.getInt(PrefKeyInt.PROXY_PORT, defaultTorSettings.proxyPort)
+        get() = servicePrefs.getInt(
+            PrefKeyInt.PROXY_PORT, defaultTorSettings.proxyPort
+        )
 
     /**
      * Saves the value for [proxyPort] to [TorServicePrefs]. If the value is the same as what is
@@ -302,7 +320,6 @@ abstract class BaseServiceTorSettings(
      * it exists.
      *
      * @param [proxyPort] An Int value between 1024 and 65535, or `null`
-     * @see [checkPortSelection]
      * @see [TorSettings.proxyPort]
      * @throws [IllegalArgumentException] if the value is not `null`, or between 1024 and 65535
      * */
@@ -312,7 +329,9 @@ abstract class BaseServiceTorSettings(
 
     override val proxySocks5Host: String?
         @WorkerThread
-        get() = servicePrefs.getString(PrefKeyString.PROXY_SOCKS5_HOST, defaultTorSettings.proxySocks5Host)
+        get() = servicePrefs.getString(
+            PrefKeyString.PROXY_SOCKS5_HOST, defaultTorSettings.proxySocks5Host
+        )
 
     /**
      * Saves the value for [proxySocks5Host] to [TorServicePrefs]. If the value is the same as what is
@@ -327,7 +346,9 @@ abstract class BaseServiceTorSettings(
 
     override val proxySocks5ServerPort: Int?
         @WorkerThread
-        get() = servicePrefs.getInt(PrefKeyInt.PROXY_SOCKS5_SERVER_PORT, defaultTorSettings.proxySocks5ServerPort)
+        get() = servicePrefs.getInt(
+            PrefKeyInt.PROXY_SOCKS5_SERVER_PORT, defaultTorSettings.proxySocks5ServerPort
+        )
 
     /**
      * Saves the value for [proxySocks5ServerPort] to [TorServicePrefs]. If the value is the same
@@ -335,7 +356,6 @@ abstract class BaseServiceTorSettings(
      * setting if it exists.
      *
      * @param [proxySocks5ServerPort] An Int value between 1024 and 65535, or `null`
-     * @see [checkPortSelection]
      * @see [TorSettings.proxySocks5ServerPort]
      * @throws [IllegalArgumentException] if the value is not `null`, or between 1024 and 65535
      * */
@@ -345,7 +365,9 @@ abstract class BaseServiceTorSettings(
 
     override val proxyType: @ProxyType String
         @WorkerThread
-        get() = servicePrefs.getString(PrefKeyString.PROXY_TYPE, defaultTorSettings.proxyType) ?: defaultTorSettings.proxyType
+        get() = servicePrefs.getString(
+            PrefKeyString.PROXY_TYPE, defaultTorSettings.proxyType
+        ) ?: defaultTorSettings.proxyType
 
     /**
      * Saves the value for [proxyType] to [TorServicePrefs]. If the value is the same
@@ -363,7 +385,9 @@ abstract class BaseServiceTorSettings(
 
     override val proxyUser: String?
         @WorkerThread
-        get() = servicePrefs.getString(PrefKeyString.PROXY_USER, defaultTorSettings.proxyUser)
+        get() = servicePrefs.getString(
+            PrefKeyString.PROXY_USER, defaultTorSettings.proxyUser
+        )
 
     /**
      * Saves the value for [proxyUser] to [TorServicePrefs]. If the value is the same as what is
@@ -378,8 +402,9 @@ abstract class BaseServiceTorSettings(
 
     override val reachableAddressPorts: String
         @WorkerThread
-        get() = servicePrefs.getString(PrefKeyString.REACHABLE_ADDRESS_PORTS, defaultTorSettings.reachableAddressPorts)
-            ?: defaultTorSettings.reachableAddressPorts
+        get() = servicePrefs.getString(
+            PrefKeyString.REACHABLE_ADDRESS_PORTS, defaultTorSettings.reachableAddressPorts
+        ) ?: defaultTorSettings.reachableAddressPorts
 
     /**
      * Saves the value for [reachableAddressPorts] to [TorServicePrefs]. If the value is the same as what is
@@ -394,7 +419,9 @@ abstract class BaseServiceTorSettings(
 
     override val relayNickname: String?
         @WorkerThread
-        get() = servicePrefs.getString(PrefKeyString.RELAY_NICKNAME, defaultTorSettings.relayNickname)
+        get() = servicePrefs.getString(
+            PrefKeyString.RELAY_NICKNAME, defaultTorSettings.relayNickname
+        )
 
     /**
      * Saves the value for [relayNickname] to [TorServicePrefs]. If the value is the same as what is
@@ -409,8 +436,9 @@ abstract class BaseServiceTorSettings(
 
     override val relayPort: String
         @WorkerThread
-        get() = servicePrefs.getString(PrefKeyString.RELAY_PORT, defaultTorSettings.relayPort)
-            ?: defaultTorSettings.relayPort
+        get() = servicePrefs.getString(
+            PrefKeyString.RELAY_PORT, defaultTorSettings.relayPort
+        ) ?: defaultTorSettings.relayPort
 
     /**
      * Saves the value for [relayPort] to [TorServicePrefs]. If the value is the same as what is
@@ -418,7 +446,6 @@ abstract class BaseServiceTorSettings(
      * it exists.
      *
      * @param [relayPort] A String value of 0, auto, or number between 1024 and 65535
-     * @see [checkPortSelection]
      * @see [TorSettings.relayPort]
      * @throws [IllegalArgumentException] if the value is not 0, auto, or between 1024 and 65535
      * */
@@ -428,8 +455,9 @@ abstract class BaseServiceTorSettings(
 
     override val socksPort: String
         @WorkerThread
-        get() = servicePrefs.getString(PrefKeyString.SOCKS_PORT, defaultTorSettings.socksPort)
-            ?: defaultTorSettings.socksPort
+        get() = servicePrefs.getString(
+            PrefKeyString.SOCKS_PORT, defaultTorSettings.socksPort
+        ) ?: defaultTorSettings.socksPort
 
     /**
      * Saves the value for [socksPort] to [TorServicePrefs]. If the value is the same as what is
@@ -437,7 +465,6 @@ abstract class BaseServiceTorSettings(
      * it exists.
      *
      * @param [socksPort] A String value of 0, auto, or number between 1024 and 65535
-     * @see [checkPortSelection]
      * @see [TorSettings.socksPort]
      * @throws [IllegalArgumentException] if the value is not 0, auto, or between 1024 and 65535
      * */
@@ -467,7 +494,9 @@ abstract class BaseServiceTorSettings(
 
     override val virtualAddressNetwork: String?
         @WorkerThread
-        get() = servicePrefs.getString(PrefKeyString.VIRTUAL_ADDRESS_NETWORK, defaultTorSettings.virtualAddressNetwork)
+        get() = servicePrefs.getString(
+            PrefKeyString.VIRTUAL_ADDRESS_NETWORK, defaultTorSettings.virtualAddressNetwork
+        )
 
     /**
      * Saves the value for [virtualAddressNetwork] to [TorServicePrefs]. If the value is the same
@@ -482,7 +511,9 @@ abstract class BaseServiceTorSettings(
 
     override val hasBridges: Boolean
         @WorkerThread
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_BRIDGES, defaultTorSettings.hasBridges)
+        get() = servicePrefs.getBoolean(
+            PrefKeyBoolean.HAS_BRIDGES, defaultTorSettings.hasBridges
+        )
 
     /**
      * Saves the value for [hasBridges] to [TorServicePrefs]. If the value is the same
@@ -497,8 +528,9 @@ abstract class BaseServiceTorSettings(
 
     override val connectionPadding: String
         @WorkerThread
-        get() = servicePrefs.getString(PrefKeyString.HAS_CONNECTION_PADDING, defaultTorSettings.connectionPadding)
-            ?: defaultTorSettings.connectionPadding
+        get() = servicePrefs.getString(
+            PrefKeyString.HAS_CONNECTION_PADDING, defaultTorSettings.connectionPadding
+        ) ?: defaultTorSettings.connectionPadding
 
     /**
      * Saves the value for [connectionPadding] to [TorServicePrefs]. If the value is the same
@@ -516,7 +548,9 @@ abstract class BaseServiceTorSettings(
 
     override val hasCookieAuthentication: Boolean
         @WorkerThread
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_COOKIE_AUTHENTICATION, defaultTorSettings.hasCookieAuthentication)
+        get() = servicePrefs.getBoolean(
+            PrefKeyBoolean.HAS_COOKIE_AUTHENTICATION, defaultTorSettings.hasCookieAuthentication
+        )
 
     /**
      * Saves the value for [hasCookieAuthentication] to [TorServicePrefs]. If the value is the same
@@ -531,7 +565,9 @@ abstract class BaseServiceTorSettings(
 
     override val hasDebugLogs: Boolean
         @WorkerThread
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_DEBUG_LOGS, defaultTorSettings.hasDebugLogs)
+        get() = servicePrefs.getBoolean(
+            PrefKeyBoolean.HAS_DEBUG_LOGS, defaultTorSettings.hasDebugLogs
+        )
 
     /**
      * Saves the value for [hasDebugLogs] to [TorServicePrefs]. If the value is the same
@@ -546,7 +582,9 @@ abstract class BaseServiceTorSettings(
 
     override val hasDormantCanceledByStartup: Boolean
         @WorkerThread
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_DORMANT_CANCELED_BY_STARTUP, defaultTorSettings.hasDormantCanceledByStartup)
+        get() = servicePrefs.getBoolean(
+            PrefKeyBoolean.HAS_DORMANT_CANCELED_BY_STARTUP, defaultTorSettings.hasDormantCanceledByStartup
+        )
 
     /**
      * Saves the value for [hasDormantCanceledByStartup] to [TorServicePrefs]. If the value is the same
@@ -561,7 +599,9 @@ abstract class BaseServiceTorSettings(
 
     override val hasOpenProxyOnAllInterfaces: Boolean
         @WorkerThread
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_OPEN_PROXY_ON_ALL_INTERFACES, defaultTorSettings.hasOpenProxyOnAllInterfaces)
+        get() = servicePrefs.getBoolean(
+            PrefKeyBoolean.HAS_OPEN_PROXY_ON_ALL_INTERFACES, defaultTorSettings.hasOpenProxyOnAllInterfaces
+        )
 
     /**
      * Saves the value for [hasOpenProxyOnAllInterfaces] to [TorServicePrefs]. If the value is the same
@@ -576,7 +616,9 @@ abstract class BaseServiceTorSettings(
 
     override val hasReachableAddress: Boolean
         @WorkerThread
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_REACHABLE_ADDRESS, defaultTorSettings.hasReachableAddress)
+        get() = servicePrefs.getBoolean(
+            PrefKeyBoolean.HAS_REACHABLE_ADDRESS, defaultTorSettings.hasReachableAddress
+        )
 
     /**
      * Saves the value for [hasReachableAddress] to [TorServicePrefs]. If the value is the same
@@ -591,7 +633,9 @@ abstract class BaseServiceTorSettings(
 
     override val hasReducedConnectionPadding: Boolean
         @WorkerThread
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_REDUCED_CONNECTION_PADDING, defaultTorSettings.hasReducedConnectionPadding)
+        get() = servicePrefs.getBoolean(
+            PrefKeyBoolean.HAS_REDUCED_CONNECTION_PADDING, defaultTorSettings.hasReducedConnectionPadding
+        )
 
     /**
      * Saves the value for [hasReducedConnectionPadding] to [TorServicePrefs]. If the value is the same
@@ -606,7 +650,9 @@ abstract class BaseServiceTorSettings(
 
     override val hasSafeSocks: Boolean
         @WorkerThread
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_SAFE_SOCKS, defaultTorSettings.hasSafeSocks)
+        get() = servicePrefs.getBoolean(
+            PrefKeyBoolean.HAS_SAFE_SOCKS, defaultTorSettings.hasSafeSocks
+        )
 
     /**
      * Saves the value for [hasSafeSocks] to [TorServicePrefs]. If the value is the same
@@ -621,7 +667,9 @@ abstract class BaseServiceTorSettings(
 
     override val hasStrictNodes: Boolean
         @WorkerThread
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_STRICT_NODES, defaultTorSettings.hasStrictNodes)
+        get() = servicePrefs.getBoolean(
+            PrefKeyBoolean.HAS_STRICT_NODES, defaultTorSettings.hasStrictNodes
+        )
 
     /**
      * Saves the value for [hasStrictNodes] to [TorServicePrefs]. If the value is the same
@@ -636,7 +684,9 @@ abstract class BaseServiceTorSettings(
 
     override val hasTestSocks: Boolean
         @WorkerThread
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_TEST_SOCKS, defaultTorSettings.hasTestSocks)
+        get() = servicePrefs.getBoolean(
+            PrefKeyBoolean.HAS_TEST_SOCKS, defaultTorSettings.hasTestSocks
+        )
 
     /**
      * Saves the value for [hasTestSocks] to [TorServicePrefs]. If the value is the same
@@ -651,7 +701,9 @@ abstract class BaseServiceTorSettings(
 
     override val isAutoMapHostsOnResolve: Boolean
         @WorkerThread
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.IS_AUTO_MAP_HOSTS_ON_RESOLVE, defaultTorSettings.isAutoMapHostsOnResolve)
+        get() = servicePrefs.getBoolean(
+            PrefKeyBoolean.IS_AUTO_MAP_HOSTS_ON_RESOLVE, defaultTorSettings.isAutoMapHostsOnResolve
+        )
 
     /**
      * Saves the value for [isAutoMapHostsOnResolve] to [TorServicePrefs]. If the value is the same
@@ -666,7 +718,9 @@ abstract class BaseServiceTorSettings(
 
     override val isRelay: Boolean
         @WorkerThread
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.IS_RELAY, defaultTorSettings.isRelay)
+        get() = servicePrefs.getBoolean(
+            PrefKeyBoolean.IS_RELAY, defaultTorSettings.isRelay
+        )
 
     /**
      * Saves the value for [isRelay] to [TorServicePrefs]. If the value is the same
@@ -681,7 +735,9 @@ abstract class BaseServiceTorSettings(
 
     override val runAsDaemon: Boolean
         @WorkerThread
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.RUN_AS_DAEMON, defaultTorSettings.runAsDaemon)
+        get() = servicePrefs.getBoolean(
+            PrefKeyBoolean.RUN_AS_DAEMON, defaultTorSettings.runAsDaemon
+        )
 
     /**
      * Saves the value for [runAsDaemon] to [TorServicePrefs]. If the value is the same
@@ -696,7 +752,9 @@ abstract class BaseServiceTorSettings(
 
     override val transPort: String
         @WorkerThread
-        get() = servicePrefs.getString(PrefKeyString.TRANS_PORT, defaultTorSettings.transPort) ?: defaultTorSettings.transPort
+        get() = servicePrefs.getString(
+            PrefKeyString.TRANS_PORT, defaultTorSettings.transPort
+        ) ?: defaultTorSettings.transPort
 
     /**
      * Saves the value for [transPort] to [TorServicePrefs]. If the value is the same as what is
@@ -704,7 +762,6 @@ abstract class BaseServiceTorSettings(
      * it exists.
      *
      * @param [transPort] A String value of 0, auto, or number between 1024 and 65535
-     * @see [checkPortSelection]
      * @see [TorSettings.transPort]
      * @throws [IllegalArgumentException] if the value is not 0, auto, or between 1024 and 65535
      * */
@@ -734,7 +791,9 @@ abstract class BaseServiceTorSettings(
 
     override val useSocks5: Boolean
         @WorkerThread
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.USE_SOCKS5, defaultTorSettings.useSocks5)
+        get() = servicePrefs.getBoolean(
+            PrefKeyBoolean.USE_SOCKS5, defaultTorSettings.useSocks5
+        )
 
     /**
      * Saves the value for [useSocks5] to [TorServicePrefs]. If the value is the same

@@ -185,8 +185,9 @@ class BackgroundManager internal constructor(
         @JvmOverloads
         fun respectResourcesWhileInBackground(secondsFrom5To45: Int? = null): Policy {
             chosenPolicy = BackgroundPolicy.RESPECT_RESOURCES
-            if (secondsFrom5To45 != null && secondsFrom5To45 in 5..45)
+            if (secondsFrom5To45 != null && secondsFrom5To45 in 5..45) {
                 executionDelay = (secondsFrom5To45 * 1000).toLong()
+            }
             return Policy(this)
         }
 

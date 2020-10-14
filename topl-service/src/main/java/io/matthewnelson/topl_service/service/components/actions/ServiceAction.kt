@@ -88,7 +88,7 @@ internal sealed class ServiceAction {
     abstract val name: String
 
     /**
-     * Individual [ServiceActionCommand]'s to executed sequentially by
+     * Individual [ServiceActionCommand]'s to be executed sequentially by
      * [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor].
      * */
     abstract val commands: Array<@ServiceActionCommand String>
@@ -125,7 +125,7 @@ internal sealed class ServiceAction {
 
     class SetDisableNetwork(
         override val name: String,
-        private val updateLastServiceAction: Boolean = false
+        updateLastServiceAction: Boolean = false
     ): ServiceAction() {
 
         override val commands: Array<String>
@@ -151,8 +151,7 @@ internal sealed class ServiceAction {
 
         override val delayLengthQueue = mutableListOf(ServiceActionProcessor.disableNetworkDelay)
 
-        override val updateLastAction: Boolean
-            get() = updateLastServiceAction
+        override val updateLastAction: Boolean = updateLastServiceAction
     }
 
     class NewId: ServiceAction() {
@@ -181,7 +180,7 @@ internal sealed class ServiceAction {
         override val delayLengthQueue = mutableListOf(ServiceActionProcessor.restartTorDelayTime)
     }
 
-    class Start(private val updateLastServiceAction: Boolean = true): ServiceAction() {
+    class Start(updateLastServiceAction: Boolean = true): ServiceAction() {
 
         @ServiceActionName
         override val name: String = ServiceActionName.START
@@ -191,11 +190,10 @@ internal sealed class ServiceAction {
                 ServiceActionCommand.START_TOR
             )
 
-        override val updateLastAction: Boolean
-            get() = updateLastServiceAction
+        override val updateLastAction: Boolean = updateLastServiceAction
     }
 
-    class Stop(private val updateLastServiceAction: Boolean = true): ServiceAction() {
+    class Stop(updateLastServiceAction: Boolean = true): ServiceAction() {
 
         @ServiceActionName
         override val name: String = ServiceActionName.STOP
@@ -209,7 +207,6 @@ internal sealed class ServiceAction {
 
         override val delayLengthQueue = mutableListOf(ServiceActionProcessor.stopServiceDelayTime)
 
-        override val updateLastAction: Boolean
-            get() = updateLastServiceAction
+        override val updateLastAction: Boolean = updateLastServiceAction
     }
 }

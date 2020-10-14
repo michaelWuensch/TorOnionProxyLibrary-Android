@@ -183,9 +183,9 @@ class ServiceNotification internal constructor(
             intentExtras: String?,
             intentRequestCode: Int?
         ): Builder {
-            serviceNotification.activityWhenTapped = clazz
-            serviceNotification.activityIntentKey = intentExtrasKey
-            serviceNotification.activityIntentExtras = intentExtras
+            this.serviceNotification.activityWhenTapped = clazz
+            this.serviceNotification.activityIntentKey = intentExtrasKey
+            this.serviceNotification.activityIntentExtras = intentExtras
             intentRequestCode?.let { serviceNotification.activityIntentRequestCode = it }
             return this
         }
@@ -202,7 +202,7 @@ class ServiceNotification internal constructor(
          * @return [Builder] To continue customizing
          * */
         fun setImageTorNetworkingEnabled(@DrawableRes drawableRes: Int): Builder {
-            serviceNotification.imageNetworkEnabled = drawableRes
+            this.serviceNotification.imageNetworkEnabled = drawableRes
             return this
         }
 
@@ -218,7 +218,7 @@ class ServiceNotification internal constructor(
          * @return [Builder] To continue customizing
          * */
         fun setImageTorNetworkingDisabled(@DrawableRes drawableRes: Int): Builder {
-            serviceNotification.imageNetworkDisabled = drawableRes
+            this.serviceNotification.imageNetworkDisabled = drawableRes
             return this
         }
 
@@ -233,7 +233,7 @@ class ServiceNotification internal constructor(
          * @return [Builder] To continue customizing
          * */
         fun setImageTorDataTransfer(@DrawableRes drawableRes: Int): Builder {
-            serviceNotification.imageDataTransfer = drawableRes
+            this.serviceNotification.imageDataTransfer = drawableRes
             return this
         }
 
@@ -248,7 +248,7 @@ class ServiceNotification internal constructor(
          * @return [Builder] To continue customizing
          * */
         fun setImageTorErrors(@DrawableRes drawableRes: Int): Builder {
-            serviceNotification.imageError = drawableRes
+            this.serviceNotification.imageError = drawableRes
             return this
         }
 
@@ -264,7 +264,7 @@ class ServiceNotification internal constructor(
          * @return [Builder] To continue customizing
          * */
         fun setCustomColor(@ColorRes colorRes: Int): Builder {
-            serviceNotification.colorWhenConnected = colorRes
+            this.serviceNotification.colorWhenConnected = colorRes
             return this
         }
 
@@ -279,8 +279,9 @@ class ServiceNotification internal constructor(
          * @return [Builder] To continue customizing
          * */
         fun setVisibility(@NotificationVisibility visibility: Int): Builder {
-            if (visibility in -1..1)
-                serviceNotification.visibility = visibility
+            if (visibility in -1..1) {
+                this.serviceNotification.visibility = visibility
+            }
             return this
         }
 
@@ -297,7 +298,7 @@ class ServiceNotification internal constructor(
          * */
         @JvmOverloads
         fun enableTorRestartButton(enable: Boolean = true): Builder {
-            serviceNotification.enableRestartButton = enable
+            this.serviceNotification.enableRestartButton = enable
             return this
         }
 
@@ -314,7 +315,7 @@ class ServiceNotification internal constructor(
          * */
         @JvmOverloads
         fun enableTorStopButton(enable: Boolean = true): Builder {
-            serviceNotification.enableStopButton = enable
+            this.serviceNotification.enableStopButton = enable
             return this
         }
 
@@ -334,7 +335,7 @@ class ServiceNotification internal constructor(
          * */
         @JvmOverloads
         fun showNotification(show: Boolean = false): Builder {
-            serviceNotification.showNotification = show
+            this.serviceNotification.showNotification = show
             return this
         }
 

@@ -97,8 +97,8 @@ internal class ServiceTorInstaller(private val torService: BaseService): TorInst
     private val torConfigFiles: TorConfigFiles
         get() = TorServiceController.getTorConfigFiles()
 
-    private val torServicePrefs = TorServicePrefs(torService.context)
-    private val localPrefs = BaseService.getLocalPrefs(torService.context)
+    private val torServicePrefs by lazy { TorServicePrefs(torService.context) }
+    private val localPrefs by lazy { BaseService.getLocalPrefs(torService.context) }
     private var geoIpFileCopied = false
     private var geoIpv6FileCopied = false
 
@@ -116,8 +116,9 @@ internal class ServiceTorInstaller(private val torService: BaseService): TorInst
             copyGeoIpv6Asset()
             geoIpv6FileCopied = true
         }
-        if (!torConfigFiles.v3AuthPrivateDir.exists())
+        if (!torConfigFiles.v3AuthPrivateDir.exists()) {
             torConfigFiles.v3AuthPrivateDir.mkdirs()
+        }
 
         // If the app version has been increased, or if this is a debug build, copy over
         // geoip assets then update SharedPreferences with the new version code. This
@@ -125,10 +126,12 @@ internal class ServiceTorInstaller(private val torService: BaseService): TorInst
         if (BaseService.buildConfigDebug ||
             BaseService.buildConfigVersionCode > localPrefs.getInt(APP_VERSION_CODE, -1)
         ) {
-            if (!geoIpFileCopied)
+            if (!geoIpFileCopied) {
                 copyGeoIpAsset()
-            if (!geoIpv6FileCopied)
+            }
+            if (!geoIpv6FileCopied) {
                 copyGeoIpv6Asset()
+            }
             localPrefs.edit()
                 .putInt(APP_VERSION_CODE, BaseService.buildConfigVersionCode)
                 .apply()
@@ -188,10 +191,11 @@ internal class ServiceTorInstaller(private val torService: BaseService): TorInst
 
         val bridgeTypeStream = ByteArrayInputStream(byteArrayOf(bridgeType))
         val bridgeStream =
-            if (bridgeType.toInt() == 1)
+            if (bridgeType.toInt() == 1) {
                 ByteArrayInputStream(userDefinedBridgeList.toByteArray())
-            else
+            } else {
                 torService.context.resources.openRawResource(R.raw.bridges)
+            }
         return SequenceInputStream(bridgeTypeStream, bridgeStream)
     }
 

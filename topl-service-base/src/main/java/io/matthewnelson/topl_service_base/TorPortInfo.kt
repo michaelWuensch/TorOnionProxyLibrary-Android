@@ -72,7 +72,8 @@
 package io.matthewnelson.topl_service_base
 
 /**
- * Contains information regarding what ports Tor is operating on.
+ * Holder for information regarding what ports Tor is operating on that is broadcast
+ * to the implementing application via [io.matthewnelson.topl_service_base.TorServiceEventBroadcaster]
  *
  * Example of what one of the fields will contain:
  *

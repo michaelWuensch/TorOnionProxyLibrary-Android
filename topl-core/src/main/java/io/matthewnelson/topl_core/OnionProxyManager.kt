@@ -244,7 +244,9 @@ class OnionProxyManager(
     @get:Synchronized
     val iPv4LocalHostSocksPort: Int
         get() {
-            if (!isRunning) throw RuntimeException("Tor is not running!")
+            if (!isRunning) {
+                throw RuntimeException("Tor is not running!")
+            }
 
             val socksIpPorts = try {
                 // This returns a set of space delimited quoted strings which could be Ipv4,
@@ -293,13 +295,15 @@ class OnionProxyManager(
         val hostnameFile = torConfigFiles.hostnameFile
 
         broadcastLogger.notice("Creating hidden service")
-        if (!onionProxyContext.createNewFileIfDoesNotExist(ConfigFile.HOSTNAME_FILE))
+        if (!onionProxyContext.createNewFileIfDoesNotExist(ConfigFile.HOSTNAME_FILE)) {
             throw IOException("Could not create hostnameFile")
+        }
 
         // Watch for the hostname file being created/updated
         val hostNameFileObserver = onionProxyContext.createFileObserver(ConfigFile.HOSTNAME_FILE)
-        if (!onionProxyContext.setHostnameDirPermissionsToReadOnly())
+        if (!onionProxyContext.setHostnameDirPermissionsToReadOnly()) {
             throw RuntimeException("Unable to set permissions on hostName dir")
+        }
 
         // Use the control connection to update the Tor config
         val config = listOf(
@@ -425,7 +429,9 @@ class OnionProxyManager(
     @Throws(IOException::class, NullPointerException::class)
     fun disableNetwork(disable: Boolean) {
         synchronized(disableNetworkLock) {
-            if (!hasControlConnection) return
+            if (!hasControlConnection) {
+                return
+            }
 
             val networkIsSetToDisable = try {
                 isNetworkDisabled
@@ -433,14 +439,27 @@ class OnionProxyManager(
                 !disable
             }
 
-            if (networkIsSetToDisable == disable) return
+            if (networkIsSetToDisable == disable) {
+                return
+            }
 
             broadcastLogger.debug("Setting Tor conf DisableNetwork: $disable")
 
             try {
-                controlConnection!!.setConf("DisableNetwork", if (disable) "1" else "0")
+                controlConnection!!.setConf(
+                    "DisableNetwork",
+                    if (disable) {
+                        "1"
+                    } else {
+                        "0"
+                    }
+                )
                 torStateMachine.setTorNetworkState(
-                    if (disable) TorNetworkState.DISABLED else TorNetworkState.ENABLED
+                    if (disable) {
+                        TorNetworkState.DISABLED
+                    } else {
+                        TorNetworkState.ENABLED
+                    }
                 )
             } catch (e: IOException) {
                 warnControlConnectionNotResponding("setConf")
@@ -462,7 +481,9 @@ class OnionProxyManager(
     @get:Synchronized
     private val isNetworkDisabled: Boolean
         get() {
-            if (!hasControlConnection) return true
+            if (!hasControlConnection) {
+                return true
+            }
 
             val disableNetworkSettingValues = try {
                 controlConnection!!.getConf("DisableNetwork")
@@ -495,7 +516,9 @@ class OnionProxyManager(
     @get:Synchronized
     private val isBootstrapped: Boolean
         get() {
-            if (!hasControlConnection) return false
+            if (!hasControlConnection) {
+                return false
+            }
 
             try {
                 val phase = controlConnection?.getInfo("status/bootstrap-phase")
@@ -588,12 +611,13 @@ class OnionProxyManager(
                 controlConnection.setEvents(listOf(*eventListener.CONTROL_COMMAND_EVENTS))
             }
 
-            if (hasNetworkConnectivity())
+            if (hasNetworkConnectivity()) {
                 disableNetwork(false)
-            else
+            } else {
                 broadcastLogger.warn(
                     "No Network Connectivity. Foregoing enabling of Tor Network."
                 )
+            }
 
         } catch (e: Exception) {
             torProcess?.destroy()
@@ -614,14 +638,15 @@ class OnionProxyManager(
      */
     @Throws(SecurityException::class)
     private fun findExistingTorConnection(): TorControlConnection? {
-        return if (torConfigFiles.controlPortFile.exists())
+        return if (torConfigFiles.controlPortFile.exists()) {
             try {
                 connectToTorControlSocket()
             } catch (e: IOException) {
                 null
             }
-        else
+        } else {
             null
+        }
     }
 
     /**
@@ -699,8 +724,9 @@ class OnionProxyManager(
         }
 
         eatStream(torProcess.errorStream, true)
-        if (torSettings.hasDebugLogs)
+        if (torSettings.hasDebugLogs) {
             eatStream(torProcess.inputStream, false)
+        }
         return torProcess
     }
 
@@ -782,10 +808,11 @@ class OnionProxyManager(
     private fun torExecutable(): File {
         var torExe = torConfigFiles.torExecutableFile
         //Try removing platform specific extension
-        if (!torExe.exists())
+        if (!torExe.exists()) {
             // Named to match GuardianProject's binaries, just in case someone
             //  forgets to create/set a custom TorConfigFile if using their dependency.
             torExe = File(torExe.parent, "libtor.so")
+        }
 
         if (!torExe.exists()) {
             torStateMachine.setTorState(TorState.STOPPING)
@@ -841,7 +868,9 @@ class OnionProxyManager(
      */
     fun setExitNode(exitNodes: String?): Boolean {
         //Based on config params from Orbot project
-        if (!hasControlConnection) return false
+        if (!hasControlConnection) {
+            return false
+        }
 
         if (exitNodes.isNullOrEmpty()) {
             try {
@@ -892,7 +921,9 @@ class OnionProxyManager(
      * */
     @Synchronized
     suspend fun signalNewNym() {
-        if (!hasControlConnection || !isBootstrapped) return
+        if (!hasControlConnection || !isBootstrapped) {
+            return
+        }
         if (!hasNetworkConnectivity()) {
             broadcastLogger.notice("NEWNYM: $NEWNYM_NO_NETWORK")
             return
@@ -966,7 +997,9 @@ class OnionProxyManager(
     }
 
     fun reloadTorConfig(): Boolean {
-        if (!hasControlConnection) return false
+        if (!hasControlConnection) {
+            return false
+        }
 
         try {
             controlConnection!!.signal(TorControlCommands.SIGNAL_RELOAD)
@@ -1015,8 +1048,9 @@ class OnionProxyManager(
 
             killAttempts++
 
-            if (killAttempts > 4)
+            if (killAttempts > 4) {
                 throw Exception("Cannot kill: ${torConfigFiles.torExecutableFile.absolutePath}")
+            }
         }
     }
 

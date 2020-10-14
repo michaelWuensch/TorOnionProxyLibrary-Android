@@ -78,11 +78,13 @@ import androidx.annotation.WorkerThread
 /**
  * This class provides a standardized way for library users to change settings used
  * by the `topl-service` module such that the values expressed as default
- * [io.matthewnelson.topl_core_base.TorSettings] when initializing things via can be modified
- * by the implementing application.
+ * [io.matthewnelson.topl_service_base.ApplicationDefaultTorSettings] when initializing things
+ * can be modified by the implementing application.
  *
  * The values saved to [TorServicePrefs] are always preferred over the defaults declared
  * when initializing the `topl-service` module.
+ *
+ * Restarting Tor is currently required for the new settings to take effect.
  * */
 class TorServicePrefs(context: Context): BaseServiceConsts() {
 

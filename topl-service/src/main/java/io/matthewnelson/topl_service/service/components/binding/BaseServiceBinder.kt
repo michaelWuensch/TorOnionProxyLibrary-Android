@@ -135,8 +135,8 @@ internal abstract class BaseServiceBinder(private val torService: BaseService): 
      * Cancels the coroutine executing the [BackgroundPolicy] if it is active.
      * */
     fun cancelExecuteBackgroundPolicyJob() {
-        if (backgroundPolicyExecutionJob?.isActive == true) {
-            backgroundPolicyExecutionJob?.let {
+        backgroundPolicyExecutionJob?.let {
+            if (it.isActive) {
                 it.cancel()
                 bgMgrBroadcastLogger.debug("Execution has been cancelled")
             }

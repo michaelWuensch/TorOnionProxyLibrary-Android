@@ -94,7 +94,9 @@ fun File.readTorConfigFile(): ByteArray {
 
         while (offset < b.size) {
             val read = inputStream.read(b, offset, b.size - offset)
-            if (read == -1) throw EOFException()
+            if (read == -1) {
+                throw EOFException()
+            }
             offset += read
         }
 
@@ -113,11 +115,14 @@ fun File.readTorConfigFile(): ByteArray {
  * */
 @Throws(SecurityException::class)
 fun File.createNewFileIfDoesNotExist(): Boolean? {
-    if (this.parentFile?.exists() != true && this.parentFile?.mkdirs() != true)
-        return null
+    if (this.parentFile?.exists() != true && this.parentFile?.mkdirs() != true) return null
 
     return try {
-        val exists = if (this.exists()) true else this.createNewFile()
+        val exists = if (this.exists()) {
+            true
+        } else {
+            this.createNewFile()
+        }
         exists
     } catch (e: IOException) {
         false

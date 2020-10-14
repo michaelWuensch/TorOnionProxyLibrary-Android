@@ -124,12 +124,12 @@ internal class V3ClientAuthManager(
 
     @WorkerThread
     override fun getFileContent(nickname: String): V3ClientAuthContent? {
-        val v3ClientAuthFile = getFileByNickname(nickname) ?: return null
-        val content = v3ClientAuthFile.readText().split(':')
-        return if (content.size != 4)
+        val content = getFileByNickname(nickname)?.readText()?.split(':') ?: return null
+        return if (content.size != 4) {
             null
-        else
+        } else {
             V3ClientAuthContent(content[0], content[3])
+        }
     }
 
     @WorkerThread

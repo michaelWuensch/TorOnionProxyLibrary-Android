@@ -83,7 +83,7 @@ abstract class BaseV3ClientAuthManager {
     /**
      * Creates a file containing v3 Client Authorization for a Hidden Service in the format of:
      *  - Filename: [nickname].auth_private
-     *  - File Contents:  <56-char-onion-addr-without-.onion-part>:descriptor:x25519:<x25519 private key in base32>
+     *  - File Contents:  (56-char-onion-addr-**without**.onion):descriptor:x25519:(x25519 private key in base32)
      *
      * Exceptions are thrown for you with adequate messages if the values passed
      * are non-compliant.

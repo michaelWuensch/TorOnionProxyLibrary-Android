@@ -169,8 +169,9 @@ class TorSettingsBuilder internal constructor(
      * Add a new line to the [buffer] if a setting here is not available.
      * */
     fun addLine(value: String?): TorSettingsBuilder {
-        if (!value.isNullOrEmpty())
+        if (!value.isNullOrEmpty()) {
             buffer.append("$value\n")
+        }
         return this
     }
 
@@ -210,27 +211,34 @@ class TorSettingsBuilder internal constructor(
     }
 
     fun automapHostsOnResolve(enable: Boolean): TorSettingsBuilder {
-        val autoMapHostsOnResolve = if (enable) "1" else "0"
+        val autoMapHostsOnResolve = if (enable) {
+            "1"
+        } else {
+            "0"
+        }
         buffer.append("AutomapHostsOnResolve $autoMapHostsOnResolve\n")
         return this
     }
 
     @SettingsConfig
     fun automapHostsOnResolveFromSettings(): TorSettingsBuilder =
-        if (torSettings.isAutoMapHostsOnResolve)
+        if (torSettings.isAutoMapHostsOnResolve) {
             automapHostsOnResolve(true)
-        else
+        } else {
             this
+        }
 
     fun addBridge(type: String?, config: String?): TorSettingsBuilder {
-        if (!type.isNullOrEmpty() && !config.isNullOrEmpty())
+        if (!type.isNullOrEmpty() && !config.isNullOrEmpty()) {
             buffer.append("Bridge $type $config\n")
+        }
         return this
     }
 
     fun addCustomBridge(config: String?): TorSettingsBuilder {
-        if (!config.isNullOrEmpty())
+        if (!config.isNullOrEmpty()) {
             buffer.append("Bridge $config\n")
+        }
         return this
     }
 
@@ -253,18 +261,19 @@ class TorSettingsBuilder internal constructor(
     // TODO: Re-work this to utilize torConfigFiles
     @Throws(IOException::class, SecurityException::class)
     fun configurePluggableTransportsFromSettings(pluggableTransportClient: File?): TorSettingsBuilder {
-        if (pluggableTransportClient == null) return this
-
-        if (!pluggableTransportClient.exists())
+        if (pluggableTransportClient == null) {
+            return this
+        }
+        if (!pluggableTransportClient.exists()) {
             throw IOException(
                 "Bridge binary does not exist: ${pluggableTransportClient.canonicalPath}"
             )
-
-        if (!pluggableTransportClient.canExecute())
+        }
+        if (!pluggableTransportClient.canExecute()) {
             throw IOException(
                 "Bridge binary is not executable: ${pluggableTransportClient.canonicalPath}"
             )
-
+        }
         transportPlugin(pluggableTransportClient.canonicalPath)
         return this
     }
@@ -277,10 +286,11 @@ class TorSettingsBuilder internal constructor(
 
     @SettingsConfig
     fun cookieAuthenticationFromSettings(): TorSettingsBuilder =
-        if (torSettings.hasCookieAuthentication)
+        if (torSettings.hasCookieAuthentication) {
             cookieAuthentication()
-        else
+        } else {
             this
+        }
 
     fun connectionPadding(@ConnectionPadding setting: String): TorSettingsBuilder {
         buffer.append("ConnectionPadding $setting\n")
@@ -318,16 +328,18 @@ class TorSettingsBuilder internal constructor(
 
     @SettingsConfig
     fun debugLogsFromSettings(): TorSettingsBuilder =
-        if (torSettings.hasDebugLogs)
+        if (torSettings.hasDebugLogs) {
             debugLogs()
-        else
+        } else {
             this
+        }
 
     fun dormantClientTimetout(minutes: Int): TorSettingsBuilder {
-        val value = if (minutes < 10)
+        val value = if (minutes < 10) {
             10
-        else
+        } else {
             minutes
+        }
         buffer.append("DormantClientTimeout $value minutes\n")
         return this
     }
@@ -345,20 +357,27 @@ class TorSettingsBuilder internal constructor(
     }
 
     fun disableNetwork(disable: Boolean): TorSettingsBuilder {
-        val disableNetwork = if (disable) "1" else "0"
+        val disableNetwork = if (disable) {
+            "1"
+        } else {
+            "0"
+        }
         buffer.append("DisableNetwork $disableNetwork\n")
         return this
     }
 
     @SettingsConfig
     fun disableNetworkFromSettings(): TorSettingsBuilder =
-        if (torSettings.disableNetwork)
+        if (torSettings.disableNetwork) {
             disableNetwork(true)
-        else
+        } else {
             this
+        }
 
     fun dnsPort(dnsPort: String, isolationFlags: List<@IsolationFlag String>?): TorSettingsBuilder {
-        if (dnsPort.isEmpty()) return this
+        if (dnsPort.isEmpty()) {
+            return this
+        }
 
         buffer.append("DNSPort $dnsPort")
 
@@ -385,50 +404,62 @@ class TorSettingsBuilder internal constructor(
     }
 
     fun dormantCanceledByStartup(enable: Boolean): TorSettingsBuilder {
-        val dormantCanceledStartup = if (enable) "1" else "0"
+        val dormantCanceledStartup = if (enable) {
+            "1"
+        } else {
+            "0"
+        }
         buffer.append("DormantCanceledByStartup $dormantCanceledStartup\n")
         return this
     }
 
     @SettingsConfig
     fun dormantCanceledByStartupFromSettings(): TorSettingsBuilder =
-        if (torSettings.hasDormantCanceledByStartup)
+        if (torSettings.hasDormantCanceledByStartup) {
             dormantCanceledByStartup(true)
-        else
+        } else {
             this
+        }
 
     fun entryNodes(entryNodes: String?): TorSettingsBuilder {
-        if (!entryNodes.isNullOrEmpty())
+        if (!entryNodes.isNullOrEmpty()) {
             buffer.append("EntryNodes $entryNodes\n")
+        }
         return this
     }
 
     fun excludeNodes(excludeNodes: String?): TorSettingsBuilder {
-        if (!excludeNodes.isNullOrEmpty())
+        if (!excludeNodes.isNullOrEmpty()) {
             buffer.append("ExcludeNodes $excludeNodes\n")
+        }
         return this
     }
 
     fun exitNodes(exitNodes: String?): TorSettingsBuilder {
-        if (!exitNodes.isNullOrEmpty())
+        if (!exitNodes.isNullOrEmpty()) {
             buffer.append("ExitNodes $exitNodes\n")
+        }
         return this
     }
 
     fun geoIpFile(path: String?): TorSettingsBuilder {
-        if (!path.isNullOrEmpty())
+        if (!path.isNullOrEmpty()) {
             buffer.append("GeoIPFile $path\n")
+        }
         return this
     }
 
     fun geoIpV6File(path: String?): TorSettingsBuilder {
-        if (!path.isNullOrEmpty())
+        if (!path.isNullOrEmpty()) {
             buffer.append("GeoIPv6File $path\n")
+        }
         return this
     }
 
     fun httpTunnelPort(port: String, isolationFlags: List<@IsolationFlag String>?): TorSettingsBuilder {
-        if (port.isEmpty()) return this
+        if (port.isEmpty()) {
+            return this
+        }
 
         buffer.append("HTTPTunnelPort $port")
 
@@ -514,10 +545,11 @@ class TorSettingsBuilder internal constructor(
 
     @SettingsConfig
     fun proxyOnAllInterfacesFromSettings(): TorSettingsBuilder =
-        if (torSettings.hasOpenProxyOnAllInterfaces)
+        if (torSettings.hasOpenProxyOnAllInterfaces) {
             proxyOnAllInterfaces()
-        else
+        } else {
             this
+        }
 
     /**
      * Set socks5 proxy with no authentication.
@@ -532,13 +564,14 @@ class TorSettingsBuilder internal constructor(
 
     @SettingsConfig
     fun proxySocks5FromSettings(): TorSettingsBuilder =
-        if (torSettings.useSocks5 && !torSettings.hasBridges)
+        if (torSettings.useSocks5 && !torSettings.hasBridges) {
             proxySocks5(
                 torSettings.proxySocks5Host,
                 torSettings.proxySocks5ServerPort
             )
-        else
+        } else {
             this
+        }
 
     /**
      * Sets proxyWithAuthentication information.
@@ -580,7 +613,7 @@ class TorSettingsBuilder internal constructor(
 
     @SettingsConfig
     fun proxyWithAuthenticationFromSettings(): TorSettingsBuilder =
-        if (!torSettings.useSocks5 && !torSettings.hasBridges)
+        if (!torSettings.useSocks5 && !torSettings.hasBridges) {
             proxyWithAuthentication(
                 torSettings.proxyType,
                 torSettings.proxyHost,
@@ -588,64 +621,82 @@ class TorSettingsBuilder internal constructor(
                 torSettings.proxyUser,
                 torSettings.proxyPassword
             )
-        else
+        } else {
             this
+        }
 
     fun reachableAddressPorts(reachableAddressesPorts: String?): TorSettingsBuilder {
-        if (!reachableAddressesPorts.isNullOrEmpty())
+        if (!reachableAddressesPorts.isNullOrEmpty()) {
             buffer.append("ReachableAddresses $reachableAddressesPorts\n")
+        }
         return this
     }
 
     @SettingsConfig
     fun reachableAddressesFromSettings(): TorSettingsBuilder =
-        if (torSettings.hasReachableAddress)
+        if (torSettings.hasReachableAddress) {
             reachableAddressPorts(torSettings.reachableAddressPorts)
-        else
+        } else {
             this
+        }
 
     fun reducedConnectionPadding(enable: Boolean): TorSettingsBuilder {
-        val reducedPadding = if (enable) "1" else "0"
+        val reducedPadding = if (enable) {
+            "1"
+        } else {
+            "0"
+        }
         buffer.append("ReducedConnectionPadding $reducedPadding\n")
         return this
     }
 
     @SettingsConfig
     fun reducedConnectionPaddingFromSettings(): TorSettingsBuilder =
-        if (torSettings.hasReducedConnectionPadding)
+        if (torSettings.hasReducedConnectionPadding) {
             reducedConnectionPadding(true)
-        else
+        } else {
             this
+        }
 
     fun reset() {
         buffer = StringBuffer()
     }
 
     fun runAsDaemon(enable: Boolean): TorSettingsBuilder {
-        val daemon = if (enable) "1" else "0"
+        val daemon = if (enable) {
+            "1"
+        } else {
+            "0"
+        }
         buffer.append("RunAsDaemon $daemon").append("\n")
         return this
     }
 
     @SettingsConfig
     fun runAsDaemonFromSettings(): TorSettingsBuilder =
-        if (torSettings.runAsDaemon)
+        if (torSettings.runAsDaemon) {
             runAsDaemon(true)
-        else
+        } else {
             this
+        }
 
     fun safeSocks(enable: Boolean): TorSettingsBuilder {
-        val safeSocksSetting = if (enable) "1" else "0"
+        val safeSocksSetting = if (enable) {
+            "1"
+        } else {
+            "0"
+        }
         buffer.append("SafeSocks $safeSocksSetting\n")
         return this
     }
 
     @SettingsConfig
     fun safeSocksFromSettings(): TorSettingsBuilder =
-        if (torSettings.hasSafeSocks)
+        if (torSettings.hasSafeSocks) {
             safeSocks(true)
-        else
+        } else {
             this
+        }
 
     /**
      * Ensure that you have setup [io.matthewnelson.topl_core.util.TorInstaller]
@@ -653,10 +704,12 @@ class TorSettingsBuilder internal constructor(
      * */
     @Throws(IOException::class, SecurityException::class)
     fun setGeoIpFiles(): TorSettingsBuilder {
-        if (torConfigFiles.geoIpFile.exists())
+        if (torConfigFiles.geoIpFile.exists()) {
             geoIpFile(torConfigFiles.geoIpFile.canonicalPath)
-        if (torConfigFiles.geoIpv6File.exists())
+        }
+        if (torConfigFiles.geoIpv6File.exists()) {
             geoIpV6File(torConfigFiles.geoIpv6File.canonicalPath)
+        }
         return this
     }
 
@@ -666,13 +719,16 @@ class TorSettingsBuilder internal constructor(
      * to utilizing this method when building your torrc file.
      * */
     fun setV3AuthPrivateDir(): TorSettingsBuilder {
-        if (torConfigFiles.v3AuthPrivateDir.exists())
+        if (torConfigFiles.v3AuthPrivateDir.exists()) {
             v3AuthPrivateDir(torConfigFiles.v3AuthPrivateDir.canonicalPath)
+        }
         return this
     }
 
     fun socksPort(socksPort: String, isolationFlags: List<@IsolationFlag String>?): TorSettingsBuilder {
-        if (socksPort.isEmpty()) return this
+        if (socksPort.isEmpty()) {
+            return this
+        }
 
         buffer.append("SocksPort $socksPort")
 
@@ -690,54 +746,66 @@ class TorSettingsBuilder internal constructor(
     @WorkerThread
     fun socksPortFromSettings(): TorSettingsBuilder {
         var socksPort = torSettings.socksPort
-        if (socksPort.indexOf(':') != -1)
+        if (socksPort.indexOf(':') != -1) {
             socksPort = socksPort.split(":".toRegex()).toTypedArray()[1]
-
-        if (!socksPort.equals("auto", ignoreCase = true) && isLocalPortOpen(socksPort.toInt()))
+        }
+        if (!socksPort.equals("auto", ignoreCase = true) && isLocalPortOpen(socksPort.toInt())) {
             socksPort = "auto"
-
+        }
         return socksPort(socksPort, torSettings.socksPortIsolationFlags)
     }
 
     fun strictNodes(enable: Boolean): TorSettingsBuilder {
-        val strictNodeSetting = if (enable) "1" else "0"
+        val strictNodeSetting = if (enable) {
+            "1"
+        } else {
+            "0"
+        }
         buffer.append("StrictNodes $strictNodeSetting").append("\n")
         return this
     }
 
     @SettingsConfig
     fun strictNodesFromSettings(): TorSettingsBuilder =
-        if (torSettings.hasStrictNodes)
+        if (torSettings.hasStrictNodes) {
             strictNodes(true)
-        else
+        } else {
             this
+        }
 
     fun testSocks(enable: Boolean): TorSettingsBuilder {
-        val testSocksSetting = if (enable) "1" else "0"
+        val testSocksSetting = if (enable) {
+            "1"
+        } else {
+            "0"
+        }
         buffer.append("TestSocks $testSocksSetting\n")
         return this
     }
 
     @SettingsConfig
     fun testSocksFromSettings(): TorSettingsBuilder =
-        if (torSettings.hasTestSocks)
+        if (torSettings.hasTestSocks) {
             testSocks(true)
-        else
+        } else {
             this
+        }
 
     @SettingsConfig
     @Throws(UnsupportedEncodingException::class)
     fun torrcCustomFromSettings(): TorSettingsBuilder {
         val customTorrc = torSettings.customTorrc
-        return if (!customTorrc.isNullOrEmpty())
+        return if (!customTorrc.isNullOrEmpty()) {
             addLine(String(customTorrc.toByteArray(Charsets.US_ASCII)))
-        else
+        } else {
             this
+        }
     }
 
     fun transPort(transPort: String, isolationFlags: List<@IsolationFlag String>?): TorSettingsBuilder {
-        if (transPort.isEmpty()) return this
-
+        if (transPort.isEmpty()) {
+            return this
+        }
         buffer.append("TransPort $transPort")
 
         if (!isolationFlags.isNullOrEmpty()) {
@@ -763,27 +831,34 @@ class TorSettingsBuilder internal constructor(
     }
 
     fun useBridges(useThem: Boolean): TorSettingsBuilder {
-        val useBridges = if (useThem) "1" else "0"
+        val useBridges = if (useThem) {
+            "1"
+        } else {
+            "0"
+        }
         buffer.append("UseBridges $useBridges\n")
         return this
     }
 
     @SettingsConfig
     fun useBridgesFromSettings(): TorSettingsBuilder =
-        if (torSettings.hasBridges)
+        if (torSettings.hasBridges) {
             useBridges(true)
-        else
+        } else {
             this
+        }
 
     fun v3AuthPrivateDir(path: String?): TorSettingsBuilder {
-        if (!path.isNullOrEmpty())
+        if (!path.isNullOrEmpty()) {
             buffer.append("ClientOnionAuthDir $path\n")
+        }
         return this
     }
 
     fun virtualAddressNetwork(address: String?): TorSettingsBuilder {
-        if (!address.isNullOrEmpty())
+        if (!address.isNullOrEmpty()) {
             buffer.append("VirtualAddrNetwork $address\n")
+        }
         return this
     }
 
@@ -817,10 +892,11 @@ class TorSettingsBuilder internal constructor(
             if (bridgesStream != null) {
                 val formatType = bridgesStream.read()
 
-                if (formatType == 0)
+                if (formatType == 0) {
                     addBridges(bridgesStream)
-                else
+                } else {
                     addCustomBridges(bridgesStream)
+                }
             }
         }
         return this
@@ -830,11 +906,13 @@ class TorSettingsBuilder internal constructor(
      * Add bridges from bridges.txt file.
      * */
     private fun addBridges(input: InputStream?) {
-        if (input == null) return
-
+        if (input == null) {
+            return
+        }
         val bridges = readBridgesFromStream(input)
-        for (b in bridges)
+        for (b in bridges) {
             addBridge(b.type, b.config)
+        }
     }
 
     /**
@@ -842,12 +920,16 @@ class TorSettingsBuilder internal constructor(
      * the first field.
      * */
     private fun addCustomBridges(input: InputStream?) {
-        if (input == null) return
+        if (input == null) {
+            return
+        }
 
         val bridges = readCustomBridgesFromStream(input)
-        for (b in bridges)
-            if (b.type == "custom")
+        for (b in bridges) {
+            if (b.type == "custom") {
                 addCustomBridge(b.config)
+            }
+        }
     }
 
     private class Bridge(val type: String, val config: String)

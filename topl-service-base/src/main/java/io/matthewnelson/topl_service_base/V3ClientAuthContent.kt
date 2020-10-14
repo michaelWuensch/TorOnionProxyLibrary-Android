@@ -71,4 +71,8 @@
 * */
 package io.matthewnelson.topl_service_base
 
+/**
+ * Holder for v3 client authentication data used by
+ * [io.matthewnelson.topl_service_base.BaseV3ClientAuthManager]
+ * */
 class V3ClientAuthContent (val address: String, val privateKey: String)

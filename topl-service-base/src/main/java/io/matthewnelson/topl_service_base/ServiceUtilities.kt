@@ -78,7 +78,7 @@ import java.util.*
 object ServiceUtilities {
 
     /**
-     * Formats the supplied values to look like: `20kbps ↓ / 85kbps ↑`
+     * Formats the supplied values to look like: `20KBps ↓ / 85KBps ↑`
      *
      * @param [download] Long value associated with download (bytesRead)
      * @param [upload] Long value associated with upload (bytesWritten)

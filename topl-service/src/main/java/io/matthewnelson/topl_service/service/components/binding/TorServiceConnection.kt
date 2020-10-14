@@ -78,7 +78,9 @@ import android.os.IBinder
 internal class TorServiceConnection: ServiceConnection {
 
     companion object {
-        val torServiceConnection = TorServiceConnection()
+        val torServiceConnection by lazy {
+            TorServiceConnection()
+        }
 
         @Volatile
         var serviceBinder: BaseServiceBinder? = null

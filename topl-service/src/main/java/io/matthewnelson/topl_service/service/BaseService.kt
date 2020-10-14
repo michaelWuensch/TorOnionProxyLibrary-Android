@@ -169,8 +169,6 @@ internal abstract class BaseService: Service() {
         fun updateLastAcceptedServiceAction(@ServiceActionName serviceAction: String) {
             lastAcceptedServiceAction = serviceAction
         }
-        fun wasLastAcceptedServiceActionStop(): Boolean =
-            lastAcceptedServiceAction == ServiceActionName.STOP
 
 
         //////////////////////
@@ -199,8 +197,9 @@ internal abstract class BaseService: Service() {
             bindServiceFlag: Int = Context.BIND_AUTO_CREATE
         ): Boolean {
             val intent = Intent(context.applicationContext, serviceClass)
-            if (includeIntentActionStart)
+            if (includeIntentActionStart) {
                 intent.action = ServiceActionName.START
+            }
 
             // A RuntimeException is thrown if Context.startService is called while
             // the application is in the background. In that case, we do not want to
@@ -404,10 +403,11 @@ internal abstract class BaseService: Service() {
      * @see [Companion.startService]
      * */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent?.action == ServiceActionName.START)
+        if (intent?.action == ServiceActionName.START) {
             processServiceAction(ServiceAction.Start())
-        else
+        } else {
             processServiceAction(ServiceAction.Start(updateLastServiceAction = false))
+        }
 
         return START_NOT_STICKY
     }
@@ -421,7 +421,8 @@ internal abstract class BaseService: Service() {
         startForegroundService()
 
         // Shutdown Tor and stop the Service.
-        if (stopServiceOnTaskRemoved)
+        if (stopServiceOnTaskRemoved) {
             processServiceAction(ServiceAction.Stop(updateLastServiceAction = false))
+        }
     }
 }
