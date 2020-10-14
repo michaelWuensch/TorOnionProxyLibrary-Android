@@ -27,16 +27,21 @@
 * GNU General Public License, version 3 (“GPLv3”).
 *
 *     "The Interfaces" is henceforth defined as Application Programming Interfaces
-*     that are publicly available classes/functions/etc (ie: do not contain the
-*     visibility modifiers `internal`, `private`, `protected`, or are within
-*     classes/functions/etc that contain the aforementioned visibility modifiers)
-*     to TorOnionProxyLibrary-Android users that are needed to implement
-*     TorOnionProxyLibrary-Android and reside in ONLY the following modules:
+*     needed to implement TorOnionProxyLibrary-Android, as listed below:
 *
-*      - topl-core-base
-*      - topl-service
+*      - From the `topl-core-base` module:
+*          - All Classes/methods/variables
 *
-*     The following are excluded from "The Interfaces":
+*      - From the `topl-service-base` module:
+*          - All Classes/methods/variables
+*
+*      - From the `topl-service` module:
+*          - The TorServiceController class and it's contained classes/methods/variables
+*          - The ServiceNotification.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Companion class and it's contained methods/variables
+*
+*     The following code is excluded from "The Interfaces":
 *
 *       - All other code
 *
@@ -63,7 +68,7 @@
 *     exception. If you modify "The Interfaces", this exception does not apply to your
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
- */
+* */
 package io.matthewnelson.topl_core_base
 
 import java.io.EOFException
