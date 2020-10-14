@@ -77,7 +77,7 @@ import io.matthewnelson.sampleapp.R
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashMessage
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment
 import io.matthewnelson.topl_service.TorServiceController
-import io.matthewnelson.topl_service.prefs.TorServicePrefs
+import io.matthewnelson.topl_service_base.TorServicePrefs
 import io.matthewnelson.topl_service.util.ServiceConsts
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

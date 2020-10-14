@@ -72,7 +72,7 @@ import io.matthewnelson.topl_service_base.BaseServiceConsts.PrefKeyString
 import io.matthewnelson.topl_service_base.BaseServiceConsts.PrefKeyList
 import io.matthewnelson.topl_service_base.BaseServiceConsts.PrefKeyInt
 import io.matthewnelson.topl_service_base.BaseServiceConsts.PrefKeyBoolean
-import io.matthewnelson.topl_service.prefs.TorServicePrefs
+import io.matthewnelson.topl_service_base.TorServicePrefs
 
 /**
  * This class enables the querying of [TorServicePrefs] to obtain values potentially set by

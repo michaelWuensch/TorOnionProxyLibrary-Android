@@ -75,7 +75,7 @@ import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
-import io.matthewnelson.topl_service.prefs.TorServicePrefs
+import io.matthewnelson.topl_service_base.TorServicePrefs
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.actions.ServiceAction
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
@@ -90,26 +90,6 @@ class TorServiceController private constructor(): ServiceConsts() {
     /**
      * The [TorServiceController.Builder] is where you get to customize how [TorService] works
      * for your application. Call it in `Application.onCreate` and follow along.
-     *
-     * A note about the [TorSettings] you send this. Those are the default settings which
-     * [TorService] will fall back on if [io.matthewnelson.topl_service.prefs.TorServicePrefs]
-     * has nothing in it for that particular [ServiceConsts].PrefKey.
-     *
-     * The settings get written to the `torrc` file every time Tor is started (I plan to make
-     * this less sledgehammer-ish in the future).
-     *
-     * To update settings while your application is running you need only to instantiate
-     * [io.matthewnelson.topl_service.prefs.TorServicePrefs] and save the data using the
-     * appropriately annotated method and [ServiceConsts].PrefKey, then
-     * restart Tor (for now... ;-D).
-     *
-     * I plan to implement a
-     * [android.content.SharedPreferences.OnSharedPreferenceChangeListener] that will do this
-     * immediately for the settings that don't require a restart, but a stable release comes first).
-     *
-     * You can see how the [TorSettings] sent here are used in [TorService] by looking at
-     * [io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings] and
-     * [TorService.onionProxyManager].
      *
      * @param [application] [Application], for obtaining context
      * @param [torServiceNotificationBuilder] The [ServiceNotification.Builder] for
@@ -233,28 +213,6 @@ class TorServiceController private constructor(): ServiceConsts() {
             return this
         }
 
-//        /**
-//         * Default is set to 30_000ms
-//         *
-//         * When the user sends your application to the background (recent app's tray),
-//         * [io.matthewnelson.topl_service.lifecycle.BackgroundManager] begins
-//         * a heartbeat for Tor, as well as cycling [TorService] between foreground and
-//         * background as to keep the OS from killing things due to being idle for too long.
-//         *
-//         * If the user returns the application to the foreground, the heartbeat and
-//         * foreground/background cycling stops.
-//         *
-//         * This method sets the time between each heartbeat.
-//         *
-//         * @param [milliseconds] A Long between 15_000 and 45_000. Will fallback to default
-//         *   value if not between that range
-//         * */
-//        fun setBackgroundHeartbeatTime(milliseconds: Long): Builder {
-//            if (milliseconds in 15_000L..45_000L)
-//                heartbeatTime = milliseconds
-//            return this
-//        }
-
         /**
          * This makes it such that on your Application's **Debug** builds, the `topl-core` and
          * `topl-service` modules will provide you with Logcat messages (when
@@ -266,9 +224,6 @@ class TorServiceController private constructor(): ServiceConsts() {
          *
          * @param [buildConfigDebug] Send [BuildConfig.DEBUG]
          * @see [io.matthewnelson.topl_core.broadcaster.BroadcastLogger]
-         *
-         * TODO: Provide a link to gh-pages that discusses logging and how it work, it's pretty
-         *  complex with everything that is going on.
          * */
         fun setBuildConfigDebug(buildConfigDebug: Boolean): Builder {
             this.buildConfigDebug = buildConfigDebug

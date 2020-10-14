@@ -68,6 +68,7 @@ package io.matthewnelson.topl_service.prefs
 
 import androidx.test.core.app.ApplicationProvider
 import io.matthewnelson.topl_service.util.ServiceConsts
+import io.matthewnelson.topl_service_base.TorServicePrefs
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
