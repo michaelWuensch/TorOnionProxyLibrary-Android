@@ -72,7 +72,7 @@ import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.TorService
-import io.matthewnelson.topl_service.service.components.onionproxy.model.TorPortInfo
+import io.matthewnelson.topl_service_base.TorPortInfo
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import io.matthewnelson.topl_service_base.ServiceUtilities

@@ -64,30 +64,22 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.topl_service.service.components.onionproxy.model
-
-import io.matthewnelson.topl_core_base.EventBroadcaster
+package io.matthewnelson.topl_service_base
 
 /**
- * Adds broadcasting methods to the [EventBroadcaster] to update you with information about
- * what addresses Tor is operating on. Very helpful when choosing "auto" in your
- * [io.matthewnelson.topl_core_base.TorSettings] to easily identify what addresses to
- * use for making network calls, as well as being notified when Tor is ready to be used.
+ * Contains information regarding what ports Tor is operating on.
  *
- * The addresses will be broadcast to you after Tor has been fully Bootstrapped. If Tor is
- * stopped (ie. it's [io.matthewnelson.topl_core_base.BaseConsts.TorState] changes from **ON**
- * to **OFF**), a [TorPortInfo] object containing 'null' for all fields will be broadcast.
+ * Example of what one of the fields will contain:
  *
- * All broadcasts to your implementation to this class will occur on the Main Thread.
- *
- * @sample [io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster]
+ *   - "127.0.0.1:33432"
  * */
-abstract class TorServiceEventBroadcaster: EventBroadcaster() {
-
-    /**
-     * Override this method to implement receiving of port information pertaining to Tor.
-     *
-     * @see [TorPortInfo]
-     * */
-    abstract fun broadcastPortInformation(torPortInfo: TorPortInfo)
-}
+class TorPortInfo(
+    val controlPort: String?,
+    val dnsPort: String?,
+    val httpPort: String?,
+    // TODO: Add proxyPort after refactor
+    // TODO: Add proxySocks5ServerPort after refactor
+    // TODO: Add relayPort after refactor
+    val socksPort: String?,
+    val transPort: String?
+)
