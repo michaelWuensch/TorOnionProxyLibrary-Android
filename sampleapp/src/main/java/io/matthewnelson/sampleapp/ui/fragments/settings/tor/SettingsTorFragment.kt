@@ -113,7 +113,7 @@ class SettingsTorFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        serviceTorSettings = TorServiceController.getServiceTorSettings(inflater.context)
+        serviceTorSettings = TorServiceController.getServiceTorSettings()
         return inflater.inflate(R.layout.fragment_settings_tor, container, false)
     }
 

@@ -195,7 +195,7 @@ internal class TorService: BaseService() {
             context,
             TorServiceController.getTorConfigFiles(),
             ServiceTorInstaller(this),
-            TorServiceController.getServiceTorSettings(context),
+            TorServiceController.getServiceTorSettings(),
             ServiceEventListener(),
             ServiceEventBroadcaster(this),
             buildConfigDebug

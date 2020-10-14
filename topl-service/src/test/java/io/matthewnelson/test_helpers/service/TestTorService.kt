@@ -85,6 +85,7 @@ import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSet
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.receiver.TorServiceReceiver
+import io.matthewnelson.topl_service_base.BaseServiceTorSettings
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.TestCoroutineScope
 import net.freehaven.tor.control.TorControlCommands
@@ -173,8 +174,8 @@ internal class TestTorService(
     val serviceEventBroadcaster: ServiceEventBroadcaster by lazy {
         ServiceEventBroadcaster(this)
     }
-    val serviceTorSettings: ServiceTorSettings by lazy {
-        TorServiceController.getServiceTorSettings(context)
+    val serviceTorSettings: BaseServiceTorSettings by lazy {
+        TorServiceController.getServiceTorSettings()
     }
     val onionProxyManager: OnionProxyManager by lazy {
         OnionProxyManager(

@@ -71,7 +71,7 @@ import androidx.lifecycle.MutableLiveData
 import io.matthewnelson.sampleapp.ui.fragments.home.LogMessageAdapter
 import io.matthewnelson.topl_service.service.components.onionproxy.model.TorPortInfo
 import io.matthewnelson.topl_service.service.components.onionproxy.model.TorServiceEventBroadcaster
-import io.matthewnelson.topl_service.util.ServiceUtilities
+import io.matthewnelson.topl_service_base.ServiceUtilities
 
 /**
  * @suppress
