@@ -2,9 +2,11 @@
 
 ## [topl-service](./topl-service/index.md)
 
+## [topl-service-base](./topl-service-base/index.md)
+
 ## [topl-core-base](./topl-core-base/index.md)
 
-<!-- Hold off linking to docs until release -->
+<!-- Hold off linking to docs until refactor is complete -->
 <!-- ## [topl-core](./topl-core/io.matthewnelson.topl_core/index.md) -->
 
 !!! Info
