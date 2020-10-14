@@ -70,7 +70,7 @@ import androidx.core.app.NotificationCompat
 import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.BuildConfig
 import io.matthewnelson.sampleapp.R
-import io.matthewnelson.topl_service.util.ServiceConsts.BackgroundPolicy
+import io.matthewnelson.topl_service_base.BaseServiceConsts.BackgroundPolicy
 
 object LibraryPrefs {
 

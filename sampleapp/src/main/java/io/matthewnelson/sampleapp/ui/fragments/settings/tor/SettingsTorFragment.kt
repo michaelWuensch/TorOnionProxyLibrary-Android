@@ -82,10 +82,9 @@ import io.matthewnelson.sampleapp.ui.fragments.settings.CloseKeyBoardNavListener
 import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.DnsPortOption
 import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.HttpPortOption
 import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.SocksPortOption
-import io.matthewnelson.sampleapp.ui.fragments.settings.tor.components.TransPortOption
 import io.matthewnelson.topl_core_base.BaseConsts.IsolationFlag
 import io.matthewnelson.topl_service.TorServiceController
-import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
+import io.matthewnelson.topl_service_base.BaseServiceTorSettings
 
 class SettingsTorFragment : Fragment() {
 
@@ -95,7 +94,7 @@ class SettingsTorFragment : Fragment() {
         const val CUSTOM = "Custom"
     }
 
-    private lateinit var serviceTorSettings: ServiceTorSettings
+    private lateinit var serviceTorSettings: BaseServiceTorSettings
     private lateinit var socksPortOption: SocksPortOption
     private lateinit var httpPortOption: HttpPortOption
     private lateinit var dnsPortOption: DnsPortOption

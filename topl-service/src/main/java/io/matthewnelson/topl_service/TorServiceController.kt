@@ -83,6 +83,8 @@ import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSet
 import io.matthewnelson.topl_service.service.components.onionproxy.model.TorServiceEventBroadcaster
 import io.matthewnelson.topl_service.util.ServiceConsts
 import io.matthewnelson.topl_service.util.V3ClientAuthManager
+import io.matthewnelson.topl_service_base.ApplicationDefaultTorSettings
+import io.matthewnelson.topl_service_base.BaseServiceTorSettings
 import io.matthewnelson.topl_service_base.BaseV3ClientAuthManager
 
 class TorServiceController private constructor(): ServiceConsts() {
@@ -98,7 +100,8 @@ class TorServiceController private constructor(): ServiceConsts() {
      *   while your application is in the background (the Recent App's tray).
      * @param [buildConfigVersionCode] send [BuildConfig.VERSION_CODE]. Mitigates copying of geoip
      *   files to app updates only
-     * @param [torSettings] [TorSettings] used to create your torrc file on start of Tor
+     * @param [defaultTorSettings] [ApplicationDefaultTorSettings] used to create your torrc file
+     *   on start of Tor
      * @param [geoipAssetPath] The path to where you have your geoip file located (ex: in
      *   assets/common directory, send this variable "common/geoip")
      * @param [geoip6AssetPath] The path to where you have your geoip6 file located (ex: in
@@ -113,7 +116,7 @@ class TorServiceController private constructor(): ServiceConsts() {
         private val torServiceNotificationBuilder: ServiceNotification.Builder,
         private val backgroundManagerPolicy: BackgroundManager.Builder.Policy,
         private val buildConfigVersionCode: Int,
-        private val torSettings: TorSettings,
+        private val defaultTorSettings: ApplicationDefaultTorSettings,
         private val geoipAssetPath: String,
         private val geoip6AssetPath: String
     ) {
@@ -283,7 +286,7 @@ class TorServiceController private constructor(): ServiceConsts() {
             BaseService.initialize(
                 application,
                 buildConfigVersionCode,
-                torSettings,
+                defaultTorSettings,
                 buildConfigDebug,
                 geoipAssetPath,
                 geoip6AssetPath,
@@ -334,28 +337,29 @@ class TorServiceController private constructor(): ServiceConsts() {
         }
 
         /**
-         * Get the [TorSettings] that have been set after calling [Builder.build].
-         *
          * This method will *never* throw the [RuntimeException] if you call it after
          * [Builder.build].
          *
-         * @return Instance of [TorSettings] that are being used throughout TOPL-Android
+         * @return Instance of [ApplicationDefaultTorSettings] that were used to instantiate
+         *   [TorServiceController.Builder] with
          * @throws [RuntimeException] if called before [Builder.build]
          * */
         @JvmStatic
         @Throws(RuntimeException::class)
-        fun getTorSettings(): TorSettings {
+        fun getDefaultTorSettings(): ApplicationDefaultTorSettings {
             return try {
-                BaseService.torSettings
+                BaseService.defaultTorSettings
             } catch (e: UninitializedPropertyAccessException) {
                 throw RuntimeException(e.message)
             }
         }
 
         /**
-         * Returns an instance of [V3ClientAuthManager] for adding, querying, and removing
-         * v3 Client Authorization private key files.
+         * This method will *never* throw the [RuntimeException] if you call it after
+         * [Builder.build].
          *
+         * @return The implemented [BaseV3ClientAuthManager] for adding, querying, and removing
+         *   v3 Client Authorization private key files
          * @throws [RuntimeException] if called before [Builder.build]
          * */
         @JvmStatic
@@ -364,16 +368,23 @@ class TorServiceController private constructor(): ServiceConsts() {
             V3ClientAuthManager(getTorConfigFiles())
 
         /**
-         * Helper method for easily obtaining [ServiceTorSettings].
+         * This method will *never* throw the [RuntimeException] if you call it after
+         * [Builder.build].
          *
-         * @throws [RuntimeException] See [getTorSettings]
+         * @return [BaseServiceTorSettings]
+         * @throws [RuntimeException] if called before [Builder.build]
          * */
         @JvmStatic
         @Throws(RuntimeException::class)
-        fun getServiceTorSettings(context: Context): ServiceTorSettings =
-            ServiceTorSettings(TorServicePrefs(context), getTorSettings())
+        fun getServiceTorSettings(): BaseServiceTorSettings =
+            ServiceTorSettings(
+                TorServicePrefs(BaseService.getAppContext()), getDefaultTorSettings()
+            )
 
         /**
+         * This method will *never* throw the [RuntimeException] if you call it after
+         * [Builder.build].
+         *
          * Starts [TorService] and then Tor. You can call this as much as you want. If
          * the Tor [Process] is already running, it will do nothing.
          *

@@ -67,12 +67,13 @@
 package io.matthewnelson.sampleapp.topl_android
 
 import io.matthewnelson.topl_core_base.TorSettings
+import io.matthewnelson.topl_service_base.ApplicationDefaultTorSettings
 
 /**
  * @suppress
  * @see [TorSettings]
  * */
-class MyTorSettings: TorSettings() {
+class MyTorSettings: ApplicationDefaultTorSettings() {
 
     override val dormantClientTimeout: Int?
         get() = DEFAULT__DORMANT_CLIENT_TIMEOUT

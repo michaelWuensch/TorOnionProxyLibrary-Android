@@ -75,9 +75,9 @@ import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashMessage
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment
 import io.matthewnelson.sampleapp.ui.fragments.settings.tor.SettingsTorFragment
 import io.matthewnelson.topl_core_base.BaseConsts
-import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
+import io.matthewnelson.topl_service_base.BaseServiceTorSettings
 
-class SocksPortOption(view: View, private val serviceTorSettings: ServiceTorSettings) {
+class SocksPortOption(view: View, private val serviceTorSettings: BaseServiceTorSettings) {
 
     // Views
     private lateinit var spinnerSocksPort: Spinner

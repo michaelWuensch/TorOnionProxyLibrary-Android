@@ -131,7 +131,7 @@ class CodeSamples {
             // Can instantiate directly here then access it from
             // TorServiceController.Companion.getTorSettings() and cast what's returned
             // as MyTorSettings
-            torSettings = MyTorSettings(),
+            defaultTorSettings = MyTorSettings(),
 
             // These should live somewhere in your module's assets directory,
             // ex: my-project/my-application-module/src/main/assets/common/geoip

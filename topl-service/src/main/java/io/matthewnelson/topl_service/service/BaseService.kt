@@ -75,7 +75,6 @@ import androidx.annotation.WorkerThread
 import androidx.core.app.NotificationCompat
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core_base.TorConfigFiles
-import io.matthewnelson.topl_core_base.TorSettings
 import io.matthewnelson.topl_service.BuildConfig
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
 import io.matthewnelson.topl_service.notification.ServiceNotification
@@ -85,6 +84,7 @@ import io.matthewnelson.topl_service.service.components.actions.ServiceAction
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
+import io.matthewnelson.topl_service_base.ApplicationDefaultTorSettings
 import kotlinx.coroutines.CoroutineScope
 import java.io.File
 import java.io.IOException
@@ -108,7 +108,7 @@ internal abstract class BaseService: Service() {
             private set
         lateinit var torConfigFiles: TorConfigFiles
             private set
-        lateinit var torSettings: TorSettings
+        lateinit var defaultTorSettings: ApplicationDefaultTorSettings
             private set
         var stopServiceOnTaskRemoved: Boolean = true
             private set
@@ -116,7 +116,7 @@ internal abstract class BaseService: Service() {
         fun initialize(
             application: Application,
             buildConfigVersionCode: Int,
-            torSettings: TorSettings,
+            torSettings: ApplicationDefaultTorSettings,
             buildConfigDebug: Boolean,
             geoipAssetPath: String,
             geoip6AssetPath: String,
@@ -126,7 +126,7 @@ internal abstract class BaseService: Service() {
             if (this.application == null) {
                 this.application = application
                 this.buildConfigVersionCode = buildConfigVersionCode
-                this.torSettings = torSettings
+                this.defaultTorSettings = torSettings
                 this.buildConfigDebug = buildConfigDebug
                 this.geoipAssetPath = geoipAssetPath
                 this.geoip6AssetPath = geoip6AssetPath

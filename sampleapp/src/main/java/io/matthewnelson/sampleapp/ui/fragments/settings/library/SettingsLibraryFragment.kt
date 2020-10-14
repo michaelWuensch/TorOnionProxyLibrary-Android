@@ -83,7 +83,7 @@ import io.matthewnelson.sampleapp.ui.fragments.settings.CloseKeyBoardNavListener
 import io.matthewnelson.sampleapp.ui.fragments.settings.library.components.BackgroundManagerOptions
 import io.matthewnelson.sampleapp.ui.fragments.settings.library.components.ControllerOptions
 import io.matthewnelson.sampleapp.ui.fragments.settings.library.components.NotificationOptions
-import io.matthewnelson.topl_service.util.ServiceConsts.BackgroundPolicy
+import io.matthewnelson.topl_service_base.BaseServiceConsts.BackgroundPolicy
 
 class SettingsLibraryFragment : Fragment() {
 

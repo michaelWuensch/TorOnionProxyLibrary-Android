@@ -134,7 +134,7 @@ internal class TorServiceControllerUnitTest {
 
     @Test(expected = RuntimeException::class)
     fun `_throw errors if getTorSettings called before build`() {
-        TorServiceController.getTorSettings()
+        TorServiceController.getDefaultTorSettings()
     }
 
     @Test(expected = RuntimeException::class)
@@ -169,7 +169,7 @@ internal class TorServiceControllerUnitTest {
     @Test
     fun `_zz_ensure one-time initialization if build called more than once`() {
         try {
-            TorServiceController.getTorSettings()
+            TorServiceController.getDefaultTorSettings()
             assertNotNull(BaseService.buildConfigDebug)
             // build has been called in a previous test
         } catch (e: RuntimeException) {
@@ -178,7 +178,7 @@ internal class TorServiceControllerUnitTest {
             assertNotNull(BaseService.buildConfigDebug)
         }
 
-        val initialHashCode = TorServiceController.getTorSettings().hashCode()
+        val initialHashCode = TorServiceController.getDefaultTorSettings().hashCode()
 
         // Instantiate new TorSettings and try to overwrite things via the builder
         val newTorSettings =
@@ -187,7 +187,7 @@ internal class TorServiceControllerUnitTest {
             .useCustomTorConfigFiles(torConfigFiles)
             .build()
 
-        val hashCodeAfterSecondBuildCall = TorServiceController.getTorSettings().hashCode()
+        val hashCodeAfterSecondBuildCall = TorServiceController.getDefaultTorSettings().hashCode()
 
         assertNotEquals(newTorSettings.hashCode(), hashCodeAfterSecondBuildCall)
         assertEquals(initialHashCode, hashCodeAfterSecondBuildCall)

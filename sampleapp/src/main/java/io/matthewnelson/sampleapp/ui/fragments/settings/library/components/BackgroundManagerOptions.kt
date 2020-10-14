@@ -74,7 +74,7 @@ import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.R
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashMessage
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment
-import io.matthewnelson.topl_service.util.ServiceConsts.BackgroundPolicy
+import io.matthewnelson.topl_service_base.BaseServiceConsts.BackgroundPolicy
 
 class BackgroundManagerOptions(view: View, prefs: Prefs) {
 

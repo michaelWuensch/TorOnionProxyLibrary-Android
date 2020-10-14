@@ -79,6 +79,7 @@ import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service_base.TorServicePrefs
 import io.matthewnelson.topl_service.util.ServiceConsts
+import io.matthewnelson.topl_service_base.BaseServiceConsts
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -112,8 +113,8 @@ class HomeFragment : Fragment() {
         torServicePrefs = TorServicePrefs(inflater.context)
         getDebugLogsJob = lifecycleScope.launch(Dispatchers.IO) {
             hasDebugLogs = torServicePrefs.getBoolean(
-                ServiceConsts.PrefKeyBoolean.HAS_DEBUG_LOGS,
-                TorServiceController.getTorSettings().hasDebugLogs
+                BaseServiceConsts.PrefKeyBoolean.HAS_DEBUG_LOGS,
+                TorServiceController.getDefaultTorSettings().hasDebugLogs
             )
         }
         return inflater.inflate(R.layout.fragment_home, container, false)
@@ -149,7 +150,7 @@ class HomeFragment : Fragment() {
             hasDebugLogs = !hasDebugLogs
             setButtonDebugText()
             torServicePrefs.putBoolean(
-                ServiceConsts.PrefKeyBoolean.HAS_DEBUG_LOGS,
+                BaseServiceConsts.PrefKeyBoolean.HAS_DEBUG_LOGS,
                 hasDebugLogs
             )
         }

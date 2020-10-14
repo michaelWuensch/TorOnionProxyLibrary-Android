@@ -78,7 +78,7 @@ import io.matthewnelson.sampleapp.ui.fragments.settings.library.components.Libra
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
-import io.matthewnelson.topl_service.util.ServiceConsts.BackgroundPolicy
+import io.matthewnelson.topl_service_base.BaseServiceConsts.BackgroundPolicy
 
 /**
  * @suppress
@@ -170,7 +170,7 @@ class App: Application() {
                 torServiceNotificationBuilder = serviceNotificationBuilder,
                 backgroundManagerPolicy = backgroundManagerPolicy,
                 buildConfigVersionCode = BuildConfig.VERSION_CODE,
-                torSettings = MyTorSettings(),
+                defaultTorSettings = MyTorSettings(),
                 geoipAssetPath = "common/geoip",
                 geoip6AssetPath = "common/geoip6"
             )
