@@ -83,6 +83,7 @@ import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSet
 import io.matthewnelson.topl_service.service.components.onionproxy.model.TorServiceEventBroadcaster
 import io.matthewnelson.topl_service.util.ServiceConsts
 import io.matthewnelson.topl_service.util.V3ClientAuthManager
+import io.matthewnelson.topl_service_base.BaseV3ClientAuthManager
 
 class TorServiceController private constructor(): ServiceConsts() {
 
@@ -404,7 +405,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * */
         @JvmStatic
         @Throws(RuntimeException::class)
-        fun getV3ClientAuthManager(): V3ClientAuthManager =
+        fun getV3ClientAuthManager(): BaseV3ClientAuthManager =
             V3ClientAuthManager(getTorConfigFiles())
 
         /**
