@@ -69,4 +69,8 @@ dependencies {
     api project(path: ':topl-core-base')
     implementation deps.kotlin.stdlib
     implementation deps.androidx.core
+
+    testImplementation testDeps.androidx.core
+    testImplementation testDeps.junit
+    testImplementation testDeps.robolectric
 }

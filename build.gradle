@@ -9,10 +9,10 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath deps.androidGradlePlugin
-        classpath deps.kotlin.dokka
-        classpath deps.kotlin.gradlePlugin
-        classpath deps.mavenPublish
+        classpath plugin.androidGradle
+        classpath plugin.kotlin.dokka
+        classpath plugin.kotlin.gradle
+        classpath plugin.mavenPublish
     }
 }
 
@@ -20,6 +20,7 @@ allprojects  {
     repositories {
         google()
         jcenter()
+//        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     }
 
     tasks.withType(Test) {

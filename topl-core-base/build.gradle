@@ -59,9 +59,9 @@ dependencies {
     implementation deps.kotlin.stdlib
     implementation deps.androidx.core
 
-    testImplementation deps.junit
+    testImplementation testDeps.junit
 
-    androidTestImplementation deps.androidx.test.core
-    androidTestImplementation deps.androidx.test.junit
-    androidTestImplementation deps.androidx.test.espresso
+    androidTestImplementation testDeps.androidx.core
+    androidTestImplementation testDeps.androidx.junit
+    androidTestImplementation testDeps.androidx.espresso
 }

@@ -69,11 +69,9 @@
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
 * */
-package io.matthewnelson.topl_service.prefs
+package io.matthewnelson.topl_service_base
 
 import androidx.test.core.app.ApplicationProvider
-import io.matthewnelson.topl_service.util.ServiceConsts
-import io.matthewnelson.topl_service_base.TorServicePrefs
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -82,7 +80,7 @@ import org.robolectric.annotation.Config
 
 @Config(minSdk = 16, maxSdk = 28)
 @RunWith(RobolectricTestRunner::class)
-class TorServicePrefsUnitTest: ServiceConsts() {
+class TorServicePrefsUnitTest: BaseServiceConsts() {
 
     private val prefs by lazy {
         TorServicePrefs(ApplicationProvider.getApplicationContext())
