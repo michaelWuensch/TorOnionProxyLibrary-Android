@@ -2,7 +2,7 @@
 
 # ServiceNotification
 
-`class ServiceNotification : `[`ServiceConsts`](../../io.matthewnelson.topl_service.util/-service-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L99)
+`class ServiceNotification : `[`ServiceConsts`](../../io.matthewnelson.topl_service.util/-service-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L100)
 
 Everything to do with [TorService](#)'s notification.
 
@@ -20,6 +20,7 @@ Everything to do with [TorService](#)'s notification.
 
 | Name | Summary |
 |---|---|
+| [activityIntentBundle](activity-intent-bundle.md) | `var activityIntentBundle: `[`Bundle`](https://developer.android.com/reference/android/os/Bundle.html)`?` |
 | [activityIntentExtras](activity-intent-extras.md) | `var activityIntentExtras: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?` |
 | [activityIntentKey](activity-intent-key.md) | `var activityIntentKey: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?` |
 | [activityIntentRequestCode](activity-intent-request-code.md) | `var activityIntentRequestCode: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html) |

@@ -2,7 +2,7 @@
 
 # Builder
 
-`class Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L144)
+`class Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L146)
 
 Where you get to customize how your notification will look and function.
 
@@ -19,12 +19,9 @@ in order to properly shut down Tor and clean up w/o being killed by the OS.
             channelID = "TOPL-Android Demo",
             notificationID = 615
         )
-            .setActivityToBeOpenedOnTap(
-                clazz = MainActivity::class.java,
-                intentExtrasKey = null,
-                intentExtras = null,
-                intentRequestCode = null
-            )
+            // Only needed if you are passing a bundle, or changing request code to something other than 0
+            .setContentIntentData(bundle = null, requestCode = 21)
+
             .setImageTorNetworkingEnabled(drawableRes = R.drawable.tor_stat_network_enabled)
             .setImageTorNetworkingDisabled(drawableRes = R.drawable.tor_stat_network_disabled)
             .setImageTorDataTransfer(drawableRes = R.drawable.tor_stat_network_dataxfer)
@@ -63,7 +60,8 @@ in order to properly shut down Tor and clean up w/o being killed by the OS.
 |---|---|
 | [enableTorRestartButton](enable-tor-restart-button.md) | Disabled by Default`fun enableTorRestartButton(enable: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)` = true): Builder` |
 | [enableTorStopButton](enable-tor-stop-button.md) | Disabled by Default`fun enableTorStopButton(enable: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)` = true): Builder` |
-| [setActivityToBeOpenedOnTap](set-activity-to-be-opened-on-tap.md) | Define the Activity to be opened when your user taps TorService's notification.`fun setActivityToBeOpenedOnTap(clazz: `[`Class`](https://docs.oracle.com/javase/6/docs/api/java/lang/Class.html)`<*>, intentExtrasKey: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?, intentExtras: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?, intentRequestCode: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`?): Builder` |
+| [setActivityToBeOpenedOnTap](set-activity-to-be-opened-on-tap.md) | Define the Activity to be opened when your user taps TorService's notification.`fun ~~setActivityToBeOpenedOnTap~~(clazz: `[`Class`](https://docs.oracle.com/javase/6/docs/api/java/lang/Class.html)`<*>, intentExtrasKey: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?, intentExtras: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?, intentRequestCode: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`?): Builder` |
+| [setContentIntentData](set-content-intent-data.md) | Default notification behaviour is to use the launch intent for your application from Package Manager when a user taps the notification. Electing this method allows for adding a request code and bundle to the PendingIntent.`fun setContentIntentData(bundle: `[`Bundle`](https://developer.android.com/reference/android/os/Bundle.html)`?, requestCode: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`?): Builder` |
 | [setCustomColor](set-custom-color.md) | Defaults to [R.color.tor_service_white](#)`fun setCustomColor(colorRes: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`): Builder` |
 | [setImageTorDataTransfer](set-image-tor-data-transfer.md) | Defaults to Orbot/TorBrowser's icon [R.drawable.tor_stat_network_dataxfer](#).`fun setImageTorDataTransfer(drawableRes: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`): Builder` |
 | [setImageTorErrors](set-image-tor-errors.md) | Defaults to Orbot/TorBrowser's icon [R.drawable.tor_stat_notifyerr](#).`fun setImageTorErrors(drawableRes: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`): Builder` |

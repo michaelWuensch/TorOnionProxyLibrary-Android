@@ -15,12 +15,9 @@ for your application. Call it in `Application.onCreate` and follow along.
             channelID = "TOPL-Android Demo",
             notificationID = 615
         )
-            .setActivityToBeOpenedOnTap(
-                clazz = MainActivity::class.java,
-                intentExtrasKey = null,
-                intentExtras = null,
-                intentRequestCode = null
-            )
+            // Only needed if you are passing a bundle, or changing request code to something other than 0
+            .setContentIntentData(bundle = null, requestCode = 21)
+
             .setImageTorNetworkingEnabled(drawableRes = R.drawable.tor_stat_network_enabled)
             .setImageTorNetworkingDisabled(drawableRes = R.drawable.tor_stat_network_disabled)
             .setImageTorDataTransfer(drawableRes = R.drawable.tor_stat_network_dataxfer)
