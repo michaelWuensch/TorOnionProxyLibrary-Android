@@ -438,7 +438,8 @@ class ServiceNotification internal constructor(
         if (activityWhenTapped != null) {
             builder.setContentIntent(getContentPendingIntent(torService))
         } else {
-            torService.packageManager.getLaunchIntentForPackage(torService.packageName)
+            torService.context.packageManager
+                ?.getLaunchIntentForPackage(torService.context.packageName)
                 ?.let { intent ->
                     builder.setContentIntent(
                         PendingIntent.getActivity(
