@@ -27,16 +27,21 @@
 * GNU General Public License, version 3 (“GPLv3”).
 *
 *     "The Interfaces" is henceforth defined as Application Programming Interfaces
-*     that are publicly available classes/functions/etc (ie: do not contain the
-*     visibility modifiers `internal`, `private`, `protected`, or are within
-*     classes/functions/etc that contain the aforementioned visibility modifiers)
-*     to TorOnionProxyLibrary-Android users that are needed to implement
-*     TorOnionProxyLibrary-Android and reside in ONLY the following modules:
+*     needed to implement TorOnionProxyLibrary-Android, as listed below:
 *
-*      - topl-core-base
-*      - topl-service
+*      - From the `topl-core-base` module:
+*          - All Classes/methods/variables
 *
-*     The following are excluded from "The Interfaces":
+*      - From the `topl-service-base` module:
+*          - All Classes/methods/variables
+*
+*      - From the `topl-service` module:
+*          - The TorServiceController class and it's contained classes/methods/variables
+*          - The ServiceNotification.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Companion class and it's contained methods/variables
+*
+*     The following code is excluded from "The Interfaces":
 *
 *       - All other code
 *
@@ -67,7 +72,6 @@
 package io.matthewnelson.topl_service.service.components.actions
 
 import io.matthewnelson.topl_service.service.BaseService
-import io.matthewnelson.topl_service.service.components.actions.ServiceActions.ServiceAction
 import io.matthewnelson.topl_service.util.ServiceConsts
 import kotlinx.coroutines.*
 
@@ -79,7 +83,7 @@ import kotlinx.coroutines.*
  * to standardize things.
  *
  * @param [torService] [BaseService] for interacting with other components of the Service
- * @see [ServiceActions]
+ * @see [ServiceAction]
  * */
 internal class ServiceActionProcessor(private val torService: BaseService): ServiceConsts() {
 
@@ -121,28 +125,28 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
 
     fun processServiceAction(serviceAction: ServiceAction) {
         when (serviceAction) {
-            is ServiceActions.NewId -> {
+            is ServiceAction.NewId -> {
                 removeActionFromQueueByName(
                     arrayOf(ServiceActionName.NEW_ID)
                 )
             }
-            is ServiceActions.RestartTor -> {
+            is ServiceAction.RestartTor -> {
                 removeActionFromQueueByName(
                     arrayOf(ServiceActionName.DISABLE_NETWORK)
                 )
             }
-            is ServiceActions.SetDisableNetwork -> {
+            is ServiceAction.SetDisableNetwork -> {
                 removeActionFromQueueByName(
                     arrayOf(ServiceActionName.DISABLE_NETWORK, ServiceActionName.ENABLE_NETWORK)
                 )
             }
-            is ServiceActions.Stop -> {
+            is ServiceAction.Stop -> {
                 torService.unbindTorService()
                 torService.unregisterReceiver()
                 clearActionQueue()
                 broadcastLogger.notice(serviceAction.name)
             }
-            is ServiceActions.Start -> {
+            is ServiceAction.Start -> {
                 clearActionQueue()
                 torService.stopForegroundService()
                 torService.registerReceiver()

@@ -17,7 +17,7 @@ Get Started
  - **torrc file**:
     - Not needed
     - Your application's `torrc` file gets created for you based on what you have stored in 
-    [TorServicePrefs](./topl-service/io.matthewnelson.topl_service.prefs/-tor-service-prefs/index.md). 
+    [TorServicePrefs](./topl-service-base/io.matthewnelson.topl_service_base/-tor-service-prefs/index.md). 
     If nothing is in `TorServicePrefs` for that particular setting, then it will fall back on 
     your static/default [TorSettings](./topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) 
     that you supply upon initialization of `TorServiceController.Builder`.  
@@ -56,9 +56,7 @@ Get Started
 ## Implementation - Step 2: topl-service
  - In your Application module's `build.gradle` file, add the following to the `dependencies` block:
      ```groovy
-     def topl_android_version = "{{ topl_android.release }}"
-     implementation "io.matthewnelson.topl-android:topl-core-base:$topl_android_version"
-     implementation "io.matthewnelson.topl-android:topl-service:$topl_android_version"
+     implementation "io.matthewnelson.topl-android:topl-service:{{ topl_android.release }}"
      ```
  
  - Create a new class which extends [TorSettings](./topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md)
@@ -87,9 +85,7 @@ Get Started
    
  - In your Application module's `build.gradle` file, add (or modify) the following in the `dependencies` block:
      ```groovy
-     def topl_android_version = "{{ topl_android.next_release }}-SNAPSHOT"
-     implementation 'io.matthewnelson.topl-android:topl-core-base:$topl_android_version'
-     implementation 'io.matthewnelson.topl-android:topl-service:$topl_android_version'
+     implementation 'io.matthewnelson.topl-android:topl-service:{{ topl_android.next_release }}-SNAPSHOT'
      ```
 
     !!! Warning

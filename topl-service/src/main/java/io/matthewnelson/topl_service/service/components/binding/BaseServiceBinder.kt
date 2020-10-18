@@ -27,16 +27,21 @@
 * GNU General Public License, version 3 (“GPLv3”).
 *
 *     "The Interfaces" is henceforth defined as Application Programming Interfaces
-*     that are publicly available classes/functions/etc (ie: do not contain the
-*     visibility modifiers `internal`, `private`, `protected`, or are within
-*     classes/functions/etc that contain the aforementioned visibility modifiers)
-*     to TorOnionProxyLibrary-Android users that are needed to implement
-*     TorOnionProxyLibrary-Android and reside in ONLY the following modules:
+*     needed to implement TorOnionProxyLibrary-Android, as listed below:
 *
-*      - topl-core-base
-*      - topl-service
+*      - From the `topl-core-base` module:
+*          - All Classes/methods/variables
 *
-*     The following are excluded from "The Interfaces":
+*      - From the `topl-service-base` module:
+*          - All Classes/methods/variables
+*
+*      - From the `topl-service` module:
+*          - The TorServiceController class and it's contained classes/methods/variables
+*          - The ServiceNotification.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Companion class and it's contained methods/variables
+*
+*     The following code is excluded from "The Interfaces":
 *
 *       - All other code
 *
@@ -70,9 +75,8 @@ import android.os.Binder
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
-import io.matthewnelson.topl_service.service.components.actions.ServiceActions
-import io.matthewnelson.topl_service.service.components.actions.ServiceActions.ServiceAction
-import io.matthewnelson.topl_service.util.ServiceConsts.BackgroundPolicy
+import io.matthewnelson.topl_service.service.components.actions.ServiceAction
+import io.matthewnelson.topl_service_base.BaseServiceConsts.BackgroundPolicy
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -83,11 +87,11 @@ internal abstract class BaseServiceBinder(private val torService: BaseService): 
     abstract fun getTorService(): BaseService?
 
     /**
-     * Accepts all [ServiceActions] except [ServiceActions.Start], which gets issued via
+     * Accepts all [ServiceAction] except [ServiceAction.Start], which gets issued via
      * [io.matthewnelson.topl_service.service.TorService.onStartCommand].
      * */
     fun submitServiceAction(serviceAction: ServiceAction) {
-        if (serviceAction is ServiceActions.Start) return
+        if (serviceAction is ServiceAction.Start) return
         torService.processServiceAction(serviceAction)
     }
 
@@ -120,7 +124,7 @@ internal abstract class BaseServiceBinder(private val torService: BaseService): 
                     delay(executionDelay)
                     bgMgrBroadcastLogger.debug("Executing background management policy")
                     torService.processServiceAction(
-                        ServiceActions.Stop(updateLastServiceAction = false)
+                        ServiceAction.Stop(updateLastServiceAction = false)
                     )
                 }
             }
@@ -131,8 +135,8 @@ internal abstract class BaseServiceBinder(private val torService: BaseService): 
      * Cancels the coroutine executing the [BackgroundPolicy] if it is active.
      * */
     fun cancelExecuteBackgroundPolicyJob() {
-        if (backgroundPolicyExecutionJob?.isActive == true) {
-            backgroundPolicyExecutionJob?.let {
+        backgroundPolicyExecutionJob?.let {
+            if (it.isActive) {
                 it.cancel()
                 bgMgrBroadcastLogger.debug("Execution has been cancelled")
             }

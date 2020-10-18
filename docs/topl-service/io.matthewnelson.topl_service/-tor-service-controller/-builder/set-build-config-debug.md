@@ -2,7 +2,7 @@
 
 # setBuildConfigDebug
 
-`fun setBuildConfigDebug(buildConfigDebug: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)`): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L271)
+`fun setBuildConfigDebug(buildConfigDebug: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)`): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L235)
 
 This makes it such that on your Application's **Debug** builds, the `topl-core` and
 `topl-service` modules will provide you with Logcat messages (when
@@ -14,7 +14,7 @@ via [Builder.setEventBroadcaster](set-event-broadcaster.md).
 
 ### Parameters
 
-`buildConfigDebug` - Send [BuildConfig.DEBUG](#)
+`buildConfigDebug` - Send [BuildConfig.DEBUG](../../../..//topl-service-base/io.matthewnelson.topl_service_base/-build-config/-d-e-b-u-g.md)
 
 **See Also**
 

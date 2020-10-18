@@ -2,7 +2,7 @@
 
 # TorSettings
 
-`abstract class TorSettings : `[`BaseConsts`](../-base-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorSettings.kt#L106)
+`abstract class TorSettings : `[`BaseConsts`](../-base-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorSettings.kt#L111)
 
 This class is for defining default values for your torrc file. Extend this class and define
 your own settings.

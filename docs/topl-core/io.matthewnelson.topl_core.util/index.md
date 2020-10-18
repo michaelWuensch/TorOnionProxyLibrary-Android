@@ -8,6 +8,7 @@
 |---|---|
 | [CoreConsts](-core-consts/index.md) | `abstract class CoreConsts : `[`BaseConsts`](../..//topl-core-base/io.matthewnelson.topl_core_base/-base-consts/index.md) |
 | [FileUtilities](-file-utilities/index.md) | `object FileUtilities` |
+| [OnionAuthUtilities](-onion-auth-utilities/index.md) | `object OnionAuthUtilities` |
 | [TorInstaller](-tor-installer/index.md) | Extend this class and implement the need methods.`abstract class TorInstaller : `[`CoreConsts`](-core-consts/index.md) |
 | [Utilities](-utilities/index.md) | `object Utilities` |
 | [WriteObserver](-write-observer/index.md) | Adapted from the Briar WriteObserver code`class WriteObserver : `[`FileObserver`](https://developer.android.com/reference/android/os/FileObserver.html) |

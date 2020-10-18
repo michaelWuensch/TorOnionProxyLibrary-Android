@@ -2,7 +2,7 @@
 
 # TorServiceController
 
-`class TorServiceController : `[`ServiceConsts`](../../io.matthewnelson.topl_service.util/-service-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L86)
+`class TorServiceController : `[`ServiceConsts`](../../io.matthewnelson.topl_service.util/-service-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L91)
 
 ### Types
 
@@ -14,16 +14,17 @@
 
 | Name | Summary |
 |---|---|
-| [appEventBroadcaster](app-event-broadcaster.md) | `var appEventBroadcaster: `[`TorServiceEventBroadcaster`](../../io.matthewnelson.topl_service.service.components.onionproxy.model/-tor-service-event-broadcaster/index.md)`?` |
+| [appEventBroadcaster](app-event-broadcaster.md) | `var appEventBroadcaster: `[`TorServiceEventBroadcaster`](../../..//topl-service-base/io.matthewnelson.topl_service_base/-tor-service-event-broadcaster/index.md)`?` |
 
 ### Companion Object Functions
 
 | Name | Summary |
 |---|---|
-| [getServiceTorSettings](get-service-tor-settings.md) | Helper method for easily obtaining [ServiceTorSettings](../../io.matthewnelson.topl_service.service.components.onionproxy/-service-tor-settings/index.md).`fun getServiceTorSettings(context: `[`Context`](https://developer.android.com/reference/android/content/Context.html)`): `[`ServiceTorSettings`](../../io.matthewnelson.topl_service.service.components.onionproxy/-service-tor-settings/index.md) |
+| [getDefaultTorSettings](get-default-tor-settings.md) | This method will *never* throw the [RuntimeException](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-runtime-exception/index.html) if you call it after [Builder.build](-builder/build.md).`fun getDefaultTorSettings(): `[`ApplicationDefaultTorSettings`](../../..//topl-service-base/io.matthewnelson.topl_service_base/-application-default-tor-settings/index.md) |
+| [getServiceTorSettings](get-service-tor-settings.md) | This method will *never* throw the [RuntimeException](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-runtime-exception/index.html) if you call it after [Builder.build](-builder/build.md).`fun getServiceTorSettings(): `[`BaseServiceTorSettings`](../../..//topl-service-base/io.matthewnelson.topl_service_base/-base-service-tor-settings/index.md) |
 | [getTorConfigFiles](get-tor-config-files.md) | Get the [TorConfigFiles](../../..//topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md) that have been set after calling [Builder.build](-builder/build.md)`fun getTorConfigFiles(): `[`TorConfigFiles`](../../..//topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md) |
-| [getTorSettings](get-tor-settings.md) | Get the [TorSettings](../../..//topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) that have been set after calling [Builder.build](-builder/build.md).`fun getTorSettings(): `[`TorSettings`](../../..//topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) |
+| [getV3ClientAuthManager](get-v3-client-auth-manager.md) | This method will *never* throw the [RuntimeException](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-runtime-exception/index.html) if you call it after [Builder.build](-builder/build.md).`fun getV3ClientAuthManager(): `[`BaseV3ClientAuthManager`](../../..//topl-service-base/io.matthewnelson.topl_service_base/-base-v3-client-auth-manager/index.md) |
 | [newIdentity](new-identity.md) | Changes identities.`fun newIdentity(): `[`Unit`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html) |
 | [restartTor](restart-tor.md) | Restarts Tor.`fun restartTor(): `[`Unit`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html) |
-| [startTor](start-tor.md) | Starts [TorService](#) and then Tor. You can call this as much as you want. If the Tor [Process](https://docs.oracle.com/javase/6/docs/api/java/lang/Process.html) is already running, it will do nothing.`fun startTor(): `[`Unit`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html) |
+| [startTor](start-tor.md) | This method will *never* throw the [RuntimeException](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-runtime-exception/index.html) if you call it after [Builder.build](-builder/build.md).`fun startTor(): `[`Unit`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html) |
 | [stopTor](stop-tor.md) | Stops [TorService](#).`fun stopTor(): `[`Unit`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html) |

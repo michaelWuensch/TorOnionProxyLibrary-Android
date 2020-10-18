@@ -2,4 +2,4 @@
 
 # DEFAULT__HAS_REDUCED_CONNECTION_PADDING
 
-`const val DEFAULT__HAS_REDUCED_CONNECTION_PADDING: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorSettings.kt#L124)
+`const val DEFAULT__HAS_REDUCED_CONNECTION_PADDING: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorSettings.kt#L129)

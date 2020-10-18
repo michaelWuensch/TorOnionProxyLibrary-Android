@@ -6,5 +6,4 @@
 
 | Name | Summary |
 |---|---|
-| [ServiceConsts](-service-consts/index.md) | `abstract class ServiceConsts : `[`BaseConsts`](../..//topl-core-base/io.matthewnelson.topl_core_base/-base-consts/index.md) |
-| [ServiceUtilities](-service-utilities/index.md) | `object ServiceUtilities` |
+| [ServiceConsts](-service-consts/index.md) | `abstract class ServiceConsts : `[`BaseServiceConsts`](../..//topl-service-base/io.matthewnelson.topl_service_base/-base-service-consts/index.md) |

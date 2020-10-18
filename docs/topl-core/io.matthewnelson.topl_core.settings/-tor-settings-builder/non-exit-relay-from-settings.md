@@ -2,7 +2,7 @@
 
 # nonExitRelayFromSettings
 
-`fun nonExitRelayFromSettings(): `[`TorSettingsBuilder`](index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/settings/TorSettingsBuilder.kt#L482)
+`fun nonExitRelayFromSettings(): `[`TorSettingsBuilder`](index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/settings/TorSettingsBuilder.kt#L518)
 
 Adds non exit relay to builder. This method uses a default Quad9 nameserver.
 

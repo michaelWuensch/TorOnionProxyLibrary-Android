@@ -27,16 +27,21 @@
 * GNU General Public License, version 3 (“GPLv3”).
 *
 *     "The Interfaces" is henceforth defined as Application Programming Interfaces
-*     that are publicly available classes/functions/etc (ie: do not contain the
-*     visibility modifiers `internal`, `private`, `protected`, or are within
-*     classes/functions/etc that contain the aforementioned visibility modifiers)
-*     to TorOnionProxyLibrary-Android users that are needed to implement
-*     TorOnionProxyLibrary-Android and reside in ONLY the following modules:
+*     needed to implement TorOnionProxyLibrary-Android, as listed below:
 *
-*      - topl-core-base
-*      - topl-service
+*      - From the `topl-core-base` module:
+*          - All Classes/methods/variables
 *
-*     The following are excluded from "The Interfaces":
+*      - From the `topl-service-base` module:
+*          - All Classes/methods/variables
+*
+*      - From the `topl-service` module:
+*          - The TorServiceController class and it's contained classes/methods/variables
+*          - The ServiceNotification.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Companion class and it's contained methods/variables
+*
+*     The following code is excluded from "The Interfaces":
 *
 *       - All other code
 *
@@ -63,7 +68,7 @@
 *     exception. If you modify "The Interfaces", this exception does not apply to your
 *     modified version of TorOnionProxyLibrary-Android, and you must remove this
 *     exception when you distribute your modified version.
- */
+* */
 package io.matthewnelson.topl_service
 
 import android.app.Application
@@ -134,7 +139,7 @@ internal class TorServiceControllerUnitTest {
 
     @Test(expected = RuntimeException::class)
     fun `_throw errors if getTorSettings called before build`() {
-        TorServiceController.getTorSettings()
+        TorServiceController.getDefaultTorSettings()
     }
 
     @Test(expected = RuntimeException::class)
@@ -169,7 +174,7 @@ internal class TorServiceControllerUnitTest {
     @Test
     fun `_zz_ensure one-time initialization if build called more than once`() {
         try {
-            TorServiceController.getTorSettings()
+            TorServiceController.getDefaultTorSettings()
             assertNotNull(BaseService.buildConfigDebug)
             // build has been called in a previous test
         } catch (e: RuntimeException) {
@@ -178,7 +183,7 @@ internal class TorServiceControllerUnitTest {
             assertNotNull(BaseService.buildConfigDebug)
         }
 
-        val initialHashCode = TorServiceController.getTorSettings().hashCode()
+        val initialHashCode = TorServiceController.getDefaultTorSettings().hashCode()
 
         // Instantiate new TorSettings and try to overwrite things via the builder
         val newTorSettings =
@@ -187,7 +192,7 @@ internal class TorServiceControllerUnitTest {
             .useCustomTorConfigFiles(torConfigFiles)
             .build()
 
-        val hashCodeAfterSecondBuildCall = TorServiceController.getTorSettings().hashCode()
+        val hashCodeAfterSecondBuildCall = TorServiceController.getDefaultTorSettings().hashCode()
 
         assertNotEquals(newTorSettings.hashCode(), hashCodeAfterSecondBuildCall)
         assertEquals(initialHashCode, hashCodeAfterSecondBuildCall)
@@ -198,7 +203,7 @@ internal class TorServiceControllerUnitTest {
             app,
             notificationBuilder,
             BackgroundManager.Builder().respectResourcesWhileInBackground(30),
-            BuildConfig.VERSION_CODE,
+            1,
             torSettings,
             "common/geoip",
             "common/geoip6"

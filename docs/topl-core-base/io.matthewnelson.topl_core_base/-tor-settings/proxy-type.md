@@ -2,7 +2,7 @@
 
 # proxyType
 
-`abstract val proxyType: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorSettings.kt#L418)
+`abstract val proxyType: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorSettings.kt#L423)
 
 Depending on the [BaseConsts.ProxyType](../-base-consts/-proxy-type/index.md), will add authenticated Socks5 or HTTPS proxy,
 if other settings are configured properly.

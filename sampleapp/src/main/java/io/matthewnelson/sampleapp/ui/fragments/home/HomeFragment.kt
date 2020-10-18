@@ -27,16 +27,21 @@
 * GNU General Public License, version 3 (“GPLv3”).
 *
 *     "The Interfaces" is henceforth defined as Application Programming Interfaces
-*     that are publicly available classes/functions/etc (ie: do not contain the
-*     visibility modifiers `internal`, `private`, `protected`, or are within
-*     classes/functions/etc that contain the aforementioned visibility modifiers)
-*     to TorOnionProxyLibrary-Android users that are needed to implement
-*     TorOnionProxyLibrary-Android and reside in ONLY the following modules:
+*     needed to implement TorOnionProxyLibrary-Android, as listed below:
 *
-*      - topl-core-base
-*      - topl-service
+*      - From the `topl-core-base` module:
+*          - All Classes/methods/variables
 *
-*     The following are excluded from "The Interfaces":
+*      - From the `topl-service-base` module:
+*          - All Classes/methods/variables
+*
+*      - From the `topl-service` module:
+*          - The TorServiceController class and it's contained classes/methods/variables
+*          - The ServiceNotification.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Companion class and it's contained methods/variables
+*
+*     The following code is excluded from "The Interfaces":
 *
 *       - All other code
 *
@@ -72,12 +77,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.lifecycle.lifecycleScope
 import io.matthewnelson.sampleapp.R
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashMessage
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment
 import io.matthewnelson.topl_service.TorServiceController
-import io.matthewnelson.topl_service.prefs.TorServicePrefs
+import io.matthewnelson.topl_service_base.TorServicePrefs
 import io.matthewnelson.topl_service.util.ServiceConsts
+import io.matthewnelson.topl_service_base.BaseServiceConsts
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
 
@@ -97,6 +108,7 @@ class HomeFragment : Fragment() {
 
     private lateinit var torServicePrefs: TorServicePrefs
     private lateinit var logMessageAdapter: LogMessageAdapter
+    private var getDebugLogsJob: Job? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -104,10 +116,12 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         torServicePrefs = TorServicePrefs(inflater.context)
-        hasDebugLogs = torServicePrefs.getBoolean(
-            ServiceConsts.PrefKeyBoolean.HAS_DEBUG_LOGS,
-            TorServiceController.getTorSettings().hasDebugLogs
-        )
+        getDebugLogsJob = lifecycleScope.launch(Dispatchers.IO) {
+            hasDebugLogs = torServicePrefs.getBoolean(
+                BaseServiceConsts.PrefKeyBoolean.HAS_DEBUG_LOGS,
+                TorServiceController.getDefaultTorSettings().hasDebugLogs
+            )
+        }
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
@@ -141,7 +155,7 @@ class HomeFragment : Fragment() {
             hasDebugLogs = !hasDebugLogs
             setButtonDebugText()
             torServicePrefs.putBoolean(
-                ServiceConsts.PrefKeyBoolean.HAS_DEBUG_LOGS,
+                BaseServiceConsts.PrefKeyBoolean.HAS_DEBUG_LOGS,
                 hasDebugLogs
             )
         }
@@ -172,10 +186,22 @@ class HomeFragment : Fragment() {
     }
 
     private fun setButtonDebugText() {
-        buttonDebug.text = if (hasDebugLogs) {
-            getString(R.string.home_button_debugging_disable)
-        } else {
-            getString(R.string.home_button_debugging_enable)
-        }
+        if (getDebugLogsJob?.isActive == true)
+            lifecycleScope.launch {
+                getDebugLogsJob?.join()
+                delay(50L)
+
+                buttonDebug.text = if (hasDebugLogs) {
+                    getString(R.string.home_button_debugging_disable)
+                } else {
+                    getString(R.string.home_button_debugging_enable)
+                }
+            }
+        else
+            buttonDebug.text = if (hasDebugLogs) {
+                getString(R.string.home_button_debugging_disable)
+            } else {
+                getString(R.string.home_button_debugging_enable)
+            }
     }
 }

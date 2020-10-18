@@ -1,5 +1,3 @@
-apply plugin: 'org.jetbrains.dokka'
-
 buildscript {
     apply from: "$rootDir/gradle/dependencies.gradle"
 
@@ -9,10 +7,11 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath deps.androidGradlePlugin
-        classpath deps.kotlin.dokka
-        classpath deps.kotlin.gradlePlugin
-        classpath deps.mavenPublish
+        classpath plugin.androidGradle
+        classpath plugin.kotlin.dokka
+        classpath plugin.kotlin.gradle
+        classpath plugin.mavenPublish
+        classpath plugin.gradleVersions
     }
 }
 
@@ -20,12 +19,60 @@ allprojects  {
     repositories {
         google()
         jcenter()
+//        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     }
 
     tasks.withType(Test) {
         maxHeapSize = "4096m"
     }
 }
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+////////////////////////////////////////////////////////////////////////////
+/// Gradle Versions: https://github.com/ben-manes/gradle-versions-plugin ///
+////////////////////////////////////////////////////////////////////////////
+
+apply plugin: 'com.github.ben-manes.versions'
+
+def isNonStable = { String version ->
+    def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { it -> version.toUpperCase().contains(it) }
+    def regex = /^[0-9,.v-]+(-r)?$/
+    return !stableKeyword && !(version ==~ regex)
+}
+
+tasks.named("dependencyUpdates").configure {
+    checkForGradleUpdate = true
+
+    // Example 1: reject all non stable versions
+    rejectVersionIf {
+        isNonStable(candidate.version)
+    }
+
+    // Example 2: disallow release candidates as upgradable versions from stable versions
+    rejectVersionIf {
+        isNonStable(candidate.version) && !isNonStable(currentVersion)
+    }
+
+    // Example 3: using the full syntax
+    resolutionStrategy {
+        componentSelection {
+            all {
+                if (isNonStable(candidate.version) && !isNonStable(currentVersion)) {
+                    reject('Release candidate')
+                }
+            }
+        }
+    }
+}
+
+//////////////////////////////////////////////
+/// Dokka: https://github.com/Kotlin/dokka ///
+//////////////////////////////////////////////
+
+apply plugin: 'org.jetbrains.dokka'
 
 // Dokka's configuration.externalDocumentationLink.url setting for connecting methods/variables
 // in each module is quarky, especially when relying on Mkdocs to generate a website using the
@@ -36,8 +83,4 @@ allprojects  {
 task fixDokkaDocLinks(type: Exec) {
     workingDir "$rootDir"
     commandLine "scripts/fix_dokka_doc_external_links.sh"
-}
-
-task clean(type: Delete) {
-  delete rootProject.buildDir
 }

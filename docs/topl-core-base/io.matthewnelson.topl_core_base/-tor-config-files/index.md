@@ -2,7 +2,7 @@
 
 # TorConfigFiles
 
-`class TorConfigFiles : `[`BaseConsts`](../-base-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorConfigFiles.kt#L107)
+`class TorConfigFiles : `[`BaseConsts`](../-base-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/TorConfigFiles.kt#L112)
 
 Holds Tor configuration information for files and directories that Tor will use.
 
@@ -46,6 +46,8 @@ See extension function [readTorConfigFile](../java.io.-file/read-tor-config-file
 | [torExecutableFile](tor-executable-file.md) | `val torExecutableFile: `[`File`](https://docs.oracle.com/javase/6/docs/api/java/io/File.html) |
 | [torrcFile](torrc-file.md) | `var torrcFile: `[`File`](https://docs.oracle.com/javase/6/docs/api/java/io/File.html) |
 | [torrcFileLock](torrc-file-lock.md) | `val torrcFileLock: `[`Object`](https://docs.oracle.com/javase/6/docs/api/java/lang/Object.html) |
+| [v3AuthPrivateDir](v3-auth-private-dir.md) | `val v3AuthPrivateDir: `[`File`](https://docs.oracle.com/javase/6/docs/api/java/io/File.html) |
+| [v3AuthPrivateDirLock](v3-auth-private-dir-lock.md) | `val v3AuthPrivateDirLock: `[`Object`](https://docs.oracle.com/javase/6/docs/api/java/lang/Object.html) |
 
 ### Functions
 

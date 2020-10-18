@@ -2,7 +2,7 @@
 
 # signalNewNym
 
-`@Synchronized suspend fun signalNewNym(): `[`Unit`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/OnionProxyManager.kt#L889)
+`@Synchronized suspend fun signalNewNym(): `[`Unit`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/OnionProxyManager.kt#L923)
 
 Will signal for a NewNym, then broadcast [NEWNYM_SUCCESS_MESSAGE](-n-e-w-n-y-m_-s-u-c-c-e-s-s_-m-e-s-s-a-g-e.md) if successful.
 

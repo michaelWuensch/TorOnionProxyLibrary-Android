@@ -2,7 +2,7 @@
 
 # WriteObserver
 
-`class WriteObserver : `[`FileObserver`](https://developer.android.com/reference/android/os/FileObserver.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/util/WriteObserver.kt#L100)
+`class WriteObserver : `[`FileObserver`](https://developer.android.com/reference/android/os/FileObserver.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/util/WriteObserver.kt#L106)
 
 Adapted from the Briar WriteObserver code
 

@@ -7,6 +7,7 @@ android {
     compileSdkVersion versions.compileSdk
     buildToolsVersion versions.buildTools
 
+    testOptions.unitTests.includeAndroidResources = true
     defaultConfig {
         minSdkVersion versions.minSdk
         targetSdkVersion versions.compileSdk
@@ -63,16 +64,19 @@ dokka {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation project(':topl-core-base')
+    api project(':topl-core-base')
     implementation deps.androidx.core
     implementation deps.jtorctl
     implementation deps.kotlin.coroutinesAndroid
     implementation deps.kotlin.coroutinesCore
     implementation deps.kotlin.stdlib
 
-    testImplementation deps.junit
+    testImplementation testDeps.androidx.core
+    testImplementation testDeps.junit
+    testImplementation testDeps.kotlin.coroutines
+    testImplementation testDeps.robolectric
 
-    androidTestImplementation deps.androidx.test.core
-    androidTestImplementation deps.androidx.test.junit
-    androidTestImplementation deps.androidx.test.espresso
+    androidTestImplementation testDeps.androidx.core
+    androidTestImplementation testDeps.androidx.espresso
+    androidTestImplementation testDeps.androidx.junit
 }

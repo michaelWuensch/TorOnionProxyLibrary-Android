@@ -27,16 +27,21 @@
 * GNU General Public License, version 3 (“GPLv3”).
 *
 *     "The Interfaces" is henceforth defined as Application Programming Interfaces
-*     that are publicly available classes/functions/etc (ie: do not contain the
-*     visibility modifiers `internal`, `private`, `protected`, or are within
-*     classes/functions/etc that contain the aforementioned visibility modifiers)
-*     to TorOnionProxyLibrary-Android users that are needed to implement
-*     TorOnionProxyLibrary-Android and reside in ONLY the following modules:
+*     needed to implement TorOnionProxyLibrary-Android, as listed below:
 *
-*      - topl-core-base
-*      - topl-service
+*      - From the `topl-core-base` module:
+*          - All Classes/methods/variables
 *
-*     The following are excluded from "The Interfaces":
+*      - From the `topl-service-base` module:
+*          - All Classes/methods/variables
+*
+*      - From the `topl-service` module:
+*          - The TorServiceController class and it's contained classes/methods/variables
+*          - The ServiceNotification.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Companion class and it's contained methods/variables
+*
+*     The following code is excluded from "The Interfaces":
 *
 *       - All other code
 *
@@ -178,9 +183,9 @@ class ServiceNotification internal constructor(
             intentExtras: String?,
             intentRequestCode: Int?
         ): Builder {
-            serviceNotification.activityWhenTapped = clazz
-            serviceNotification.activityIntentKey = intentExtrasKey
-            serviceNotification.activityIntentExtras = intentExtras
+            this.serviceNotification.activityWhenTapped = clazz
+            this.serviceNotification.activityIntentKey = intentExtrasKey
+            this.serviceNotification.activityIntentExtras = intentExtras
             intentRequestCode?.let { serviceNotification.activityIntentRequestCode = it }
             return this
         }
@@ -197,7 +202,7 @@ class ServiceNotification internal constructor(
          * @return [Builder] To continue customizing
          * */
         fun setImageTorNetworkingEnabled(@DrawableRes drawableRes: Int): Builder {
-            serviceNotification.imageNetworkEnabled = drawableRes
+            this.serviceNotification.imageNetworkEnabled = drawableRes
             return this
         }
 
@@ -213,7 +218,7 @@ class ServiceNotification internal constructor(
          * @return [Builder] To continue customizing
          * */
         fun setImageTorNetworkingDisabled(@DrawableRes drawableRes: Int): Builder {
-            serviceNotification.imageNetworkDisabled = drawableRes
+            this.serviceNotification.imageNetworkDisabled = drawableRes
             return this
         }
 
@@ -228,7 +233,7 @@ class ServiceNotification internal constructor(
          * @return [Builder] To continue customizing
          * */
         fun setImageTorDataTransfer(@DrawableRes drawableRes: Int): Builder {
-            serviceNotification.imageDataTransfer = drawableRes
+            this.serviceNotification.imageDataTransfer = drawableRes
             return this
         }
 
@@ -243,7 +248,7 @@ class ServiceNotification internal constructor(
          * @return [Builder] To continue customizing
          * */
         fun setImageTorErrors(@DrawableRes drawableRes: Int): Builder {
-            serviceNotification.imageError = drawableRes
+            this.serviceNotification.imageError = drawableRes
             return this
         }
 
@@ -259,7 +264,7 @@ class ServiceNotification internal constructor(
          * @return [Builder] To continue customizing
          * */
         fun setCustomColor(@ColorRes colorRes: Int): Builder {
-            serviceNotification.colorWhenConnected = colorRes
+            this.serviceNotification.colorWhenConnected = colorRes
             return this
         }
 
@@ -274,8 +279,9 @@ class ServiceNotification internal constructor(
          * @return [Builder] To continue customizing
          * */
         fun setVisibility(@NotificationVisibility visibility: Int): Builder {
-            if (visibility in -1..1)
-                serviceNotification.visibility = visibility
+            if (visibility in -1..1) {
+                this.serviceNotification.visibility = visibility
+            }
             return this
         }
 
@@ -292,7 +298,7 @@ class ServiceNotification internal constructor(
          * */
         @JvmOverloads
         fun enableTorRestartButton(enable: Boolean = true): Builder {
-            serviceNotification.enableRestartButton = enable
+            this.serviceNotification.enableRestartButton = enable
             return this
         }
 
@@ -309,7 +315,7 @@ class ServiceNotification internal constructor(
          * */
         @JvmOverloads
         fun enableTorStopButton(enable: Boolean = true): Builder {
-            serviceNotification.enableStopButton = enable
+            this.serviceNotification.enableStopButton = enable
             return this
         }
 
@@ -329,7 +335,7 @@ class ServiceNotification internal constructor(
          * */
         @JvmOverloads
         fun showNotification(show: Boolean = false): Builder {
-            serviceNotification.showNotification = show
+            this.serviceNotification.showNotification = show
             return this
         }
 

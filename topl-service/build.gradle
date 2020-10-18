@@ -43,17 +43,22 @@ android {
 dokka {
     configuration {
         moduleName = 'topl-service'
-        subProjects = [ 'topl-core-base', 'topl-core' ]
+        subProjects = [ 'topl-core-base', 'topl-service-base', 'topl-core' ]
         reportUndocumented = false
         includeNonPublic = false
         skipEmptyPackages = true
         samples = [
-                "$rootDir/sampleapp/src/main/java/io/matthewnelson/sampleapp/topl_android/CodeSamples.kt".toString(),
-                "$rootDir/sampleapp/src/main/java/io/matthewnelson/sampleapp/topl_android/MyEventBroadcaster.kt".toString()
+                "$rootDir/sampleapp/src/main/java/io/matthewnelson/sampleapp/topl_android/CodeSamples.kt".toString()
         ]
         sourceLink {
             url = "https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/"
             lineSuffix = "#L"
+        }
+        externalDocumentationLink {
+            // Dokka plugin requires a protocol (http/https/etc.) here, so we have to repair the
+            // links after building the docs by running `./gradlew fixDokkaDocLinks`.
+            url = new URL("http://FIX_DOKKA_LINKS/topl-service-base/")
+            packageListUrl = new URL("file://$rootDir/docs/topl-service-base/package-list")
         }
         externalDocumentationLink {
             // Dokka plugin requires a protocol (http/https/etc.) here, so we have to repair the
@@ -74,8 +79,8 @@ dokka {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation project(':topl-core')
-    implementation project(':topl-core-base')
+    implementation project(path: ':topl-core')
+    api project(path: ':topl-service-base')
     implementation deps.androidx.core
     implementation deps.androidx.lifecycle.runtime
     implementation deps.androidx.lifecycle.processLifecycleOwner
@@ -84,12 +89,12 @@ dependencies {
     implementation deps.kotlin.coroutinesCore
     implementation deps.kotlin.stdlib
 
-    testImplementation deps.androidx.test.core
-    testImplementation deps.junit
-    testImplementation deps.kotlin.coroutinesTest
-    testImplementation deps.robolectric
+    testImplementation testDeps.androidx.core
+    testImplementation testDeps.junit
+    testImplementation testDeps.kotlin.coroutines
+    testImplementation testDeps.robolectric
 
-    androidTestImplementation deps.androidx.test.core
-    androidTestImplementation deps.androidx.test.espresso
-    androidTestImplementation deps.androidx.test.junit
+    androidTestImplementation testDeps.androidx.core
+    androidTestImplementation testDeps.androidx.espresso
+    androidTestImplementation testDeps.androidx.junit
 }

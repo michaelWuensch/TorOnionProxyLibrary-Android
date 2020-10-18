@@ -2,7 +2,7 @@
 
 # openBridgesStream
 
-`abstract fun openBridgesStream(): `[`InputStream`](https://docs.oracle.com/javase/6/docs/api/java/io/InputStream.html)`?` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/util/TorInstaller.kt#L149)
+`abstract fun openBridgesStream(): `[`InputStream`](https://docs.oracle.com/javase/6/docs/api/java/io/InputStream.html)`?` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/util/TorInstaller.kt#L154)
 
 If first byte of stream is 0, then the following stream will have the form
 
@@ -43,10 +43,11 @@ if (bridgeType.toInt() == 0) {
 
 val bridgeTypeStream = ByteArrayInputStream(byteArrayOf(bridgeType))
 val bridgeStream =
-    if (bridgeType.toInt() == 1)
+    if (bridgeType.toInt() == 1) {
         ByteArrayInputStream(userDefinedBridgeList.toByteArray())
-    else
+    } else {
         torService.context.resources.openRawResource(R.raw.bridges)
+    }
 return SequenceInputStream(bridgeTypeStream, bridgeStream)
 ```
 

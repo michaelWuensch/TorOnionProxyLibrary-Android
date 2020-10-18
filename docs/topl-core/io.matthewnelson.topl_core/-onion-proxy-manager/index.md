@@ -2,7 +2,7 @@
 
 # OnionProxyManager
 
-`class OnionProxyManager : `[`CoreConsts`](../../io.matthewnelson.topl_core.util/-core-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/OnionProxyManager.kt#L133)
+`class OnionProxyManager : `[`CoreConsts`](../../io.matthewnelson.topl_core.util/-core-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/OnionProxyManager.kt#L138)
 
 This is where all the fun is, this is the class which acts as a gateway into the `topl-core`
 module, and ensures synchronicity is had.

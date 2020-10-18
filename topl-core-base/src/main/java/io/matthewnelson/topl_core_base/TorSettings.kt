@@ -27,16 +27,21 @@
 * GNU General Public License, version 3 (“GPLv3”).
 *
 *     "The Interfaces" is henceforth defined as Application Programming Interfaces
-*     that are publicly available classes/functions/etc (ie: do not contain the
-*     visibility modifiers `internal`, `private`, `protected`, or are within
-*     classes/functions/etc that contain the aforementioned visibility modifiers)
-*     to TorOnionProxyLibrary-Android users that are needed to implement
-*     TorOnionProxyLibrary-Android and reside in ONLY the following modules:
+*     needed to implement TorOnionProxyLibrary-Android, as listed below:
 *
-*      - topl-core-base
-*      - topl-service
+*      - From the `topl-core-base` module:
+*          - All Classes/methods/variables
 *
-*     The following are excluded from "The Interfaces":
+*      - From the `topl-service-base` module:
+*          - All Classes/methods/variables
+*
+*      - From the `topl-service` module:
+*          - The TorServiceController class and it's contained classes/methods/variables
+*          - The ServiceNotification.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Companion class and it's contained methods/variables
+*
+*     The following code is excluded from "The Interfaces":
 *
 *       - All other code
 *
@@ -513,45 +518,4 @@ abstract class TorSettings: BaseConsts() {
      * Docs: https://2019.www.torproject.org/docs/tor-manual.html.en#VirtualAddrNetworkIPv6
      * */
     abstract val virtualAddressNetwork: String?
-
-//    override fun toString(): String {
-//        return "TorSettings{ " +
-//                "disableNetwork=${if (disableNetwork) TRUE else FALSE}, " +
-//                "dnsPort=${dnsPort.toString()}, " +
-//                "customTorrc=${customTorrc ?: NULL}, " +
-//                "entryNodes=${entryNodes ?: NULL}, " +
-//                "excludeNodes=${excludeNodes ?: NULL}, " +
-//                "exitNodes=${exitNodes ?: NULL}, " +
-//                "httpTunnelPort=${httpTunnelPort.toString()}, " +
-//                "listOfSupportedBridges=${listOfSupportedBridges.joinToString(", ", "[", "]")}, " +
-//                "proxyHost=${proxyHost ?: NULL}, " +
-//                "proxyPassword=${proxyPassword ?: NULL}, " +
-//                "proxyPort=${proxyPort?.toString() ?: NULL}, " +
-//                "proxySocks5Host=${proxySocks5Host ?: NULL}, " +
-//                "proxySocks5ServerPort=${proxySocks5ServerPort?.toString() ?: NULL}, " +
-//                "proxyType=${proxyType ?: NULL}, " +
-//                "proxyUser=${proxyUser ?: NULL}, " +
-//                "reachableAddressPorts=$reachableAddressPorts, " +
-//                "relayNickname=${relayNickname ?: NULL}, " +
-//                "relayPort=${relayPort.toString()}, " +
-//                "socksPort=$socksPort, " +
-//                "virtualAddressNetwork=${virtualAddressNetwork ?: NULL}, " +
-//                "hasBridges=${if (hasBridges) TRUE else FALSE}, " +
-//                "hasConnectionPadding=${if (hasConnectionPadding) TRUE else FALSE}, " +
-//                "hasCookieAuthentication=${if (hasCookieAuthentication) TRUE else FALSE}, " +
-//                "hasDebugLogs=${if (hasDebugLogs) TRUE else FALSE}, " +
-//                "hasDormantCanceledByStartup=${if (hasDormantCanceledByStartup) TRUE else FALSE}, " +
-//                "hasIsolationAddressFlagForTunnel=${if (hasIsolationAddressFlagForTunnel) TRUE else FALSE}, " +
-//                "hasOpenProxyOnAllInterfaces=${if (hasOpenProxyOnAllInterfaces) TRUE else FALSE}, " +
-//                "hasReachableAddress=${if (hasReachableAddress) TRUE else FALSE}, " +
-//                "hasReducedConnectionPadding=${if (hasReducedConnectionPadding) TRUE else FALSE}, " +
-//                "hasSafeSocks=${if (hasSafeSocks) TRUE else FALSE}, " +
-//                "hasStrictNodes=${if (hasStrictNodes) TRUE else FALSE}, " +
-//                "hasTestSocks=${if (hasTestSocks) TRUE else FALSE}, " +
-//                "isAutoMapHostsOnResolve=${if (isAutoMapHostsOnResolve) TRUE else FALSE}, " +
-//                "isRelay=${if (isRelay) TRUE else FALSE}, " +
-//                "runAsDaemon=${if (runAsDaemon) TRUE else FALSE}, " +
-//                "transPort=${transPort?.toString() ?: NULL}, " +
-//                "useSocks5=${if (useSocks5) TRUE else FALSE} }"
-//    }
 }

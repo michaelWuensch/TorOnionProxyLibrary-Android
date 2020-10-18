@@ -27,16 +27,21 @@
 * GNU General Public License, version 3 (“GPLv3”).
 *
 *     "The Interfaces" is henceforth defined as Application Programming Interfaces
-*     that are publicly available classes/functions/etc (ie: do not contain the
-*     visibility modifiers `internal`, `private`, `protected`, or are within
-*     classes/functions/etc that contain the aforementioned visibility modifiers)
-*     to TorOnionProxyLibrary-Android users that are needed to implement
-*     TorOnionProxyLibrary-Android and reside in ONLY the following modules:
+*     needed to implement TorOnionProxyLibrary-Android, as listed below:
 *
-*      - topl-core-base
-*      - topl-service
+*      - From the `topl-core-base` module:
+*          - All Classes/methods/variables
 *
-*     The following are excluded from "The Interfaces":
+*      - From the `topl-service-base` module:
+*          - All Classes/methods/variables
+*
+*      - From the `topl-service` module:
+*          - The TorServiceController class and it's contained classes/methods/variables
+*          - The ServiceNotification.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Companion class and it's contained methods/variables
+*
+*     The following code is excluded from "The Interfaces":
 *
 *       - All other code
 *
@@ -66,82 +71,41 @@
 * */
 package io.matthewnelson.topl_service.service.components.onionproxy
 
-import io.matthewnelson.topl_core_base.TorSettings
-import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyString
-import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyList
-import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyInt
-import io.matthewnelson.topl_service.util.ServiceConsts.PrefKeyBoolean
-import io.matthewnelson.topl_service.prefs.TorServicePrefs
+import androidx.annotation.WorkerThread
+import io.matthewnelson.topl_service_base.ApplicationDefaultTorSettings
+import io.matthewnelson.topl_service_base.BaseServiceConsts.PrefKeyString
+import io.matthewnelson.topl_service_base.BaseServiceConsts.PrefKeyList
+import io.matthewnelson.topl_service_base.BaseServiceConsts.PrefKeyInt
+import io.matthewnelson.topl_service_base.BaseServiceConsts.PrefKeyBoolean
+import io.matthewnelson.topl_service_base.BaseServiceTorSettings
+import io.matthewnelson.topl_service_base.TorServicePrefs
 
-/**
- * This class enables the querying of [TorServicePrefs] to obtain values potentially set by
- * the User such that they are *preferred* over static/default values you may have set in the
- * [io.matthewnelson.topl_service.TorServiceController.Builder]'s constructor argument for
- * [TorSettings].
- *
- * It enables the updating of settings in a standardized manner such that library users can
- * simply instantiate [TorServicePrefs], change things, and then call
- * [io.matthewnelson.topl_service.TorServiceController.restartTor] to have them applied to the
- * Tor Process.
- *
- * It also makes designing of a settings screen much easier for your application.
- *
- * Use [io.matthewnelson.topl_service.TorServiceController.getServiceTorSettings] to instantiate
- *
- * @param [servicePrefs] [TorServicePrefs] to query/save values to shared preferences
- * @param [defaultTorSettings] Default values to fall back on if nothing is returned from
- *   [TorServicePrefs]. Use [io.matthewnelson.topl_service.TorServiceController.getTorSettings] for
- *   this value.
- * */
-class ServiceTorSettings internal constructor(
-    val servicePrefs: TorServicePrefs,
-    val defaultTorSettings: TorSettings
-): TorSettings() {
+internal class ServiceTorSettings(
+    servicePrefs: TorServicePrefs,
+    defaultTorSettings: ApplicationDefaultTorSettings
+): BaseServiceTorSettings(servicePrefs, defaultTorSettings) {
 
-    override val dormantClientTimeout: Int?
-        get() = servicePrefs.getInt(PrefKeyInt.DORMANT_CLIENT_TIMEOUT, defaultTorSettings.dormantClientTimeout)
-
-    fun dormantClientTimeoutSave(minutes: Int?) {
-        if (minutes == defaultTorSettings.dormantClientTimeout)
+    @WorkerThread
+    override fun dormantClientTimeoutSave(minutes: Int?) {
+        if (minutes == defaultTorSettings.dormantClientTimeout) {
             servicePrefs.remove(PrefKeyInt.DORMANT_CLIENT_TIMEOUT)
-        else
+        } else {
             servicePrefs.putInt(PrefKeyInt.DORMANT_CLIENT_TIMEOUT, minutes)
+        }
     }
 
-    override val disableNetwork: Boolean
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.DISABLE_NETWORK, defaultTorSettings.disableNetwork)
-
-    /**
-     * Saves the value for [disableNetwork] to [TorServicePrefs]. If the value is the same as what is
-     * declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the setting if
-     * it exists.
-     *
-     * @param [boolean]
-     * @see [TorSettings.disableNetwork]
-     * */
-    fun disableNetworkSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.disableNetwork)
+    @WorkerThread
+    override fun disableNetworkSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.disableNetwork) {
             servicePrefs.remove(PrefKeyBoolean.DISABLE_NETWORK)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.DISABLE_NETWORK, boolean)
+        }
     }
 
-    override val dnsPort: String
-        get() = servicePrefs.getString(PrefKeyString.DNS_PORT, defaultTorSettings.dnsPort)
-            ?: defaultTorSettings.dnsPort
-
-    /**
-     * Saves the value for [dnsPort] to [TorServicePrefs]. If the value is the same as what is
-     * declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the setting if
-     * it exists.
-     *
-     * @param [dnsPort] A String value of 0, auto, or number between 1024 and 65535
-     * @see [checkPortSelection]
-     * @see [TorSettings.dnsPort]
-     * @throws [IllegalArgumentException] if the value is not 0, auto, or between 1024 and 65535
-     * */
+    @WorkerThread
     @Throws(IllegalArgumentException::class)
-    fun dnsPortSave(dnsPort: String) {
+    override fun dnsPortSave(dnsPort: String) {
         when {
             dnsPort == defaultTorSettings.dnsPort -> {
                 servicePrefs.remove(PrefKeyString.DNS_PORT)
@@ -157,23 +121,8 @@ class ServiceTorSettings internal constructor(
         }
     }
 
-    override val dnsPortIsolationFlags: List<@IsolationFlag String>?
-        get() = servicePrefs.getList(
-            PrefKeyList.DNS_PORT_ISOLATION_FLAGS,
-            defaultTorSettings.dnsPortIsolationFlags ?: arrayListOf()
-        )
-
-    /**
-     * Saves the value for [isolationFlags] to [TorServicePrefs]. If the value is the same as what is
-     * declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the setting if
-     * it exists.
-     *
-     * @param [isolationFlags] A List of [io.matthewnelson.topl_core_base.BaseConsts.IsolationFlag]'s
-     *   for the [dnsPort]
-     * @see [io.matthewnelson.topl_core_base.BaseConsts.IsolationFlag]
-     * @see [TorSettings.dnsPortIsolationFlags]
-     * */
-    fun dnsPortIsolationFlagsSave(isolationFlags: List<@IsolationFlag String>) {
+    @WorkerThread
+    override fun dnsPortIsolationFlagsSave(isolationFlags: List<@IsolationFlag String>) {
         if (isolationFlags == defaultTorSettings.dnsPortIsolationFlags) {
             servicePrefs.remove(PrefKeyList.DNS_PORT_ISOLATION_FLAGS)
         } else {
@@ -181,94 +130,45 @@ class ServiceTorSettings internal constructor(
         }
     }
 
-    override val customTorrc: String?
-        get() = servicePrefs.getString(PrefKeyString.CUSTOM_TORRC, defaultTorSettings.customTorrc)
-
-    /**
-     * Saves the value for [customTorrc] to [TorServicePrefs]. If the value is the same as what is
-     * declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the setting if
-     * it exists.
-     *
-     * @param [customTorrc] A String of values to be added to the torrc file
-     * @see [TorSettings.customTorrc]
-     * */
-    fun customTorrcSave(customTorrc: String?) {
-        if (customTorrc == defaultTorSettings.customTorrc)
+    @WorkerThread
+    override fun customTorrcSave(customTorrc: String?) {
+        if (customTorrc == defaultTorSettings.customTorrc) {
             servicePrefs.remove(PrefKeyString.CUSTOM_TORRC)
-        else
+        } else {
             servicePrefs.putString(PrefKeyString.CUSTOM_TORRC, customTorrc)
+        }
     }
 
-    override val entryNodes: String?
-        get() = servicePrefs.getString(PrefKeyString.ENTRY_NODES, defaultTorSettings.entryNodes)
-
-    /**
-     * Saves the value for [entryNodes] to [TorServicePrefs]. If the value is the same as what is
-     * declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the setting if
-     * it exists.
-     *
-     * @param [entryNodes] A comma separated list of nodes
-     * @see [TorSettings.entryNodes]
-     * */
-    fun entryNodesSave(entryNodes: String?) {
-        if (entryNodes == defaultTorSettings.entryNodes)
+    @WorkerThread
+    override fun entryNodesSave(entryNodes: String?) {
+        if (entryNodes == defaultTorSettings.entryNodes) {
             servicePrefs.remove(PrefKeyString.ENTRY_NODES)
-        else
+        } else {
             servicePrefs.putString(PrefKeyString.ENTRY_NODES, entryNodes)
+        }
     }
 
-    override val excludeNodes: String?
-        get() = servicePrefs.getString(PrefKeyString.EXCLUDED_NODES, defaultTorSettings.excludeNodes)
-
-    /**
-     * Saves the value for [excludeNodes] to [TorServicePrefs]. If the value is the same as what is
-     * declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the setting if
-     * it exists.
-     *
-     * @param [excludeNodes] A comma separated list of nodes
-     * @see [TorSettings.excludeNodes]
-     * */
-    fun excludeNodesSave(excludeNodes: String?) {
-        if (excludeNodes == defaultTorSettings.excludeNodes)
+    @WorkerThread
+    override fun excludeNodesSave(excludeNodes: String?) {
+        if (excludeNodes == defaultTorSettings.excludeNodes) {
             servicePrefs.remove(PrefKeyString.EXCLUDED_NODES)
-        else
+        } else {
             servicePrefs.putString(PrefKeyString.EXCLUDED_NODES, excludeNodes)
+        }
     }
 
-    override val exitNodes: String?
-        get() = servicePrefs.getString(PrefKeyString.EXIT_NODES, defaultTorSettings.exitNodes)
-
-    /**
-     * Saves the value for [exitNodes] to [TorServicePrefs]. If the value is the same as what is
-     * declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the setting if
-     * it exists.
-     *
-     * @param [exitNodes] A comma separated list of nodes
-     * @see [TorSettings.exitNodes]
-     * */
-    fun exitNodesSave(exitNodes: String?) {
-        if (exitNodes == defaultTorSettings.exitNodes)
+    @WorkerThread
+    override fun exitNodesSave(exitNodes: String?) {
+        if (exitNodes == defaultTorSettings.exitNodes) {
             servicePrefs.remove(PrefKeyString.EXIT_NODES)
-        else
+        } else {
             servicePrefs.putString(PrefKeyString.EXIT_NODES, exitNodes)
+        }
     }
 
-    override val httpTunnelPort: String
-        get() = servicePrefs.getString(PrefKeyString.HTTP_TUNNEL_PORT, defaultTorSettings.httpTunnelPort)
-            ?: defaultTorSettings.httpTunnelPort
-
-    /**
-     * Saves the value for [httpPort] to [TorServicePrefs]. If the value is the same as what is
-     * declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the setting if
-     * it exists.
-     *
-     * @param [httpPort] A String value of 0, auto, or number between 1024 and 65535
-     * @see [checkPortSelection]
-     * @see [TorSettings.httpTunnelPort]
-     * @throws [IllegalArgumentException] if the value is not 0, auto, or between 1024 and 65535
-     * */
+    @WorkerThread
     @Throws(IllegalArgumentException::class)
-    fun httpTunnelPortSave(httpPort: String) {
+    override fun httpTunnelPortSave(httpPort: String) {
         when {
             httpPort == defaultTorSettings.httpTunnelPort -> {
                 servicePrefs.remove(PrefKeyString.HTTP_TUNNEL_PORT)
@@ -284,23 +184,8 @@ class ServiceTorSettings internal constructor(
         }
     }
 
-    override val httpTunnelPortIsolationFlags: List<@IsolationFlag String>?
-        get() = servicePrefs.getList(
-            PrefKeyList.HTTP_TUNNEL_PORT_ISOLATION_FLAGS,
-            defaultTorSettings.httpTunnelPortIsolationFlags ?: arrayListOf()
-        )
-
-    /**
-     * Saves the value for [isolationFlags] to [TorServicePrefs]. If the value is the same as what is
-     * declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the setting if
-     * it exists.
-     *
-     * @param [isolationFlags] A List of [io.matthewnelson.topl_core_base.BaseConsts.IsolationFlag]'s
-     *   for the [httpTunnelPort]
-     * @see [io.matthewnelson.topl_core_base.BaseConsts.IsolationFlag]
-     * @see [TorSettings.httpTunnelPortIsolationFlags]
-     * */
-    fun httpPortIsolationFlagsSave(isolationFlags: List<@IsolationFlag String>) {
+    @WorkerThread
+    override fun httpPortIsolationFlagsSave(isolationFlags: List<@IsolationFlag String>) {
         if (isolationFlags == defaultTorSettings.httpTunnelPortIsolationFlags) {
             servicePrefs.remove(PrefKeyList.HTTP_TUNNEL_PORT_ISOLATION_FLAGS)
         } else {
@@ -308,68 +193,32 @@ class ServiceTorSettings internal constructor(
         }
     }
 
-    override val listOfSupportedBridges: List<@SupportedBridgeType String>
-        get() = defaultTorSettings.listOfSupportedBridges
-
-    // TODO: write a save method after refactor
-
-    override val proxyHost: String?
-        get() = servicePrefs.getString(PrefKeyString.PROXY_HOST, defaultTorSettings.proxyHost)
-
-    /**
-     * Saves the value for [proxyHost] to [TorServicePrefs]. If the value is the same as what is
-     * declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the setting if
-     * it exists.
-     *
-     * @param [proxyHost]
-     * @see [TorSettings.proxyHost]
-     * */
-    fun proxyHostSave(proxyHost: String?) {
-        if (proxyHost == defaultTorSettings.proxyHost)
+    @WorkerThread
+    override fun proxyHostSave(proxyHost: String?) {
+        if (proxyHost == defaultTorSettings.proxyHost) {
             servicePrefs.remove(PrefKeyString.PROXY_HOST)
-        else
+        } else {
             servicePrefs.putString(PrefKeyString.PROXY_HOST, proxyHost)
+        }
     }
 
-    override val proxyPassword: String?
-        get() = servicePrefs.getString(PrefKeyString.PROXY_PASSWORD, defaultTorSettings.proxyPassword)
-
-    /**
-     * Saves the value for [proxyPassword] to [TorServicePrefs]. If the value is the same as what is
-     * declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the setting if
-     * it exists.
-     *
-     * @param [proxyPassword]
-     * @see [TorSettings.proxyPassword]
-     * */
-    fun proxyPasswordSave(proxyPassword: String?) {
-        if (proxyPassword == defaultTorSettings.proxyPassword)
+    @WorkerThread
+    override fun proxyPasswordSave(proxyPassword: String?) {
+        if (proxyPassword == defaultTorSettings.proxyPassword) {
             servicePrefs.remove(PrefKeyString.PROXY_PASSWORD)
-        else
+        } else {
             servicePrefs.putString(PrefKeyString.PROXY_PASSWORD, proxyPassword)
+        }
     }
 
-    override val proxyPort: Int?
-        get() = servicePrefs.getInt(PrefKeyInt.PROXY_PORT, defaultTorSettings.proxyPort)
-
-    /**
-     * Saves the value for [proxyPort] to [TorServicePrefs]. If the value is the same as what is
-     * declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the setting if
-     * it exists.
-     *
-     * @param [proxyPort] An Int value between 1024 and 65535, or `null`
-     * @see [checkPortSelection]
-     * @see [TorSettings.proxyPort]
-     * @throws [IllegalArgumentException] if the value is not `null`, or between 1024 and 65535
-     * */
+    @WorkerThread
     @Throws(IllegalArgumentException::class)
-    fun proxyPortSave(proxyPort: Int?) {
+    override fun proxyPortSave(proxyPort: Int?) {
         when {
             proxyPort == defaultTorSettings.proxyPort -> {
                 servicePrefs.remove(PrefKeyInt.PROXY_PORT)
             }
-            proxyPort == null ||
-            checkPortSelection(proxyPort, checkZero = false) -> {
+            proxyPort == null || checkPortSelection(proxyPort, checkZero = false) -> {
                 servicePrefs.putInt(PrefKeyInt.PROXY_PORT, proxyPort)
             }
             else -> {
@@ -380,45 +229,23 @@ class ServiceTorSettings internal constructor(
         }
     }
 
-    override val proxySocks5Host: String?
-        get() = servicePrefs.getString(PrefKeyString.PROXY_SOCKS5_HOST, defaultTorSettings.proxySocks5Host)
-
-    /**
-     * Saves the value for [proxySocks5Host] to [TorServicePrefs]. If the value is the same as what is
-     * declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the setting if
-     * it exists.
-     *
-     * @param [proxySocks5Host]
-     * @see [TorSettings.proxySocks5Host]
-     * */
-    fun proxySocks5HostSave(proxySocks5Host: String?) {
-        if (proxySocks5Host == defaultTorSettings.proxySocks5Host)
+    @WorkerThread
+    override fun proxySocks5HostSave(proxySocks5Host: String?) {
+        if (proxySocks5Host == defaultTorSettings.proxySocks5Host) {
             servicePrefs.remove(PrefKeyString.PROXY_SOCKS5_HOST)
-        else
+        } else {
             servicePrefs.putString(PrefKeyString.PROXY_SOCKS5_HOST, proxySocks5Host)
+        }
     }
 
-    override val proxySocks5ServerPort: Int?
-        get() = servicePrefs.getInt(PrefKeyInt.PROXY_SOCKS5_SERVER_PORT, defaultTorSettings.proxySocks5ServerPort)
-
-    /**
-     * Saves the value for [proxySocks5ServerPort] to [TorServicePrefs]. If the value is the same
-     * as what is declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the
-     * setting if it exists.
-     *
-     * @param [proxySocks5ServerPort] An Int value between 1024 and 65535, or `null`
-     * @see [checkPortSelection]
-     * @see [TorSettings.proxySocks5ServerPort]
-     * @throws [IllegalArgumentException] if the value is not `null`, or between 1024 and 65535
-     * */
+    @WorkerThread
     @Throws(IllegalArgumentException::class)
-    fun proxySocks5ServerPortSave(proxySocks5ServerPort: Int?) {
+    override fun proxySocks5ServerPortSave(proxySocks5ServerPort: Int?) {
         when {
             proxySocks5ServerPort == defaultTorSettings.proxySocks5ServerPort -> {
                 servicePrefs.remove(PrefKeyInt.PROXY_SOCKS5_SERVER_PORT)
             }
-            proxySocks5ServerPort == null ||
-            checkPortSelection(proxySocks5ServerPort, checkZero = false) -> {
+            proxySocks5ServerPort == null || checkPortSelection(proxySocks5ServerPort, checkZero = false) -> {
                 servicePrefs.putInt(PrefKeyInt.PROXY_SOCKS5_SERVER_PORT, proxySocks5ServerPort)
             }
             else -> {
@@ -429,29 +256,18 @@ class ServiceTorSettings internal constructor(
         }
     }
 
-    override val proxyType: @ProxyType String
-        get() = servicePrefs.getString(PrefKeyString.PROXY_TYPE, defaultTorSettings.proxyType) ?: defaultTorSettings.proxyType
-
-    /**
-     * Saves the value for [proxyType] to [TorServicePrefs]. If the value is the same
-     * as what is declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the
-     * setting if it exists.
-     *
-     * @param [proxyType] A [io.matthewnelson.topl_core_base.BaseConsts.ProxyType]
-     * @see [io.matthewnelson.topl_core_base.BaseConsts.ProxyType]
-     * @see [TorSettings.proxyType]
-     * @throws [IllegalArgumentException] if the value is not empty (disabled), HTTPS, or Socks5
-     * */
+    @WorkerThread
     @Throws(IllegalArgumentException::class)
-    fun proxyTypeSave(@ProxyType proxyType: String) {
+    override fun proxyTypeSave(@ProxyType proxyType: String) {
         when (proxyType) {
             ProxyType.DISABLED,
             ProxyType.HTTPS,
             ProxyType.SOCKS_5 -> {
-                if (proxyType == defaultTorSettings.proxyType)
+                if (proxyType == defaultTorSettings.proxyType) {
                     servicePrefs.remove(PrefKeyString.PROXY_TYPE)
-                else
+                } else {
                     servicePrefs.putString(PrefKeyString.PROXY_TYPE, proxyType)
+                }
             }
             else -> {
                 throw IllegalArgumentException(
@@ -461,77 +277,36 @@ class ServiceTorSettings internal constructor(
         }
     }
 
-    override val proxyUser: String?
-        get() = servicePrefs.getString(PrefKeyString.PROXY_USER, defaultTorSettings.proxyUser)
-
-    /**
-     * Saves the value for [proxyUser] to [TorServicePrefs]. If the value is the same as what is
-     * declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the setting if
-     * it exists.
-     *
-     * @param [proxyUser]
-     * @see [TorSettings.proxyUser]
-     * */
-    fun proxyUserSave(proxyUser: String?) {
-        if (proxyUser == defaultTorSettings.proxyUser)
+    @WorkerThread
+    override fun proxyUserSave(proxyUser: String?) {
+        if (proxyUser == defaultTorSettings.proxyUser) {
             servicePrefs.remove(PrefKeyString.PROXY_USER)
-        else
+        } else {
             servicePrefs.putString(PrefKeyString.PROXY_USER, proxyUser)
+        }
     }
 
-    override val reachableAddressPorts: String
-        get() = servicePrefs.getString(PrefKeyString.REACHABLE_ADDRESS_PORTS, defaultTorSettings.reachableAddressPorts)
-            ?: defaultTorSettings.reachableAddressPorts
-
-    /**
-     * Saves the value for [reachableAddressPorts] to [TorServicePrefs]. If the value is the same as what is
-     * declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the setting if
-     * it exists.
-     *
-     * @param [reachableAddressPorts]
-     * @see [TorSettings.reachableAddressPorts]
-     * */
-    fun reachableAddressPortsSave(reachableAddressPorts: String) {
-        if (reachableAddressPorts == defaultTorSettings.reachableAddressPorts)
+    @WorkerThread
+    override fun reachableAddressPortsSave(reachableAddressPorts: String) {
+        if (reachableAddressPorts == defaultTorSettings.reachableAddressPorts) {
             servicePrefs.remove(PrefKeyString.REACHABLE_ADDRESS_PORTS)
-        else
+        } else {
             servicePrefs.putString(PrefKeyString.REACHABLE_ADDRESS_PORTS, reachableAddressPorts)
+        }
     }
 
-    override val relayNickname: String?
-        get() = servicePrefs.getString(PrefKeyString.RELAY_NICKNAME, defaultTorSettings.relayNickname)
-
-    /**
-     * Saves the value for [relayNickname] to [TorServicePrefs]. If the value is the same as what is
-     * declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the setting if
-     * it exists.
-     *
-     * @param [relayNickname]
-     * @see [TorSettings.relayNickname]
-     * */
-    fun relayNicknameSave(relayNickname: String) {
-        if (relayNickname == defaultTorSettings.relayNickname)
+    @WorkerThread
+    override fun relayNicknameSave(relayNickname: String) {
+        if (relayNickname == defaultTorSettings.relayNickname) {
             servicePrefs.remove(PrefKeyString.RELAY_NICKNAME)
-        else
+        } else {
             servicePrefs.putString(PrefKeyString.RELAY_NICKNAME, relayNickname)
+        }
     }
 
-    override val relayPort: String
-        get() = servicePrefs.getString(PrefKeyString.RELAY_PORT, defaultTorSettings.relayPort)
-            ?: defaultTorSettings.relayPort
-
-    /**
-     * Saves the value for [relayPort] to [TorServicePrefs]. If the value is the same as what is
-     * declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the setting if
-     * it exists.
-     *
-     * @param [relayPort] A String value of 0, auto, or number between 1024 and 65535
-     * @see [checkPortSelection]
-     * @see [TorSettings.relayPort]
-     * @throws [IllegalArgumentException] if the value is not 0, auto, or between 1024 and 65535
-     * */
+    @WorkerThread
     @Throws(IllegalArgumentException::class)
-    fun relayPortSave(relayPort: String) {
+    override fun relayPortSave(relayPort: String) {
         when {
             relayPort == defaultTorSettings.relayPort -> {
                 servicePrefs.remove(PrefKeyString.RELAY_PORT)
@@ -547,22 +322,9 @@ class ServiceTorSettings internal constructor(
         }
     }
 
-    override val socksPort: String
-        get() = servicePrefs.getString(PrefKeyString.SOCKS_PORT, defaultTorSettings.socksPort)
-            ?: defaultTorSettings.socksPort
-
-    /**
-     * Saves the value for [socksPort] to [TorServicePrefs]. If the value is the same as what is
-     * declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the setting if
-     * it exists.
-     *
-     * @param [socksPort] A String value of 0, auto, or number between 1024 and 65535
-     * @see [checkPortSelection]
-     * @see [TorSettings.socksPort]
-     * @throws [IllegalArgumentException] if the value is not 0, auto, or between 1024 and 65535
-     * */
+    @WorkerThread
     @Throws(IllegalArgumentException::class)
-    fun socksPortSave(socksPort: String) {
+    override fun socksPortSave(socksPort: String) {
         when {
             socksPort == defaultTorSettings.socksPort -> {
                 servicePrefs.remove(PrefKeyString.SOCKS_PORT)
@@ -578,23 +340,8 @@ class ServiceTorSettings internal constructor(
         }
     }
 
-    override val socksPortIsolationFlags: List<@IsolationFlag String>?
-        get() = servicePrefs.getList(
-            PrefKeyList.SOCKS_PORT_ISOLATION_FLAGS,
-            defaultTorSettings.socksPortIsolationFlags ?: arrayListOf()
-        )
-
-    /**
-     * Saves the value for [isolationFlags] to [TorServicePrefs]. If the value is the same as what is
-     * declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the setting if
-     * it exists.
-     *
-     * @param [isolationFlags] A List of [io.matthewnelson.topl_core_base.BaseConsts.IsolationFlag]'s
-     *   for the [socksPort]
-     * @see [io.matthewnelson.topl_core_base.BaseConsts.IsolationFlag]
-     * @see [TorSettings.socksPortIsolationFlags]
-     * */
-    fun socksPortIsolationFlagsSave(isolationFlags: List<@IsolationFlag String>) {
+    @WorkerThread
+    override fun socksPortIsolationFlagsSave(isolationFlags: List<@IsolationFlag String>) {
         if (isolationFlags == defaultTorSettings.socksPortIsolationFlags) {
             servicePrefs.remove(PrefKeyList.SOCKS_PORT_ISOLATION_FLAGS)
         } else {
@@ -602,66 +349,36 @@ class ServiceTorSettings internal constructor(
         }
     }
 
-    override val virtualAddressNetwork: String?
-        get() = servicePrefs.getString(PrefKeyString.VIRTUAL_ADDRESS_NETWORK, defaultTorSettings.virtualAddressNetwork)
-
-    /**
-     * Saves the value for [virtualAddressNetwork] to [TorServicePrefs]. If the value is the same
-     * as what is declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the
-     * setting if it exists.
-     *
-     * @param [virtualAddressNetwork]
-     * @see [TorSettings.virtualAddressNetwork]
-     * */
-    fun virtualAddressNetworkSave(virtualAddressNetwork: String) {
-        if (virtualAddressNetwork == defaultTorSettings.virtualAddressNetwork)
+    @WorkerThread
+    override fun virtualAddressNetworkSave(virtualAddressNetwork: String) {
+        if (virtualAddressNetwork == defaultTorSettings.virtualAddressNetwork) {
             servicePrefs.remove(PrefKeyString.VIRTUAL_ADDRESS_NETWORK)
-        else
+        } else {
             servicePrefs.putString(PrefKeyString.VIRTUAL_ADDRESS_NETWORK, virtualAddressNetwork)
+        }
     }
 
-    override val hasBridges: Boolean
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_BRIDGES, defaultTorSettings.hasBridges)
-
-    /**
-     * Saves the value for [hasBridges] to [TorServicePrefs]. If the value is the same
-     * as what is declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the
-     * setting if it exists.
-     *
-     * @param [boolean] to enable/disable
-     * @see [TorSettings.hasBridges]
-     * */
-    fun hasBridgesSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.hasBridges)
+    @WorkerThread
+    override fun hasBridgesSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.hasBridges) {
             servicePrefs.remove(PrefKeyBoolean.HAS_BRIDGES)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.HAS_BRIDGES, boolean)
+        }
     }
 
-    override val connectionPadding: String
-        get() = servicePrefs.getString(PrefKeyString.HAS_CONNECTION_PADDING, defaultTorSettings.connectionPadding)
-            ?: defaultTorSettings.connectionPadding
-
-    /**
-     * Saves the value for [connectionPadding] to [TorServicePrefs]. If the value is the same
-     * as what is declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the
-     * setting if it exists.
-     *
-     * @param [connectionPadding] A [io.matthewnelson.topl_core_base.BaseConsts.ConnectionPadding]
-     * @see [io.matthewnelson.topl_core_base.BaseConsts.ConnectionPadding]
-     * @see [TorSettings.connectionPadding]
-     * @throws [IllegalArgumentException] if the value is not 0 (Off), 1 (On), or auto
-     * */
+    @WorkerThread
     @Throws(IllegalArgumentException::class)
-    fun connectionPaddingSave(@ConnectionPadding connectionPadding: String) {
+    override fun connectionPaddingSave(@ConnectionPadding connectionPadding: String) {
         when (connectionPadding) {
             ConnectionPadding.AUTO,
             ConnectionPadding.OFF,
             ConnectionPadding.ON -> {
-                if (connectionPadding == defaultTorSettings.connectionPadding)
+                if (connectionPadding == defaultTorSettings.connectionPadding) {
                     servicePrefs.remove(PrefKeyString.HAS_CONNECTION_PADDING)
-                else
+                } else {
                     servicePrefs.putString(PrefKeyString.HAS_CONNECTION_PADDING, connectionPadding)
+                }
             }
             else -> {
                 throw IllegalArgumentException(
@@ -671,237 +388,117 @@ class ServiceTorSettings internal constructor(
         }
     }
 
-    override val hasCookieAuthentication: Boolean
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_COOKIE_AUTHENTICATION, defaultTorSettings.hasCookieAuthentication)
-
-    /**
-     * Saves the value for [hasCookieAuthentication] to [TorServicePrefs]. If the value is the same
-     * as what is declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the
-     * setting if it exists.
-     *
-     * @param [boolean] to enable/disable
-     * @see [TorSettings.hasCookieAuthentication]
-     * */
-    fun hasCookieAuthenticationSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.hasCookieAuthentication)
+    @WorkerThread
+    override fun hasCookieAuthenticationSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.hasCookieAuthentication) {
             servicePrefs.remove(PrefKeyBoolean.HAS_COOKIE_AUTHENTICATION)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.HAS_COOKIE_AUTHENTICATION, boolean)
+        }
     }
 
-    override val hasDebugLogs: Boolean
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_DEBUG_LOGS, defaultTorSettings.hasDebugLogs)
-
-    /**
-     * Saves the value for [hasDebugLogs] to [TorServicePrefs]. If the value is the same
-     * as what is declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the
-     * setting if it exists.
-     *
-     * @param [boolean] to enable/disable
-     * @see [TorSettings.hasDebugLogs]
-     * */
-    fun hasDebugLogsSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.hasDebugLogs)
+    @WorkerThread
+    override fun hasDebugLogsSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.hasDebugLogs) {
             servicePrefs.remove(PrefKeyBoolean.HAS_DEBUG_LOGS)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.HAS_DEBUG_LOGS, boolean)
+        }
     }
 
-    override val hasDormantCanceledByStartup: Boolean
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_DORMANT_CANCELED_BY_STARTUP, defaultTorSettings.hasDormantCanceledByStartup)
-
-    /**
-     * Saves the value for [hasDormantCanceledByStartup] to [TorServicePrefs]. If the value is the same
-     * as what is declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the
-     * setting if it exists.
-     *
-     * @param [boolean] to enable/disable
-     * @see [TorSettings.hasDormantCanceledByStartup]
-     * */
-    fun hasDormantCanceledByStartupSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.hasDormantCanceledByStartup)
+    @WorkerThread
+    override fun hasDormantCanceledByStartupSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.hasDormantCanceledByStartup) {
             servicePrefs.remove(PrefKeyBoolean.HAS_DORMANT_CANCELED_BY_STARTUP)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.HAS_DORMANT_CANCELED_BY_STARTUP, boolean)
+        }
     }
 
-    override val hasOpenProxyOnAllInterfaces: Boolean
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_OPEN_PROXY_ON_ALL_INTERFACES, defaultTorSettings.hasOpenProxyOnAllInterfaces)
-
-    /**
-     * Saves the value for [hasOpenProxyOnAllInterfaces] to [TorServicePrefs]. If the value is the same
-     * as what is declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the
-     * setting if it exists.
-     *
-     * @param [boolean] to enable/disable
-     * @see [TorSettings.hasOpenProxyOnAllInterfaces]
-     * */
-    fun hasOpenProxyOnAllInterfacesSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.hasOpenProxyOnAllInterfaces)
+    @WorkerThread
+    override fun hasOpenProxyOnAllInterfacesSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.hasOpenProxyOnAllInterfaces) {
             servicePrefs.remove(PrefKeyBoolean.HAS_OPEN_PROXY_ON_ALL_INTERFACES)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.HAS_OPEN_PROXY_ON_ALL_INTERFACES, boolean)
+        }
     }
 
-    override val hasReachableAddress: Boolean
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_REACHABLE_ADDRESS, defaultTorSettings.hasReachableAddress)
-
-    /**
-     * Saves the value for [hasReachableAddress] to [TorServicePrefs]. If the value is the same
-     * as what is declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the
-     * setting if it exists.
-     *
-     * @param [boolean] to enable/disable
-     * @see [TorSettings.hasReachableAddress]
-     * */
-    fun hasReachableAddressSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.hasReachableAddress)
+    @WorkerThread
+    override fun hasReachableAddressSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.hasReachableAddress) {
             servicePrefs.remove(PrefKeyBoolean.HAS_REACHABLE_ADDRESS)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.HAS_REACHABLE_ADDRESS, boolean)
+        }
     }
 
-    override val hasReducedConnectionPadding: Boolean
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_REDUCED_CONNECTION_PADDING, defaultTorSettings.hasReducedConnectionPadding)
-
-    /**
-     * Saves the value for [hasReducedConnectionPadding] to [TorServicePrefs]. If the value is the same
-     * as what is declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the
-     * setting if it exists.
-     *
-     * @param [boolean] to enable/disable
-     * @see [TorSettings.hasReducedConnectionPadding]
-     * */
-    fun hasReducedConnectionPaddingSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.hasReducedConnectionPadding)
+    @WorkerThread
+    override fun hasReducedConnectionPaddingSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.hasReducedConnectionPadding) {
             servicePrefs.remove(PrefKeyBoolean.HAS_REDUCED_CONNECTION_PADDING)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.HAS_REDUCED_CONNECTION_PADDING, boolean)
+        }
     }
 
-    override val hasSafeSocks: Boolean
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_SAFE_SOCKS, defaultTorSettings.hasSafeSocks)
-
-    /**
-     * Saves the value for [hasSafeSocks] to [TorServicePrefs]. If the value is the same
-     * as what is declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the
-     * setting if it exists.
-     *
-     * @param [boolean] to enable/disable
-     * @see [TorSettings.hasSafeSocks]
-     * */
-    fun hasSafeSocksSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.hasSafeSocks)
+    @WorkerThread
+    override fun hasSafeSocksSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.hasSafeSocks) {
             servicePrefs.remove(PrefKeyBoolean.HAS_SAFE_SOCKS)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.HAS_SAFE_SOCKS, boolean)
+        }
     }
 
-    override val hasStrictNodes: Boolean
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_STRICT_NODES, defaultTorSettings.hasStrictNodes)
-
-    /**
-     * Saves the value for [hasStrictNodes] to [TorServicePrefs]. If the value is the same
-     * as what is declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the
-     * setting if it exists.
-     *
-     * @param [boolean] to enable/disable
-     * @see [TorSettings.hasStrictNodes]
-     * */
-    fun hasStrictNodesSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.hasStrictNodes)
+    @WorkerThread
+    override fun hasStrictNodesSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.hasStrictNodes) {
             servicePrefs.remove(PrefKeyBoolean.HAS_STRICT_NODES)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.HAS_STRICT_NODES, boolean)
+        }
     }
 
-    override val hasTestSocks: Boolean
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.HAS_TEST_SOCKS, defaultTorSettings.hasTestSocks)
-
-    /**
-     * Saves the value for [hasTestSocks] to [TorServicePrefs]. If the value is the same
-     * as what is declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the
-     * setting if it exists.
-     *
-     * @param [boolean] to enable/disable
-     * @see [TorSettings.hasTestSocks]
-     * */
-    fun hasTestSocksSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.hasTestSocks)
+    @WorkerThread
+    override fun hasTestSocksSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.hasTestSocks) {
             servicePrefs.remove(PrefKeyBoolean.HAS_TEST_SOCKS)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.HAS_TEST_SOCKS, boolean)
+        }
     }
 
-    override val isAutoMapHostsOnResolve: Boolean
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.IS_AUTO_MAP_HOSTS_ON_RESOLVE, defaultTorSettings.isAutoMapHostsOnResolve)
-
-    /**
-     * Saves the value for [isAutoMapHostsOnResolve] to [TorServicePrefs]. If the value is the same
-     * as what is declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the
-     * setting if it exists.
-     *
-     * @param [boolean] to enable/disable
-     * @see [TorSettings.isAutoMapHostsOnResolve]
-     * */
-    fun isAutoMapHostsOnResolveSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.isAutoMapHostsOnResolve)
+    @WorkerThread
+    override fun isAutoMapHostsOnResolveSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.isAutoMapHostsOnResolve) {
             servicePrefs.remove(PrefKeyBoolean.IS_AUTO_MAP_HOSTS_ON_RESOLVE)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.IS_AUTO_MAP_HOSTS_ON_RESOLVE, boolean)
+        }
     }
 
-    override val isRelay: Boolean
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.IS_RELAY, defaultTorSettings.isRelay)
-
-    /**
-     * Saves the value for [isRelay] to [TorServicePrefs]. If the value is the same
-     * as what is declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the
-     * setting if it exists.
-     *
-     * @param [boolean] to enable/disable
-     * @see [TorSettings.isRelay]
-     * */
-    fun isRelaySave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.isRelay)
+    @WorkerThread
+    override fun isRelaySave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.isRelay) {
             servicePrefs.remove(PrefKeyBoolean.IS_RELAY)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.IS_RELAY, boolean)
+        }
     }
 
-    override val runAsDaemon: Boolean
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.RUN_AS_DAEMON, defaultTorSettings.runAsDaemon)
-
-    /**
-     * Saves the value for [runAsDaemon] to [TorServicePrefs]. If the value is the same
-     * as what is declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the
-     * setting if it exists.
-     *
-     * @param [boolean] to enable/disable
-     * @see [TorSettings.runAsDaemon]
-     * */
-    fun runAsDaemonSave(boolean: Boolean) {
-        if (boolean == defaultTorSettings.runAsDaemon)
+    @WorkerThread
+    override fun runAsDaemonSave(boolean: Boolean) {
+        if (boolean == defaultTorSettings.runAsDaemon) {
             servicePrefs.remove(PrefKeyBoolean.RUN_AS_DAEMON)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.RUN_AS_DAEMON, boolean)
+        }
     }
 
-    override val transPort: String
-        get() = servicePrefs.getString(PrefKeyString.TRANS_PORT, defaultTorSettings.transPort) ?: defaultTorSettings.transPort
-
-    /**
-     * Saves the value for [transPort] to [TorServicePrefs]. If the value is the same as what is
-     * declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the setting if
-     * it exists.
-     *
-     * @param [transPort] A String value of 0, auto, or number between 1024 and 65535
-     * @see [checkPortSelection]
-     * @see [TorSettings.transPort]
-     * @throws [IllegalArgumentException] if the value is not 0, auto, or between 1024 and 65535
-     * */
+    @WorkerThread
     @Throws(IllegalArgumentException::class)
-    fun transPortSave(transPort: String) {
+    override fun transPortSave(transPort: String) {
         when {
             transPort == defaultTorSettings.transPort -> {
                 servicePrefs.remove(PrefKeyString.TRANS_PORT)
@@ -917,23 +514,8 @@ class ServiceTorSettings internal constructor(
         }
     }
 
-    override val transPortIsolationFlags: List<@IsolationFlag String>?
-        get() = servicePrefs.getList(
-            PrefKeyList.TRANS_PORT_ISOLATION_FLAGS,
-            defaultTorSettings.transPortIsolationFlags ?: arrayListOf()
-        )
-
-    /**
-     * Saves the value for [isolationFlags] to [TorServicePrefs]. If the value is the same as what is
-     * declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the setting if
-     * it exists.
-     *
-     * @param [isolationFlags] A List of [io.matthewnelson.topl_core_base.BaseConsts.IsolationFlag]'s
-     *   for the [transPort]
-     * @see [io.matthewnelson.topl_core_base.BaseConsts.IsolationFlag]
-     * @see [TorSettings.transPortIsolationFlags]
-     * */
-    fun transPortIsolationFlagsSave(isolationFlags: List<@IsolationFlag String>) {
+    @WorkerThread
+    override fun transPortIsolationFlagsSave(isolationFlags: List<@IsolationFlag String>) {
         if (isolationFlags == defaultTorSettings.transPortIsolationFlags) {
             servicePrefs.remove(PrefKeyList.TRANS_PORT_ISOLATION_FLAGS)
         } else {
@@ -941,22 +523,13 @@ class ServiceTorSettings internal constructor(
         }
     }
 
-    override val useSocks5: Boolean
-        get() = servicePrefs.getBoolean(PrefKeyBoolean.USE_SOCKS5, defaultTorSettings.useSocks5)
-
-    /**
-     * Saves the value for [useSocks5] to [TorServicePrefs]. If the value is the same
-     * as what is declared in [defaultTorSettings], [TorServicePrefs] is queried to remove the
-     * setting if it exists.
-     *
-     * @param [boolean] to enable/disable
-     * @see [TorSettings.useSocks5]
-     * */
-    fun useSocks5Save(boolean: Boolean) {
-        if (boolean == defaultTorSettings.useSocks5)
+    @WorkerThread
+    override fun useSocks5Save(boolean: Boolean) {
+        if (boolean == defaultTorSettings.useSocks5) {
             servicePrefs.remove(PrefKeyBoolean.USE_SOCKS5)
-        else
+        } else {
             servicePrefs.putBoolean(PrefKeyBoolean.USE_SOCKS5, boolean)
+        }
     }
 
     private fun checkPortSelection(port: Int, checkZero: Boolean): Boolean =
@@ -967,13 +540,13 @@ class ServiceTorSettings internal constructor(
         checkAuto: Boolean = true,
         checkZero: Boolean = true
     ): Boolean {
-        if (checkAuto && port == PortOption.AUTO)
-            return true
+        if (checkAuto && port == PortOption.AUTO) return true
 
         return try {
             val portInt = port.toInt()
-            if (checkZero && portInt == 0)
+            if (checkZero && portInt == 0) {
                 return true
+            }
             portInt in 1024..65535
         } catch (e: Exception) {
             false

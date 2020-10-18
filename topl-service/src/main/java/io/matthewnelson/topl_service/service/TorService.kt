@@ -27,16 +27,21 @@
 * GNU General Public License, version 3 (“GPLv3”).
 *
 *     "The Interfaces" is henceforth defined as Application Programming Interfaces
-*     that are publicly available classes/functions/etc (ie: do not contain the
-*     visibility modifiers `internal`, `private`, `protected`, or are within
-*     classes/functions/etc that contain the aforementioned visibility modifiers)
-*     to TorOnionProxyLibrary-Android users that are needed to implement
-*     TorOnionProxyLibrary-Android and reside in ONLY the following modules:
+*     needed to implement TorOnionProxyLibrary-Android, as listed below:
 *
-*      - topl-core-base
-*      - topl-service
+*      - From the `topl-core-base` module:
+*          - All Classes/methods/variables
 *
-*     The following are excluded from "The Interfaces":
+*      - From the `topl-service-base` module:
+*          - All Classes/methods/variables
+*
+*      - From the `topl-service` module:
+*          - The TorServiceController class and it's contained classes/methods/variables
+*          - The ServiceNotification.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Builder class and it's contained classes/methods/variables
+*          - The BackgroundManager.Companion class and it's contained methods/variables
+*
+*     The following code is excluded from "The Interfaces":
 *
 *       - All other code
 *
@@ -172,14 +177,16 @@ internal class TorService: BaseService() {
     }
     override fun startForegroundService(): Boolean {
         val wasStarted = super.startForegroundService()
-        if (wasStarted)
+        if (wasStarted) {
             broadcastLogger.debug("Service sent to Foreground")
+        }
         return wasStarted
     }
     override fun stopForegroundService(): Boolean {
         val wasStopped = super.stopForegroundService()
-        if (wasStopped)
+        if (wasStopped) {
             broadcastLogger.debug("Service sent to Background")
+        }
         return wasStopped
     }
 
@@ -195,7 +202,7 @@ internal class TorService: BaseService() {
             context,
             TorServiceController.getTorConfigFiles(),
             ServiceTorInstaller(this),
-            TorServiceController.getServiceTorSettings(context),
+            TorServiceController.getServiceTorSettings(),
             ServiceEventListener(),
             ServiceEventBroadcaster(this),
             buildConfigDebug
@@ -275,6 +282,7 @@ internal class TorService: BaseService() {
         onionProxyManager.getNewSettingsBuilder()
             .updateTorSettings()
             .setGeoIpFiles()
+            .setV3AuthPrivateDir()
             .finishAndWriteToTorrcFile()
     }
 
@@ -301,7 +309,7 @@ internal class TorService: BaseService() {
     override fun onTaskRemoved(rootIntent: Intent?) {
         // Cancel the BackgroundManager's coroutine if it's active so it doesn't execute
         torServiceBinder.cancelExecuteBackgroundPolicyJob()
-        broadcastLogger.debug("Task has been removed")
+        broadcastLogger.notice("Task has been removed")
         super.onTaskRemoved(rootIntent)
     }
 }
