@@ -1,11 +1,19 @@
 # Change Log
 
+## Version 2.0.1 (2020-10-18)
+ - Deprecates the `ServiceNotification.Builder.setActivityToBeOpenedOnTap` method in favor of using
+ the new `ServiceNotification.Builder.setContentIntentData` to mitigate multiple activities from
+ being opened.
+
 ## Version 2.0.0 (2020-10-18)
  - Adds support for Version 3 Hidden Service Client Authentication
      - The `V3ClientAuthManager` class can be obtained from `TorServiceController.getV3ClientAuthManager`
      after Builder initialization, which facilitates easily adding private keys to Tor's `ClientAuthDir`.
  - Adds better support for multi-module projects by moving `topl-service`'s public
  classes/abstractions to a separate module, `topl-service-base`.
+ - TorService now broadcasts as a `NOTICE` via the EventBroadcasters when onTaskRemoved occurred,
+ instead of being broadcast as `DEBUG` (which required TorSettings.hasDebugLogs to be set to true).
+     - Can now listen for it in the implementing application's `TorServiceEventBroadcaster`.
  - See [Migrations](./migration.md) for details on how to migrate from `1.0.0` to `2.0.0`
 
 ## Version 1.0.0-beta02 (2020-10-08)
