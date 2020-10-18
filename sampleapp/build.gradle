@@ -94,8 +94,8 @@ dependencies {
     implementation deps.androidx.lifecycle.commonJava8
     implementation deps.androidx.lifecycle.liveData
     implementation deps.androidx.lifecycle.reactiveStreams
-    implementation deps.androidx.navigation.fragmentKtx
-    implementation deps.androidx.navigation.uiKtx
+    implementation deps.androidx.navigation.fragment
+    implementation deps.androidx.navigation.ui
     implementation deps.androidx.recyclerView
     implementation deps.kotlin.coroutinesAndroid
     implementation deps.kotlin.coroutinesCore
