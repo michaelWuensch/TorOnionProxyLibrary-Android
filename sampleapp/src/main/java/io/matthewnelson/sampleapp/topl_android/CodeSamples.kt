@@ -76,7 +76,6 @@ import android.content.Context
 import androidx.core.app.NotificationCompat
 import io.matthewnelson.sampleapp.BuildConfig
 import io.matthewnelson.sampleapp.R
-import io.matthewnelson.sampleapp.ui.MainActivity
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
@@ -97,12 +96,9 @@ class CodeSamples {
             channelID = "TOPL-Android Demo",
             notificationID = 615
         )
-            .setActivityToBeOpenedOnTap(
-                clazz = MainActivity::class.java,
-                intentExtrasKey = null,
-                intentExtras = null,
-                intentRequestCode = null
-            )
+            // Only needed if you are passing a bundle, or changing request code to something other than 0
+            .setContentIntentData(bundle = null, requestCode = 21)
+
             .setImageTorNetworkingEnabled(drawableRes = R.drawable.tor_stat_network_enabled)
             .setImageTorNetworkingDisabled(drawableRes = R.drawable.tor_stat_network_disabled)
             .setImageTorDataTransfer(drawableRes = R.drawable.tor_stat_network_dataxfer)
