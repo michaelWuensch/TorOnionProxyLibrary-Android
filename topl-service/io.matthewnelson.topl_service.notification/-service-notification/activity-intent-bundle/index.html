@@ -11,23 +11,23 @@
         <meta name="description" content="An Android Library for embedding Tor as a service into your Application">
       
       
-        <link rel="canonical" href="https://topl-android.matthewnelson.io/topl-service/io.matthewnelson.topl_service.notification/-service-notification/-builder/set-activity-to-be-opened-on-tap/">
+        <link rel="canonical" href="https://topl-android.matthewnelson.io/topl-service/io.matthewnelson.topl_service.notification/-service-notification/activity-intent-bundle/">
       
       
         <meta name="author" content="Matthew Nelson">
       
-      <link rel="shortcut icon" href="../../../../../assets/images/favicon.png">
+      <link rel="shortcut icon" href="../../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.2.0">
     
     
       
-        <title>Set activity to be opened on tap - TorOnionProxyLibrary-Android</title>
+        <title>Activity intent bundle - TorOnionProxyLibrary-Android</title>
       
     
     
-      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.18ac144a.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.18ac144a.min.css">
       
-        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.616af814.min.css">
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.616af814.min.css">
       
       
         
@@ -59,7 +59,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#setactivitytobeopenedontap" class="md-skip">
+        <a href="#activityintentbundle" class="md-skip">
           Skip to content
         </a>
       
@@ -87,7 +87,7 @@
           </span>
           <span class="md-header-nav__topic md-ellipsis">
             
-              Set activity to be opened on tap
+              Activity intent bundle
             
           </span>
         </div>
@@ -156,7 +156,7 @@
         
   <li class="md-tabs__item">
     
-      <a href="../../../../.." class="md-tabs__link md-tabs__link--active">
+      <a href="../../../.." class="md-tabs__link md-tabs__link--active">
         Overview
       </a>
     
@@ -176,7 +176,7 @@
   
     <li class="md-tabs__item">
       
-        <a href="../../../../../releasing/" class="md-tabs__link">
+        <a href="../../../../releasing/" class="md-tabs__link">
           Help & Community
         </a>
       
@@ -234,7 +234,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../../../.." title="Overview" class="md-nav__link">
+    <a href="../../../.." title="Overview" class="md-nav__link">
       Overview
     </a>
   </li>
@@ -246,7 +246,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../../../../get_started/" title="Get Started" class="md-nav__link">
+    <a href="../../../../get_started/" title="Get Started" class="md-nav__link">
       Get Started
     </a>
   </li>
@@ -258,7 +258,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../../../../roadmap/" title="Project Roadmap" class="md-nav__link">
+    <a href="../../../../roadmap/" title="Project Roadmap" class="md-nav__link">
       Project Roadmap
     </a>
   </li>
@@ -320,7 +320,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../../../../releasing/" title="Releasing" class="md-nav__link">
+    <a href="../../../../releasing/" title="Releasing" class="md-nav__link">
       Releasing
     </a>
   </li>
@@ -342,7 +342,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../../../../documentation/" title="Documentation" class="md-nav__link">
+    <a href="../../../../documentation/" title="Documentation" class="md-nav__link">
       Documentation
     </a>
   </li>
@@ -354,7 +354,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../../../../changelog/" title="Change Log" class="md-nav__link">
+    <a href="../../../../changelog/" title="Change Log" class="md-nav__link">
       Change Log
     </a>
   </li>
@@ -377,23 +377,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-      </span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
-    Parameters
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -404,7 +387,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/edit/master/docs/topl-service/io.matthewnelson.topl_service.notification/-service-notification/-builder/set-activity-to-be-opened-on-tap.md" title="Edit this page" class="md-content__button md-icon">
+                  <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/edit/master/docs/topl-service/io.matthewnelson.topl_service.notification/-service-notification/activity-intent-bundle.md" title="Edit this page" class="md-content__button md-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
                   </a>
                 
@@ -412,17 +395,9 @@
                   
                 
                 
-                <p><a href="../../../../">topl-service</a> / <a href="../../../">io.matthewnelson.topl_service.notification</a> / <a href="../../">ServiceNotification</a> / <a href="../">Builder</a> / <a href="./">setActivityToBeOpenedOnTap</a></p>
-<h1 id="setactivitytobeopenedontap">setActivityToBeOpenedOnTap<a class="headerlink" href="#setactivitytobeopenedontap" title="Permanent link">&para;</a></h1>
-<p><code>fun ~~setActivityToBeOpenedOnTap~~(clazz:</code><a href="https://docs.oracle.com/javase/6/docs/api/java/lang/Class.html"><code>Class</code></a><code>&lt;*&gt;, intentExtrasKey:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?, intentExtras:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?, intentRequestCode:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>?): Builder</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L182">(source)</a>
-<strong>Deprecated:</strong> Default behavior of user tapping notification now uses your application&rsquo;s launcher intent from package manager to mitigate launching of multiple activities.</p>
-<p>Define the Activity to be opened when your user taps TorService&rsquo;s notification.</p>
-<p>See <a href="../">Builder</a> for code samples.</p>
-<h3 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h3>
-<p><code>clazz</code> - The Activity to be opened when tapped.</p>
-<p><code>intentExtrasKey</code> - ? The key for if you with to add extras in the PendingIntent.</p>
-<p><code>intentExtras</code> - ? The extras that will be sent in the PendingIntent.</p>
-<p><code>intentRequestCode</code> - ? The request code - Defaults to 0 if not set.</p>
+                <p><a href="../../../">topl-service</a> / <a href="../../">io.matthewnelson.topl_service.notification</a> / <a href="../">ServiceNotification</a> / <a href="./">activityIntentBundle</a></p>
+<h1 id="activityintentbundle">activityIntentBundle<a class="headerlink" href="#activityintentbundle" title="Permanent link">&para;</a></h1>
+<p><code>var activityIntentBundle:</code><a href="https://developer.android.com/reference/android/os/Bundle.html"><code>Bundle</code></a><code>?</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L109">(source)</a></p>
                 
               
               
@@ -516,15 +491,15 @@
       
     </div>
     
-      <script src="../../../../../assets/javascripts/vendor.d710d30a.min.js"></script>
-      <script src="../../../../../assets/javascripts/bundle.5f27aba8.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents"}</script>
+      <script src="../../../../assets/javascripts/vendor.d710d30a.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.5f27aba8.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents"}</script>
       
       <script>
         app = initialize({
-          base: "../../../../..",
+          base: "../../../..",
           features: ["tabs"],
           search: Object.assign({
-            worker: "../../../../../assets/javascripts/worker/search.27c6a5e6.min.js"
+            worker: "../../../../assets/javascripts/worker/search.27c6a5e6.min.js"
           }, typeof search !== "undefined" && search)
         })
       </script>

@@ -435,7 +435,7 @@
                 
                 <p><a href="../../../">topl-service</a> / <a href="../../">io.matthewnelson.topl_service.notification</a> / <a href="../">ServiceNotification</a> / <a href="./">Builder</a></p>
 <h1 id="builder">Builder<a class="headerlink" href="#builder" title="Permanent link">&para;</a></h1>
-<p><code>class Builder</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L144">(source)</a></p>
+<p><code>class Builder</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L146">(source)</a></p>
 <p>Where you get to customize how your notification will look and function.</p>
 <p>A notification is required to be displayed while <a href="#">TorService</a> is running in the
 Foreground. Even if you set <a href="show-notification/">Builder.showNotification</a> to false, <a href="#">TorService</a>
@@ -448,12 +448,9 @@ in order to properly shut down Tor and clean up w/o being killed by the OS.</p>
             <span class="n">channelID</span> <span class="p">=</span> <span class="s">&quot;TOPL-Android Demo&quot;</span><span class="p">,</span>
             <span class="n">notificationID</span> <span class="p">=</span> <span class="m">615</span>
         <span class="p">)</span>
-            <span class="p">.</span><span class="n">setActivityToBeOpenedOnTap</span><span class="p">(</span>
-                <span class="n">clazz</span> <span class="p">=</span> <span class="n">MainActivity</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">,</span>
-                <span class="n">intentExtrasKey</span> <span class="p">=</span> <span class="k">null</span><span class="p">,</span>
-                <span class="n">intentExtras</span> <span class="p">=</span> <span class="k">null</span><span class="p">,</span>
-                <span class="n">intentRequestCode</span> <span class="p">=</span> <span class="k">null</span>
-            <span class="p">)</span>
+            <span class="c1">// Only needed if you are passing a bundle, or changing request code to something other than 0</span>
+            <span class="p">.</span><span class="n">setContentIntentData</span><span class="p">(</span><span class="n">bundle</span> <span class="p">=</span> <span class="k">null</span><span class="p">,</span> <span class="n">requestCode</span> <span class="p">=</span> <span class="m">21</span><span class="p">)</span>
+
             <span class="p">.</span><span class="n">setImageTorNetworkingEnabled</span><span class="p">(</span><span class="n">drawableRes</span> <span class="p">=</span> <span class="n">R</span><span class="p">.</span><span class="n">drawable</span><span class="p">.</span><span class="n">tor_stat_network_enabled</span><span class="p">)</span>
             <span class="p">.</span><span class="n">setImageTorNetworkingDisabled</span><span class="p">(</span><span class="n">drawableRes</span> <span class="p">=</span> <span class="n">R</span><span class="p">.</span><span class="n">drawable</span><span class="p">.</span><span class="n">tor_stat_network_disabled</span><span class="p">)</span>
             <span class="p">.</span><span class="n">setImageTorDataTransfer</span><span class="p">(</span><span class="n">drawableRes</span> <span class="p">=</span> <span class="n">R</span><span class="p">.</span><span class="n">drawable</span><span class="p">.</span><span class="n">tor_stat_network_dataxfer</span><span class="p">)</span>
@@ -507,7 +504,11 @@ in order to properly shut down Tor and clean up w/o being killed by the OS.</p>
 </tr>
 <tr>
 <td><a href="set-activity-to-be-opened-on-tap/">setActivityToBeOpenedOnTap</a></td>
-<td>Define the Activity to be opened when your user taps TorService&rsquo;s notification.<code>fun setActivityToBeOpenedOnTap(clazz:</code><a href="https://docs.oracle.com/javase/6/docs/api/java/lang/Class.html"><code>Class</code></a><code>&lt;*&gt;, intentExtrasKey:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?, intentExtras:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?, intentRequestCode:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>?): Builder</code></td>
+<td>Define the Activity to be opened when your user taps TorService&rsquo;s notification.<code>fun ~~setActivityToBeOpenedOnTap~~(clazz:</code><a href="https://docs.oracle.com/javase/6/docs/api/java/lang/Class.html"><code>Class</code></a><code>&lt;*&gt;, intentExtrasKey:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?, intentExtras:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?, intentRequestCode:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>?): Builder</code></td>
+</tr>
+<tr>
+<td><a href="set-content-intent-data/">setContentIntentData</a></td>
+<td>Default notification behaviour is to use the launch intent for your application from Package Manager when a user taps the notification. Electing this method allows for adding a request code and bundle to the PendingIntent.<code>fun setContentIntentData(bundle:</code><a href="https://developer.android.com/reference/android/os/Bundle.html"><code>Bundle</code></a><code>?, requestCode:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>?): Builder</code></td>
 </tr>
 <tr>
 <td><a href="set-custom-color/">setCustomColor</a></td>

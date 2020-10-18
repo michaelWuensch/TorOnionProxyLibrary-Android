@@ -434,12 +434,9 @@ in order to properly shut down Tor and clean up w/o being killed by the OS.</p>
             <span class="n">channelID</span> <span class="p">=</span> <span class="s">&quot;TOPL-Android Demo&quot;</span><span class="p">,</span>
             <span class="n">notificationID</span> <span class="p">=</span> <span class="m">615</span>
         <span class="p">)</span>
-            <span class="p">.</span><span class="n">setActivityToBeOpenedOnTap</span><span class="p">(</span>
-                <span class="n">clazz</span> <span class="p">=</span> <span class="n">MainActivity</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">,</span>
-                <span class="n">intentExtrasKey</span> <span class="p">=</span> <span class="k">null</span><span class="p">,</span>
-                <span class="n">intentExtras</span> <span class="p">=</span> <span class="k">null</span><span class="p">,</span>
-                <span class="n">intentRequestCode</span> <span class="p">=</span> <span class="k">null</span>
-            <span class="p">)</span>
+            <span class="c1">// Only needed if you are passing a bundle, or changing request code to something other than 0</span>
+            <span class="p">.</span><span class="n">setContentIntentData</span><span class="p">(</span><span class="n">bundle</span> <span class="p">=</span> <span class="k">null</span><span class="p">,</span> <span class="n">requestCode</span> <span class="p">=</span> <span class="m">21</span><span class="p">)</span>
+
             <span class="p">.</span><span class="n">setImageTorNetworkingEnabled</span><span class="p">(</span><span class="n">drawableRes</span> <span class="p">=</span> <span class="n">R</span><span class="p">.</span><span class="n">drawable</span><span class="p">.</span><span class="n">tor_stat_network_enabled</span><span class="p">)</span>
             <span class="p">.</span><span class="n">setImageTorNetworkingDisabled</span><span class="p">(</span><span class="n">drawableRes</span> <span class="p">=</span> <span class="n">R</span><span class="p">.</span><span class="n">drawable</span><span class="p">.</span><span class="n">tor_stat_network_disabled</span><span class="p">)</span>
             <span class="p">.</span><span class="n">setImageTorDataTransfer</span><span class="p">(</span><span class="n">drawableRes</span> <span class="p">=</span> <span class="n">R</span><span class="p">.</span><span class="n">drawable</span><span class="p">.</span><span class="n">tor_stat_network_dataxfer</span><span class="p">)</span>

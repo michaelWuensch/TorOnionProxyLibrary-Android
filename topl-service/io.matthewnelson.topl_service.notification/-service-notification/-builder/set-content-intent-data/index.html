@@ -11,7 +11,7 @@
         <meta name="description" content="An Android Library for embedding Tor as a service into your Application">
       
       
-        <link rel="canonical" href="https://topl-android.matthewnelson.io/topl-service/io.matthewnelson.topl_service.notification/-service-notification/-builder/set-activity-to-be-opened-on-tap/">
+        <link rel="canonical" href="https://topl-android.matthewnelson.io/topl-service/io.matthewnelson.topl_service.notification/-service-notification/-builder/set-content-intent-data/">
       
       
         <meta name="author" content="Matthew Nelson">
@@ -21,7 +21,7 @@
     
     
       
-        <title>Set activity to be opened on tap - TorOnionProxyLibrary-Android</title>
+        <title>Set content intent data - TorOnionProxyLibrary-Android</title>
       
     
     
@@ -59,7 +59,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#setactivitytobeopenedontap" class="md-skip">
+        <a href="#setcontentintentdata" class="md-skip">
           Skip to content
         </a>
       
@@ -87,7 +87,7 @@
           </span>
           <span class="md-header-nav__topic md-ellipsis">
             
-              Set activity to be opened on tap
+              Set content intent data
             
           </span>
         </div>
@@ -404,7 +404,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/edit/master/docs/topl-service/io.matthewnelson.topl_service.notification/-service-notification/-builder/set-activity-to-be-opened-on-tap.md" title="Edit this page" class="md-content__button md-icon">
+                  <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/edit/master/docs/topl-service/io.matthewnelson.topl_service.notification/-service-notification/-builder/set-content-intent-data.md" title="Edit this page" class="md-content__button md-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
                   </a>
                 
@@ -412,17 +412,20 @@
                   
                 
                 
-                <p><a href="../../../../">topl-service</a> / <a href="../../../">io.matthewnelson.topl_service.notification</a> / <a href="../../">ServiceNotification</a> / <a href="../">Builder</a> / <a href="./">setActivityToBeOpenedOnTap</a></p>
-<h1 id="setactivitytobeopenedontap">setActivityToBeOpenedOnTap<a class="headerlink" href="#setactivitytobeopenedontap" title="Permanent link">&para;</a></h1>
-<p><code>fun ~~setActivityToBeOpenedOnTap~~(clazz:</code><a href="https://docs.oracle.com/javase/6/docs/api/java/lang/Class.html"><code>Class</code></a><code>&lt;*&gt;, intentExtrasKey:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?, intentExtras:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>?, intentRequestCode:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>?): Builder</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L182">(source)</a>
-<strong>Deprecated:</strong> Default behavior of user tapping notification now uses your application&rsquo;s launcher intent from package manager to mitigate launching of multiple activities.</p>
-<p>Define the Activity to be opened when your user taps TorService&rsquo;s notification.</p>
-<p>See <a href="../">Builder</a> for code samples.</p>
+                <p><a href="../../../../">topl-service</a> / <a href="../../../">io.matthewnelson.topl_service.notification</a> / <a href="../../">ServiceNotification</a> / <a href="../">Builder</a> / <a href="./">setContentIntentData</a></p>
+<h1 id="setcontentintentdata">setContentIntentData<a class="headerlink" href="#setcontentintentdata" title="Permanent link">&para;</a></h1>
+<p><code>fun setContentIntentData(bundle:</code><a href="https://developer.android.com/reference/android/os/Bundle.html"><code>Bundle</code></a><code>?, requestCode:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>?): Builder</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L211">(source)</a></p>
+<p>Default notification behaviour is to use the launch intent for your application
+from Package Manager when a user taps the notification. Electing this method allows
+for adding a request code and bundle to the PendingIntent.</p>
+<p><strong>NOTE:</strong> electing <a href="../set-activity-to-be-opened-on-tap/">setActivityToBeOpenedOnTap</a> method behaviour takes precedent until
+it is removed in a future release.</p>
+<p><strong>NOTE:</strong> If you do not elect this method or <a href="../set-activity-to-be-opened-on-tap/">setActivityToBeOpenedOnTap</a> in your
+<a href="../">Builder</a>, the notification&rsquo;s content intent is still set with a default <a href="./#io.matthewnelson.topl_service.notification.ServiceNotification.Builder$setContentIntentData(android.os.Bundle, kotlin.Int)/requestCode">requestCode</a>
+value of 0 and null bundle.</p>
 <h3 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h3>
-<p><code>clazz</code> - The Activity to be opened when tapped.</p>
-<p><code>intentExtrasKey</code> - ? The key for if you with to add extras in the PendingIntent.</p>
-<p><code>intentExtras</code> - ? The extras that will be sent in the PendingIntent.</p>
-<p><code>intentRequestCode</code> - ? The request code - Defaults to 0 if not set.</p>
+<p><code>bundle</code> - Bundle to be sent to the Launch Activity</p>
+<p><code>requestCode</code> - Request Code to be used when launching the Activity</p>
                 
               
               

@@ -389,6 +389,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-201-2020-10-18" class="md-nav__link">
+    Version 2.0.1 (2020-10-18)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-200-2020-10-18" class="md-nav__link">
     Version 2.0.0 (2020-10-18)
   </a>
@@ -456,6 +463,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-201-2020-10-18" class="md-nav__link">
+    Version 2.0.1 (2020-10-18)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-200-2020-10-18" class="md-nav__link">
     Version 2.0.0 (2020-10-18)
   </a>
@@ -511,6 +525,12 @@
                 
                 
                 <h1 id="change-log">Change Log<a class="headerlink" href="#change-log" title="Permanent link">&para;</a></h1>
+<h2 id="version-201-2020-10-18">Version 2.0.1 (2020-10-18)<a class="headerlink" href="#version-201-2020-10-18" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Deprecates the <code>ServiceNotification.Builder.setActivityToBeOpenedOnTap</code> method in favor of using
+ the new <code>ServiceNotification.Builder.setContentIntentData</code> to mitigate multiple activities from
+ being opened.</li>
+</ul>
 <h2 id="version-200-2020-10-18">Version 2.0.0 (2020-10-18)<a class="headerlink" href="#version-200-2020-10-18" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Adds support for Version 3 Hidden Service Client Authentication<ul>
@@ -520,6 +540,11 @@
 </li>
 <li>Adds better support for multi-module projects by moving <code>topl-service</code>&lsquo;s public
  classes/abstractions to a separate module, <code>topl-service-base</code>.</li>
+<li>TorService now broadcasts as a <code>NOTICE</code> via the EventBroadcasters when onTaskRemoved occurred,
+ instead of being broadcast as <code>DEBUG</code> (which required TorSettings.hasDebugLogs to be set to true).<ul>
+<li>Can now listen for it in the implementing application&rsquo;s <code>TorServiceEventBroadcaster</code>.</li>
+</ul>
+</li>
 <li>See <a href="../migration/">Migrations</a> for details on how to migrate from <code>1.0.0</code> to <code>2.0.0</code></li>
 </ul>
 <h2 id="version-100-beta02-2020-10-08">Version 1.0.0-beta02 (2020-10-08)<a class="headerlink" href="#version-100-beta02-2020-10-08" title="Permanent link">&para;</a></h2>
