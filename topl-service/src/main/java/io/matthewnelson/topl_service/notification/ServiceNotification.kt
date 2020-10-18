@@ -77,6 +77,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
@@ -105,6 +106,7 @@ class ServiceNotification internal constructor(
     var activityWhenTapped: Class<*>? = null,
     var activityIntentKey: String? = null,
     var activityIntentExtras: String? = null,
+    var activityIntentBundle: Bundle? = null,
     var activityIntentRequestCode: Int = 0,
 
     @DrawableRes var imageNetworkEnabled: Int = R.drawable.tor_stat_network_enabled,
@@ -171,12 +173,12 @@ class ServiceNotification internal constructor(
          * @param [intentExtrasKey]? The key for if you with to add extras in the PendingIntent.
          * @param [intentExtras]? The extras that will be sent in the PendingIntent.
          * @param [intentRequestCode]? The request code - Defaults to 0 if not set.
-         *
-         * TODO:
-         *  + Include an optional Bundle? to be set for creating the pending intent.
-         *  + Think about overriding and providing another option to rotate the ContentIntent
-         *  to open up/resume current activity?
          * */
+        @Deprecated(
+            message = "Default behavior of user tapping notification now uses your application's " +
+                    "launcher intent from package manager to mitigate launching of multiple activities.",
+            replaceWith = ReplaceWith("setContentIntentData(bundle = null, requestCode = intentRequestCode)")
+        )
         fun setActivityToBeOpenedOnTap(
             clazz: Class<*>,
             intentExtrasKey: String?,
@@ -187,6 +189,31 @@ class ServiceNotification internal constructor(
             this.serviceNotification.activityIntentKey = intentExtrasKey
             this.serviceNotification.activityIntentExtras = intentExtras
             intentRequestCode?.let { serviceNotification.activityIntentRequestCode = it }
+            return this
+        }
+
+
+        /**
+         * Default notification behaviour is to use the launch intent for your application
+         * from Package Manager when a user taps the notification. Electing this method allows
+         * for adding a request code and bundle to the PendingIntent.
+         *
+         * **NOTE:** electing [setActivityToBeOpenedOnTap] method behaviour takes precedent until
+         * it is removed in a future release.
+         *
+         * **NOTE:** If you do not elect this method or [setActivityToBeOpenedOnTap] in your
+         * [Builder], the notification's content intent is still set with a default [requestCode]
+         * value of 0 and null bundle.
+         *
+         * @param [bundle] Bundle to be sent to the Launch Activity
+         * @param [requestCode] Request Code to be used when launching the Activity
+         * */
+        fun setContentIntentData(
+            bundle: Bundle?,
+            requestCode: Int?
+        ): Builder {
+            this.serviceNotification.activityIntentBundle = bundle
+            requestCode?.let { serviceNotification.activityIntentRequestCode = it }
             return this
         }
 
@@ -408,8 +435,23 @@ class ServiceNotification internal constructor(
                 builder.setProgress(100, 0, true)
         }
 
-        if (activityWhenTapped != null)
+        if (activityWhenTapped != null) {
             builder.setContentIntent(getContentPendingIntent(torService))
+        } else {
+            torService.context.packageManager
+                ?.getLaunchIntentForPackage(torService.context.packageName)
+                ?.let { intent ->
+                    builder.setContentIntent(
+                        PendingIntent.getActivity(
+                            torService.context,
+                            activityIntentRequestCode,
+                            intent,
+                            PendingIntent.FLAG_UPDATE_CURRENT,
+                            activityIntentBundle
+                        )
+                    )
+                }
+        }
 
         notificationBuilder = builder
         return builder

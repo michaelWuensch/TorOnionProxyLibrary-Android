@@ -76,7 +76,6 @@ import android.os.Process
 import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster
 import io.matthewnelson.sampleapp.topl_android.MyTorSettings
-import io.matthewnelson.sampleapp.ui.MainActivity
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashMessage
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment
 import io.matthewnelson.sampleapp.ui.fragments.settings.library.components.LibraryPrefs
@@ -114,13 +113,7 @@ class App: Application() {
                 channelID = "TOPL-Android Demo",
                 notificationID = 615
             )
-                .setActivityToBeOpenedOnTap(
-                    clazz = MainActivity::class.java,
-                    intentExtrasKey = null,
-                    intentExtras = null,
-                    intentRequestCode = null
-                )
-
+                .setContentIntentData(bundle = null, requestCode = 8)
                 .setVisibility(visibility)
                 .setCustomColor(iconColorRes)
                 .enableTorRestartButton(enableRestart)
