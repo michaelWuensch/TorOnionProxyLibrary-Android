@@ -414,10 +414,13 @@
                 
                 <p><a href="../../../">topl-service</a> / <a href="../../">io.matthewnelson.topl_service</a> / <a href="../">TorServiceController</a> / <a href="./">getServiceTorSettings</a></p>
 <h1 id="getservicetorsettings">getServiceTorSettings<a class="headerlink" href="#getservicetorsettings" title="Permanent link">&para;</a></h1>
-<p><code>@JvmStatic fun getServiceTorSettings(context:</code><a href="https://developer.android.com/reference/android/content/Context.html"><code>Context</code></a><code>):</code><a href="../../../io.matthewnelson.topl_service.service.components.onionproxy/-service-tor-settings/"><code>ServiceTorSettings</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L405">(source)</a></p>
-<p>Helper method for easily obtaining <a href="../../../io.matthewnelson.topl_service.service.components.onionproxy/-service-tor-settings/">ServiceTorSettings</a>.</p>
+<p><code>@JvmStatic fun getServiceTorSettings():</code><a href="../../../../topl-service-base/io.matthewnelson.topl_service_base/-base-service-tor-settings/"><code>BaseServiceTorSettings</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L385">(source)</a></p>
+<p>This method will <em>never</em> throw the <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-runtime-exception/index.html">RuntimeException</a> if you call it after
+<a href="../-builder/build/">Builder.build</a>.</p>
 <h3 id="exceptions">Exceptions<a class="headerlink" href="#exceptions" title="Permanent link">&para;</a></h3>
-<p><code>RuntimeException</code> - See <a href="../get-tor-settings/">getTorSettings</a></p>
+<p><code>RuntimeException</code> - if called before <a href="../-builder/build/">Builder.build</a></p>
+<p><strong>Return</strong>
+<a href="../../../../topl-service-base/io.matthewnelson.topl_service_base/-base-service-tor-settings/">BaseServiceTorSettings</a></p>
                 
               
               

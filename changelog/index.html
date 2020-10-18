@@ -389,6 +389,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-200-2020-10-18" class="md-nav__link">
+    Version 2.0.0 (2020-10-18)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-100-beta02-2020-10-08" class="md-nav__link">
     Version 1.0.0-beta02 (2020-10-08)
   </a>
@@ -449,6 +456,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-200-2020-10-18" class="md-nav__link">
+    Version 2.0.0 (2020-10-18)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-100-beta02-2020-10-08" class="md-nav__link">
     Version 1.0.0-beta02 (2020-10-08)
   </a>
@@ -497,6 +511,17 @@
                 
                 
                 <h1 id="change-log">Change Log<a class="headerlink" href="#change-log" title="Permanent link">&para;</a></h1>
+<h2 id="version-200-2020-10-18">Version 2.0.0 (2020-10-18)<a class="headerlink" href="#version-200-2020-10-18" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Adds support for Version 3 Hidden Service Client Authentication<ul>
+<li>The <code>V3ClientAuthManager</code> class can be obtained from <code>TorServiceController.getV3ClientAuthManager</code>
+ after Builder initialization, which facilitates easily adding private keys to Tor&rsquo;s <code>ClientAuthDir</code>.</li>
+</ul>
+</li>
+<li>Adds better support for multi-module projects by moving <code>topl-service</code>&lsquo;s public
+ classes/abstractions to a separate module, <code>topl-service-base</code>.</li>
+<li>See <a href="../migration/">Migrations</a> for details on how to migrate from <code>1.0.0</code> to <code>2.0.0</code></li>
+</ul>
 <h2 id="version-100-beta02-2020-10-08">Version 1.0.0-beta02 (2020-10-08)<a class="headerlink" href="#version-100-beta02-2020-10-08" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Bug Fix: Service re-binding when application sent to background inhibiting call to stopSelf in 
@@ -529,7 +554,7 @@
 <ul>
 <li>API breaking changes were made to <code>TorServiceController.Builder</code>. See the following to update:<ul>
 <li><a href="../topl-service/io.matthewnelson.topl_service/-tor-service-controller/-builder/">TorServiceController.Builder</a></li>
-<li><a href="../topl-service/io.matthewnelson.topl_service.service.components.onionproxy.model/-tor-service-event-broadcaster/">TorServiceEventBroadcaster</a></li>
+<li><a href="../topl-service-base/io.matthewnelson.topl_service_base/-tor-service-event-broadcaster/">TorServiceEventBroadcaster</a></li>
 </ul>
 </li>
 <li>Added ability to hide the notification<ul>

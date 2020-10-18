@@ -414,7 +414,7 @@
                 
                 <p><a href="../../../../">topl-service</a> / <a href="../../../">io.matthewnelson.topl_service</a> / <a href="../../">TorServiceController</a> / <a href="../">Builder</a> / <a href="./">addTimeToDisableNetworkDelay</a></p>
 <h1 id="addtimetodisablenetworkdelay">addTimeToDisableNetworkDelay<a class="headerlink" href="#addtimetodisablenetworkdelay" title="Permanent link">&para;</a></h1>
-<p><code>fun addTimeToDisableNetworkDelay(milliseconds:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html"><code>Long</code></a><code>): Builder</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L170">(source)</a></p>
+<p><code>fun addTimeToDisableNetworkDelay(milliseconds:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html"><code>Long</code></a><code>): Builder</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L156">(source)</a></p>
 <p>Default is set to 6_000ms, (what this method adds time to).</p>
 <p>When network connectivity is lost a delay is had before setting Tor&rsquo;s config
 &ldquo;DisableNetwork&rdquo; to true, in case connectivity is re-gained within the delay period.</p>
@@ -429,7 +429,7 @@ regained within the delay period and ports will not be cycled (if using &ldquo;a
 <h3 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h3>
 <p><code>milliseconds</code> - A value greater than 0</p>
 <p><strong>See Also</strong></p>
-<p><a href="#">io.matthewnelson.topl_service.service.components.actions.ServiceActions.SetDisableNetwork</a></p>
+<p><a href="#">io.matthewnelson.topl_service.service.components.actions.ServiceAction.SetDisableNetwork</a></p>
 <p><a href="#">io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor.processServiceAction</a></p>
                 
               

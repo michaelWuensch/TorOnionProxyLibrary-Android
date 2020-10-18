@@ -414,24 +414,9 @@
                 
                 <p><a href="../../../../">topl-service</a> / <a href="../../../">io.matthewnelson.topl_service</a> / <a href="../../">TorServiceController</a> / <a href="../">Builder</a> / <a href="./">&lt;init&gt;</a></p>
 <h1 id="init">&lt;init&gt;<a class="headerlink" href="#init" title="Permanent link">&para;</a></h1>
-<p><code>Builder(application:</code><a href="https://developer.android.com/reference/android/app/Application.html"><code>Application</code></a><code>, torServiceNotificationBuilder: Builder, backgroundManagerPolicy: Policy, buildConfigVersionCode:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>, torSettings:</code><a href="../../../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/"><code>TorSettings</code></a><code>, geoipAssetPath:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>, geoip6AssetPath:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>)</code></p>
+<p><code>Builder(application:</code><a href="https://developer.android.com/reference/android/app/Application.html"><code>Application</code></a><code>, torServiceNotificationBuilder: Builder, backgroundManagerPolicy: Policy, buildConfigVersionCode:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>, defaultTorSettings:</code><a href="../../../../../topl-service-base/io.matthewnelson.topl_service_base/-application-default-tor-settings/"><code>ApplicationDefaultTorSettings</code></a><code>, geoipAssetPath:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>, geoip6AssetPath:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>)</code></p>
 <p>The <a href="../">TorServiceController.Builder</a> is where you get to customize how <a href="#">TorService</a> works
 for your application. Call it in <code>Application.onCreate</code> and follow along.</p>
-<p>A note about the <a href="../../../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/">TorSettings</a> you send this. Those are the default settings which
-<a href="#">TorService</a> will fall back on if <a href="../../../../io.matthewnelson.topl_service.prefs/-tor-service-prefs/">io.matthewnelson.topl_service.prefs.TorServicePrefs</a>
-has nothing in it for that particular <a href="../../../../io.matthewnelson.topl_service.util/-service-consts/">ServiceConsts</a>.PrefKey.</p>
-<p>The settings get written to the <code>torrc</code> file every time Tor is started (I plan to make
-this less sledgehammer-ish in the future).</p>
-<p>To update settings while your application is running you need only to instantiate
-<a href="../../../../io.matthewnelson.topl_service.prefs/-tor-service-prefs/">io.matthewnelson.topl_service.prefs.TorServicePrefs</a> and save the data using the
-appropriately annotated method and <a href="../../../../io.matthewnelson.topl_service.util/-service-consts/">ServiceConsts</a>.PrefKey, then
-restart Tor (for now&hellip; ;-D).</p>
-<p>I plan to implement a
-<a href="https://developer.android.com/reference/android/content/SharedPreferences/OnSharedPreferenceChangeListener.html">android.content.SharedPreferences.OnSharedPreferenceChangeListener</a> that will do this
-immediately for the settings that don&rsquo;t require a restart, but a stable release comes first).</p>
-<p>You can see how the <a href="../../../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/">TorSettings</a> sent here are used in <a href="#">TorService</a> by looking at
-<a href="../../../../io.matthewnelson.topl_service.service.components.onionproxy/-service-tor-settings/">io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings</a> and
-<a href="#">TorService.onionProxyManager</a>.</p>
 <div class="highlight"><pre><span></span><code><span class="c1">//  private fun generateTorServiceNotificationBuilder(): ServiceNotification.Builder {</span>
         <span class="k">return</span> <span class="n">ServiceNotification</span><span class="p">.</span><span class="n">Builder</span><span class="p">(</span>
             <span class="n">channelName</span> <span class="p">=</span> <span class="s">&quot;TOPL-Android Demo&quot;</span><span class="p">,</span>
@@ -476,7 +461,7 @@ immediately for the settings that don&rsquo;t require a restart, but a stable re
             <span class="c1">// Can instantiate directly here then access it from</span>
             <span class="c1">// TorServiceController.Companion.getTorSettings() and cast what&#39;s returned</span>
             <span class="c1">// as MyTorSettings</span>
-            <span class="n">torSettings</span> <span class="p">=</span> <span class="n">MyTorSettings</span><span class="p">(),</span>
+            <span class="n">defaultTorSettings</span> <span class="p">=</span> <span class="n">MyTorSettings</span><span class="p">(),</span>
 
             <span class="c1">// These should live somewhere in your module&#39;s assets directory,</span>
             <span class="c1">// ex: my-project/my-application-module/src/main/assets/common/geoip</span>
@@ -511,7 +496,8 @@ customizing <a href="#">TorService</a>&lsquo;s notification</p>
 while your application is in the background (the Recent App&rsquo;s tray).</p>
 <p><code>buildConfigVersionCode</code> - send <a href="#">BuildConfig.VERSION_CODE</a>. Mitigates copying of geoip
 files to app updates only</p>
-<p><code>torSettings</code> - <a href="../../../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/">TorSettings</a> used to create your torrc file on start of Tor</p>
+<p><code>defaultTorSettings</code> - <a href="../../../../../topl-service-base/io.matthewnelson.topl_service_base/-application-default-tor-settings/">ApplicationDefaultTorSettings</a> used to create your torrc file
+on start of Tor</p>
 <p><code>geoipAssetPath</code> - The path to where you have your geoip file located (ex: in
 assets/common directory, send this variable &ldquo;common/geoip&rdquo;)</p>
 <p><code>geoip6AssetPath</code> - The path to where you have your geoip6 file located (ex: in

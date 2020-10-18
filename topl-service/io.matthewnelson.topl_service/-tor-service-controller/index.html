@@ -428,7 +428,7 @@
                 
                 <p><a href="../../">topl-service</a> / <a href="../">io.matthewnelson.topl_service</a> / <a href="./">TorServiceController</a></p>
 <h1 id="torservicecontroller">TorServiceController<a class="headerlink" href="#torservicecontroller" title="Permanent link">&para;</a></h1>
-<p><code>class TorServiceController :</code><a href="../../io.matthewnelson.topl_service.util/-service-consts/"><code>ServiceConsts</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L86">(source)</a></p>
+<p><code>class TorServiceController :</code><a href="../../io.matthewnelson.topl_service.util/-service-consts/"><code>ServiceConsts</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L91">(source)</a></p>
 <h3 id="types">Types<a class="headerlink" href="#types" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -455,7 +455,7 @@
 <tbody>
 <tr>
 <td><a href="app-event-broadcaster/">appEventBroadcaster</a></td>
-<td><code>var appEventBroadcaster:</code><a href="../../io.matthewnelson.topl_service.service.components.onionproxy.model/-tor-service-event-broadcaster/"><code>TorServiceEventBroadcaster</code></a><code>?</code></td>
+<td><code>var appEventBroadcaster:</code><a href="../../../topl-service-base/io.matthewnelson.topl_service_base/-tor-service-event-broadcaster/"><code>TorServiceEventBroadcaster</code></a><code>?</code></td>
 </tr>
 </tbody>
 </table>
@@ -469,16 +469,20 @@
 </thead>
 <tbody>
 <tr>
+<td><a href="get-default-tor-settings/">getDefaultTorSettings</a></td>
+<td>This method will <em>never</em> throw the <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-runtime-exception/index.html">RuntimeException</a> if you call it after <a href="-builder/build/">Builder.build</a>.<code>fun getDefaultTorSettings():</code><a href="../../../topl-service-base/io.matthewnelson.topl_service_base/-application-default-tor-settings/"><code>ApplicationDefaultTorSettings</code></a></td>
+</tr>
+<tr>
 <td><a href="get-service-tor-settings/">getServiceTorSettings</a></td>
-<td>Helper method for easily obtaining <a href="../../io.matthewnelson.topl_service.service.components.onionproxy/-service-tor-settings/">ServiceTorSettings</a>.<code>fun getServiceTorSettings(context:</code><a href="https://developer.android.com/reference/android/content/Context.html"><code>Context</code></a><code>):</code><a href="../../io.matthewnelson.topl_service.service.components.onionproxy/-service-tor-settings/"><code>ServiceTorSettings</code></a></td>
+<td>This method will <em>never</em> throw the <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-runtime-exception/index.html">RuntimeException</a> if you call it after <a href="-builder/build/">Builder.build</a>.<code>fun getServiceTorSettings():</code><a href="../../../topl-service-base/io.matthewnelson.topl_service_base/-base-service-tor-settings/"><code>BaseServiceTorSettings</code></a></td>
 </tr>
 <tr>
 <td><a href="get-tor-config-files/">getTorConfigFiles</a></td>
 <td>Get the <a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/">TorConfigFiles</a> that have been set after calling <a href="-builder/build/">Builder.build</a><code>fun getTorConfigFiles():</code><a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/"><code>TorConfigFiles</code></a></td>
 </tr>
 <tr>
-<td><a href="get-tor-settings/">getTorSettings</a></td>
-<td>Get the <a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/">TorSettings</a> that have been set after calling <a href="-builder/build/">Builder.build</a>.<code>fun getTorSettings():</code><a href="../../../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/"><code>TorSettings</code></a></td>
+<td><a href="get-v3-client-auth-manager/">getV3ClientAuthManager</a></td>
+<td>This method will <em>never</em> throw the <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-runtime-exception/index.html">RuntimeException</a> if you call it after <a href="-builder/build/">Builder.build</a>.<code>fun getV3ClientAuthManager():</code><a href="../../../topl-service-base/io.matthewnelson.topl_service_base/-base-v3-client-auth-manager/"><code>BaseV3ClientAuthManager</code></a></td>
 </tr>
 <tr>
 <td><a href="new-identity/">newIdentity</a></td>
@@ -490,7 +494,7 @@
 </tr>
 <tr>
 <td><a href="start-tor/">startTor</a></td>
-<td>Starts <a href="#">TorService</a> and then Tor. You can call this as much as you want. If the Tor <a href="https://docs.oracle.com/javase/6/docs/api/java/lang/Process.html">Process</a> is already running, it will do nothing.<code>fun startTor():</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><code>Unit</code></a></td>
+<td>This method will <em>never</em> throw the <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-runtime-exception/index.html">RuntimeException</a> if you call it after <a href="-builder/build/">Builder.build</a>.<code>fun startTor():</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><code>Unit</code></a></td>
 </tr>
 <tr>
 <td><a href="stop-tor/">stopTor</a></td>

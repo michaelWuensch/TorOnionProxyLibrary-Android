@@ -548,16 +548,31 @@ along with this program. If not, see
 <p>The following exception is an additional permission under section 7 of the<br />
 GNU General Public License, version 3 (“GPLv3”).  </p>
 <p>&ldquo;The Interfaces&rdquo; is henceforth defined as Application Programming Interfaces<br />
-that are publicly available classes/functions/etc (ie: do not contain the<br />
-visibility modifiers <code>internal</code>, <code>private</code>, <code>protected</code>, or are within<br />
-classes/functions/etc that contain the aforementioned visibility modifiers)<br />
-to TorOnionProxyLibrary-Android users that are needed to implement<br />
-TorOnionProxyLibrary-Android and reside in ONLY the following modules:  </p>
+needed to implement TorOnionProxyLibrary-Android, as listed below:  </p>
 <ul>
-<li>topl-core-base  </li>
-<li>topl-service  </li>
+<li>
+<p>From the <code>topl-core-base</code> module:  </p>
+<ul>
+<li>All Classes/methods/variables  </li>
 </ul>
-<p>The following are excluded from &ldquo;The Interfaces&rdquo;:  </p>
+</li>
+<li>
+<p>From the <code>topl-service-base</code> module:  </p>
+<ul>
+<li>All Classes/methods/variables  </li>
+</ul>
+</li>
+<li>
+<p>From the <code>topl-service</code> module:  </p>
+<ul>
+<li>The TorServiceController class and it&rsquo;s contained classes/methods/variables  </li>
+<li>The ServiceNotification.Builder class and it&rsquo;s contained classes/methods/variables  </li>
+<li>The BackgroundManager.Builder class and it&rsquo;s contained classes/methods/variables  </li>
+<li>The BackgroundManager.Companion class and it&rsquo;s contained methods/variables  </li>
+</ul>
+</li>
+</ul>
+<p>The following code is excluded from &ldquo;The Interfaces&rdquo;:  </p>
 <ul>
 <li>All other code  </li>
 </ul>

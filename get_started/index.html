@@ -296,6 +296,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#multi-module-projects" class="md-nav__link">
+    Multi-Module projects
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#using-the-snapshot-version-of-topl-service" class="md-nav__link">
     Using the SNAPSHOT version of topl-service
   </a>
@@ -463,6 +470,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#multi-module-projects" class="md-nav__link">
+    Multi-Module projects
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#using-the-snapshot-version-of-topl-service" class="md-nav__link">
     Using the SNAPSHOT version of topl-service
   </a>
@@ -518,31 +532,35 @@ Until then, you&rsquo;ll have to provide them.</li>
 <li><strong>torrc file</strong>:<ul>
 <li>Not needed</li>
 <li>Your application&rsquo;s <code>torrc</code> file gets created for you based on what you have stored in 
-<a href="../topl-service/io.matthewnelson.topl_service.prefs/-tor-service-prefs/">TorServicePrefs</a>. 
+<a href="../topl-service-base/io.matthewnelson.topl_service_base/-tor-service-prefs/">TorServicePrefs</a>. 
 If nothing is in <code>TorServicePrefs</code> for that particular setting, then it will fall back on 
-your static/default <a href="../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/">TorSettings</a> 
+your static/default
+<a href="../topl-service-base/io.matthewnelson.topl_service_base/-application-default-tor-settings/">ApplicationDefaultTorSettings</a>
 that you supply upon initialization of <code>TorServiceController.Builder</code>.  </li>
 </ul>
 </li>
 <li><strong>Tor Binaries</strong>:        <ul>
 <li>I use The GuardianProject&rsquo;s <a href="https://github.com/guardianproject/tor-android" target="_blank">tor-android</a>
-    project to build binaries, and provided them 
-    <a href="https://github.com/05nelsonm/TOPL-Android-TorBinary" target="_blank">here</a>. The 
-    difference is in how they are packaged as a dependency, and the contents of what you are
-    importing as a dependency. I package them in the <code>jniLibs</code> directory so that the Android OS
-    will automatically install them into your application&rsquo;s <code>/data/app/...</code> directory, and include
-    no unnecessary classes or resources; just the binaries. Android API 29+ no longer supports 
-    execution of executable files from your application&rsquo;s <code>/data/data/</code> directory, and must now be
-    installed in the <code>context.applicationInfo.nativeLibraryDir</code> directory (aka, <code>/data/app/...</code>) 
-    to execute.  <ul>
+project to re-package and provide <em>only</em> the binaries, as that&rsquo;s all which is needed by
+TOPL-Android. As of version 0.4.4.0, the binaries are simply copied instead of being
+re-built (prior versions I was building, but build reproducability is problematic&hellip;) which can
+be verified by checking the sha256sums (see the repo&rsquo;s README for instructions on how to do that).<ul>
+<li>They can be found <a href="https://github.com/05nelsonm/TOPL-Android-TorBinary" target="_blank">here</a>.</li>
+<li>The only difference is the contents of what you are importing as a dependency. I package
+them in the <code>jniLibs</code> directory so that the Android OS will automatically extract them to
+your application&rsquo;s <code>/data/app/...</code> directory, and include no unnecessary classes or
+resources; just the binaries.</li>
+<li>Android API 29+ no longer supports execution of executable files from your application&rsquo;s
+<code>/data/data/</code> directory, and must now be installed in the
+<code>context.applicationInfo.nativeLibraryDir</code> directory (aka, <code>/data/app/...</code>) to execute.</li>
 <li>Nothing more is needed in terms of configuring initialization via the 
-<code>TorServiceController.Builder</code>, as files will be installed in the correct directory, and 
-named to match what <code>topl-service</code> looks for.</li>
+<code>TorServiceController.Builder.useCustomTorConfigFiles</code>, as files will be installed in the
+correct directory, and named to match what <code>topl-service</code> looks for.</li>
 </ul>
 </li>
-<li>If you wish to use GuardianProject&rsquo;s binaries, see 
+<li>If you wish to use GuardianProject&rsquo;s dependency, see
 <a href="https://github.com/guardianproject/tor-android" target="_blank">tor-android</a>.<ul>
-<li>You&rsquo;ll need to use their <code>NativeResouceInstaller</code> to install the binaries.</li>
+<li>You&rsquo;ll need to use their <code>NativeResourceInstaller</code> to install the binaries.</li>
 <li>You&rsquo;ll need to also implement <code>TorServiceController.Builder.useCustomTorConfigFiles</code> 
 method when initializing <code>topl-service</code> and provide it with your own 
 <a href="../topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/">TorConfigFiles</a>.<ul>
@@ -570,19 +588,29 @@ down. See the <code>sampleapp</code>&lsquo;s <code>build.gradle</code> file for 
 <ul>
 <li>
 <p>In your Application module&rsquo;s <code>build.gradle</code> file, add the following to the <code>dependencies</code> block:
-     <div class="highlight"><pre><span></span><code><span class="kt">def</span> <span class="n">topl_android_version</span> <span class="o">=</span> <span class="s2">&quot;1.0.0-beta02&quot;</span>
-<span class="n">implementation</span> <span class="s2">&quot;io.matthewnelson.topl-android:topl-core-base:$topl_android_version&quot;</span>
-<span class="n">implementation</span> <span class="s2">&quot;io.matthewnelson.topl-android:topl-service:$topl_android_version&quot;</span>
+     <div class="highlight"><pre><span></span><code><span class="n">implementation</span> <span class="s2">&quot;io.matthewnelson.topl-android:topl-service:2.0.0&quot;</span>
 </code></pre></div></p>
 </li>
 <li>
-<p>Create a new class which extends <a href="../topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/">TorSettings</a>
+<p>Create a new class which extends <a href="../topl-service-base/io.matthewnelson.topl_service_base/-application-default-tor-settings/">ApplicationDefaultTorSettings</a>
    and apply your own default settings.</p>
 <ul>
 <li>See the SampleApp&rsquo;s 
-<a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/sampleapp/src/main/java/io/matthewnelson/sampleapp/topl_android/MyTorSettings.kt" target="_blank">MyTorSettings</a> 
+<a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/sampleapp/src/main/java/io/matthewnelson/sampleapp/topl_android/MyTorSettings.kt" target="_blank">MyTorSettings</a>
 class for help.  </li>
 <li>Also checkout the documentation in the <code>TorSettings</code> class for more of a breakdown and help.</li>
+</ul>
+</li>
+<li>
+<p>Optional: If you wish to receive broadcasts (TorState/NetworkState, Port Information, Logs, etc.),
+ Create a new class which extends <a href="../topl-service-base/io.matthewnelson.topl_service_base/-tor-service-event-broadcaster/">TorServiceEventBroadcaster</a>
+ and implement the abstract methods.</p>
+<ul>
+<li>See the SampleApp&rsquo;s
+<a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/sampleapp/src/main/java/io/matthewnelson/sampleapp/topl_android/MyEventBroadcaster.kt" target="_blank">MyEventBroadcaster</a>
+class for help.</li>
+<li>Use the <a href="../topl-service/io.matthewnelson.topl_service/-tor-service-controller/-builder/set-event-broadcaster/">TorServiceController.Builder.setEventBroadcaster</a>
+and provide your implementation when initializing <code>topl-service</code>.</li>
 </ul>
 </li>
 <li>
@@ -592,6 +620,19 @@ class for help.  </li>
 <li>
 <p>Call APIs provided from
    <a href="../topl-service/io.matthewnelson.topl_service/-tor-service-controller/">TorServiceController.Companion</a></p>
+</li>
+</ul>
+<h3 id="multi-module-projects">Multi-Module projects<a class="headerlink" href="#multi-module-projects" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p>If you have a <code>tor</code> module in your project that extends the api&rsquo;s in <code>TorServiceController</code> to centralize
+ control of <code>topl-service</code>, other modules depending on it need only import the <code>topl-service-base</code>
+ module which provides all of the necessary public classes/abstractions.</p>
+</li>
+<li>
+<p>In your <code>tor</code> module&rsquo;s <code>build.gradle</code> file, add the following to the <code>dependencies</code> block:
+     <div class="highlight"><pre><span></span><code><span class="n">api</span> <span class="s2">&quot;io.matthewnelson.topl-android:topl-service-base:2.0.0&quot;</span>
+</code></pre></div></p>
 </li>
 </ul>
 <h3 id="using-the-snapshot-version-of-topl-service">Using the SNAPSHOT version of topl-service<a class="headerlink" href="#using-the-snapshot-version-of-topl-service" title="Permanent link">&para;</a></h3>
@@ -607,9 +648,7 @@ class for help.  </li>
 </li>
 <li>
 <p>In your Application module&rsquo;s <code>build.gradle</code> file, add (or modify) the following in the <code>dependencies</code> block:
-     <div class="highlight"><pre><span></span><code><span class="kt">def</span> <span class="n">topl_android_version</span> <span class="o">=</span> <span class="s2">&quot;1.0.0-rc01-SNAPSHOT&quot;</span>
-<span class="n">implementation</span> <span class="s1">&#39;io.matthewnelson.topl-android:topl-core-base:$topl_android_version&#39;</span>
-<span class="n">implementation</span> <span class="s1">&#39;io.matthewnelson.topl-android:topl-service:$topl_android_version&#39;</span>
+     <div class="highlight"><pre><span></span><code><span class="n">implementation</span> <span class="s1">&#39;io.matthewnelson.topl-android:topl-service:2.0.1-SNAPSHOT&#39;</span>
 </code></pre></div></p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
