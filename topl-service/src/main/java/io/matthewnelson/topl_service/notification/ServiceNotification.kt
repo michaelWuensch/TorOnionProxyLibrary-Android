@@ -597,14 +597,14 @@ class ServiceNotification internal constructor(
         builder.addAction(
             imageNetworkEnabled,
             "New Identity",
-            getActionPendingIntent(torService, ServiceConsts.ServiceActionName.NEW_ID, 1)
+            getActionPendingIntent(torService, ServiceActionName.NEW_ID, 1)
         )
 
         if (enableRestartButton && TorServiceReceiver.deviceIsLocked != true)
             builder.addAction(
                 imageNetworkEnabled,
                 "Restart Tor",
-                getActionPendingIntent(torService, ServiceConsts.ServiceActionName.RESTART_TOR, 2)
+                getActionPendingIntent(torService, ServiceActionName.RESTART_TOR, 2)
             )
 
         if (enableStopButton && TorServiceReceiver.deviceIsLocked != true)
