@@ -71,12 +71,12 @@ dependencies {
     implementation deps.kotlin.coroutinesCore
     implementation deps.kotlin.stdlib
 
-    testImplementation deps.androidx.test.core
-    testImplementation deps.junit
-    testImplementation deps.kotlin.coroutinesTest
-    testImplementation deps.robolectric
+    testImplementation testDeps.androidx.core
+    testImplementation testDeps.junit
+    testImplementation testDeps.kotlin.coroutines
+    testImplementation testDeps.robolectric
 
-    androidTestImplementation deps.androidx.test.core
-    androidTestImplementation deps.androidx.test.espresso
-    androidTestImplementation deps.androidx.test.junit
+    androidTestImplementation testDeps.androidx.core
+    androidTestImplementation testDeps.androidx.espresso
+    androidTestImplementation testDeps.androidx.junit
 }

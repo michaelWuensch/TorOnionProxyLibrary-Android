@@ -74,6 +74,7 @@ package io.matthewnelson.topl_service.service
 import android.app.Application
 import android.content.ComponentName
 import android.content.Intent
+import android.os.Looper.getMainLooper
 import androidx.test.core.app.ApplicationProvider
 import io.matthewnelson.test_helpers.application_provided_classes.TestEventBroadcaster
 import io.matthewnelson.test_helpers.application_provided_classes.TestTorSettings
@@ -206,7 +207,7 @@ internal class TorServiceUnitTest {
             app,
             notificationBuilder,
             backgroundPolicyBuilder,
-            BuildConfig.VERSION_CODE,
+            1,
             torSettings,
             "common/geoip",
             "common/geoip6"
@@ -222,7 +223,7 @@ internal class TorServiceUnitTest {
     }
 
     @Test
-    fun `validate startup state`() = runBlockingTest(testDispatcher) {
+    fun `validate startup state`() = testDispatcher.runBlockingTest {
         // Check EventBroadcasters are working and notification is being updated
         var statePair = testTorService.getSimulatedTorStates()
         assertEquals(TorState.STARTING, statePair.first)
@@ -286,7 +287,7 @@ internal class TorServiceUnitTest {
     }
 
     @Test
-    fun `calling stopTor cleans up`() = runBlockingTest(testDispatcher){
+    fun `calling stopTor cleans up`() = testDispatcher.runBlockingTest{
         delay(6000) // testTorService.simulateStart() takes 6000ms
 
         TorServiceController.stopTor()

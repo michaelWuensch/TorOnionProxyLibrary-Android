@@ -1,0 +1,6 @@
+[topl-core](../../index.md) / [io.matthewnelson.topl_core.util](../index.md) / [OnionAuthUtilities](index.md) / [deleteFile](./delete-file.md)
+
+# deleteFile
+
+`@WorkerThread @JvmStatic fun deleteFile(nickname: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`, torConfigFiles: `[`TorConfigFiles`](../../..//topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md)`): `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)`?` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/util/OnionAuthUtilities.kt#L340)
+`@WorkerThread @JvmStatic fun deleteFile(file: `[`File`](https://docs.oracle.com/javase/6/docs/api/java/io/File.html)`, torConfigFiles: `[`TorConfigFiles`](../../..//topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md)`): `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)`?` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/util/OnionAuthUtilities.kt#L353)

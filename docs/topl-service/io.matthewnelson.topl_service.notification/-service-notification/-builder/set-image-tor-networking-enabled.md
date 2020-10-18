@@ -2,7 +2,7 @@
 
 # setImageTorNetworkingEnabled
 
-`fun setImageTorNetworkingEnabled(@DrawableRes drawableRes: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L199)
+`fun setImageTorNetworkingEnabled(@DrawableRes drawableRes: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L204)
 
 Defaults to Orbot/TorBrowser's icon [R.drawable.tor_stat_network_enabled](#).
 

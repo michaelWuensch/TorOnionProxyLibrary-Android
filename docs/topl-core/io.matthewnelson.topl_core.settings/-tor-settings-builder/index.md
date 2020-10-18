@@ -2,7 +2,7 @@
 
 # TorSettingsBuilder
 
-`class TorSettingsBuilder : `[`CoreConsts`](../../io.matthewnelson.topl_core.util/-core-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/settings/TorSettingsBuilder.kt#L125)
+`class TorSettingsBuilder : `[`CoreConsts`](../../io.matthewnelson.topl_core.util/-core-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/settings/TorSettingsBuilder.kt#L130)
 
 Call [io.matthewnelson.topl_core.OnionProxyManager.getNewSettingsBuilder](../../io.matthewnelson.topl_core/-onion-proxy-manager/get-new-settings-builder.md) to obtain
 this class.
@@ -23,6 +23,7 @@ Calling [finishAndWriteToTorrcFile](finish-and-write-to-torrc-file.md) will do j
 onionProxyManager.getNewSettingsBuilder()
     .updateTorSettings()
     .setGeoIpFiles()
+    .setV3AuthPrivateDir()
     .finishAndWriteToTorrcFile()
 ```
 
@@ -88,6 +89,7 @@ onionProxyManager.getNewSettingsBuilder()
 | [safeSocks](safe-socks.md) | `fun safeSocks(enable: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)`): `[`TorSettingsBuilder`](./index.md) |
 | [safeSocksFromSettings](safe-socks-from-settings.md) | `fun safeSocksFromSettings(): `[`TorSettingsBuilder`](./index.md) |
 | [setGeoIpFiles](set-geo-ip-files.md) | Ensure that you have setup [io.matthewnelson.topl_core.util.TorInstaller](../../io.matthewnelson.topl_core.util/-tor-installer/index.md) such that you've copied the geoip/geoip6 files over prior to calling this.`fun setGeoIpFiles(): `[`TorSettingsBuilder`](./index.md) |
+| [setV3AuthPrivateDir](set-v3-auth-private-dir.md) | Will add to the torrc file "ClientOnionAuthDir &lt;/data/data/path/to/directory&gt;, so be sure to create the directory if it does not exist in [TorInstaller.setup](../../io.matthewnelson.topl_core.util/-tor-installer/setup.md) prior to utilizing this method when building your torrc file.`fun setV3AuthPrivateDir(): `[`TorSettingsBuilder`](./index.md) |
 | [socksPort](socks-port.md) | `fun socksPort(socksPort: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`, isolationFlags: `[`List`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html)`<`[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`>?): `[`TorSettingsBuilder`](./index.md) |
 | [socksPortFromSettings](socks-port-from-settings.md) | `fun socksPortFromSettings(): `[`TorSettingsBuilder`](./index.md) |
 | [strictNodes](strict-nodes.md) | `fun strictNodes(enable: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)`): `[`TorSettingsBuilder`](./index.md) |
@@ -101,5 +103,6 @@ onionProxyManager.getNewSettingsBuilder()
 | [updateTorSettings](update-tor-settings.md) | Updates the buffer for all methods annotated with [SettingsConfig](#). You still need to call [finishAndReturnString](finish-and-return-string.md) and then write the returned String to your [io.matthewnelson.topl_core_base.TorConfigFiles.torrcFile](../../..//topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/torrc-file.md).`fun updateTorSettings(): `[`TorSettingsBuilder`](./index.md) |
 | [useBridges](use-bridges.md) | `fun useBridges(useThem: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)`): `[`TorSettingsBuilder`](./index.md) |
 | [useBridgesFromSettings](use-bridges-from-settings.md) | `fun useBridgesFromSettings(): `[`TorSettingsBuilder`](./index.md) |
+| [v3AuthPrivateDir](v3-auth-private-dir.md) | `fun v3AuthPrivateDir(path: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?): `[`TorSettingsBuilder`](./index.md) |
 | [virtualAddressNetwork](virtual-address-network.md) | `fun virtualAddressNetwork(address: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?): `[`TorSettingsBuilder`](./index.md) |
 | [virtualAddressNetworkFromSettings](virtual-address-network-from-settings.md) | `fun virtualAddressNetworkFromSettings(): `[`TorSettingsBuilder`](./index.md) |

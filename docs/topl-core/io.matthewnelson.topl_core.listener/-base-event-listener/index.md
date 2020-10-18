@@ -2,7 +2,7 @@
 
 # BaseEventListener
 
-`abstract class BaseEventListener : EventListener` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/listener/BaseEventListener.kt#L78)
+`abstract class BaseEventListener : EventListener` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/listener/BaseEventListener.kt#L83)
 
 Extend this class to customize implementation of the member overrides.
 

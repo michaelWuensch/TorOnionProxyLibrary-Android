@@ -2,7 +2,7 @@
 
 # BackgroundManager
 
-`class BackgroundManager : `[`ServiceConsts`](../../io.matthewnelson.topl_service.util/-service-consts/index.md)`, LifecycleObserver` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/lifecycle/BackgroundManager.kt#L130)
+`class BackgroundManager : `[`ServiceConsts`](../../io.matthewnelson.topl_service.util/-service-consts/index.md)`, LifecycleObserver` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/lifecycle/BackgroundManager.kt#L136)
 
 When your application is sent to the background (the Recent App's tray or lock screen), the
 chosen [BackgroundManager.Builder.Policy](-builder/-policy.md) will be triggered.
@@ -46,7 +46,7 @@ See the [BackgroundManager.Builder](-builder/index.md) for more detail.
 
 ### Parameters
 
-`policy` - The chosen [ServiceConsts.BackgroundPolicy](../../io.matthewnelson.topl_service.util/-service-consts/-background-policy/index.md) to be executed.
+`policy` - The chosen [BackgroundPolicy](../../..//topl-service-base/io.matthewnelson.topl_service_base/-base-service-consts/-background-policy/index.md) to be executed.
 
 `executionDelay` - Length of time before the policy gets executed *after* the application
 is sent to the background.

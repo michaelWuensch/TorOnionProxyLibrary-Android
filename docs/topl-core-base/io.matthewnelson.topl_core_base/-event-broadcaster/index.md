@@ -2,7 +2,7 @@
 
 # EventBroadcaster
 
-`abstract class EventBroadcaster : `[`BaseConsts`](../-base-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/EventBroadcaster.kt#L101)
+`abstract class EventBroadcaster : `[`BaseConsts`](../-base-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core-base/src/main/java/io/matthewnelson/topl_core_base/EventBroadcaster.kt#L106)
 
 Service for sending event logs to the system.
 
