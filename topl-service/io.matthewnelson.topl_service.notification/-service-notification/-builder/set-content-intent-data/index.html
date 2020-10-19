@@ -414,18 +414,15 @@
                 
                 <p><a href="../../../../">topl-service</a> / <a href="../../../">io.matthewnelson.topl_service.notification</a> / <a href="../../">ServiceNotification</a> / <a href="../">Builder</a> / <a href="./">setContentIntentData</a></p>
 <h1 id="setcontentintentdata">setContentIntentData<a class="headerlink" href="#setcontentintentdata" title="Permanent link">&para;</a></h1>
-<p><code>fun setContentIntentData(bundle:</code><a href="https://developer.android.com/reference/android/os/Bundle.html"><code>Bundle</code></a><code>?, requestCode:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>?): Builder</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L211">(source)</a></p>
-<p>Default notification behaviour is to use the launch intent for your application
-from Package Manager when a user taps the notification. Electing this method allows
-for adding a request code and bundle to the PendingIntent.</p>
-<p><strong>NOTE:</strong> electing <a href="../set-activity-to-be-opened-on-tap/">setActivityToBeOpenedOnTap</a> method behaviour takes precedent until
-it is removed in a future release.</p>
-<p><strong>NOTE:</strong> If you do not elect this method or <a href="../set-activity-to-be-opened-on-tap/">setActivityToBeOpenedOnTap</a> in your
-<a href="../">Builder</a>, the notification&rsquo;s content intent is still set with a default <a href="./#io.matthewnelson.topl_service.notification.ServiceNotification.Builder$setContentIntentData(android.os.Bundle, kotlin.Int)/requestCode">requestCode</a>
-value of 0 and null bundle.</p>
+<p><code>fun ~~setContentIntentData~~(bundle:</code><a href="https://developer.android.com/reference/android/os/Bundle.html"><code>Bundle</code></a><code>?, requestCode:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><code>Int</code></a><code>?): Builder</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L211">(source)</a>
+<strong>Deprecated:</strong> This method will be removed in a future release</p>
+<p>Do not use this method.</p>
+<p>A non-null, non-0 number must be supplied for requestCode.</p>
 <h3 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h3>
 <p><code>bundle</code> - Bundle to be sent to the Launch Activity</p>
 <p><code>requestCode</code> - Request Code to be used when launching the Activity</p>
+<p><strong>See Also</strong></p>
+<p><a href="../set-content-intent/">setContentIntent</a></p>
                 
               
               
