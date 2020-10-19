@@ -8,16 +8,13 @@ The [TorServiceController.Builder](./index.md) is where you get to customize how
 for your application. Call it in `Application.onCreate` and follow along.
 
 ``` kotlin
-//  private fun generateTorServiceNotificationBuilder(): ServiceNotification.Builder {
+//  private fun generateTorServiceNotificationBuilder(context: Context): ServiceNotification.Builder {
         return ServiceNotification.Builder(
             channelName = "TOPL-Android Demo",
             channelDescription = "TorOnionProxyLibrary-Android Demo",
             channelID = "TOPL-Android Demo",
             notificationID = 615
         )
-            // Only needed if you are passing a bundle, or changing request code to something other than 0
-            .setContentIntentData(bundle = null, requestCode = 21)
-
             .setImageTorNetworkingEnabled(drawableRes = R.drawable.tor_stat_network_enabled)
             .setImageTorNetworkingDisabled(drawableRes = R.drawable.tor_stat_network_disabled)
             .setImageTorDataTransfer(drawableRes = R.drawable.tor_stat_network_dataxfer)
@@ -27,6 +24,34 @@ for your application. Call it in `Application.onCreate` and follow along.
             .enableTorRestartButton(enable = true)
             .enableTorStopButton(enable = true)
             .showNotification(show = true)
+
+            // Set the notification's contentIntent for when the user clicks the notification
+            .also { builder ->
+                context.applicationContext.packageManager
+                    ?.getLaunchIntentForPackage(context.applicationContext.packageName)
+                    ?.let { intent ->
+
+                        // Set in your manifest for the launch activity so the intent won't launch
+                        // a new activity over top of your already created activity if the app is
+                        // open when the user clicks the notification:
+                        //
+                        // android:launchMode="singleInstance"
+                        //
+                        // For more info on launchMode and Activity Intent flags, see:
+                        //
+                        // https://medium.com/swlh/truly-understand-tasks-and-back-stack-intent-flags-of-activity-2a137c401eca
+
+                        builder.setContentIntent(
+                            PendingIntent.getActivity(
+                                context.applicationContext,
+                                0, // Your desired request code
+                                intent,
+                                0 // flags
+                            // can also include a bundle if desired
+                            )
+                        )
+                }
+            }
 //  }
 ```
 
@@ -44,7 +69,7 @@ for your application. Call it in `Application.onCreate` and follow along.
 //  private fun setupTorServices(application: Application, torConfigFiles: TorConfigFiles ) {
         TorServiceController.Builder(
             application = application,
-            torServiceNotificationBuilder = generateTorServiceNotificationBuilder(),
+            torServiceNotificationBuilder = generateTorServiceNotificationBuilder(application),
             backgroundManagerPolicy = generateBackgroundManagerPolicy(),
             buildConfigVersionCode = BuildConfig.VERSION_CODE,
 

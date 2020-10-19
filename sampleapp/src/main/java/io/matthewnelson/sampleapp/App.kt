@@ -194,12 +194,7 @@ class App: Application() {
         val prefs = Prefs.createUnencrypted(PREFS_NAME, this)
 
         packageManager?.getLaunchIntentForPackage(packageName)?.let { intent ->
-            contentIntent = PendingIntent.getActivity(
-                this.applicationContext,
-                0,
-                intent,
-                0
-            )
+            contentIntent = PendingIntent.getActivity(this.applicationContext, 0, intent, 0)
         }
 
         val serviceNotificationBuilder = generateTorServiceNotificationBuilder(
