@@ -72,10 +72,13 @@
 package io.matthewnelson.sampleapp
 
 import android.app.Application
+import android.app.PendingIntent
+import android.content.Intent
 import android.os.Process
 import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster
 import io.matthewnelson.sampleapp.topl_android.MyTorSettings
+import io.matthewnelson.sampleapp.ui.MainActivity
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashMessage
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashboardFragment
 import io.matthewnelson.sampleapp.ui.fragments.settings.library.components.LibraryPrefs
@@ -93,6 +96,7 @@ class App: Application() {
 
     companion object {
         const val PREFS_NAME = "TOPL-Android_SampleApp"
+        private var contentIntent: PendingIntent? = null
         lateinit var stopTorDelaySettingAtAppStartup: String
             private set
 
@@ -113,12 +117,16 @@ class App: Application() {
                 channelID = "TOPL-Android Demo",
                 notificationID = 615
             )
-                .setContentIntentData(bundle = null, requestCode = 8)
                 .setVisibility(visibility)
                 .setCustomColor(iconColorRes)
                 .enableTorRestartButton(enableRestart)
                 .enableTorStopButton(enableStop)
                 .showNotification(show)
+                .also { builder ->
+                    contentIntent?.let {
+                        builder.setContentIntent(pendingIntent = it)
+                    }
+                }
         }
 
         /**
@@ -184,6 +192,15 @@ class App: Application() {
     override fun onCreate() {
         super.onCreate()
         val prefs = Prefs.createUnencrypted(PREFS_NAME, this)
+
+        packageManager?.getLaunchIntentForPackage(packageName)?.let { intent ->
+            contentIntent = PendingIntent.getActivity(
+                this.applicationContext,
+                0,
+                intent,
+                0
+            )
+        }
 
         val serviceNotificationBuilder = generateTorServiceNotificationBuilder(
             LibraryPrefs.getNotificationVisibilitySetting(prefs),

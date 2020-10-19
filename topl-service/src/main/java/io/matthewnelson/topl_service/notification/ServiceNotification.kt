@@ -84,9 +84,10 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.NotificationVisibility
 import androidx.core.content.ContextCompat
 import io.matthewnelson.topl_service.R
+import io.matthewnelson.topl_service.notification.ServiceNotification.Builder
+import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.service.components.receiver.TorServiceReceiver
-import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.util.ServiceConsts
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -108,6 +109,7 @@ class ServiceNotification internal constructor(
     var activityIntentExtras: String? = null,
     var activityIntentBundle: Bundle? = null,
     var activityIntentRequestCode: Int = 0,
+    var contentPendingIntent: PendingIntent? = null,
 
     @DrawableRes var imageNetworkEnabled: Int = R.drawable.tor_stat_network_enabled,
     @DrawableRes var imageNetworkDisabled: Int = R.drawable.tor_stat_network_disabled,
@@ -165,9 +167,9 @@ class ServiceNotification internal constructor(
             )
 
         /**
-         * Define the Activity to be opened when your user taps TorService's notification.
+         * Do not use this method.
          *
-         * See [Builder] for code samples.
+         * @see [setContentIntent]
          *
          * @param [clazz] The Activity to be opened when tapped.
          * @param [intentExtrasKey]? The key for if you with to add extras in the PendingIntent.
@@ -175,9 +177,8 @@ class ServiceNotification internal constructor(
          * @param [intentRequestCode]? The request code - Defaults to 0 if not set.
          * */
         @Deprecated(
-            message = "Default behavior of user tapping notification now uses your application's " +
-                    "launcher intent from package manager to mitigate launching of multiple activities.",
-            replaceWith = ReplaceWith("setContentIntentData(bundle = null, requestCode = intentRequestCode)")
+            message = "This method will be removed in a future release",
+            replaceWith = ReplaceWith("setContentIntent(pendingIntent = null)")
         )
         fun setActivityToBeOpenedOnTap(
             clazz: Class<*>,
@@ -194,26 +195,36 @@ class ServiceNotification internal constructor(
 
 
         /**
-         * Default notification behaviour is to use the launch intent for your application
-         * from Package Manager when a user taps the notification. Electing this method allows
-         * for adding a request code and bundle to the PendingIntent.
+         * Do not use this method.
          *
-         * **NOTE:** electing [setActivityToBeOpenedOnTap] method behaviour takes precedent until
-         * it is removed in a future release.
+         * A non-null, non-0 number must be supplied for requestCode.
          *
-         * **NOTE:** If you do not elect this method or [setActivityToBeOpenedOnTap] in your
-         * [Builder], the notification's content intent is still set with a default [requestCode]
-         * value of 0 and null bundle.
+         * @see [setContentIntent]
          *
          * @param [bundle] Bundle to be sent to the Launch Activity
          * @param [requestCode] Request Code to be used when launching the Activity
          * */
+        @Deprecated(
+            message = "This method will be removed in a future release",
+            replaceWith = ReplaceWith("setContentIntent(pendingIntent = null)")
+        )
         fun setContentIntentData(
             bundle: Bundle?,
             requestCode: Int?
         ): Builder {
             this.serviceNotification.activityIntentBundle = bundle
             requestCode?.let { serviceNotification.activityIntentRequestCode = it }
+            return this
+        }
+
+        /**
+         * Allows for full control over the [PendingIntent] used when the user taps the
+         * [ServiceNotification].
+         *
+         * **NOTE**: use applicationContext when building your pending intent.
+         * */
+        fun setContentIntent(pendingIntent: PendingIntent?): Builder {
+            this.serviceNotification.contentPendingIntent = pendingIntent
             return this
         }
 
@@ -435,30 +446,34 @@ class ServiceNotification internal constructor(
                 builder.setProgress(100, 0, true)
         }
 
-        if (activityWhenTapped != null) {
-            builder.setContentIntent(getContentPendingIntent(torService))
-        } else {
-            torService.context.packageManager
-                ?.getLaunchIntentForPackage(torService.context.packageName)
-                ?.let { intent ->
-                    builder.setContentIntent(
-                        PendingIntent.getActivity(
-                            torService.context,
-                            activityIntentRequestCode,
-                            intent,
-                            PendingIntent.FLAG_UPDATE_CURRENT,
-                            activityIntentBundle
+        contentPendingIntent?.let { pendingIntent ->
+            builder.setContentIntent(pendingIntent)
+        } ?: activityWhenTapped?.let { clazz ->
+            builder.setContentIntent(getContentPendingIntent(torService, clazz))
+
+            // if the request code has been changed
+        } ?: if (activityIntentRequestCode != 0) {
+                torService.context.packageManager
+                    ?.getLaunchIntentForPackage(torService.context.packageName)
+                    ?.let { intent ->
+                        builder.setContentIntent(
+                            PendingIntent.getActivity(
+                                torService.context,
+                                activityIntentRequestCode,
+                                intent,
+                                PendingIntent.FLAG_UPDATE_CURRENT,
+                                activityIntentBundle
+                            )
                         )
-                    )
-                }
-        }
+                    }
+            }
 
         notificationBuilder = builder
         return builder
     }
 
-    private fun getContentPendingIntent(torService: BaseService): PendingIntent {
-        val contentIntent = Intent(torService.context, activityWhenTapped)
+    private fun getContentPendingIntent(torService: BaseService, clazz: Class<*>): PendingIntent {
+        val contentIntent = Intent(torService.context, clazz)
 
         if (!activityIntentKey.isNullOrEmpty() && !activityIntentExtras.isNullOrEmpty())
             contentIntent.putExtra(activityIntentKey, activityIntentExtras)
@@ -518,7 +533,7 @@ class ServiceNotification internal constructor(
      * [io.matthewnelson.topl_service.TorServiceController.Builder.build]
      * */
     internal fun setupNotificationChannel(context: Context): ServiceNotification {
-        val nm: NotificationManager? = context.applicationContext
+        notificationManager = context.applicationContext
             .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -528,10 +543,7 @@ class ServiceNotification internal constructor(
             )
             channel.description = channelDescription
             channel.setSound(null, null)
-            nm?.let {
-                notificationManager = it
-                it.createNotificationChannel(channel)
-            }
+            notificationManager?.createNotificationChannel(channel)
         }
         return serviceNotification
     }
@@ -596,21 +608,21 @@ class ServiceNotification internal constructor(
         actionsPresent = true
 
         builder.addAction(
-            imageNetworkEnabled,
+            0,
             "New Identity",
             getActionPendingIntent(torService, ServiceActionName.NEW_ID, 1)
         )
 
         if (enableRestartButton && TorServiceReceiver.deviceIsLocked != true)
             builder.addAction(
-                imageNetworkEnabled,
+                0,
                 "Restart Tor",
                 getActionPendingIntent(torService, ServiceActionName.RESTART_TOR, 2)
             )
 
         if (enableStopButton && TorServiceReceiver.deviceIsLocked != true)
             builder.addAction(
-                imageNetworkEnabled,
+                0,
                 "Stop Tor",
                 getActionPendingIntent(torService, ServiceActionName.STOP, 3)
             )
