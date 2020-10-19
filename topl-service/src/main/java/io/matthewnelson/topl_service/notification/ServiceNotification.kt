@@ -533,7 +533,7 @@ class ServiceNotification internal constructor(
      * [io.matthewnelson.topl_service.TorServiceController.Builder.build]
      * */
     internal fun setupNotificationChannel(context: Context): ServiceNotification {
-        val nm: NotificationManager? = context.applicationContext
+        notificationManager = context.applicationContext
             .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -543,10 +543,7 @@ class ServiceNotification internal constructor(
             )
             channel.description = channelDescription
             channel.setSound(null, null)
-            nm?.let {
-                notificationManager = it
-                it.createNotificationChannel(channel)
-            }
+            notificationManager?.createNotificationChannel(channel)
         }
         return serviceNotification
     }
