@@ -2,7 +2,7 @@
 
 # Builder
 
-`class Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L146)
+`class Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L148)
 
 Where you get to customize how your notification will look and function.
 
@@ -60,8 +60,9 @@ in order to properly shut down Tor and clean up w/o being killed by the OS.
 |---|---|
 | [enableTorRestartButton](enable-tor-restart-button.md) | Disabled by Default`fun enableTorRestartButton(enable: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)` = true): Builder` |
 | [enableTorStopButton](enable-tor-stop-button.md) | Disabled by Default`fun enableTorStopButton(enable: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)` = true): Builder` |
-| [setActivityToBeOpenedOnTap](set-activity-to-be-opened-on-tap.md) | Define the Activity to be opened when your user taps TorService's notification.`fun ~~setActivityToBeOpenedOnTap~~(clazz: `[`Class`](https://docs.oracle.com/javase/6/docs/api/java/lang/Class.html)`<*>, intentExtrasKey: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?, intentExtras: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?, intentRequestCode: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`?): Builder` |
-| [setContentIntentData](set-content-intent-data.md) | Default notification behaviour is to use the launch intent for your application from Package Manager when a user taps the notification. Electing this method allows for adding a request code and bundle to the PendingIntent.`fun setContentIntentData(bundle: `[`Bundle`](https://developer.android.com/reference/android/os/Bundle.html)`?, requestCode: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`?): Builder` |
+| [setActivityToBeOpenedOnTap](set-activity-to-be-opened-on-tap.md) | Do not use this method.`fun ~~setActivityToBeOpenedOnTap~~(clazz: `[`Class`](https://docs.oracle.com/javase/6/docs/api/java/lang/Class.html)`<*>, intentExtrasKey: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?, intentExtras: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?, intentRequestCode: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`?): Builder` |
+| [setContentIntent](set-content-intent.md) | Allows for full control over the [PendingIntent](https://developer.android.com/reference/android/app/PendingIntent.html) used when the user taps the [ServiceNotification](../index.md).`fun setContentIntent(pendingIntent: `[`PendingIntent`](https://developer.android.com/reference/android/app/PendingIntent.html)`?): Builder` |
+| [setContentIntentData](set-content-intent-data.md) | Do not use this method.`fun ~~setContentIntentData~~(bundle: `[`Bundle`](https://developer.android.com/reference/android/os/Bundle.html)`?, requestCode: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`?): Builder` |
 | [setCustomColor](set-custom-color.md) | Defaults to [R.color.tor_service_white](#)`fun setCustomColor(colorRes: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`): Builder` |
 | [setImageTorDataTransfer](set-image-tor-data-transfer.md) | Defaults to Orbot/TorBrowser's icon [R.drawable.tor_stat_network_dataxfer](#).`fun setImageTorDataTransfer(drawableRes: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`): Builder` |
 | [setImageTorErrors](set-image-tor-errors.md) | Defaults to Orbot/TorBrowser's icon [R.drawable.tor_stat_notifyerr](#).`fun setImageTorErrors(drawableRes: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`): Builder` |

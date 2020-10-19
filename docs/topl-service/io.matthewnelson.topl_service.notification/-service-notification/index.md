@@ -2,7 +2,7 @@
 
 # ServiceNotification
 
-`class ServiceNotification : `[`ServiceConsts`](../../io.matthewnelson.topl_service.util/-service-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L100)
+`class ServiceNotification : `[`ServiceConsts`](../../io.matthewnelson.topl_service.util/-service-consts/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L101)
 
 Everything to do with [TorService](#)'s notification.
 
@@ -26,6 +26,7 @@ Everything to do with [TorService](#)'s notification.
 | [activityIntentRequestCode](activity-intent-request-code.md) | `var activityIntentRequestCode: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html) |
 | [activityWhenTapped](activity-when-tapped.md) | `var activityWhenTapped: `[`Class`](https://docs.oracle.com/javase/6/docs/api/java/lang/Class.html)`<*>?` |
 | [colorWhenConnected](color-when-connected.md) | `var colorWhenConnected: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html) |
+| [contentPendingIntent](content-pending-intent.md) | `var contentPendingIntent: `[`PendingIntent`](https://developer.android.com/reference/android/app/PendingIntent.html)`?` |
 | [enableRestartButton](enable-restart-button.md) | `var enableRestartButton: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) |
 | [enableStopButton](enable-stop-button.md) | `var enableStopButton: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) |
 | [imageDataTransfer](image-data-transfer.md) | `var imageDataTransfer: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html) |
