@@ -611,21 +611,21 @@ class ServiceNotification internal constructor(
         actionsPresent = true
 
         builder.addAction(
-            imageNetworkEnabled,
+            0,
             "New Identity",
             getActionPendingIntent(torService, ServiceActionName.NEW_ID, 1)
         )
 
         if (enableRestartButton && TorServiceReceiver.deviceIsLocked != true)
             builder.addAction(
-                imageNetworkEnabled,
+                0,
                 "Restart Tor",
                 getActionPendingIntent(torService, ServiceActionName.RESTART_TOR, 2)
             )
 
         if (enableStopButton && TorServiceReceiver.deviceIsLocked != true)
             builder.addAction(
-                imageNetworkEnabled,
+                0,
                 "Stop Tor",
                 getActionPendingIntent(torService, ServiceActionName.STOP, 3)
             )
