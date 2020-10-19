@@ -1,5 +1,11 @@
 # Change Log
 
+## Version 2.0.2 (2020-10-19)
+ - Bug Fix: Notifications not showing on API 25 and below [12abbf7](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/commit/12abbf7faec781cb2c9b0a9babf3fe0e3d6cb352)
+ - Deprecates `ServiceNotification.Builder.setContentIntentData` in favor of
+ `ServiceNotification.Builder.setContentIntent` via Library implementer providing the needed PendingIntent
+ - Removes Notification Action icons
+
 ## Version 2.0.1 (2020-10-18)
  - Deprecates the `ServiceNotification.Builder.setActivityToBeOpenedOnTap` method in favor of using
  the new `ServiceNotification.Builder.setContentIntentData` to mitigate multiple activities from

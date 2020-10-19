@@ -2,12 +2,10 @@
 
 # setActivityToBeOpenedOnTap
 
-`fun ~~setActivityToBeOpenedOnTap~~(clazz: `[`Class`](https://docs.oracle.com/javase/6/docs/api/java/lang/Class.html)`<*>, intentExtrasKey: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?, intentExtras: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?, intentRequestCode: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`?): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L182)
-**Deprecated:** Default behavior of user tapping notification now uses your application's launcher intent from package manager to mitigate launching of multiple activities.
+`fun ~~setActivityToBeOpenedOnTap~~(clazz: `[`Class`](https://docs.oracle.com/javase/6/docs/api/java/lang/Class.html)`<*>, intentExtrasKey: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?, intentExtras: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`?, intentRequestCode: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`?): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L183)
+**Deprecated:** This method will be removed in a future release
 
-Define the Activity to be opened when your user taps TorService's notification.
-
-See [Builder](index.md) for code samples.
+Do not use this method.
 
 ### Parameters
 
@@ -18,3 +16,8 @@ See [Builder](index.md) for code samples.
 `intentExtras` - ? The extras that will be sent in the PendingIntent.
 
 `intentRequestCode` - ? The request code - Defaults to 0 if not set.
+
+**See Also**
+
+[setContentIntent](set-content-intent.md)
+
