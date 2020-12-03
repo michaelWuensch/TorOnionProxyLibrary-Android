@@ -50,7 +50,7 @@ ext.plugin = [
         dokka: "org.jetbrains.dokka:dokka-gradle-plugin:0.10.1",
         gradle: "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
     ],
-    mavenPublish: "com.vanniktech:gradle-maven-publish-plugin:0.12.0",
+    mavenPublish: "com.vanniktech:gradle-maven-publish-plugin:0.13.0",
 ]
 
 /**
