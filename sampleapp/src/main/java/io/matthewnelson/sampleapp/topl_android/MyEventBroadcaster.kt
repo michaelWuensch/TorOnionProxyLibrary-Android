@@ -96,6 +96,10 @@ class MyEventBroadcaster: TorServiceEventBroadcaster() {
         _liveTorPortInfo.value = torPortInfo
     }
 
+    override fun broadcastServiceLifecycleEvent(event: String, hashCode: Int) {
+        broadcastLogMessage("NOTICE|TorService|LCE=$event - HashCode=$hashCode")
+    }
+
 
     /////////////////
     /// Bandwidth ///

@@ -110,11 +110,11 @@ internal class TorService: BaseService() {
     override fun unbindTorService() {
         try {
             unbindService(context)
-            broadcastLogger.debug("Has been unbound")
+            super.unbindTorService()
         } catch (e: IllegalArgumentException) {}
     }
     override fun onBind(intent: Intent?): IBinder? {
-        broadcastLogger.debug("Has been bound")
+        super.onBind(null)
         return torServiceBinder
     }
 
@@ -295,7 +295,7 @@ internal class TorService: BaseService() {
 
 
     override fun onCreate() {
-        broadcastLogger.notice("Created. BuildConfig.DEBUG set to: $buildConfigDebug")
+        broadcastLogger.notice("BuildConfig.DEBUG set to: $buildConfigDebug")
         super.onCreate()
     }
 
@@ -309,7 +309,6 @@ internal class TorService: BaseService() {
     override fun onTaskRemoved(rootIntent: Intent?) {
         // Cancel the BackgroundManager's coroutine if it's active so it doesn't execute
         torServiceBinder.cancelExecuteBackgroundPolicyJob()
-        broadcastLogger.notice("Task has been removed")
         super.onTaskRemoved(rootIntent)
     }
 }

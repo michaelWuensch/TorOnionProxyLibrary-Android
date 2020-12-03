@@ -76,11 +76,13 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.IBinder
 import androidx.annotation.WorkerThread
 import androidx.core.app.NotificationCompat
 import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core_base.TorConfigFiles
 import io.matthewnelson.topl_service.BuildConfig
+import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
 import io.matthewnelson.topl_service.notification.ServiceNotification
 import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
@@ -90,6 +92,7 @@ import io.matthewnelson.topl_service.service.components.binding.TorServiceConnec
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import io.matthewnelson.topl_service_base.ApplicationDefaultTorSettings
+import io.matthewnelson.topl_service_base.BaseServiceConsts.ServiceLifecycleEvent
 import kotlinx.coroutines.CoroutineScope
 import java.io.File
 import java.io.IOException
@@ -258,7 +261,18 @@ internal abstract class BaseService: Service() {
     ///////////////
     /// Binding ///
     ///////////////
-    abstract fun unbindTorService()
+    open fun unbindTorService() {
+        TorServiceController.appEventBroadcaster?.broadcastServiceLifecycleEvent(
+            ServiceLifecycleEvent.ON_UNBIND, this.hashCode()
+        )
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        TorServiceController.appEventBroadcaster?.broadcastServiceLifecycleEvent(
+            ServiceLifecycleEvent.ON_BIND, this.hashCode()
+        )
+        return null
+    }
 
 
     /////////////////////////
@@ -387,12 +401,18 @@ internal abstract class BaseService: Service() {
 
 
     override fun onCreate() {
+        TorServiceController.appEventBroadcaster?.broadcastServiceLifecycleEvent(
+            ServiceLifecycleEvent.CREATED, this.hashCode()
+        )
         serviceNotification.buildNotification(this, setStartTime = true)
         registerPrefsListener()
         setIsDeviceLocked()
     }
 
     override fun onDestroy() {
+        TorServiceController.appEventBroadcaster?.broadcastServiceLifecycleEvent(
+            ServiceLifecycleEvent.DESTROYED, this.hashCode()
+        )
         unregisterPrefsListener()
     }
 
@@ -414,6 +434,9 @@ internal abstract class BaseService: Service() {
 
 
     override fun onTaskRemoved(rootIntent: Intent?) {
+        TorServiceController.appEventBroadcaster?.broadcastServiceLifecycleEvent(
+            ServiceLifecycleEvent.TASK_REMOVED, this.hashCode()
+        )
         BackgroundManager.taskIsRemovedFromRecentApps(true)
         // Move to the foreground so we can properly shutdown w/o interrupting the
         // application's normal lifecycle (Context.startServiceForeground does... thus,
