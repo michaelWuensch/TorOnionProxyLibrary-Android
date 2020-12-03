@@ -3,10 +3,10 @@ ext.versions = [
     'compileSdk': 30,
     'minSdk': 16,
 
-    'coroutines': '1.4.0-M1',
+    'coroutines': '1.4.2',
     'lifecycle': '2.2.0',
-    'kotlin': '1.4.10',
-    'navigation': '2.3.1',
+    'kotlin': '1.4.20',
+    'navigation': '2.3.2',
 ]
 
 /**
@@ -44,13 +44,13 @@ ext.deps = [
 ]
 
 ext.plugin = [
-    androidGradle: "com.android.tools.build:gradle:4.1.0",
-    gradleVersions: "com.github.ben-manes:gradle-versions-plugin:0.33.0",
+    androidGradle: "com.android.tools.build:gradle:4.1.1",
+    gradleVersions: "com.github.ben-manes:gradle-versions-plugin:0.36.0",
     kotlin: [
         dokka: "org.jetbrains.dokka:dokka-gradle-plugin:0.10.1",
         gradle: "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
     ],
-    mavenPublish: "com.vanniktech:gradle-maven-publish-plugin:0.12.0",
+    mavenPublish: "com.vanniktech:gradle-maven-publish-plugin:0.13.0",
 ]
 
 /**
