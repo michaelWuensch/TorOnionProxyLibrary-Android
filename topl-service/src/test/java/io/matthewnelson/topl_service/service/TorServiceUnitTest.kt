@@ -74,7 +74,6 @@ package io.matthewnelson.topl_service.service
 import android.app.Application
 import android.content.ComponentName
 import android.content.Intent
-import android.os.Looper.getMainLooper
 import androidx.test.core.app.ApplicationProvider
 import io.matthewnelson.test_helpers.application_provided_classes.TestEventBroadcaster
 import io.matthewnelson.test_helpers.application_provided_classes.TestTorSettings
@@ -91,7 +90,7 @@ import io.matthewnelson.topl_service.service.components.receiver.TorServiceRecei
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service_base.BaseServiceConsts.PrefKeyBoolean
-import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
+import io.matthewnelson.topl_service_base.BaseServiceConsts.ServiceActionName
 import io.matthewnelson.topl_service_base.ServiceUtilities
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.TestCoroutineDispatcher
