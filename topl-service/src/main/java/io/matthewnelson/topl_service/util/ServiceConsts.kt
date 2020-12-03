@@ -77,6 +77,7 @@ import io.matthewnelson.topl_service_base.BaseServiceConsts
 
 abstract class ServiceConsts: BaseServiceConsts() {
 
+
     //////////////////////////
     /// NotificationImages ///
     //////////////////////////
@@ -97,9 +98,9 @@ abstract class ServiceConsts: BaseServiceConsts() {
     }
 
 
-    //////////////////////
+    /////////////////////
     /// ServiceAction ///
-    //////////////////////
+    /////////////////////
     @Target(
         AnnotationTarget.TYPE,
         AnnotationTarget.CLASS,
@@ -123,33 +124,6 @@ abstract class ServiceConsts: BaseServiceConsts() {
             const val START_TOR = "${ACTION_COMMAND}START_TOR"
             const val STOP_SERVICE = "${ACTION_COMMAND}STOP_SERVICE"
             const val STOP_TOR = "${ACTION_COMMAND}STOP_TOR"
-        }
-    }
-
-    @Target(
-        AnnotationTarget.CLASS,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.PROPERTY
-    )
-    @StringDef(
-        ServiceActionName.DISABLE_NETWORK,
-        ServiceActionName.ENABLE_NETWORK,
-        ServiceActionName.NEW_ID,
-        ServiceActionName.RESTART_TOR,
-        ServiceActionName.START,
-        ServiceActionName.STOP
-    )
-    @Retention(AnnotationRetention.SOURCE)
-    internal annotation class ServiceActionName {
-        companion object {
-            private const val ACTION_NAME = "Action_"
-            const val DISABLE_NETWORK = "${ACTION_NAME}DISABLE_NETWORK"
-            const val ENABLE_NETWORK = "${ACTION_NAME}ENABLE_NETWORK"
-            const val NEW_ID = "${ACTION_NAME}NEW_ID"
-            const val RESTART_TOR = "${ACTION_NAME}RESTART_TOR"
-            const val START = "${ACTION_NAME}START"
-            const val STOP = "${ACTION_NAME}STOP"
         }
     }
 }

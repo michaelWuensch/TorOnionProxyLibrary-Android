@@ -89,9 +89,9 @@ import io.matthewnelson.topl_service.prefs.TorServicePrefsListener
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.actions.ServiceAction
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
-import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
 import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import io.matthewnelson.topl_service_base.ApplicationDefaultTorSettings
+import io.matthewnelson.topl_service_base.BaseServiceConsts.ServiceActionName
 import io.matthewnelson.topl_service_base.BaseServiceConsts.ServiceLifecycleEvent
 import kotlinx.coroutines.CoroutineScope
 import java.io.File

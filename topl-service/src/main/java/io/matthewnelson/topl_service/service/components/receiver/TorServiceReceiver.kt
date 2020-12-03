@@ -80,7 +80,7 @@ import android.net.ConnectivityManager
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service.service.components.actions.ServiceAction
-import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
+import io.matthewnelson.topl_service_base.BaseServiceConsts.ServiceActionName
 import java.math.BigInteger
 import java.security.SecureRandom
 
