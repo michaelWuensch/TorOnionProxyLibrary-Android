@@ -72,7 +72,7 @@
 package io.matthewnelson.topl_service.service.components.actions
 
 import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionCommand
-import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
+import io.matthewnelson.topl_service_base.BaseServiceConsts.ServiceActionName
 
 /**
  * There are multiple avenues to interacting with a Service (BroadcastReceiver, Binder,
