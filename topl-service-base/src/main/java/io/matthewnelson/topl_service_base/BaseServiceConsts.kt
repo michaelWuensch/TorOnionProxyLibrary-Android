@@ -100,6 +100,34 @@ abstract class BaseServiceConsts: BaseConsts() {
     }
 
 
+    ////////////////////////////////
+    /// Service Lifecycle Events ///
+    ////////////////////////////////
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.PROPERTY,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.TYPE
+    )
+    @StringDef(
+        ServiceLifecycleEvent.CREATED,
+        ServiceLifecycleEvent.DESTROYED,
+        ServiceLifecycleEvent.ON_BIND,
+        ServiceLifecycleEvent.ON_UNBIND,
+        ServiceLifecycleEvent.TASK_REMOVED,
+    )
+    @Retention(AnnotationRetention.SOURCE)
+    annotation class ServiceLifecycleEvent {
+        companion object {
+            const val CREATED = "onCreate"
+            const val DESTROYED = "onDestroy"
+            const val ON_BIND = "onBind"
+            const val ON_UNBIND = "onUnbind"
+            const val TASK_REMOVED = "onTaskRemoved"
+        }
+    }
+
+
     ///////////////////////
     /// TorServicePrefs ///
     ///////////////////////
