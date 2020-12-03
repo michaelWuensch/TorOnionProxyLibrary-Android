@@ -131,6 +131,12 @@ abstract class BaseServiceConsts: BaseConsts() {
     ///////////////////////
     /// TorServicePrefs ///
     ///////////////////////
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.PROPERTY,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.TYPE
+    )
     @StringDef(
         PrefKeyBoolean.DISABLE_NETWORK,
         PrefKeyBoolean.HAS_BRIDGES,
@@ -170,6 +176,12 @@ abstract class BaseServiceConsts: BaseConsts() {
         }
     }
 
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.PROPERTY,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.TYPE
+    )
     @StringDef(
         PrefKeyInt.DORMANT_CLIENT_TIMEOUT,
         PrefKeyInt.PROXY_PORT,
@@ -185,6 +197,12 @@ abstract class BaseServiceConsts: BaseConsts() {
         }
     }
 
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.PROPERTY,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.TYPE
+    )
     @StringDef(
         PrefKeyList.DNS_PORT_ISOLATION_FLAGS,
         PrefKeyList.HTTP_TUNNEL_PORT_ISOLATION_FLAGS,
@@ -204,6 +222,12 @@ abstract class BaseServiceConsts: BaseConsts() {
         }
     }
 
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.PROPERTY,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.TYPE
+    )
     @StringDef(
         PrefKeyString.DNS_PORT,
         PrefKeyString.CUSTOM_TORRC,
