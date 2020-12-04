@@ -253,8 +253,9 @@ class TorServiceController private constructor(): ServiceConsts() {
         }
 
         /**
-         * Implement and set hooks to be executed in [TorService.onCreate], and just
-         * prior to calling [TorService.stopSelf].
+         * Implement and set hooks to be executed in [TorService.onCreate], and
+         * [ServiceActionProcessor.processServiceAction] prior to starting of Tor, and
+         * post stopping of Tor.
          * */
         fun setServiceExecutionHooks(executionHooks: ServiceExecutionHooks): Builder {
             if (serviceExecutionHooks == null) {
