@@ -71,7 +71,6 @@
 * */
 package io.matthewnelson.topl_service.service.components.actions
 
-import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.util.ServiceConsts
 import kotlinx.coroutines.*
@@ -288,22 +287,7 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
                             }
                             ServiceActionCommand.START_TOR -> {
                                 if (!torService.hasControlConnection()) {
-
-                                    TorServiceController.serviceExecutionHooks?.let { hooks ->
-                                        withContext(Dispatchers.Main) {
-                                            try {
-                                                hooks.executeBeforeStartTor(torService.context.applicationContext)
-                                            } catch (e: Exception) {
-                                                TorServiceController.appEventBroadcaster?.broadcastException(
-                                                    "${BroadcastType.EXCEPTION}|" +
-                                                            "${hooks.javaClass.simpleName}|" +
-                                                            "${e.message}"
-                                                    , e
-                                                )
-                                            }
-                                        }
-                                    }
-
+                                    torService.executionHookPreStartTor()
                                     torService.startTor()
                                     delay(300L)
                                 }
@@ -314,24 +298,9 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
                             }
                             ServiceActionCommand.STOP_TOR -> {
                                 if (torService.hasControlConnection()) {
-
                                     torService.stopTor()
                                     delay(300L)
-
-                                    TorServiceController.serviceExecutionHooks?.let { hooks ->
-                                        withContext(Dispatchers.Main) {
-                                            try {
-                                                hooks.executeAfterStopTor(torService.context.applicationContext)
-                                            } catch (e: Exception) {
-                                                TorServiceController.appEventBroadcaster?.broadcastException(
-                                                    "${BroadcastType.EXCEPTION}|" +
-                                                            "${hooks.javaClass.simpleName}|" +
-                                                            "${e.message}"
-                                                    , e
-                                                )
-                                            }
-                                        }
-                                    }
+                                    torService.executionHookPostStopTor()
                                 }
                             }
                         }
