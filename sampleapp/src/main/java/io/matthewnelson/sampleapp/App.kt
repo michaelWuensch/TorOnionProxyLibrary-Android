@@ -77,6 +77,7 @@ import android.content.Intent
 import android.os.Process
 import io.matthewnelson.encrypted_storage.Prefs
 import io.matthewnelson.sampleapp.topl_android.MyEventBroadcaster
+import io.matthewnelson.sampleapp.topl_android.MyServiceExecutionHooks
 import io.matthewnelson.sampleapp.topl_android.MyTorSettings
 import io.matthewnelson.sampleapp.ui.MainActivity
 import io.matthewnelson.sampleapp.ui.fragments.dashboard.DashMessage
@@ -186,6 +187,7 @@ class App: Application() {
                 .disableStopServiceOnTaskRemoved(stopServiceOnTaskRemoved)
                 .setBuildConfigDebug(buildConfigDebug)
                 .setEventBroadcaster(eventBroadcaster = MyEventBroadcaster())
+                .setServiceExecutionHooks(executionHooks = MyServiceExecutionHooks())
         }
     }
 

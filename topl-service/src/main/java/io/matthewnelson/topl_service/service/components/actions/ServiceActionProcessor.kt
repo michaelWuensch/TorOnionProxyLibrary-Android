@@ -287,6 +287,7 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
                             }
                             ServiceActionCommand.START_TOR -> {
                                 if (!torService.hasControlConnection()) {
+                                    torService.executionHookPreStartTor()
                                     torService.startTor()
                                     delay(300L)
                                 }
@@ -299,6 +300,7 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
                                 if (torService.hasControlConnection()) {
                                     torService.stopTor()
                                     delay(300L)
+                                    torService.executionHookPostStopTor()
                                 }
                             }
                         }

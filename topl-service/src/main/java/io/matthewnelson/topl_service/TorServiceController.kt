@@ -246,8 +246,20 @@ class TorServiceController private constructor(): ServiceConsts() {
          * class actually is.
          * */
         fun setEventBroadcaster(eventBroadcaster: TorServiceEventBroadcaster): Builder {
-            if (Companion.appEventBroadcaster == null) {
+            if (appEventBroadcaster == null) {
                 appEventBroadcaster = eventBroadcaster
+            }
+            return this
+        }
+
+        /**
+         * Implement and set hooks to be executed in [TorService.onCreate], and
+         * [ServiceActionProcessor.processServiceAction] prior to starting of Tor, and
+         * post stopping of Tor.
+         * */
+        fun setServiceExecutionHooks(executionHooks: ServiceExecutionHooks): Builder {
+            if (serviceExecutionHooks == null) {
+                serviceExecutionHooks = executionHooks
             }
             return this
         }
@@ -321,6 +333,10 @@ class TorServiceController private constructor(): ServiceConsts() {
 
         @JvmStatic
         var appEventBroadcaster: TorServiceEventBroadcaster? = null
+            private set
+
+        @JvmStatic
+        var serviceExecutionHooks: ServiceExecutionHooks? = null
             private set
 
         /**
