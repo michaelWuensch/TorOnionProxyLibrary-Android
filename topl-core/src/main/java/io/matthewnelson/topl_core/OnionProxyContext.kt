@@ -123,15 +123,27 @@ import java.io.*
  * @param [torInstaller] [TorInstaller]
  * @param [torSettings] [TorSettings] Basically your torrc file
  */
-internal class OnionProxyContext(
+internal class OnionProxyContext private constructor(
     val torConfigFiles: TorConfigFiles,
     val torInstaller: TorInstaller,
     val torSettings: TorSettings
 ): CoreConsts() {
 
+    companion object {
+        @JvmSynthetic
+        internal fun instantiate(
+            torConfigFiles: TorConfigFiles,
+            torInstaller: TorInstaller,
+            torSettings: TorSettings
+        ): OnionProxyContext =
+            OnionProxyContext(torConfigFiles, torInstaller, torSettings)
+    }
+
     // Gets initialized in OnionProxyManager _immediately_ after
     // OnionProxyContext is instantiated.
     private lateinit var broadcastLogger: BroadcastLogger
+
+    @JvmSynthetic
     fun initBroadcastLogger(onionProxyBroadcastLogger: BroadcastLogger) {
         if (!::broadcastLogger.isInitialized)
             broadcastLogger = onionProxyBroadcastLogger
@@ -157,6 +169,7 @@ internal class OnionProxyContext(
      * @throws [IllegalArgumentException] If [configFileReference] is an invalid argument, or null file.
      * @throws [SecurityException] See [WriteObserver.checkExists]
      */
+    @JvmSynthetic
     @Throws(IllegalArgumentException::class, SecurityException::class)
     fun createFileObserver(@ConfigFile configFileReference: String): WriteObserver {
         broadcastLogger.debug("Creating FileObserver for $configFileReference")
@@ -190,6 +203,7 @@ internal class OnionProxyContext(
      * @return True if file exists or is created successfully, otherwise false.
      * @throws [SecurityException] Unauthorized access to file/directory.
      * */
+    @JvmSynthetic
     @Throws(IllegalArgumentException::class, SecurityException::class)
     fun createNewFileIfDoesNotExist(@ConfigFile configFileReference: String): Boolean {
         broadcastLogger.debug("Creating $configFileReference if DNE")
@@ -238,6 +252,7 @@ internal class OnionProxyContext(
      * @throws [SecurityException] Unauthorized access to file/directory.
      * @throws [IllegalArgumentException]
      * */
+    @JvmSynthetic
     @Throws(SecurityException::class, IllegalArgumentException::class)
     fun deleteFile(@ConfigFile configFileReference: String): Boolean {
         broadcastLogger.debug("Deleting $configFileReference")
@@ -273,6 +288,7 @@ internal class OnionProxyContext(
      * @throws [EOFException] Errors while reading file.
      * @throws [SecurityException] Unauthorized access to file/directory.
      * */
+    @JvmSynthetic
     @Throws(IOException::class, EOFException::class, SecurityException::class)
     fun readFile(@ConfigFile configFileReference: String): ByteArray {
         broadcastLogger.debug("Reading $configFileReference")
@@ -307,6 +323,7 @@ internal class OnionProxyContext(
      * @return True if directory exists or is created successfully, otherwise false.
      * @throws [SecurityException] Unauthorized access to file/directory.
      */
+    @JvmSynthetic
     @Throws(SecurityException::class)
     fun createDataDir(): Boolean =
         synchronized(dataDirLock) {
@@ -319,6 +336,7 @@ internal class OnionProxyContext(
      * @throws [RuntimeException] Was unable to delete a file.
      * @throws [SecurityException] Unauthorized access to file/directory.
      */
+    @JvmSynthetic
     @Throws(RuntimeException::class, SecurityException::class)
     fun deleteDataDirExceptHiddenServiceAndAuthPrivate() {
         synchronized(dataDirLock) {
@@ -337,6 +355,7 @@ internal class OnionProxyContext(
     ////////////////////
     /// HostnameFile ///
     ////////////////////
+    @JvmSynthetic
     @Throws(SecurityException::class)
     fun setHostnameDirPermissionsToReadOnly(): Boolean =
         synchronized(hostnameFileLock) {
@@ -354,6 +373,7 @@ internal class OnionProxyContext(
      * @return The resolveConf file with newly added ip addresses for Quad9
      * @throws [IOException] from FileWriter
      */
+    @JvmSynthetic
     @Throws(IOException::class)
     fun createQuad9NameserverFile(): File =
         synchronized(resolvConfFileLock) {
@@ -370,6 +390,7 @@ internal class OnionProxyContext(
      *
      * @return process id
      */
-    val processId: String
-        get() = Process.myPid().toString()
+    @JvmSynthetic
+    fun getProcessId(): String =
+        Process.myPid().toString()
 }

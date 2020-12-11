@@ -115,6 +115,8 @@ abstract class TorInstaller: CoreConsts() {
      * */
     var broadcastLogger: BroadcastLogger? = null
         private set
+
+    @JvmSynthetic
     internal fun initBroadcastLogger(torInstallerBroadcastLogger: BroadcastLogger) {
         if (broadcastLogger == null)
             broadcastLogger = torInstallerBroadcastLogger

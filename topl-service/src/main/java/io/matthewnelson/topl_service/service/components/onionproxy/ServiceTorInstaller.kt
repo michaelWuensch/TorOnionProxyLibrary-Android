@@ -88,17 +88,23 @@ import java.util.concurrent.TimeoutException
  *
  * @param [torService] [BaseService] for context
  * */
-internal class ServiceTorInstaller(private val torService: BaseService): TorInstaller() {
+internal class ServiceTorInstaller private constructor(
+    private val torService: BaseService
+): TorInstaller() {
 
-    private companion object {
-        const val APP_VERSION_CODE = "APP_VERSION_CODE"
+    companion object {
+        @JvmSynthetic
+        fun instantiate(torService: BaseService): ServiceTorInstaller =
+            ServiceTorInstaller(torService)
+
+        private const val APP_VERSION_CODE = "APP_VERSION_CODE"
     }
 
     private val torConfigFiles: TorConfigFiles
         get() = TorServiceController.getTorConfigFiles()
 
-    private val torServicePrefs by lazy { TorServicePrefs(torService.context) }
-    private val localPrefs by lazy { BaseService.getLocalPrefs(torService.context) }
+    private val torServicePrefs by lazy { TorServicePrefs(torService.getContext()) }
+    private val localPrefs by lazy { BaseService.getLocalPrefs(torService.getContext()) }
     private var geoIpFileCopied = false
     private var geoIpv6FileCopied = false
 
@@ -123,8 +129,8 @@ internal class ServiceTorInstaller(private val torService: BaseService): TorInst
         // If the app version has been increased, or if this is a debug build, copy over
         // geoip assets then update SharedPreferences with the new version code. This
         // mitigates copying to be done only if a version upgrade is had.
-        if (BaseService.buildConfigDebug ||
-            BaseService.buildConfigVersionCode > localPrefs.getInt(APP_VERSION_CODE, -1)
+        if (BaseService.getBuildConfigDebug() ||
+            BaseService.getBuildConfigVersionCode() > localPrefs.getInt(APP_VERSION_CODE, -1)
         ) {
             if (!geoIpFileCopied) {
                 copyGeoIpAsset()
@@ -133,25 +139,25 @@ internal class ServiceTorInstaller(private val torService: BaseService): TorInst
                 copyGeoIpv6Asset()
             }
             localPrefs.edit()
-                .putInt(APP_VERSION_CODE, BaseService.buildConfigVersionCode)
+                .putInt(APP_VERSION_CODE, BaseService.getBuildConfigVersionCode())
                 .apply()
         }
     }
 
     private fun copyGeoIpAsset() {
         synchronized(torConfigFiles.geoIpFileLock) {
-            torService.copyAsset(BaseService.geoipAssetPath, torConfigFiles.geoIpFile)
+            torService.copyAsset(BaseService.getGeoipAssetPath(), torConfigFiles.geoIpFile)
             broadcastLogger?.debug(
-                "Asset copied from ${BaseService.geoipAssetPath} -> ${torConfigFiles.geoIpFile}"
+                "Asset copied from ${BaseService.getGeoipAssetPath()} -> ${torConfigFiles.geoIpFile}"
             )
         }
     }
 
     private fun copyGeoIpv6Asset() {
         synchronized(torConfigFiles.geoIpv6FileLock) {
-            torService.copyAsset(BaseService.geoip6AssetPath, torConfigFiles.geoIpv6File)
+            torService.copyAsset(BaseService.getGeoip6AssetPath(), torConfigFiles.geoIpv6File)
             broadcastLogger?.debug(
-                "Asset copied from ${BaseService.geoip6AssetPath} -> ${torConfigFiles.geoIpv6File}"
+                "Asset copied from ${BaseService.getGeoip6AssetPath()} -> ${torConfigFiles.geoIpv6File}"
             )
         }
     }
@@ -194,9 +200,8 @@ internal class ServiceTorInstaller(private val torService: BaseService): TorInst
             if (bridgeType.toInt() == 1) {
                 ByteArrayInputStream(userDefinedBridgeList.toByteArray())
             } else {
-                torService.context.resources.openRawResource(R.raw.bridges)
+                torService.getContext().resources.openRawResource(R.raw.bridges)
             }
         return SequenceInputStream(bridgeTypeStream, bridgeStream)
     }
-
 }

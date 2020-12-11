@@ -85,16 +85,31 @@ import kotlinx.coroutines.*
  * @param [torService] [BaseService] for interacting with other components of the Service
  * @see [ServiceAction]
  * */
-internal class ServiceActionProcessor(private val torService: BaseService): ServiceConsts() {
+internal class ServiceActionProcessor private constructor(
+    private val torService: BaseService
+): ServiceConsts() {
 
     companion object {
-        var disableNetworkDelay = 6_000L
-            private set
-        var restartTorDelayTime = 500L
-            private set
-        var stopServiceDelayTime = 100L
-            private set
+        @JvmSynthetic
+        fun instantiate(torService: BaseService): ServiceActionProcessor =
+            ServiceActionProcessor(torService)
 
+        private var disableNetworkDelay = 6_000L
+        @JvmSynthetic
+        fun getDisableNetworkDelay(): Long =
+            disableNetworkDelay
+
+        private var restartTorDelayTime = 500L
+        @JvmSynthetic
+        fun getRestartTorDelayTime(): Long =
+            restartTorDelayTime
+
+        private var stopServiceDelayTime = 100L
+        @JvmSynthetic
+        fun getStopServiceDelayTime(): Long =
+            stopServiceDelayTime
+
+        @JvmSynthetic
         fun initialize(
             disableNetworkMilliseconds: Long,
             restartMilliseconds: Long,
@@ -117,12 +132,14 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
         @ServiceActionName
         private var lastServiceAction: String = ServiceActionName.STOP
 
+        @JvmSynthetic
         fun wasLastAcceptedServiceActionStop(): Boolean =
             lastServiceAction == ServiceActionName.STOP
     }
 
     private val broadcastLogger = torService.getBroadcastLogger(ServiceActionProcessor::class.java)
 
+    @JvmSynthetic
     fun processServiceAction(serviceAction: ServiceAction) {
         when (serviceAction) {
             is ServiceAction.NewId -> {
@@ -194,9 +211,9 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
         }
     }
 
-    private fun getActionQueueElementAtOrNull(element: Int): ServiceAction? =
+    private fun getActionQueueElementAtOrNull(): ServiceAction? =
         synchronized(actionQueueLock) {
-            actionQueue.elementAtOrNull(element)
+            actionQueue.elementAtOrNull(0)
         }
 
     private fun removeActionFromQueue(serviceAction: ServiceAction) {
@@ -244,7 +261,7 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
             broadcastDebugMsgWithObjectDetails("Processing Queue: ", this)
 
             while (actionQueue.isNotEmpty() && isActive) {
-                val serviceAction = getActionQueueElementAtOrNull(0)
+                val serviceAction = getActionQueueElementAtOrNull()
                 if (serviceAction == null) {
                     return@launch
                 } else {
@@ -253,7 +270,7 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
 
                         // Check if the current actionObject being executed has been
                         // removed from the queue before executing it's next command.
-                        if (getActionQueueElementAtOrNull(0) != serviceAction) {
+                        if (getActionQueueElementAtOrNull() != serviceAction) {
                             broadcastDebugMsgWithObjectDetails(
                                 "Interrupting execution of: ServiceAction.", serviceAction
                             )
@@ -266,7 +283,7 @@ internal class ServiceActionProcessor(private val torService: BaseService): Serv
                                 broadcastLogger.debug("${command}: ${delayLength}L")
 
                                 while (delayLength > 0) {
-                                    if (getActionQueueElementAtOrNull(0) != serviceAction)
+                                    if (getActionQueueElementAtOrNull() != serviceAction)
                                         break
 
                                     if (delayLength in 1..499)

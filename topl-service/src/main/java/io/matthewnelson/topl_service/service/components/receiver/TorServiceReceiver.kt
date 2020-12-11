@@ -91,28 +91,43 @@ import java.security.SecureRandom
  *
  * @param [torService]
  * */
-internal class TorServiceReceiver(private val torService: BaseService): BroadcastReceiver() {
+internal class TorServiceReceiver private constructor(
+    private val torService: BaseService
+): BroadcastReceiver() {
 
     companion object {
+        @JvmSynthetic
+        fun instantiate(torService: BaseService): TorServiceReceiver =
+            TorServiceReceiver(torService)
+
         // Secures the intent filter at each application startup.
         // Also serves as the key to string extras containing the ServiceAction to be executed.
-        val SERVICE_INTENT_FILTER: String by lazy {
+        private val SERVICE_INTENT_FILTER: String by lazy {
             BigInteger(130, SecureRandom()).toString(32)
         }
 
-        @Volatile
-        var isRegistered = false
-            private set
+        @JvmSynthetic
+        fun getServiceIntentFilter(): String =
+            SERVICE_INTENT_FILTER
 
         @Volatile
-        var deviceIsLocked: Boolean? = null
-            private set
+        private var isRegistered = false
+        @JvmSynthetic
+        internal fun isRegistered(): Boolean =
+            isRegistered
+
+        @Volatile
+        private var deviceIsLocked: Boolean? = null
+        @JvmSynthetic
+        internal fun deviceIsLocked(): Boolean? =
+            deviceIsLocked
     }
 
     private val broadcastLogger by lazy {
         torService.getBroadcastLogger(TorServiceReceiver::class.java)
     }
 
+    @JvmSynthetic
     fun register() {
         val filter = IntentFilter(SERVICE_INTENT_FILTER)
         @Suppress("DEPRECATION")
@@ -123,7 +138,7 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
             filter.addAction(Intent.ACTION_SCREEN_ON)
             filter.addAction(Intent.ACTION_USER_PRESENT)
         }
-        torService.context.applicationContext.registerReceiver(this, filter)
+        torService.getContext().applicationContext.registerReceiver(this, filter)
         if (!isRegistered)
             broadcastLogger.debug("Has been registered")
         isRegistered = true
@@ -133,14 +148,16 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
      * Sets [deviceIsLocked] to the value sent. If [value] is null, it will check
      * KeyguardManager.
      * */
+    @JvmSynthetic
     fun setDeviceIsLocked(value: Boolean? = null) {
         deviceIsLocked = value ?: checkIfDeviceIsLocked()
     }
 
+    @JvmSynthetic
     fun unregister() {
         if (isRegistered) {
             try {
-                torService.context.applicationContext.unregisterReceiver(this)
+                torService.getContext().applicationContext.unregisterReceiver(this)
                 isRegistered = false
                 setDeviceIsLocked()
                 broadcastLogger.debug("Has been unregistered")
@@ -151,7 +168,7 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
     }
 
     private fun checkIfDeviceIsLocked(): Boolean? {
-        val keyguardManager = torService.context.applicationContext
+        val keyguardManager = torService.getContext().applicationContext
             .getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager?
         return keyguardManager?.isKeyguardLocked
     }
@@ -167,9 +184,9 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
                     broadcastLogger.notice("Network connectivity: $connectivity")
 
                     val actionObject = if (connectivity) {
-                        ServiceAction.SetDisableNetwork(ServiceActionName.ENABLE_NETWORK)
+                        ServiceAction.SetDisableNetwork.instantiate(ServiceActionName.ENABLE_NETWORK)
                     } else {
-                        ServiceAction.SetDisableNetwork(ServiceActionName.DISABLE_NETWORK)
+                        ServiceAction.SetDisableNetwork.instantiate(ServiceActionName.DISABLE_NETWORK)
                     }
 
                     torService.processServiceAction(actionObject)
@@ -188,13 +205,13 @@ internal class TorServiceReceiver(private val torService: BaseService): Broadcas
 
                     when (val serviceAction = intent.getStringExtra(SERVICE_INTENT_FILTER)) {
                         ServiceActionName.NEW_ID -> {
-                            torService.processServiceAction(ServiceAction.NewId())
+                            torService.processServiceAction(ServiceAction.NewId.instantiate())
                         }
                         ServiceActionName.RESTART_TOR -> {
-                            torService.processServiceAction(ServiceAction.RestartTor())
+                            torService.processServiceAction(ServiceAction.RestartTor.instantiate())
                         }
                         ServiceActionName.STOP -> {
-                            torService.processServiceAction(ServiceAction.Stop())
+                            torService.processServiceAction(ServiceAction.Stop.instantiate())
                         }
                         else -> {
                             broadcastLogger.warn(

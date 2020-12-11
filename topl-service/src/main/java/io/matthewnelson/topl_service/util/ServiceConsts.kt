@@ -118,12 +118,18 @@ abstract class ServiceConsts: BaseServiceConsts() {
     internal annotation class ServiceActionCommand {
         companion object {
             private const val ACTION_COMMAND = "Command_"
-            const val DELAY = "${ACTION_COMMAND}DELAY"
-            const val NEW_ID = "${ACTION_COMMAND}NEW_ID"
-            const val SET_DISABLE_NETWORK = "${ACTION_COMMAND}SET_DISABLE_NETWORK"
-            const val START_TOR = "${ACTION_COMMAND}START_TOR"
-            const val STOP_SERVICE = "${ACTION_COMMAND}STOP_SERVICE"
-            const val STOP_TOR = "${ACTION_COMMAND}STOP_TOR"
+            @JvmSynthetic
+            internal const val DELAY = "${ACTION_COMMAND}DELAY"
+            @JvmSynthetic
+            internal const val NEW_ID = "${ACTION_COMMAND}NEW_ID"
+            @JvmSynthetic
+            internal const val SET_DISABLE_NETWORK = "${ACTION_COMMAND}SET_DISABLE_NETWORK"
+            @JvmSynthetic
+            internal const val START_TOR = "${ACTION_COMMAND}START_TOR"
+            @JvmSynthetic
+            internal const val STOP_SERVICE = "${ACTION_COMMAND}STOP_SERVICE"
+            @JvmSynthetic
+            internal const val STOP_TOR = "${ACTION_COMMAND}STOP_TOR"
         }
     }
 }

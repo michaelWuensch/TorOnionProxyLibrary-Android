@@ -84,8 +84,11 @@ abstract class CoreConsts: BaseConsts() {
     @Retention(AnnotationRetention.SOURCE)
     internal annotation class ConfigFile {
         companion object {
+            @JvmSynthetic
             const val CONTROL_PORT_FILE = "ControlPort file"
+            @JvmSynthetic
             const val COOKIE_AUTH_FILE = "CookieAuth file"
+            @JvmSynthetic
             const val HOSTNAME_FILE = "Hostname file"
         }
     }

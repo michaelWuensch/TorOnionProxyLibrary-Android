@@ -82,6 +82,7 @@ import io.matthewnelson.topl_service.service.components.actions.ServiceActionPro
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service.util.ServiceConsts
 import io.matthewnelson.topl_service_base.BaseServiceConsts.BackgroundPolicy
+import io.matthewnelson.topl_service_base.BaseServiceConsts.ServiceActionName
 import kotlin.system.exitProcess
 
 /**
@@ -94,11 +95,11 @@ import kotlin.system.exitProcess
  * If brought back into the foreground by the user:
  *
  *   - **Before Policy execution**: Execution is canceled. If [BaseService.lastAcceptedServiceAction]
- *   was **not** [ServiceConsts.ServiceActionName.STOP], a startService call is made to ensure it's
+ *   was **not** [ServiceActionName.STOP], a startService call is made to ensure it's
  *   started.
  *
  *   - **After Policy execution**: If [BaseService.lastAcceptedServiceAction] was **not**
- *   [ServiceConsts.ServiceActionName.STOP], a startService call is made to ensure it's started.
+ *   [ServiceActionName.STOP], a startService call is made to ensure it's started.
  *
  *   - See [io.matthewnelson.topl_service.service.components.binding.BaseServiceBinder],
  *   [BaseService.updateLastAcceptedServiceAction], and [TorService.onTaskRemoved] for
@@ -133,7 +134,7 @@ import kotlin.system.exitProcess
  * @see [io.matthewnelson.topl_service.service.components.binding.BaseServiceBinder.executeBackgroundPolicyJob]
  * @see [io.matthewnelson.topl_service.service.components.binding.BaseServiceBinder.cancelExecuteBackgroundPolicyJob]
  * */
-class BackgroundManager internal constructor(
+class BackgroundManager private constructor(
     @BackgroundPolicy private val policy: String,
     private val executionDelay: Long,
     private val serviceClass: Class<*>,
@@ -188,7 +189,7 @@ class BackgroundManager internal constructor(
             if (secondsFrom5To45 != null && secondsFrom5To45 in 5..45) {
                 executionDelay = (secondsFrom5To45 * 1000).toLong()
             }
-            return Policy(this)
+            return Policy.instantiate(this)
         }
 
         /**
@@ -219,7 +220,7 @@ class BackgroundManager internal constructor(
         fun runServiceInForeground(killAppIfTaskIsRemoved: Boolean = false): Policy {
             chosenPolicy = BackgroundPolicy.RUN_IN_FOREGROUND
             this.killAppIfTaskIsRemoved = killAppIfTaskIsRemoved
-            return Policy(this)
+            return Policy.instantiate(this)
         }
 
         /**
@@ -228,8 +229,15 @@ class BackgroundManager internal constructor(
          *
          * @param [policyBuilder] The [BackgroundManager.Builder] to be built during initialization
          * */
-        class Policy internal constructor (private val policyBuilder: Builder) {
+        class Policy private constructor(private val policyBuilder: Builder) {
 
+            companion object {
+                @JvmSynthetic
+                internal fun instantiate(policyBuilder: Builder): Policy =
+                    Policy(policyBuilder)
+            }
+
+            @JvmSynthetic
             internal fun configurationIsCompliant(stopServiceOnTaskRemoved: Boolean): Boolean {
                 return if (!stopServiceOnTaskRemoved) {
                     policyBuilder.chosenPolicy == BackgroundPolicy.RUN_IN_FOREGROUND &&
@@ -245,6 +253,7 @@ class BackgroundManager internal constructor(
              * [io.matthewnelson.topl_service.TorServiceController.Builder.build] ensures our
              * test classes get initialized so they aren't overwritten by production classes.
              * */
+            @JvmSynthetic
             internal fun build(
                 serviceClass: Class<*> = TorService::class.java,
                 bindServiceFlag: Int = Context.BIND_AUTO_CREATE
@@ -281,6 +290,7 @@ class BackgroundManager internal constructor(
         var taskIsRemovedFromRecentApps = false
             private set
 
+        @JvmSynthetic
         internal fun taskIsRemovedFromRecentApps(isRemoved: Boolean) {
             taskIsRemovedFromRecentApps = isRemoved
         }
@@ -295,6 +305,7 @@ class BackgroundManager internal constructor(
          * [TorService.onTaskRemoved] gets a callback, and this method is called from
          * [TorService.onDestroy].
          * */
+        @JvmSynthetic
         internal fun killAppProcess() {
             if (backgroundManager.killAppIfTaskIsRemoved && taskIsRemovedFromRecentApps) {
                 exitProcess(0)
@@ -313,7 +324,7 @@ class BackgroundManager internal constructor(
         // if the last _accepted_ ServiceAction to be issued by the Application was not to STOP
         // the service, then we want to put it back in the state it was in
         if (!ServiceActionProcessor.wasLastAcceptedServiceActionStop()) {
-            TorServiceConnection.serviceBinder?.cancelExecuteBackgroundPolicyJob()
+            TorServiceConnection.getServiceBinder()?.cancelExecuteBackgroundPolicyJob()
             BaseService.startService(
                 BaseService.getAppContext(),
                 serviceClass,
@@ -323,11 +334,12 @@ class BackgroundManager internal constructor(
         }
     }
 
+    @Suppress("unused")
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     private fun applicationMovedToBackground() {
         taskIsInForeground = false
         if (!ServiceActionProcessor.wasLastAcceptedServiceActionStop()) {
-            TorServiceConnection.serviceBinder?.let { binder ->
+            TorServiceConnection.getServiceBinder()?.let { binder ->
                 // System automatically unbinds when app is sent to the background. This prevents
                 // it so that we maintain a started, bound service.
                 BaseService.bindService(

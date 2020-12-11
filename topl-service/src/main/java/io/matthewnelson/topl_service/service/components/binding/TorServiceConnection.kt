@@ -75,16 +75,22 @@ import android.content.ComponentName
 import android.content.ServiceConnection
 import android.os.IBinder
 
-internal class TorServiceConnection: ServiceConnection {
+internal class TorServiceConnection private constructor(): ServiceConnection {
 
     companion object {
-        val torServiceConnection by lazy {
+        private val torServiceConnection by lazy {
             TorServiceConnection()
         }
 
+        @JvmSynthetic
+        internal fun getTorServiceConnection(): TorServiceConnection =
+            torServiceConnection
+
         @Volatile
-        var serviceBinder: BaseServiceBinder? = null
-            private set
+        private var serviceBinder: BaseServiceBinder? = null
+        @JvmSynthetic
+        fun getServiceBinder(): BaseServiceBinder? =
+            serviceBinder
     }
 
     /**
@@ -92,7 +98,8 @@ internal class TorServiceConnection: ServiceConnection {
      * [onServiceDisconnected] is not always called on disconnect, as the name
      * suggests.
      * */
-    fun clearServiceBinderReference() {
+    @JvmSynthetic
+    internal fun clearServiceBinderReference() {
         serviceBinder = null
     }
 

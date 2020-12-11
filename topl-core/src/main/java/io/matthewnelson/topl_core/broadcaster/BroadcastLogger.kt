@@ -95,20 +95,33 @@ import io.matthewnelson.topl_core_base.TorSettings
  * @param [buildConfigDebug] To enable/disable Logcat messages
  * @param [hasDebugLogs] To switch debug logs on/off, as well as Logcat messages on Debug builds.
  * */
-class BroadcastLogger internal constructor(
+class BroadcastLogger private constructor(
     val TAG: String,
     val eventBroadcaster: EventBroadcaster,
     private val buildConfigDebug: Boolean,
     hasDebugLogs: Boolean
 ): CoreConsts() {
 
+    companion object {
+        @JvmSynthetic
+        internal fun instantiate(
+            tag: String,
+            eventBroadcaster: EventBroadcaster,
+            buildConfigDebug: Boolean,
+            hasDebugLogs: Boolean
+        ): BroadcastLogger =
+            BroadcastLogger(tag, eventBroadcaster, buildConfigDebug, hasDebugLogs)
+    }
+
     @Volatile
+    @JvmSynthetic
     internal var hasDebugLogs: Boolean = hasDebugLogs
         private set
 
     /**
      * See [io.matthewnelson.topl_core.broadcaster.BroadcastLoggerHelper.refreshBroadcastLoggersHasDebugLogsVar]
      * */
+    @JvmSynthetic
     internal fun updateHasDebugLogs(hasDebugLogs: Boolean) {
         this.hasDebugLogs = hasDebugLogs
     }
