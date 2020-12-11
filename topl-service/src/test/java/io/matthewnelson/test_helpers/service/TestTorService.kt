@@ -144,6 +144,9 @@ internal class TestTorService(
     val supervisorJob = SupervisorJob()
     val testCoroutineScope = TestCoroutineScope(dispatcher + supervisorJob)
 
+    override fun getScopeDefault(): CoroutineScope {
+        return testCoroutineScope
+    }
     override fun getScopeIO(): CoroutineScope {
         return testCoroutineScope
     }
@@ -251,7 +254,7 @@ internal class TestTorService(
         return true
     }
     @WorkerThread
-    override fun startTor() {
+    override suspend fun startTor() {
         simulateStart()
     }
 
@@ -259,6 +262,7 @@ internal class TestTorService(
     val bandwidth0 = "0"
 
     // Add 6_000ms delay at start of each test to account for startup time.
+    @Suppress("BlockingMethodInNonBlockingContext")
     private fun simulateStart() = getScopeIO().launch {
         try {
             onionProxyManager.setup()
@@ -282,7 +286,7 @@ internal class TestTorService(
         }
     }
     @WorkerThread
-    override fun stopTor() {
+    override suspend fun stopTor() {
         simulateStopTor()
     }
 

@@ -1,9 +1,7 @@
 package io.matthewnelson.sampleapp.topl_android
 
 import android.content.Context
-import android.widget.Toast
 import io.matthewnelson.topl_service_base.ServiceExecutionHooks
-import kotlinx.coroutines.delay
 
 class MyServiceExecutionHooks: ServiceExecutionHooks() {
 
