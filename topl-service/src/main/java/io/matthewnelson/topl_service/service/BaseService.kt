@@ -95,9 +95,7 @@ import io.matthewnelson.topl_service_base.ApplicationDefaultTorSettings
 import io.matthewnelson.topl_service_base.BaseServiceConsts.ServiceActionName
 import io.matthewnelson.topl_service_base.BaseServiceConsts.ServiceLifecycleEvent
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
 
@@ -290,6 +288,7 @@ internal abstract class BaseService: Service() {
     //////////////////
     /// Coroutines ///
     //////////////////
+    abstract fun getScopeDefault(): CoroutineScope
     abstract fun getScopeIO(): CoroutineScope
     abstract fun getScopeMain(): CoroutineScope
 
@@ -380,41 +379,9 @@ internal abstract class BaseService: Service() {
     @WorkerThread
     abstract suspend fun signalNewNym()
     @WorkerThread
-    abstract fun startTor()
-    suspend fun executionHookPreStartTor() {
-        TorServiceController.serviceExecutionHooks?.let { hooks ->
-            withContext(Dispatchers.Main) {
-                try {
-                    hooks.executeBeforeStartTor(context.applicationContext)
-                } catch (e: Exception) {
-                    TorServiceController.appEventBroadcaster?.broadcastException(
-                        "${BroadcastType.EXCEPTION}|" +
-                                "${hooks.javaClass.simpleName}|" +
-                                "${e.message}"
-                        , e
-                    )
-                }
-            }
-        }
-    }
+    abstract suspend fun startTor()
     @WorkerThread
-    abstract fun stopTor()
-    suspend fun executionHookPostStopTor() {
-        TorServiceController.serviceExecutionHooks?.let { hooks ->
-            withContext(Dispatchers.Main) {
-                try {
-                    hooks.executeAfterStopTor(context.applicationContext)
-                } catch (e: Exception) {
-                    TorServiceController.appEventBroadcaster?.broadcastException(
-                        "${BroadcastType.EXCEPTION}|" +
-                                "${hooks.javaClass.simpleName}|" +
-                                "${e.message}"
-                        , e
-                    )
-                }
-            }
-        }
-    }
+    abstract suspend fun stopTor()
 
 
     ///////////////////////////////
@@ -445,13 +412,13 @@ internal abstract class BaseService: Service() {
         setIsDeviceLocked()
 
         TorServiceController.serviceExecutionHooks?.let { hooks ->
-            getScopeMain().launch {
+            getScopeDefault().launch {
                 try {
                     hooks.executeOnCreateTorService(context.applicationContext)
                 } catch (e: Exception) {
                     TorServiceController.appEventBroadcaster?.broadcastException(
                         "${BroadcastType.EXCEPTION}|" +
-                                "${hooks.javaClass.simpleName}|" +
+                                "${this@BaseService.javaClass.simpleName}|" +
                                 "${e.message}"
                         , e
                     )
