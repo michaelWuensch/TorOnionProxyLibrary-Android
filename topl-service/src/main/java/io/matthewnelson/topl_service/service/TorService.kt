@@ -140,9 +140,13 @@ internal class TorService: BaseService() {
     /// Coroutines ///
     //////////////////
     private val supervisorJob = SupervisorJob()
+    private val scopeDefault = CoroutineScope(Dispatchers.Default + supervisorJob)
     private val scopeIO = CoroutineScope(Dispatchers.IO + supervisorJob)
     private val scopeMain = CoroutineScope(Dispatchers.Main + supervisorJob)
 
+    override fun getScopeDefault(): CoroutineScope {
+        return scopeDefault
+    }
     override fun getScopeIO(): CoroutineScope {
         return scopeIO
     }
@@ -250,20 +254,36 @@ internal class TorService: BaseService() {
         onionProxyManager.signalNewNym()
     }
     @WorkerThread
-    override fun startTor() {
+    @Suppress("BlockingMethodInNonBlockingContext")
+    override suspend fun startTor() {
         try {
+            TorServiceController.serviceExecutionHooks
+                ?.executeBeforeStartTor(context.applicationContext)
+
             onionProxyManager.setup()
             generateTorrcFile()
 
             onionProxyManager.start()
+            delay(300L)
         } catch (e: Exception) {
             broadcastLogger.exception(e)
         }
     }
+    @Suppress("BlockingMethodInNonBlockingContext")
     @WorkerThread
-    override fun stopTor() {
+    override suspend fun stopTor() {
+
         try {
             onionProxyManager.stop()
+        } catch (e: Exception) {
+            broadcastLogger.exception(e)
+        }
+
+        delay(300L)
+
+        try {
+            TorServiceController.serviceExecutionHooks
+                ?.executeAfterStopTor(context.applicationContext)
         } catch (e: Exception) {
             broadcastLogger.exception(e)
         }
