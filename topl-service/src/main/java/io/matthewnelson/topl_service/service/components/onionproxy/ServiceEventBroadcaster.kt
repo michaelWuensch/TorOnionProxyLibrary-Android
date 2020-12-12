@@ -97,7 +97,15 @@ import net.freehaven.tor.control.TorControlCommands
  *
  * @param [torService] [BaseService] for context.
  * */
-internal class ServiceEventBroadcaster(private val torService: BaseService): EventBroadcaster() {
+internal class ServiceEventBroadcaster private constructor(
+    private val torService: BaseService
+): EventBroadcaster() {
+
+    companion object {
+        @JvmSynthetic
+        fun instantiate(torService: BaseService): ServiceEventBroadcaster =
+            ServiceEventBroadcaster(torService)
+    }
 
     private val scopeMain: CoroutineScope
         get() = torService.getScopeMain()

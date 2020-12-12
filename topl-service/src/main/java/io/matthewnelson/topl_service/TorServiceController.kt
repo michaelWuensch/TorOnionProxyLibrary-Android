@@ -123,14 +123,14 @@ class TorServiceController private constructor(): ServiceConsts() {
     ) {
 
 //        private var heartbeatTime = BackgroundManager.heartbeatTime
-        private var disableNetworkDelay = ServiceActionProcessor.disableNetworkDelay
-        private var restartTorDelayTime = ServiceActionProcessor.restartTorDelayTime
-        private var stopServiceDelayTime = ServiceActionProcessor.stopServiceDelayTime
+        private var disableNetworkDelay = ServiceActionProcessor.getDisableNetworkDelay()
+        private var restartTorDelayTime = ServiceActionProcessor.getRestartTorDelayTime()
+        private var stopServiceDelayTime = ServiceActionProcessor.getStopServiceDelayTime()
         private var stopServiceOnTaskRemoved = true
         private var torConfigFiles: TorConfigFiles? = null
 
         // On published releases of this Library, this value will **always** be `false`.
-        private var buildConfigDebug = BaseService.buildConfigDebug
+        private var buildConfigDebug = BaseService.getBuildConfigDebug()
 
         /**
          * Default is set to 6_000ms, (what this method adds time to).
@@ -352,7 +352,7 @@ class TorServiceController private constructor(): ServiceConsts() {
         @Throws(RuntimeException::class)
         fun getTorConfigFiles(): TorConfigFiles {
             return try {
-                BaseService.torConfigFiles
+                BaseService.getTorConfigFiles()
             } catch (e: UninitializedPropertyAccessException) {
                 throw RuntimeException(e.message)
             }
@@ -370,7 +370,7 @@ class TorServiceController private constructor(): ServiceConsts() {
         @Throws(RuntimeException::class)
         fun getDefaultTorSettings(): ApplicationDefaultTorSettings {
             return try {
-                BaseService.defaultTorSettings
+                BaseService.getApplicationDefaultTorSettings()
             } catch (e: UninitializedPropertyAccessException) {
                 throw RuntimeException(e.message)
             }
@@ -387,7 +387,7 @@ class TorServiceController private constructor(): ServiceConsts() {
         @JvmStatic
         @Throws(RuntimeException::class)
         fun getV3ClientAuthManager(): BaseV3ClientAuthManager =
-            V3ClientAuthManager(getTorConfigFiles())
+            V3ClientAuthManager.instantiate(getTorConfigFiles())
 
         /**
          * This method will *never* throw the [RuntimeException] if you call it after
@@ -399,7 +399,7 @@ class TorServiceController private constructor(): ServiceConsts() {
         @JvmStatic
         @Throws(RuntimeException::class)
         fun getServiceTorSettings(): BaseServiceTorSettings =
-            ServiceTorSettings(
+            ServiceTorSettings.instantiate(
                 TorServicePrefs(BaseService.getAppContext()), getDefaultTorSettings()
             )
 
@@ -423,7 +423,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * */
         @JvmStatic
         fun stopTor() {
-            TorServiceConnection.serviceBinder?.submitServiceAction(ServiceAction.Stop())
+            TorServiceConnection.getServiceBinder()?.submitServiceAction(ServiceAction.Stop.instantiate())
         }
 
         /**
@@ -431,7 +431,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * */
         @JvmStatic
         fun restartTor() {
-            TorServiceConnection.serviceBinder?.submitServiceAction(ServiceAction.RestartTor())
+            TorServiceConnection.getServiceBinder()?.submitServiceAction(ServiceAction.RestartTor.instantiate())
         }
 
         /**
@@ -439,7 +439,7 @@ class TorServiceController private constructor(): ServiceConsts() {
          * */
         @JvmStatic
         fun newIdentity() {
-            TorServiceConnection.serviceBinder?.submitServiceAction(ServiceAction.NewId())
+            TorServiceConnection.getServiceBinder()?.submitServiceAction(ServiceAction.NewId.instantiate())
         }
     }
 }

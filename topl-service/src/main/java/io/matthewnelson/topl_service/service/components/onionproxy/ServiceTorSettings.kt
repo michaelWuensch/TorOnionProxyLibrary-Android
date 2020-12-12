@@ -80,10 +80,19 @@ import io.matthewnelson.topl_service_base.BaseServiceConsts.PrefKeyBoolean
 import io.matthewnelson.topl_service_base.BaseServiceTorSettings
 import io.matthewnelson.topl_service_base.TorServicePrefs
 
-internal class ServiceTorSettings(
+internal class ServiceTorSettings private constructor(
     servicePrefs: TorServicePrefs,
     defaultTorSettings: ApplicationDefaultTorSettings
 ): BaseServiceTorSettings(servicePrefs, defaultTorSettings) {
+
+    companion object {
+        @JvmSynthetic
+        fun instantiate(
+            servicePrefs: TorServicePrefs,
+            defaultTorSettings: ApplicationDefaultTorSettings
+        ): ServiceTorSettings =
+            ServiceTorSettings(servicePrefs, defaultTorSettings)
+    }
 
     @WorkerThread
     override fun dormantClientTimeoutSave(minutes: Int?) {

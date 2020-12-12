@@ -74,11 +74,20 @@ package io.matthewnelson.topl_service.service.components.binding
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.TorService
 
-internal class TorServiceBinder(torService: TorService): BaseServiceBinder(torService) {
+internal class TorServiceBinder private constructor(
+    torService: TorService
+): BaseServiceBinder(torService) {
+
+    companion object {
+        @JvmSynthetic
+        fun instantiate(torService: TorService): TorServiceBinder =
+            TorServiceBinder(torService)
+    }
 
     /**
      * Always return null in production.
      * */
+    @JvmSynthetic
     override fun getTorService(): BaseService? {
         return null
     }

@@ -82,11 +82,9 @@ import io.matthewnelson.topl_core.broadcaster.BroadcastLogger
 import io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState
 import io.matthewnelson.topl_core_base.BaseConsts.TorState
 import io.matthewnelson.topl_service.TorServiceController
-import io.matthewnelson.topl_service_base.TorServicePrefs
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceEventBroadcaster
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceEventListener
 import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorInstaller
-import io.matthewnelson.topl_service.service.components.onionproxy.ServiceTorSettings
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor
 import io.matthewnelson.topl_service.service.components.receiver.TorServiceReceiver
@@ -99,9 +97,13 @@ import java.io.IOException
 import java.lang.reflect.InvocationTargetException
 
 internal class TestTorService(
-    override val context: Context,
+    private val context: Context,
     dispatcher: CoroutineDispatcher
 ): BaseService() {
+
+    override fun getContext(): Context {
+        return context
+    }
 
 
     ///////////////
@@ -113,7 +115,7 @@ internal class TestTorService(
 
     override fun unbindTorService() {
         try {
-            unbindService(context)
+            unbindService(getContext())
         } catch (e: IllegalArgumentException) {}
     }
     override fun onBind(intent: Intent?): IBinder? {
@@ -125,7 +127,7 @@ internal class TestTorService(
     /// BroadcastReceiver ///
     /////////////////////////
     val torServiceReceiver by lazy {
-        TorServiceReceiver(this)
+        TorServiceReceiver.instantiate(this)
     }
     override fun registerReceiver() {
         torServiceReceiver.register()
@@ -180,20 +182,20 @@ internal class TestTorService(
         getBroadcastLogger(TestTorService::class.java)
     }
     val serviceEventBroadcaster: ServiceEventBroadcaster by lazy {
-        ServiceEventBroadcaster(this)
+        ServiceEventBroadcaster.instantiate(this)
     }
     val serviceTorSettings: BaseServiceTorSettings by lazy {
         TorServiceController.getServiceTorSettings()
     }
     val onionProxyManager: OnionProxyManager by lazy {
         OnionProxyManager(
-            context,
+            getContext(),
             TorServiceController.getTorConfigFiles(),
-            ServiceTorInstaller(this),
+            ServiceTorInstaller.instantiate(this),
             serviceTorSettings,
-            ServiceEventListener(),
+            ServiceEventListener.instantiate(),
             serviceEventBroadcaster,
-            buildConfigDebug
+            getBuildConfigDebug()
         )
     }
 

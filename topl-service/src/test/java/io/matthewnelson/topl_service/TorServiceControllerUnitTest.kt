@@ -150,10 +150,10 @@ internal class TorServiceControllerUnitTest {
     @Test
     fun `_z_ensure builder methods properly initialize variables when build called`() {
         // Hasn't been initialized yet
-        assertEquals(BuildConfig.DEBUG, BaseService.buildConfigDebug)
+        assertEquals(BuildConfig.DEBUG, BaseService.getBuildConfigDebug())
         assertNull(TorServiceController.appEventBroadcaster)
-        val initialRestartTorDelay = ServiceActionProcessor.restartTorDelayTime
-        val initialStopServiceDelay = ServiceActionProcessor.stopServiceDelayTime
+        val initialRestartTorDelay = ServiceActionProcessor.getRestartTorDelayTime()
+        val initialStopServiceDelay = ServiceActionProcessor.getStopServiceDelayTime()
 
         val timeToAdd = 300L
 
@@ -165,9 +165,9 @@ internal class TorServiceControllerUnitTest {
             .setEventBroadcaster(TestEventBroadcaster())
             .build()
 
-        assertEquals(ServiceActionProcessor.restartTorDelayTime, initialRestartTorDelay + timeToAdd)
-        assertEquals(ServiceActionProcessor.stopServiceDelayTime, initialStopServiceDelay + timeToAdd)
-        assertEquals(BaseService.buildConfigDebug, !BuildConfig.DEBUG)
+        assertEquals(ServiceActionProcessor.getRestartTorDelayTime(), initialRestartTorDelay + timeToAdd)
+        assertEquals(ServiceActionProcessor.getStopServiceDelayTime(), initialStopServiceDelay + timeToAdd)
+        assertEquals(BaseService.getBuildConfigDebug(), !BuildConfig.DEBUG)
         assertNotNull(TorServiceController.appEventBroadcaster)
     }
 
@@ -175,12 +175,12 @@ internal class TorServiceControllerUnitTest {
     fun `_zz_ensure one-time initialization if build called more than once`() {
         try {
             TorServiceController.getDefaultTorSettings()
-            assertNotNull(BaseService.buildConfigDebug)
+            assertNotNull(BaseService.getBuildConfigDebug())
             // build has been called in a previous test
         } catch (e: RuntimeException) {
-            assertNull(BaseService.buildConfigDebug)
+            assertNull(BaseService.getBuildConfigDebug())
             getNewControllerBuilder().build()
-            assertNotNull(BaseService.buildConfigDebug)
+            assertNotNull(BaseService.getBuildConfigDebug())
         }
 
         val initialHashCode = TorServiceController.getDefaultTorSettings().hashCode()

@@ -75,22 +75,29 @@ import android.content.SharedPreferences
 import io.matthewnelson.topl_service.service.BaseService
 import io.matthewnelson.topl_service.service.TorService
 import io.matthewnelson.topl_service_base.BaseServiceConsts.PrefKeyBoolean
+import io.matthewnelson.topl_service_base.BaseServiceConsts.ServiceActionName
 import io.matthewnelson.topl_service_base.TorServicePrefs
 
 /**
  * Listens to [TorServicePrefs] for changes such that while Tor is running, it can
  * query [TorService.onionProxyManager] to have it updated immediately (if the setting doesn't
- * require a restart), or submit [io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName]'s
- * to [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor] to be
+ * require a restart), or submit [ServiceActionName]'s to
+ * [io.matthewnelson.topl_service.service.components.actions.ServiceActionProcessor] to be
  * queued for execution.
  *
  * @param [torService] To instantiate [TorServicePrefs]
  * */
-internal class TorServicePrefsListener(
+internal class TorServicePrefsListener private constructor(
     private val torService: BaseService
 ): SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private val torServicePrefs = TorServicePrefs(torService.context)
+    companion object {
+        @JvmSynthetic
+        fun instantiate(torService: BaseService): TorServicePrefsListener =
+            TorServicePrefsListener(torService)
+    }
+
+    private val torServicePrefs = TorServicePrefs(torService.getContext())
     private val broadcastLogger = torService.getBroadcastLogger(TorServicePrefsListener::class.java)
 
     init {
@@ -101,6 +108,7 @@ internal class TorServicePrefsListener(
     /**
      * Called from [TorService.onDestroy].
      * */
+    @JvmSynthetic
     fun unregister() {
         torServicePrefs.unregisterListener(this)
         broadcastLogger.debug("Has been unregistered")

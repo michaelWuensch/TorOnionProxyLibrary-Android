@@ -140,13 +140,23 @@ class OnionProxyManager(
     torConfigFiles: TorConfigFiles,
     torInstaller: TorInstaller,
     torSettings: TorSettings,
-    internal val eventListener: BaseEventListener,
+    val eventListener: BaseEventListener,
     eventBroadcaster: EventBroadcaster,
     buildConfigDebug: Boolean? = null
 ): CoreConsts() {
 
     private val appContext = context.applicationContext
-    internal val onionProxyContext = OnionProxyContext(torConfigFiles, torInstaller, torSettings)
+
+    private val onionProxyContext = OnionProxyContext.instantiate(
+        torConfigFiles,
+        torInstaller,
+        torSettings
+    )
+
+    @JvmSynthetic
+    internal fun initOnionProxyContextBroadcastLogger(broadcastLogger: BroadcastLogger) {
+        onionProxyContext.initBroadcastLogger(broadcastLogger)
+    }
 
     // Ensures that these live only in OnionProxyContext, but are accessible from here.
     val torConfigFiles: TorConfigFiles
@@ -156,12 +166,17 @@ class OnionProxyManager(
     val torSettings: TorSettings
         get() = onionProxyContext.torSettings
 
-    private val logHelper =
-        BroadcastLoggerHelper(this, eventBroadcaster, buildConfigDebug ?: BuildConfig.DEBUG)
-    private val broadcastLogger =
-        getBroadcastLogger(OnionProxyManager::class.java)
-    val torStateMachine =
-        TorStateMachine(getBroadcastLogger(TorStateMachine::class.java))
+    private val logHelper = BroadcastLoggerHelper.instantiate(
+        this,
+        eventBroadcaster,
+        buildConfigDebug ?: BuildConfig.DEBUG
+    )
+
+    private val broadcastLogger = getBroadcastLogger(OnionProxyManager::class.java)
+
+    val torStateMachine = TorStateMachine.instantiate(
+        getBroadcastLogger(TorStateMachine::class.java)
+    )
 
     /**
      * See [BroadcastLoggerHelper.refreshBroadcastLoggersHasDebugLogsVar]
@@ -213,7 +228,7 @@ class OnionProxyManager(
 
     fun getNewSettingsBuilder(): TorSettingsBuilder {
         broadcastLogger.debug("Generating a new SettingsBuilder")
-        return TorSettingsBuilder(
+        return TorSettingsBuilder.instantiate(
             onionProxyContext,
             getBroadcastLogger(TorSettingsBuilder::class.java)
         )
@@ -692,7 +707,7 @@ class OnionProxyManager(
     }
 
     val processId: String
-        get() = onionProxyContext.processId
+        get() = onionProxyContext.getProcessId()
 
     /**
      * Spawns the tor native process from the existing Java process.

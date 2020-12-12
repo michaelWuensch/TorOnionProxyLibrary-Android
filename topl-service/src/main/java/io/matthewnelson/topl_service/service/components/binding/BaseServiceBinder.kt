@@ -82,14 +82,18 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-internal abstract class BaseServiceBinder(private val torService: BaseService): Binder() {
+internal abstract class BaseServiceBinder internal constructor(
+    private val torService: BaseService
+): Binder() {
 
+    @JvmSynthetic
     abstract fun getTorService(): BaseService?
 
     /**
      * Accepts all [ServiceAction] except [ServiceAction.Start], which gets issued via
      * [io.matthewnelson.topl_service.service.TorService.onStartCommand].
      * */
+    @JvmSynthetic
     fun submitServiceAction(serviceAction: ServiceAction) {
         if (serviceAction is ServiceAction.Start) return
         torService.processServiceAction(serviceAction)
@@ -112,6 +116,7 @@ internal abstract class BaseServiceBinder(private val torService: BaseService): 
      * @param [policy] The [BackgroundPolicy] to be executed
      * @param [executionDelay] the time expressed in your [BackgroundManager.Builder.Policy]
      * */
+    @JvmSynthetic
     fun executeBackgroundPolicyJob(@BackgroundPolicy policy: String, executionDelay: Long) {
         cancelExecuteBackgroundPolicyJob()
         backgroundPolicyExecutionJob = torService.getScopeMain().launch {
@@ -124,7 +129,7 @@ internal abstract class BaseServiceBinder(private val torService: BaseService): 
                     delay(executionDelay)
                     bgMgrBroadcastLogger.debug("Executing background management policy")
                     torService.processServiceAction(
-                        ServiceAction.Stop(updateLastServiceAction = false)
+                        ServiceAction.Stop.instantiate(updateLastServiceAction = false)
                     )
                 }
             }
@@ -134,6 +139,7 @@ internal abstract class BaseServiceBinder(private val torService: BaseService): 
     /**
      * Cancels the coroutine executing the [BackgroundPolicy] if it is active.
      * */
+    @JvmSynthetic
     fun cancelExecuteBackgroundPolicyJob() {
         backgroundPolicyExecutionJob?.let {
             if (it.isActive) {

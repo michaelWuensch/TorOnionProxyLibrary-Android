@@ -79,7 +79,13 @@ import net.freehaven.tor.control.TorControlCommands
  * [io.matthewnelson.topl_core.OnionProxyManager.start] method such that messages from
  * Tor get funneled here. They get modify as needed, then shipped to it's final destination.
  * */
-internal class ServiceEventListener: BaseEventListener() {
+internal class ServiceEventListener private constructor(): BaseEventListener() {
+
+    companion object {
+        @JvmSynthetic
+        fun instantiate(): ServiceEventListener =
+            ServiceEventListener()
+    }
 
     // broadcastLogger is available from BaseEventListener and is instantiated as soon as
     // OnionProxyManager gets initialized.

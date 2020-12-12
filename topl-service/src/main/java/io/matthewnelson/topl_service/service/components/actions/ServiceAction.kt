@@ -107,6 +107,7 @@ internal sealed class ServiceAction {
      *
      * @return The 0th element within [delayLengthQueue], or 0L if empty
      * */
+    @JvmSynthetic
     fun consumeDelayLength(): Long =
         if (delayLengthQueue.isNotEmpty())
             delayLengthQueue.removeAt(0)
@@ -123,10 +124,19 @@ internal sealed class ServiceAction {
      * */
     open val updateLastAction: Boolean = true
 
-    class SetDisableNetwork(
+    internal class SetDisableNetwork private constructor(
         override val name: String,
         updateLastServiceAction: Boolean = false
     ): ServiceAction() {
+
+        companion object {
+            @JvmSynthetic
+            fun instantiate(
+                name: String,
+                updateLastServiceAction: Boolean = false
+            ): SetDisableNetwork =
+                SetDisableNetwork(name, updateLastServiceAction)
+        }
 
         override val commands: Array<String>
             get() = when (name) {
@@ -149,12 +159,18 @@ internal sealed class ServiceAction {
             }
 
 
-        override val delayLengthQueue = mutableListOf(ServiceActionProcessor.disableNetworkDelay)
+        override val delayLengthQueue = mutableListOf(ServiceActionProcessor.getDisableNetworkDelay())
 
         override val updateLastAction: Boolean = updateLastServiceAction
     }
 
-    class NewId: ServiceAction() {
+    internal class NewId private constructor(): ServiceAction() {
+
+        companion object {
+            @JvmSynthetic
+            fun instantiate(): NewId =
+                NewId()
+        }
 
         @ServiceActionName
         override val name: String = ServiceActionName.NEW_ID
@@ -165,7 +181,13 @@ internal sealed class ServiceAction {
             )
     }
 
-    class RestartTor: ServiceAction() {
+    internal class RestartTor private constructor(): ServiceAction() {
+
+        companion object {
+            @JvmSynthetic
+            fun instantiate(): RestartTor =
+                RestartTor()
+        }
 
         @ServiceActionName
         override val name: String = ServiceActionName.RESTART_TOR
@@ -177,10 +199,18 @@ internal sealed class ServiceAction {
                 ServiceActionCommand.START_TOR
             )
 
-        override val delayLengthQueue = mutableListOf(ServiceActionProcessor.restartTorDelayTime)
+        override val delayLengthQueue = mutableListOf(ServiceActionProcessor.getRestartTorDelayTime())
     }
 
-    class Start(updateLastServiceAction: Boolean = true): ServiceAction() {
+    internal class Start private constructor(
+        updateLastServiceAction: Boolean = true
+    ): ServiceAction() {
+
+        companion object {
+            @JvmSynthetic
+            fun instantiate(updateLastServiceAction: Boolean = true): Start =
+                Start(updateLastServiceAction)
+        }
 
         @ServiceActionName
         override val name: String = ServiceActionName.START
@@ -193,7 +223,15 @@ internal sealed class ServiceAction {
         override val updateLastAction: Boolean = updateLastServiceAction
     }
 
-    class Stop(updateLastServiceAction: Boolean = true): ServiceAction() {
+    internal class Stop private constructor(
+        updateLastServiceAction: Boolean = true
+    ): ServiceAction() {
+
+        companion object {
+            @JvmSynthetic
+            fun instantiate(updateLastServiceAction: Boolean = true): Stop =
+                Stop(updateLastServiceAction)
+        }
 
         @ServiceActionName
         override val name: String = ServiceActionName.STOP
@@ -205,7 +243,7 @@ internal sealed class ServiceAction {
                 ServiceActionCommand.STOP_SERVICE
             )
 
-        override val delayLengthQueue = mutableListOf(ServiceActionProcessor.stopServiceDelayTime)
+        override val delayLengthQueue = mutableListOf(ServiceActionProcessor.getStopServiceDelayTime())
 
         override val updateLastAction: Boolean = updateLastServiceAction
     }

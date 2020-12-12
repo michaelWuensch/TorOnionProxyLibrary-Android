@@ -104,25 +104,44 @@ import java.io.IOException
  * [TorService]. It acts as the glue and helps with integration testing of the individual
  * components that make [TorService] work.
  * */
-internal abstract class BaseService: Service() {
+internal abstract class BaseService internal constructor(): Service() {
 
     companion object {
         private var application: Application? = null
-        var buildConfigVersionCode: Int = -1
-            private set
-        var buildConfigDebug: Boolean = BuildConfig.DEBUG
-            private set
-        var geoipAssetPath: String = ""
-            private set
-        var geoip6AssetPath: String = ""
-            private set
-        lateinit var torConfigFiles: TorConfigFiles
-            private set
-        lateinit var defaultTorSettings: ApplicationDefaultTorSettings
-            private set
-        var stopServiceOnTaskRemoved: Boolean = true
-            private set
 
+        private var buildConfigVersionCode: Int = -1
+        @JvmSynthetic
+        fun getBuildConfigVersionCode(): Int =
+            buildConfigVersionCode
+
+        private var buildConfigDebug: Boolean = BuildConfig.DEBUG
+        @JvmSynthetic
+        fun getBuildConfigDebug(): Boolean =
+            buildConfigDebug
+
+        private var geoipAssetPath: String = ""
+        @JvmSynthetic
+        fun getGeoipAssetPath(): String =
+            geoipAssetPath
+
+        private var geoip6AssetPath: String = ""
+        @JvmSynthetic
+        fun getGeoip6AssetPath(): String =
+            geoip6AssetPath
+
+        private lateinit var torConfigFiles: TorConfigFiles
+        @JvmSynthetic
+        fun getTorConfigFiles(): TorConfigFiles =
+            torConfigFiles
+
+        private lateinit var defaultTorSettings: ApplicationDefaultTorSettings
+        @JvmSynthetic
+        fun getApplicationDefaultTorSettings(): ApplicationDefaultTorSettings =
+            defaultTorSettings
+
+        private var stopServiceOnTaskRemoved: Boolean = true
+
+        @JvmSynthetic
         fun initialize(
             application: Application,
             buildConfigVersionCode: Int,
@@ -145,6 +164,7 @@ internal abstract class BaseService: Service() {
             }
         }
 
+        @JvmSynthetic
         @Throws(RuntimeException::class)
         fun getAppContext(): Context =
             application?.applicationContext ?: throw RuntimeException(
@@ -152,6 +172,7 @@ internal abstract class BaseService: Service() {
             )
 
         // For things that can't be saved to TorServicePrefs, such as BuildConfig.VERSION_CODE
+        @JvmSynthetic
         fun getLocalPrefs(context: Context): SharedPreferences =
             context.getSharedPreferences("TorServiceLocalPrefs", Context.MODE_PRIVATE)
 
@@ -171,6 +192,7 @@ internal abstract class BaseService: Service() {
          *
          * @param [serviceAction] The [ServiceActionName] to update [lastAcceptedServiceAction] to
          * */
+        @JvmSynthetic
         fun updateLastAcceptedServiceAction(@ServiceActionName serviceAction: String) {
             lastAcceptedServiceAction = serviceAction
         }
@@ -195,6 +217,7 @@ internal abstract class BaseService: Service() {
          * @param [bindServiceFlag] The flag to use when binding to [TorService]
          * @return true if startService didn't throw an exception, false if it did.
          * */
+        @JvmSynthetic
         fun startService(
             context: Context,
             serviceClass: Class<*>,
@@ -227,6 +250,7 @@ internal abstract class BaseService: Service() {
          * @param [bindServiceFlag] The flag to use when binding to [TorService]
          * @return true if startService didn't throw an exception, false if it did.
          * */
+        @JvmSynthetic
         fun bindService(
             context: Context,
             serviceClass: Class<*>,
@@ -234,7 +258,7 @@ internal abstract class BaseService: Service() {
         ) {
             context.applicationContext.bindService(
                 Intent(context.applicationContext, serviceClass),
-                TorServiceConnection.torServiceConnection,
+                TorServiceConnection.getTorServiceConnection(),
                 bindServiceFlag
             )
         }
@@ -247,22 +271,25 @@ internal abstract class BaseService: Service() {
          * @param [context] [Context]
          * @throws [IllegalArgumentException] If no binding exists
          * */
+        @JvmSynthetic
         @Throws(IllegalArgumentException::class)
         fun unbindService(context: Context) {
-            TorServiceConnection.torServiceConnection.clearServiceBinderReference()
-            context.applicationContext.unbindService(TorServiceConnection.torServiceConnection)
+            TorServiceConnection.getTorServiceConnection().clearServiceBinderReference()
+            context.applicationContext.unbindService(TorServiceConnection.getTorServiceConnection())
         }
     }
 
     // All classes that interact with APIs which require Context to do something
     // call this in production (torService.context). This allows for easily
     // swapping it out with what we want to use when testing.
-    abstract val context: Context
+    @JvmSynthetic
+    abstract fun getContext(): Context
 
 
     ///////////////
     /// Binding ///
     ///////////////
+    @JvmSynthetic
     open fun unbindTorService() {
         TorServiceController.appEventBroadcaster?.broadcastServiceLifecycleEvent(
             ServiceLifecycleEvent.ON_UNBIND, this.hashCode()
@@ -280,16 +307,22 @@ internal abstract class BaseService: Service() {
     /////////////////////////
     /// BroadcastReceiver ///
     /////////////////////////
+    @JvmSynthetic
     abstract fun registerReceiver()
+    @JvmSynthetic
     abstract fun setIsDeviceLocked()
+    @JvmSynthetic
     abstract fun unregisterReceiver()
 
 
     //////////////////
     /// Coroutines ///
     //////////////////
+    @JvmSynthetic
     abstract fun getScopeDefault(): CoroutineScope
+    @JvmSynthetic
     abstract fun getScopeIO(): CoroutineScope
+    @JvmSynthetic
     abstract fun getScopeMain(): CoroutineScope
 
 
@@ -297,12 +330,14 @@ internal abstract class BaseService: Service() {
     /// ServiceActionProcessor ///
     //////////////////////////////
     private val serviceActionProcessor by lazy {
-        ServiceActionProcessor(this)
+        ServiceActionProcessor.instantiate(this)
     }
 
+    @JvmSynthetic
     fun processServiceAction(serviceAction: ServiceAction) {
         serviceActionProcessor.processServiceAction(serviceAction)
     }
+    @JvmSynthetic
     open fun stopService() {
         stopSelf()
     }
@@ -312,11 +347,13 @@ internal abstract class BaseService: Service() {
     /// ServiceNotification ///
     ///////////////////////////
     private val serviceNotification: ServiceNotification
-        get() = ServiceNotification.serviceNotification
+        get() = ServiceNotification.getServiceNotification()
 
+    @JvmSynthetic
     fun addNotificationActions() {
         serviceNotification.addActions(this)
     }
+    @JvmSynthetic
     fun doesReceiverNeedToListenForLockScreen(): Boolean {
         return when {
             serviceNotification.visibility == NotificationCompat.VISIBILITY_SECRET -> {
@@ -330,30 +367,39 @@ internal abstract class BaseService: Service() {
             }
         }
     }
+    @JvmSynthetic
     open fun refreshNotificationActions(): Boolean {
         return serviceNotification.refreshActions(this)
     }
+    @JvmSynthetic
     fun removeNotification() {
         serviceNotification.remove()
     }
+    @JvmSynthetic
     fun removeNotificationActions() {
         serviceNotification.removeActions(this)
     }
+    @JvmSynthetic
     open fun startForegroundService(): Boolean {
         return serviceNotification.startForeground(this)
     }
+    @JvmSynthetic
     open fun stopForegroundService(): Boolean {
         return serviceNotification.stopForeground(this)
     }
+    @JvmSynthetic
     fun updateNotificationContentText(string: String) {
         serviceNotification.updateContentText(this, string)
     }
+    @JvmSynthetic
     fun updateNotificationContentTitle(title: String) {
         serviceNotification.updateContentTitle(this, title)
     }
+    @JvmSynthetic
     fun updateNotificationIcon(@NotificationImage notificationImage: Int) {
         serviceNotification.updateIcon(this, notificationImage)
     }
+    @JvmSynthetic
     fun updateNotificationProgress(show: Boolean, progress: Int?) {
         serviceNotification.updateProgress(this, show, progress)
     }
@@ -362,24 +408,36 @@ internal abstract class BaseService: Service() {
     /////////////////
     /// TOPL-Core ///
     /////////////////
+    @JvmSynthetic
     @WorkerThread
     @Throws(IOException::class)
     abstract fun copyAsset(assetPath: String, file: File)
+    @JvmSynthetic
     @WorkerThread
     @Throws(IOException::class, NullPointerException::class)
     abstract fun disableNetwork(disable: Boolean)
+    @JvmSynthetic
     abstract fun getBroadcastLogger(clazz: Class<*>): BroadcastLogger
+    @JvmSynthetic
     abstract fun hasNetworkConnectivity(): Boolean
+    @JvmSynthetic
     abstract fun hasControlConnection(): Boolean
+    @JvmSynthetic
     abstract fun isTorOff(): Boolean
+    @JvmSynthetic
     abstract fun isTorOn(): Boolean
+    @JvmSynthetic
     abstract fun refreshBroadcastLoggersHasDebugLogsVar()
+    @JvmSynthetic
     @WorkerThread
     abstract fun signalControlConnection(torControlCommand: String): Boolean
+    @JvmSynthetic
     @WorkerThread
     abstract suspend fun signalNewNym()
+    @JvmSynthetic
     @WorkerThread
     abstract suspend fun startTor()
+    @JvmSynthetic
     @WorkerThread
     abstract suspend fun stopTor()
 
@@ -393,7 +451,7 @@ internal abstract class BaseService: Service() {
     //  Background manager
     private fun registerPrefsListener() {
         torServicePrefsListener?.unregister()
-        torServicePrefsListener = TorServicePrefsListener(this)
+        torServicePrefsListener = TorServicePrefsListener.instantiate(this)
     }
     private fun unregisterPrefsListener() {
         torServicePrefsListener?.unregister()
@@ -414,7 +472,7 @@ internal abstract class BaseService: Service() {
         TorServiceController.serviceExecutionHooks?.let { hooks ->
             getScopeDefault().launch {
                 try {
-                    hooks.executeOnCreateTorService(context.applicationContext)
+                    hooks.executeOnCreateTorService(getContext().applicationContext)
                 } catch (e: Exception) {
                     TorServiceController.appEventBroadcaster?.broadcastException(
                         "${BroadcastType.EXCEPTION}|" +
@@ -442,9 +500,9 @@ internal abstract class BaseService: Service() {
      * */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ServiceActionName.START) {
-            processServiceAction(ServiceAction.Start())
+            processServiceAction(ServiceAction.Start.instantiate())
         } else {
-            processServiceAction(ServiceAction.Start(updateLastServiceAction = false))
+            processServiceAction(ServiceAction.Start.instantiate(updateLastServiceAction = false))
         }
 
         return START_NOT_STICKY
@@ -463,7 +521,7 @@ internal abstract class BaseService: Service() {
 
         // Shutdown Tor and stop the Service.
         if (stopServiceOnTaskRemoved) {
-            processServiceAction(ServiceAction.Stop(updateLastServiceAction = false))
+            processServiceAction(ServiceAction.Stop.instantiate(updateLastServiceAction = false))
         }
     }
 }
