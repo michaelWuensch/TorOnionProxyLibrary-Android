@@ -131,7 +131,7 @@ internal class OnionProxyContext private constructor(
 
     companion object {
         @JvmSynthetic
-        internal fun instantiate(
+        fun instantiate(
             torConfigFiles: TorConfigFiles,
             torInstaller: TorInstaller,
             torSettings: TorSettings

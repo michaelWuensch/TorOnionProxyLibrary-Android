@@ -111,41 +111,38 @@ internal abstract class BaseService internal constructor(): Service() {
 
         private var buildConfigVersionCode: Int = -1
         @JvmSynthetic
-        internal fun getBuildConfigVersionCode(): Int =
+        fun getBuildConfigVersionCode(): Int =
             buildConfigVersionCode
 
         private var buildConfigDebug: Boolean = BuildConfig.DEBUG
         @JvmSynthetic
-        internal fun getBuildConfigDebug(): Boolean =
+        fun getBuildConfigDebug(): Boolean =
             buildConfigDebug
 
         private var geoipAssetPath: String = ""
         @JvmSynthetic
-        internal fun getGeoipAssetPath(): String =
+        fun getGeoipAssetPath(): String =
             geoipAssetPath
 
         private var geoip6AssetPath: String = ""
         @JvmSynthetic
-        internal fun getGeoip6AssetPath(): String =
+        fun getGeoip6AssetPath(): String =
             geoip6AssetPath
 
         private lateinit var torConfigFiles: TorConfigFiles
         @JvmSynthetic
-        internal fun getTorConfigFiles(): TorConfigFiles =
+        fun getTorConfigFiles(): TorConfigFiles =
             torConfigFiles
 
         private lateinit var defaultTorSettings: ApplicationDefaultTorSettings
         @JvmSynthetic
-        internal fun getApplicationDefaultTorSettings(): ApplicationDefaultTorSettings =
+        fun getApplicationDefaultTorSettings(): ApplicationDefaultTorSettings =
             defaultTorSettings
 
         private var stopServiceOnTaskRemoved: Boolean = true
-        @JvmSynthetic
-        internal fun getStopServiceOnTaskRemoved(): Boolean =
-            stopServiceOnTaskRemoved
 
         @JvmSynthetic
-        internal fun initialize(
+        fun initialize(
             application: Application,
             buildConfigVersionCode: Int,
             torSettings: ApplicationDefaultTorSettings,
@@ -169,14 +166,14 @@ internal abstract class BaseService internal constructor(): Service() {
 
         @JvmSynthetic
         @Throws(RuntimeException::class)
-        internal fun getAppContext(): Context =
+        fun getAppContext(): Context =
             application?.applicationContext ?: throw RuntimeException(
                 "Builder.build has not been called yet"
             )
 
         // For things that can't be saved to TorServicePrefs, such as BuildConfig.VERSION_CODE
         @JvmSynthetic
-        internal fun getLocalPrefs(context: Context): SharedPreferences =
+        fun getLocalPrefs(context: Context): SharedPreferences =
             context.getSharedPreferences("TorServiceLocalPrefs", Context.MODE_PRIVATE)
 
 
@@ -196,7 +193,7 @@ internal abstract class BaseService internal constructor(): Service() {
          * @param [serviceAction] The [ServiceActionName] to update [lastAcceptedServiceAction] to
          * */
         @JvmSynthetic
-        internal fun updateLastAcceptedServiceAction(@ServiceActionName serviceAction: String) {
+        fun updateLastAcceptedServiceAction(@ServiceActionName serviceAction: String) {
             lastAcceptedServiceAction = serviceAction
         }
 
@@ -221,7 +218,7 @@ internal abstract class BaseService internal constructor(): Service() {
          * @return true if startService didn't throw an exception, false if it did.
          * */
         @JvmSynthetic
-        internal fun startService(
+        fun startService(
             context: Context,
             serviceClass: Class<*>,
             includeIntentActionStart: Boolean = true,
@@ -254,7 +251,7 @@ internal abstract class BaseService internal constructor(): Service() {
          * @return true if startService didn't throw an exception, false if it did.
          * */
         @JvmSynthetic
-        internal fun bindService(
+        fun bindService(
             context: Context,
             serviceClass: Class<*>,
             bindServiceFlag: Int = Context.BIND_AUTO_CREATE
@@ -276,7 +273,7 @@ internal abstract class BaseService internal constructor(): Service() {
          * */
         @JvmSynthetic
         @Throws(IllegalArgumentException::class)
-        internal fun unbindService(context: Context) {
+        fun unbindService(context: Context) {
             TorServiceConnection.getTorServiceConnection().clearServiceBinderReference()
             context.applicationContext.unbindService(TorServiceConnection.getTorServiceConnection())
         }

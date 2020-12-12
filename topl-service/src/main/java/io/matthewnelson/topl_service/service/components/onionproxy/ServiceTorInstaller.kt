@@ -103,8 +103,6 @@ internal class ServiceTorInstaller private constructor(
     private val torConfigFiles: TorConfigFiles
         get() = TorServiceController.getTorConfigFiles()
 
-    private val torServicePrefs by lazy { TorServicePrefs(torService.getContext()) }
-    private val localPrefs by lazy { BaseService.getLocalPrefs(torService.getContext()) }
     private var geoIpFileCopied = false
     private var geoIpv6FileCopied = false
 
@@ -125,6 +123,8 @@ internal class ServiceTorInstaller private constructor(
         if (!torConfigFiles.v3AuthPrivateDir.exists()) {
             torConfigFiles.v3AuthPrivateDir.mkdirs()
         }
+
+        val localPrefs = BaseService.getLocalPrefs(torService.getContext())
 
         // If the app version has been increased, or if this is a debug build, copy over
         // geoip assets then update SharedPreferences with the new version code. This
@@ -183,8 +183,10 @@ internal class ServiceTorInstaller private constructor(
             If length is greater than 9, then we know this is a custom bridge
         * */
         // TODO: Completely refactor how bridges work.
-        val userDefinedBridgeList: String =
-            torServicePrefs.getList(PrefKeyList.USER_DEFINED_BRIDGES, arrayListOf()).joinToString()
+        val userDefinedBridgeList: String = TorServicePrefs(torService.getContext())
+            .getList(PrefKeyList.USER_DEFINED_BRIDGES, arrayListOf())
+            .joinToString()
+
         var bridgeType = (if (userDefinedBridgeList.length > 9) 1 else 0).toByte()
         // Terrible hack. Must keep in sync with topl::addBridgesFromResources.
         if (bridgeType.toInt() == 0) {

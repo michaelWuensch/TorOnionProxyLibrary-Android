@@ -97,8 +97,7 @@ import java.lang.reflect.InvocationTargetException
 internal class TorService internal constructor(): BaseService() {
 
     @JvmSynthetic
-    override fun getContext(): Context =
-        this
+    override fun getContext(): Context = this
 
 
     ///////////////

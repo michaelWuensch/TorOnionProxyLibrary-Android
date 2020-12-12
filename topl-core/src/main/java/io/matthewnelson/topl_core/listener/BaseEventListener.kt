@@ -86,7 +86,7 @@ abstract class BaseEventListener: EventListener() {
      * This gets set as soon as [io.matthewnelson.topl_core.OnionProxyManager] is instantiated,
      * and can be used to broadcast messages in your class which extends [TorInstaller].
      * */
-    var broadcastLogger: BroadcastLogger? = null
+    protected var broadcastLogger: BroadcastLogger? = null
         private set
 
     @JvmSynthetic

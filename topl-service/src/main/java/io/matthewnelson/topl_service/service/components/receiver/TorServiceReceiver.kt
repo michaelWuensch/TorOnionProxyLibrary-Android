@@ -113,13 +113,13 @@ internal class TorServiceReceiver private constructor(
         @Volatile
         private var isRegistered = false
         @JvmSynthetic
-        internal fun isRegistered(): Boolean =
+        fun isRegistered(): Boolean =
             isRegistered
 
         @Volatile
         private var deviceIsLocked: Boolean? = null
         @JvmSynthetic
-        internal fun deviceIsLocked(): Boolean? =
+        fun deviceIsLocked(): Boolean? =
             deviceIsLocked
     }
 

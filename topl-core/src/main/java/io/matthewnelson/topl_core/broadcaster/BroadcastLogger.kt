@@ -99,7 +99,8 @@ class BroadcastLogger private constructor(
     val TAG: String,
     val eventBroadcaster: EventBroadcaster,
     private val buildConfigDebug: Boolean,
-    hasDebugLogs: Boolean
+    @Volatile
+    private var hasDebugLogs: Boolean
 ): CoreConsts() {
 
     companion object {
@@ -112,11 +113,6 @@ class BroadcastLogger private constructor(
         ): BroadcastLogger =
             BroadcastLogger(tag, eventBroadcaster, buildConfigDebug, hasDebugLogs)
     }
-
-    @Volatile
-    @JvmSynthetic
-    internal var hasDebugLogs: Boolean = hasDebugLogs
-        private set
 
     /**
      * See [io.matthewnelson.topl_core.broadcaster.BroadcastLoggerHelper.refreshBroadcastLoggersHasDebugLogsVar]
@@ -167,5 +163,4 @@ class BroadcastLogger private constructor(
     fun torState(@TorState state: String, @TorNetworkState networkState: String) {
         eventBroadcaster.broadcastTorState(state, networkState)
     }
-
 }

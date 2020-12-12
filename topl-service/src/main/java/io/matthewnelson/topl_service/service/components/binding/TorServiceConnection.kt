@@ -99,7 +99,7 @@ internal class TorServiceConnection private constructor(): ServiceConnection {
      * suggests.
      * */
     @JvmSynthetic
-    internal fun clearServiceBinderReference() {
+    fun clearServiceBinderReference() {
         serviceBinder = null
     }
 
