@@ -95,7 +95,9 @@ import io.matthewnelson.topl_service_base.ApplicationDefaultTorSettings
 import io.matthewnelson.topl_service_base.BaseServiceConsts.ServiceActionName
 import io.matthewnelson.topl_service_base.BaseServiceConsts.ServiceLifecycleEvent
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
 
@@ -338,7 +340,23 @@ internal abstract class BaseService internal constructor(): Service() {
         serviceActionProcessor.processServiceAction(serviceAction)
     }
     @JvmSynthetic
-    open fun stopService() {
+    open suspend fun stopService() {
+        TorServiceController.serviceExecutionHooks?.let { hooks ->
+            try {
+                hooks.executeBeforeStoppingService(getContext().applicationContext)
+            } catch (e: Exception) {
+                TorServiceController.appEventBroadcaster?.let { broadcaster ->
+                    withContext(Dispatchers.Main) {
+                        broadcaster.broadcastException(
+                            "${BroadcastType.EXCEPTION}|" +
+                                    "${this@BaseService.javaClass.simpleName}|" +
+                                    "${e.message}",
+                            e
+                        )
+                    }
+                }
+            }
+        }
         stopSelf()
     }
 
@@ -474,12 +492,16 @@ internal abstract class BaseService internal constructor(): Service() {
                 try {
                     hooks.executeOnCreateTorService(getContext().applicationContext)
                 } catch (e: Exception) {
-                    TorServiceController.appEventBroadcaster?.broadcastException(
-                        "${BroadcastType.EXCEPTION}|" +
-                                "${this@BaseService.javaClass.simpleName}|" +
-                                "${e.message}"
-                        , e
-                    )
+                    TorServiceController.appEventBroadcaster?.let { broadcaster ->
+                        withContext(Dispatchers.Main) {
+                            broadcaster.broadcastException(
+                                "${BroadcastType.EXCEPTION}|" +
+                                        "${this@BaseService.javaClass.simpleName}|" +
+                                        "${e.message}",
+                                e
+                            )
+                        }
+                    }
                 }
             }
         }

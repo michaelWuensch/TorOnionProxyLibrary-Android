@@ -169,7 +169,7 @@ internal class TestTorService(
      * is simulated properly in that it will stop processing the queue and the Coroutine
      * Job will move to `complete`.
      * */
-    override fun stopService() {
+    override suspend fun stopService() {
         stopSelfCalled = true
         getScopeMain().launch { onDestroy() }
     }
