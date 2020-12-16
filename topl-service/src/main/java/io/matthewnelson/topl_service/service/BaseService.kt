@@ -94,10 +94,7 @@ import io.matthewnelson.topl_service.util.ServiceConsts.NotificationImage
 import io.matthewnelson.topl_service_base.ApplicationDefaultTorSettings
 import io.matthewnelson.topl_service_base.BaseServiceConsts.ServiceActionName
 import io.matthewnelson.topl_service_base.BaseServiceConsts.ServiceLifecycleEvent
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.io.File
 import java.io.IOException
 
@@ -339,10 +336,19 @@ internal abstract class BaseService internal constructor(): Service() {
     fun processServiceAction(serviceAction: ServiceAction) {
         serviceActionProcessor.processServiceAction(serviceAction)
     }
+
+    @Volatile
+    private var stopServiceExecutionHookJob: Job? = null
     @JvmSynthetic
     open suspend fun stopService() {
+        onStartCommandExecutionHookJob = null
         TorServiceController.serviceExecutionHooks?.let { hooks ->
             try {
+                stopServiceExecutionHookJob = getScopeMain().launch {
+                    while (currentCoroutineContext().isActive) {
+                        delay(50L)
+                    }
+                }
                 hooks.executeBeforeStoppingService(getContext().applicationContext)
             } catch (e: Exception) {
                 TorServiceController.appEventBroadcaster?.let { broadcaster ->
@@ -355,9 +361,14 @@ internal abstract class BaseService internal constructor(): Service() {
                         )
                     }
                 }
+            } finally {
+                stopServiceExecutionHookJob?.cancel()
             }
         }
-        stopSelf()
+
+        if (onStartCommandExecutionHookJob == null) {
+            stopSelf()
+        }
     }
 
 
@@ -514,6 +525,13 @@ internal abstract class BaseService internal constructor(): Service() {
         unregisterPrefsListener()
     }
 
+    @Volatile
+    private var onStartCommandExecutionHookJob: Job? = null
+    @JvmSynthetic
+    open suspend fun joinOnStartCommandExecutionHookJob() {
+        onStartCommandExecutionHookJob?.join()
+    }
+
     /**
      * No matter what Intent comes in, it starts Tor. If the Intent comes with no Action,
      * it will not update [ServiceActionProcessor.lastServiceAction].
@@ -521,6 +539,33 @@ internal abstract class BaseService internal constructor(): Service() {
      * @see [Companion.startService]
      * */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (onStartCommandExecutionHookJob == null) {
+            TorServiceController.serviceExecutionHooks?.let { hooks ->
+                onStartCommandExecutionHookJob = getScopeDefault().launch {
+                    // slight delay needed here before joining of stopService job b/c
+                    // onStartCommand job gets set to null outside/before launching of the
+                    // stopService Job (necessary for immediate user responsiveness).
+                    delay(50L)
+                    stopServiceExecutionHookJob?.join()
+
+                    try {
+                        hooks.executeOnStartCommandBeforeStartTor(getContext().applicationContext)
+                    } catch (e: Exception) {
+                        TorServiceController.appEventBroadcaster?.let { broadcaster ->
+                            withContext(Dispatchers.Main) {
+                                broadcaster.broadcastException(
+                                    "${BroadcastType.EXCEPTION}|" +
+                                            "${this@BaseService.javaClass.simpleName}|" +
+                                            "${e.message}",
+                                    e
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         if (intent?.action == ServiceActionName.START) {
             processServiceAction(ServiceAction.Start.instantiate())
         } else {
