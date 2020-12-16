@@ -46,6 +46,7 @@ dokka {
         includeNonPublic = false
         skipEmptyPackages = true
         samples = [
+                "$rootDir/sampleapp/src/main/java/io/matthewnelson/sampleapp/topl_android/MyServiceExecutionHooks.kt".toString(),
                 "$rootDir/sampleapp/src/main/java/io/matthewnelson/sampleapp/topl_android/MyEventBroadcaster.kt".toString()
         ]
         sourceLink {
