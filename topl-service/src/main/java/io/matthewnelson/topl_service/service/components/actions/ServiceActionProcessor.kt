@@ -261,7 +261,7 @@ internal class ServiceActionProcessor private constructor(
             broadcastDebugMsgWithObjectDetails("Processing Queue: ", this)
 
             while (actionQueue.isNotEmpty() && isActive) {
-                torService.getOnStartCommandExecutionHookJob()?.join()
+                torService.joinOnStartCommandExecutionHookJob()
                 val serviceAction = getActionQueueElementAtOrNull()
                 if (serviceAction == null) {
                     return@launch

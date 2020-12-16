@@ -341,9 +341,6 @@ internal abstract class BaseService internal constructor(): Service() {
     private var stopServiceExecutionHookJob: Job? = null
     @JvmSynthetic
     open suspend fun stopService() {
-        // TODO: Need to synchronize with onStartCommand execution hook b/c if the service
-        //  is re-bound before this is completed, stopSelf() won't fire. Maybe just set the
-        //  onStartcommand job to null so that if startservice is called that it will be again?
         onStartCommandExecutionHookJob = null
         TorServiceController.serviceExecutionHooks?.let { hooks ->
             try {
@@ -531,8 +528,8 @@ internal abstract class BaseService internal constructor(): Service() {
     @Volatile
     private var onStartCommandExecutionHookJob: Job? = null
     @JvmSynthetic
-    open fun getOnStartCommandExecutionHookJob(): Job? {
-        return onStartCommandExecutionHookJob
+    open suspend fun joinOnStartCommandExecutionHookJob() {
+        onStartCommandExecutionHookJob?.join()
     }
 
     /**
