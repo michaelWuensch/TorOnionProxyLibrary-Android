@@ -198,6 +198,12 @@ class OnionAuthUtilitiesUnitTest {
         addV3ClientAuthenticationPrivateKey(name = validNickname + "_diff")
     }
 
+    @Test(expected = IllegalStateException::class)
+    fun `file with same content already exists throws exception with onion appendage`() {
+        addV3ClientAuthenticationPrivateKey()
+        addV3ClientAuthenticationPrivateKey(name = validNickname + "_diff", "$validOnion.onion")
+    }
+
     @Test(expected = AssertionError::class)
     fun `check assertion method throws exception if null`() {
         checkAddAuthPrivateAssertions(null)
