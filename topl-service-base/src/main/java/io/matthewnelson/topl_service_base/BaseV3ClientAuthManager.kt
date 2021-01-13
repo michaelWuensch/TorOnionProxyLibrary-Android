@@ -106,7 +106,8 @@ abstract class BaseV3ClientAuthManager {
      *
      * @return The File if it was created properly, `null` if it was not
      * @throws [IllegalArgumentException] If passed arguments are not compliant with the spec
-     * @throws [IllegalStateException] If the file already exists (and must be deleted before overwriting)
+     * @throws [IllegalStateException] If the file already exists (and must be deleted before
+     *   overwriting), or if a file exists with the same onion address & private key
      * @throws [SecurityException] If access is not authorized
      * */
     @WorkerThread
