@@ -168,8 +168,8 @@ object OnionAuthUtilities {
                 for (existingFile in existingFiles) {
                     existingFile.readText().split(':').let { split ->
                         if (
-                            split.getOrNull(0) == onionAddress &&
-                            split.getOrNull(3) == base32EncodedPrivateKey
+                            split.getOrNull(0) == onion &&
+                            split.getOrNull(3) == key
                         ) {
                             throw IllegalStateException("A file with identical information already exists")
                         }
