@@ -2,7 +2,7 @@
 
 # Policy
 
-`class Policy` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/lifecycle/BackgroundManager.kt#L231)
+`class Policy` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/lifecycle/BackgroundManager.kt#L232)
 
 Holds the chosen policy to be built in
 [io.matthewnelson.topl_service.TorServiceController.Builder.build](../../../io.matthewnelson.topl_service/-tor-service-controller/-builder/build.md).

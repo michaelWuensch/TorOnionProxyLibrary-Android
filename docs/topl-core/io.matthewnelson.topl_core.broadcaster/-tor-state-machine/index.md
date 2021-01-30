@@ -6,12 +6,6 @@
 
 Current State of Tor
 
-### Constructors
-
-| Name | Summary |
-|---|---|
-| [&lt;init&gt;](-init-.md) | Current State of Tor`TorStateMachine(broadcastLogger: `[`BroadcastLogger`](../-broadcast-logger/index.md)`)` |
-
 ### Properties
 
 | Name | Summary |

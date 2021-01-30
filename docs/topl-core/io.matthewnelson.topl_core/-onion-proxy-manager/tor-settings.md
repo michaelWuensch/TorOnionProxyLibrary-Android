@@ -2,4 +2,4 @@
 
 # torSettings
 
-`val torSettings: `[`TorSettings`](../../..//topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/OnionProxyManager.kt#L156)
+`val torSettings: `[`TorSettings`](../../..//topl-core-base/io.matthewnelson.topl_core_base/-tor-settings/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/OnionProxyManager.kt#L166)

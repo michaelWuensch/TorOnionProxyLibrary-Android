@@ -1,7 +1,7 @@
 extra:
   topl_android:
-    release: '2.0.2'
-    next_release: '2.0.3'
+    release: '2.1.0'
+    next_release: '2.1.1'
   social:
     - icon: material/earth
       link: https://matthewnelson.io

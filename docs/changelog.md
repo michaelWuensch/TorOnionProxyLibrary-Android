@@ -1,5 +1,23 @@
 # Change Log
 
+## Version 2.1.0 (2021-01-30)
+ - New Features Added:
+     - `topl-service:TorService` Lifecycle Events are now broadcast to `TorServiceEventBroadcaster`
+     - `topl-service-base:ServiceExecutionHooks` have been implemented such that library users can
+     leverage suspension functions at key points of `TorService`'s operation, and allow for synchronous
+     code execution.
+     - Moved `topl-service:ServiceActionName` String definitions to `topl-service-base` to expose them
+     such that library users can utilize them in their implementation of `TorServiceEventBroadcaster`
+ - Bug Fixes:
+     - Kotlin internal visibility modifier is public from Java code.
+     See Issue <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/issues/100" target="_blank">100</a>
+     - Duplicate v3 Client Authentication files were inhibiting Tor from starting properly.
+     See Issue <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/issues/105" target="_blank">105</a>
+     - Tor notice messages were modified between 0.4.4.0 and 0.4.5.4-rc, which caused
+     `topl-service:ServiceEventBroadcaster`'s notice message filter to miss broadcasting of ports.
+     See Issue <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/issues/110" target="_blank">110</a>
+ - Dependencies were bumped to latest stable releases.
+
 ## Version 2.0.2 (2020-10-19)
  - Bug Fix: Notifications not showing on API 25 and below [12abbf7](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/commit/12abbf7faec781cb2c9b0a9babf3fe0e3d6cb352)
  - Deprecates `ServiceNotification.Builder.setContentIntentData` in favor of

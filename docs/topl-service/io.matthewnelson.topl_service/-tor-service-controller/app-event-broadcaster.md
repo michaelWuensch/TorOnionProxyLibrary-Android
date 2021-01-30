@@ -2,4 +2,4 @@
 
 # appEventBroadcaster
 
-`@JvmStatic var appEventBroadcaster: `[`TorServiceEventBroadcaster`](../../..//topl-service-base/io.matthewnelson.topl_service_base/-tor-service-event-broadcaster/index.md)`?` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L323)
+`@JvmStatic var appEventBroadcaster: `[`TorServiceEventBroadcaster`](../../..//topl-service-base/io.matthewnelson.topl_service_base/-tor-service-event-broadcaster/index.md)`?` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L335)

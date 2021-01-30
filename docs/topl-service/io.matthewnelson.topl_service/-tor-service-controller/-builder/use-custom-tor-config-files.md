@@ -2,7 +2,7 @@
 
 # useCustomTorConfigFiles
 
-`fun useCustomTorConfigFiles(torConfigFiles: `[`TorConfigFiles`](../../../..//topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md)`): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L268)
+`fun useCustomTorConfigFiles(torConfigFiles: `[`TorConfigFiles`](../../../..//topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md)`): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/TorServiceController.kt#L280)
 
 If you wish to customize the file structure of how Tor is installed in your app,
 you can do so by instantiating your own [TorConfigFiles](../../../..//topl-core-base/io.matthewnelson.topl_core_base/-tor-config-files/index.md) and customizing it via

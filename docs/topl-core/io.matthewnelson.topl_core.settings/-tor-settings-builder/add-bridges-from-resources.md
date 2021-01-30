@@ -2,7 +2,7 @@
 
 # addBridgesFromResources
 
-`fun addBridgesFromResources(): `[`TorSettingsBuilder`](index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/settings/TorSettingsBuilder.kt#L889)
+`fun addBridgesFromResources(): `[`TorSettingsBuilder`](index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/settings/TorSettingsBuilder.kt#L898)
 
 Adds bridges from a resource stream. This relies on the
 [io.matthewnelson.topl_core.util.TorInstaller](../../io.matthewnelson.topl_core.util/-tor-installer/index.md) to know how to obtain this stream.

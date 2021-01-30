@@ -15,6 +15,7 @@
 | Name | Summary |
 |---|---|
 | [appEventBroadcaster](app-event-broadcaster.md) | `var appEventBroadcaster: `[`TorServiceEventBroadcaster`](../../..//topl-service-base/io.matthewnelson.topl_service_base/-tor-service-event-broadcaster/index.md)`?` |
+| [serviceExecutionHooks](service-execution-hooks.md) | `var serviceExecutionHooks: `[`ServiceExecutionHooks`](../../..//topl-service-base/io.matthewnelson.topl_service_base/-service-execution-hooks/index.md)`?` |
 
 ### Companion Object Functions
 

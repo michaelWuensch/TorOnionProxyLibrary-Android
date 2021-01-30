@@ -13,6 +13,8 @@
 | [PrefKeyInt](-pref-key-int/index.md) | `annotation class PrefKeyInt` |
 | [PrefKeyList](-pref-key-list/index.md) | `annotation class PrefKeyList` |
 | [PrefKeyString](-pref-key-string/index.md) | `annotation class PrefKeyString` |
+| [ServiceActionName](-service-action-name/index.md) | `annotation class ServiceActionName` |
+| [ServiceLifecycleEvent](-service-lifecycle-event/index.md) | `annotation class ServiceLifecycleEvent` |
 
 ### Constructors
 

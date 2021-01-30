@@ -2,7 +2,7 @@
 
 # addV3ClientAuthenticationPrivateKey
 
-`@WorkerThread abstract fun addV3ClientAuthenticationPrivateKey(nickname: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`, onionAddress: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`, base32EncodedPrivateKey: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`): `[`File`](https://docs.oracle.com/javase/6/docs/api/java/io/File.html)`?` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service-base/src/main/java/io/matthewnelson/topl_service_base/BaseV3ClientAuthManager.kt#L118)
+`@WorkerThread abstract fun addV3ClientAuthenticationPrivateKey(nickname: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`, onionAddress: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`, base32EncodedPrivateKey: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`): `[`File`](https://docs.oracle.com/javase/6/docs/api/java/io/File.html)`?` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service-base/src/main/java/io/matthewnelson/topl_service_base/BaseV3ClientAuthManager.kt#L119)
 
 Creates a file containing v3 Client Authorization for a Hidden Service in the format of:
 
@@ -27,7 +27,8 @@ are non-compliant.
 
 `IllegalArgumentException` - If passed arguments are not compliant with the spec
 
-`IllegalStateException` - If the file already exists (and must be deleted before overwriting)
+`IllegalStateException` - If the file already exists (and must be deleted before
+overwriting), or if a file exists with the same onion address &amp; private key
 
 `SecurityException` - If access is not authorized
 

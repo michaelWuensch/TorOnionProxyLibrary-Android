@@ -2,7 +2,7 @@
 
 # PrefKeyBoolean
 
-`annotation class PrefKeyBoolean` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service-base/src/main/java/io/matthewnelson/topl_service_base/BaseServiceConsts.kt#L124)
+`@Target([AnnotationTarget.CLASS, AnnotationTarget.PROPERTY, AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.TYPE]) annotation class PrefKeyBoolean` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service-base/src/main/java/io/matthewnelson/topl_service_base/BaseServiceConsts.kt#L189)
 
 ### Constructors
 

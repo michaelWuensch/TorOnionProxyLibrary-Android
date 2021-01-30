@@ -2,4 +2,4 @@
 
 # HAS_DORMANT_CANCELED_BY_STARTUP
 
-`const val HAS_DORMANT_CANCELED_BY_STARTUP: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service-base/src/main/java/io/matthewnelson/topl_service_base/BaseServiceConsts.kt#L131)
+`const val HAS_DORMANT_CANCELED_BY_STARTUP: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service-base/src/main/java/io/matthewnelson/topl_service_base/BaseServiceConsts.kt#L196)
