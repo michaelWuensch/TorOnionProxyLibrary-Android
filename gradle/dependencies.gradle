@@ -5,7 +5,7 @@ ext.versions = [
 
     'coroutines': '1.4.2',
     'lifecycle': '2.2.0',
-    'kotlin': '1.4.20',
+    'kotlin': '1.4.21-2',
     'navigation': '2.3.2',
 ]
 
