@@ -44,7 +44,7 @@ ext.deps = [
 ]
 
 ext.plugin = [
-    androidGradle: "com.android.tools.build:gradle:4.1.1",
+    androidGradle: "com.android.tools.build:gradle:4.1.2",
     gradleVersions: "com.github.ben-manes:gradle-versions-plugin:0.36.0",
     kotlin: [
         dokka: "org.jetbrains.dokka:dokka-gradle-plugin:0.10.1",
