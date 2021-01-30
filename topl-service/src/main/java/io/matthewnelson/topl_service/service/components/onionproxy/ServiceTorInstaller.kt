@@ -88,17 +88,21 @@ import java.util.concurrent.TimeoutException
  *
  * @param [torService] [BaseService] for context
  * */
-internal class ServiceTorInstaller(private val torService: BaseService): TorInstaller() {
+internal class ServiceTorInstaller private constructor(
+    private val torService: BaseService
+): TorInstaller() {
 
-    private companion object {
-        const val APP_VERSION_CODE = "APP_VERSION_CODE"
+    companion object {
+        @JvmSynthetic
+        fun instantiate(torService: BaseService): ServiceTorInstaller =
+            ServiceTorInstaller(torService)
+
+        private const val APP_VERSION_CODE = "APP_VERSION_CODE"
     }
 
     private val torConfigFiles: TorConfigFiles
         get() = TorServiceController.getTorConfigFiles()
 
-    private val torServicePrefs by lazy { TorServicePrefs(torService.context) }
-    private val localPrefs by lazy { BaseService.getLocalPrefs(torService.context) }
     private var geoIpFileCopied = false
     private var geoIpv6FileCopied = false
 
@@ -120,11 +124,13 @@ internal class ServiceTorInstaller(private val torService: BaseService): TorInst
             torConfigFiles.v3AuthPrivateDir.mkdirs()
         }
 
+        val localPrefs = BaseService.getLocalPrefs(torService.getContext())
+
         // If the app version has been increased, or if this is a debug build, copy over
         // geoip assets then update SharedPreferences with the new version code. This
         // mitigates copying to be done only if a version upgrade is had.
-        if (BaseService.buildConfigDebug ||
-            BaseService.buildConfigVersionCode > localPrefs.getInt(APP_VERSION_CODE, -1)
+        if (BaseService.getBuildConfigDebug() ||
+            BaseService.getBuildConfigVersionCode() > localPrefs.getInt(APP_VERSION_CODE, -1)
         ) {
             if (!geoIpFileCopied) {
                 copyGeoIpAsset()
@@ -133,25 +139,25 @@ internal class ServiceTorInstaller(private val torService: BaseService): TorInst
                 copyGeoIpv6Asset()
             }
             localPrefs.edit()
-                .putInt(APP_VERSION_CODE, BaseService.buildConfigVersionCode)
+                .putInt(APP_VERSION_CODE, BaseService.getBuildConfigVersionCode())
                 .apply()
         }
     }
 
     private fun copyGeoIpAsset() {
         synchronized(torConfigFiles.geoIpFileLock) {
-            torService.copyAsset(BaseService.geoipAssetPath, torConfigFiles.geoIpFile)
+            torService.copyAsset(BaseService.getGeoipAssetPath(), torConfigFiles.geoIpFile)
             broadcastLogger?.debug(
-                "Asset copied from ${BaseService.geoipAssetPath} -> ${torConfigFiles.geoIpFile}"
+                "Asset copied from ${BaseService.getGeoipAssetPath()} -> ${torConfigFiles.geoIpFile}"
             )
         }
     }
 
     private fun copyGeoIpv6Asset() {
         synchronized(torConfigFiles.geoIpv6FileLock) {
-            torService.copyAsset(BaseService.geoip6AssetPath, torConfigFiles.geoIpv6File)
+            torService.copyAsset(BaseService.getGeoip6AssetPath(), torConfigFiles.geoIpv6File)
             broadcastLogger?.debug(
-                "Asset copied from ${BaseService.geoip6AssetPath} -> ${torConfigFiles.geoIpv6File}"
+                "Asset copied from ${BaseService.getGeoip6AssetPath()} -> ${torConfigFiles.geoIpv6File}"
             )
         }
     }
@@ -177,8 +183,10 @@ internal class ServiceTorInstaller(private val torService: BaseService): TorInst
             If length is greater than 9, then we know this is a custom bridge
         * */
         // TODO: Completely refactor how bridges work.
-        val userDefinedBridgeList: String =
-            torServicePrefs.getList(PrefKeyList.USER_DEFINED_BRIDGES, arrayListOf()).joinToString()
+        val userDefinedBridgeList: String = TorServicePrefs(torService.getContext())
+            .getList(PrefKeyList.USER_DEFINED_BRIDGES, arrayListOf())
+            .joinToString()
+
         var bridgeType = (if (userDefinedBridgeList.length > 9) 1 else 0).toByte()
         // Terrible hack. Must keep in sync with topl::addBridgesFromResources.
         if (bridgeType.toInt() == 0) {
@@ -194,9 +202,8 @@ internal class ServiceTorInstaller(private val torService: BaseService): TorInst
             if (bridgeType.toInt() == 1) {
                 ByteArrayInputStream(userDefinedBridgeList.toByteArray())
             } else {
-                torService.context.resources.openRawResource(R.raw.bridges)
+                torService.getContext().resources.openRawResource(R.raw.bridges)
             }
         return SequenceInputStream(bridgeTypeStream, bridgeStream)
     }
-
 }

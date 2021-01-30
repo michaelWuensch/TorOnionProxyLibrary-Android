@@ -86,8 +86,10 @@ abstract class BaseEventListener: EventListener() {
      * This gets set as soon as [io.matthewnelson.topl_core.OnionProxyManager] is instantiated,
      * and can be used to broadcast messages in your class which extends [TorInstaller].
      * */
-    var broadcastLogger: BroadcastLogger? = null
+    protected var broadcastLogger: BroadcastLogger? = null
         private set
+
+    @JvmSynthetic
     internal fun initBroadcastLogger(torInstallerBroadcastLogger: BroadcastLogger) {
         if (broadcastLogger == null)
             broadcastLogger = torInstallerBroadcastLogger
@@ -111,6 +113,7 @@ abstract class BaseEventListener: EventListener() {
      *
      * TODO: find a less hacky way to do this...
      * */
+    @JvmSynthetic
     internal suspend fun beginWatchingNoticeMsgs() {
         noticeMsgBuffer = StringBuffer()
         delay(50)
@@ -123,6 +126,7 @@ abstract class BaseEventListener: EventListener() {
      * @param [delayMilliseconds] Length of time you wish to delay the coroutine for before executing
      * @return True if it contains the string, false if not.
      * */
+    @JvmSynthetic
     internal suspend fun doesNoticeMsgBufferContain(string: String, delayMilliseconds: Long): Boolean {
         delay(delayMilliseconds)
         val boolean = noticeMsgBuffer.toString().contains(string)

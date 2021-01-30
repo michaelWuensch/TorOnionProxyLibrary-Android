@@ -192,6 +192,18 @@ class OnionAuthUtilitiesUnitTest {
         addV3ClientAuthenticationPrivateKey()
     }
 
+    @Test(expected = IllegalStateException::class)
+    fun `file with same content already exists throws exception`() {
+        addV3ClientAuthenticationPrivateKey()
+        addV3ClientAuthenticationPrivateKey(name = validNickname + "_diff")
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun `file with same content already exists throws exception with onion appendage`() {
+        addV3ClientAuthenticationPrivateKey()
+        addV3ClientAuthenticationPrivateKey(name = validNickname + "_diff", "$validOnion.onion")
+    }
+
     @Test(expected = AssertionError::class)
     fun `check assertion method throws exception if null`() {
         checkAddAuthPrivateAssertions(null)
@@ -244,10 +256,10 @@ class OnionAuthUtilitiesUnitTest {
     }
 
     @Throws(AssertionError::class)
-    private fun checkAddAuthPrivateAssertions(file: File?) {
+    private fun checkAddAuthPrivateAssertions(file: File?, expectedContent: String = expectedFileContent) {
         Assert.assertTrue(file?.exists() == true)
         Assert.assertEquals(file?.parentFile, torConfigFiles.v3AuthPrivateDir)
-        Assert.assertEquals(expectedFileContent, file?.readText())
+        Assert.assertEquals(expectedContent, file?.readText())
     }
 
 
@@ -265,12 +277,12 @@ class OnionAuthUtilitiesUnitTest {
         val name1 = "name1"
         val name2 = "name2"
         val name3 = "name3"
-        val file1 = addV3ClientAuthenticationPrivateKey(name1)
-        val file2 = addV3ClientAuthenticationPrivateKey(name2)
-        val file3 = addV3ClientAuthenticationPrivateKey(name3)
-        checkAddAuthPrivateAssertions(file1)
-        checkAddAuthPrivateAssertions(file2)
-        checkAddAuthPrivateAssertions(file3)
+        val file1 = addV3ClientAuthenticationPrivateKey(name1, privateKey = validClientAuthKey.dropLast(1) + "A")
+        val file2 = addV3ClientAuthenticationPrivateKey(name2, privateKey = validClientAuthKey.dropLast(1) + "B")
+        val file3 = addV3ClientAuthenticationPrivateKey(name3, privateKey = validClientAuthKey.dropLast(1) + "C")
+        checkAddAuthPrivateAssertions(file1, expectedFileContent.dropLast(1) + "A")
+        checkAddAuthPrivateAssertions(file2, expectedFileContent.dropLast(1) + "B")
+        checkAddAuthPrivateAssertions(file3, expectedFileContent.dropLast(1) + "C")
 
         val expectedArray = arrayOf(file1, file2, file3)
 
@@ -316,12 +328,12 @@ class OnionAuthUtilitiesUnitTest {
         val name1 = "name1"
         val name2 = "name2"
         val name3 = "name3"
-        val file1 = addV3ClientAuthenticationPrivateKey(name1)
-        val file2 = addV3ClientAuthenticationPrivateKey(name2)
-        val file3 = addV3ClientAuthenticationPrivateKey(name3)
-        checkAddAuthPrivateAssertions(file1)
-        checkAddAuthPrivateAssertions(file2)
-        checkAddAuthPrivateAssertions(file3)
+        val file1 = addV3ClientAuthenticationPrivateKey(name1, privateKey = validClientAuthKey.dropLast(1) + "A")
+        val file2 = addV3ClientAuthenticationPrivateKey(name2, privateKey = validClientAuthKey.dropLast(1) + "B")
+        val file3 = addV3ClientAuthenticationPrivateKey(name3, privateKey = validClientAuthKey.dropLast(1) + "C")
+        checkAddAuthPrivateAssertions(file1, expectedFileContent.dropLast(1) + "A")
+        checkAddAuthPrivateAssertions(file2, expectedFileContent.dropLast(1) + "B")
+        checkAddAuthPrivateAssertions(file3, expectedFileContent.dropLast(1) + "C")
 
         val expectedNicknames = arrayOf(name1, name2, name3)
 

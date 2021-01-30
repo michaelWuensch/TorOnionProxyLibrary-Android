@@ -82,16 +82,26 @@ import io.matthewnelson.topl_core_base.EventBroadcaster
  * can be controlled in a more efficient/effective manner. It also handles initialization of
  * several other classes [BroadcastLogger]'s upon instantiation.
  * */
-internal class BroadcastLoggerHelper(
+internal class BroadcastLoggerHelper private constructor(
     private val onionProxyManager: OnionProxyManager,
     private val eventBroadcaster: EventBroadcaster,
     private val buildConfigDebug: Boolean
 ) {
 
+    companion object {
+        @JvmSynthetic
+        internal fun instantiate(
+            onionProxyManager: OnionProxyManager,
+            eventBroadcaster: EventBroadcaster,
+            buildConfigDebug: Boolean
+        ): BroadcastLoggerHelper =
+            BroadcastLoggerHelper(onionProxyManager, eventBroadcaster, buildConfigDebug)
+    }
+
     private val broadcastLoggerList = mutableListOf<BroadcastLogger>()
 
     init {
-        onionProxyManager.onionProxyContext.initBroadcastLogger(
+        onionProxyManager.initOnionProxyContextBroadcastLogger(
             getBroadcastLogger(OnionProxyContext::class.java)
         )
         onionProxyManager.torInstaller.initBroadcastLogger(
@@ -107,6 +117,7 @@ internal class BroadcastLoggerHelper(
      * This gets called automatically at every [OnionProxyManager.start]. Can be called at
      * any time whether Tor's State is ON or OFF.
      * */
+    @JvmSynthetic
     fun refreshBroadcastLoggersHasDebugLogsVar() {
         if (broadcastLoggerList.size < 1) return
         val hasDebugLogs = onionProxyManager.torSettings.hasDebugLogs
@@ -124,6 +135,7 @@ internal class BroadcastLoggerHelper(
      *
      * @param [clazz] Class<*> - For initializing [BroadcastLogger.TAG] with your class' name.
      * */
+    @JvmSynthetic
     fun getBroadcastLogger(clazz: Class<*>): BroadcastLogger =
         getBroadcastLogger(clazz.simpleName)
 
@@ -134,10 +146,11 @@ internal class BroadcastLoggerHelper(
      *
      * @param [tagName] String - For initialize [BroadcastLogger.TAG].
      * */
+    @JvmSynthetic
     fun getBroadcastLogger(tagName: String): BroadcastLogger {
         var bl: BroadcastLogger? = checkIfBroadcastLoggerExists(tagName)
         if (bl == null) {
-            bl = BroadcastLogger(
+            bl = BroadcastLogger.instantiate(
                 tagName,
                 eventBroadcaster,
                 buildConfigDebug,

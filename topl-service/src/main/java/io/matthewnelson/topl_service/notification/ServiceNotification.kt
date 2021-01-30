@@ -98,7 +98,7 @@ import kotlinx.coroutines.launch
  *
  * @see [Builder]
  * */
-class ServiceNotification internal constructor(
+class ServiceNotification private constructor(
     private val channelName: String,
     private val channelID: String,
     private val channelDescription: String,
@@ -158,13 +158,12 @@ class ServiceNotification internal constructor(
             ) { "channelName, channelID, & channelDescription must not be empty." }
         }
 
-        private val serviceNotification =
-            ServiceNotification(
-                channelName,
-                channelID,
-                channelDescription,
-                notificationID
-            )
+        private val serviceNotification = ServiceNotification(
+            channelName,
+            channelID,
+            channelDescription,
+            notificationID
+        )
 
         /**
          * Do not use this method.
@@ -382,6 +381,7 @@ class ServiceNotification internal constructor(
          * channel. This is called by
          * [io.matthewnelson.topl_service.TorServiceController.Builder.build]
          * */
+        @JvmSynthetic
         internal fun build(context: Context) {
             // Only initialize it once. Reflection has issues here
             // as it's in a Companion object.
@@ -395,9 +395,13 @@ class ServiceNotification internal constructor(
 
     }
 
-    internal companion object {
-        lateinit var serviceNotification: ServiceNotification
-            private set
+    companion object {
+        private lateinit var serviceNotification: ServiceNotification
+
+        @JvmSynthetic
+        @Throws(UninitializedPropertyAccessException::class)
+        internal fun getServiceNotification(): ServiceNotification =
+            serviceNotification
     }
 
 
@@ -409,11 +413,12 @@ class ServiceNotification internal constructor(
     private val timeoutLength = 3_000L
     private var startTime: Long? = null
 
+    @JvmSynthetic
     internal fun buildNotification(
         torService: BaseService,
         setStartTime: Boolean = false
     ): NotificationCompat.Builder {
-        val builder = NotificationCompat.Builder(torService.context.applicationContext, channelID)
+        val builder = NotificationCompat.Builder(torService.getContext().applicationContext, channelID)
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
             .setContentText(currentContentText)
             .setContentTitle(currentContentTitle)
@@ -453,12 +458,12 @@ class ServiceNotification internal constructor(
 
             // if the request code has been changed
         } ?: if (activityIntentRequestCode != 0) {
-                torService.context.packageManager
-                    ?.getLaunchIntentForPackage(torService.context.packageName)
+                torService.getContext().packageManager
+                    ?.getLaunchIntentForPackage(torService.getContext().packageName)
                     ?.let { intent ->
                         builder.setContentIntent(
                             PendingIntent.getActivity(
-                                torService.context,
+                                torService.getContext(),
                                 activityIntentRequestCode,
                                 intent,
                                 PendingIntent.FLAG_UPDATE_CURRENT,
@@ -473,13 +478,13 @@ class ServiceNotification internal constructor(
     }
 
     private fun getContentPendingIntent(torService: BaseService, clazz: Class<*>): PendingIntent {
-        val contentIntent = Intent(torService.context, clazz)
+        val contentIntent = Intent(torService.getContext(), clazz)
 
         if (!activityIntentKey.isNullOrEmpty() && !activityIntentExtras.isNullOrEmpty())
             contentIntent.putExtra(activityIntentKey, activityIntentExtras)
 
         return PendingIntent.getActivity(
-            torService.context,
+            torService.getContext(),
             activityIntentRequestCode,
             contentIntent,
             PendingIntent.FLAG_UPDATE_CURRENT
@@ -523,6 +528,7 @@ class ServiceNotification internal constructor(
         }
     }
 
+    @JvmSynthetic
     @Synchronized
     internal fun remove() {
         notificationManager?.cancel(notificationID)
@@ -532,6 +538,7 @@ class ServiceNotification internal constructor(
      * Called once per application start in
      * [io.matthewnelson.topl_service.TorServiceController.Builder.build]
      * */
+    @JvmSynthetic
     internal fun setupNotificationChannel(context: Context): ServiceNotification {
         notificationManager = context.applicationContext
             .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
@@ -553,14 +560,14 @@ class ServiceNotification internal constructor(
     /// Foreground Service ///
     //////////////////////////
     @Volatile
-    internal var inForeground = false
-        private set
+    private var inForeground = false
 
     /**
      * Sends [TorService] to the Foreground.
      *
      * @return `true` if sent to Foreground, `false` if no action taken
      * */
+    @JvmSynthetic
     @Synchronized
     internal fun startForeground(torService: BaseService): Boolean {
         return if (!inForeground) {
@@ -580,6 +587,7 @@ class ServiceNotification internal constructor(
      *
      * @return `true` if sent to Background, `false` if no action taken
      * */
+    @JvmSynthetic
     @Synchronized
     internal fun stopForeground(torService: BaseService): Boolean {
         return if (inForeground) {
@@ -599,9 +607,9 @@ class ServiceNotification internal constructor(
     /// Actions ///
     ///////////////
     @Volatile
-    internal var actionsPresent = false
-        private set
+    private var actionsPresent = false
 
+    @JvmSynthetic
     @Synchronized
     internal fun addActions(torService: BaseService) {
         val builder = notificationBuilder ?: return
@@ -613,14 +621,14 @@ class ServiceNotification internal constructor(
             getActionPendingIntent(torService, ServiceActionName.NEW_ID, 1)
         )
 
-        if (enableRestartButton && TorServiceReceiver.deviceIsLocked != true)
+        if (enableRestartButton && TorServiceReceiver.deviceIsLocked() != true)
             builder.addAction(
                 0,
                 "Restart Tor",
                 getActionPendingIntent(torService, ServiceActionName.RESTART_TOR, 2)
             )
 
-        if (enableStopButton && TorServiceReceiver.deviceIsLocked != true)
+        if (enableStopButton && TorServiceReceiver.deviceIsLocked() != true)
             builder.addAction(
                 0,
                 "Stop Tor",
@@ -634,12 +642,12 @@ class ServiceNotification internal constructor(
         @ServiceActionName action: String,
         requestCode: Int
     ): PendingIntent {
-        val intent = Intent(TorServiceReceiver.SERVICE_INTENT_FILTER)
-        intent.putExtra(TorServiceReceiver.SERVICE_INTENT_FILTER, action)
-        intent.setPackage(torService.context.packageName)
+        val intent = Intent(TorServiceReceiver.getServiceIntentFilter())
+        intent.putExtra(TorServiceReceiver.getServiceIntentFilter(), action)
+        intent.setPackage(torService.getContext().packageName)
 
         return PendingIntent.getBroadcast(
-            torService.context,
+            torService.getContext(),
             requestCode,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT
@@ -653,6 +661,7 @@ class ServiceNotification internal constructor(
      *   present, thus not needing a refresh
      * @see [TorServiceReceiver.deviceIsLocked]
      * */
+    @JvmSynthetic
     @Synchronized
     internal fun refreshActions(torService: BaseService): Boolean {
         return if (actionsPresent) {
@@ -664,6 +673,7 @@ class ServiceNotification internal constructor(
         }
     }
 
+    @JvmSynthetic
     @Synchronized
     internal fun removeActions(torService: BaseService) {
         actionsPresent = false
@@ -675,9 +685,12 @@ class ServiceNotification internal constructor(
     /// Content Text ///
     ////////////////////
     @Volatile
-    internal var currentContentText = "Starting Tor..."
-        private set
+    private var currentContentText = "Starting Tor..."
+    @JvmSynthetic
+    internal fun getCurrentContentText(): String =
+        currentContentText
 
+    @JvmSynthetic
     @Synchronized
     internal fun updateContentText(torService: BaseService, string: String) {
         if (currentContentText == string) return
@@ -692,9 +705,12 @@ class ServiceNotification internal constructor(
     /// Content Title ///
     /////////////////////
     @Volatile
-    internal var currentContentTitle = TorState.OFF
-        private set
+    private var currentContentTitle = TorState.OFF
+    @JvmSynthetic
+    internal fun getCurrentContentTitle(): @TorState String =
+        currentContentTitle
 
+    @JvmSynthetic
     @Synchronized
     internal fun updateContentTitle(torService: BaseService, title: String) {
         if (currentContentTitle == title) return
@@ -709,11 +725,15 @@ class ServiceNotification internal constructor(
     /// Icon ///
     ////////////
     @Volatile
-    internal var currentIcon = imageNetworkDisabled
-        private set
-    @Volatile
-    internal var currentColor: Int? = null
+    private var currentIcon = imageNetworkDisabled
+    @JvmSynthetic
+    internal fun getCurrentIcon(): Int =
+        currentIcon
 
+    @Volatile
+    private var currentColor: Int? = null
+
+    @JvmSynthetic
     @Synchronized
     internal fun updateIcon(torService: BaseService, @NotificationImage notificationImage: Int) {
         val builder = notificationBuilder ?: return
@@ -723,7 +743,7 @@ class ServiceNotification internal constructor(
                 currentIcon = imageNetworkEnabled
                 builder.setSmallIcon(imageNetworkEnabled)
 
-                val color = ContextCompat.getColor(torService.context, colorWhenConnected)
+                val color = ContextCompat.getColor(torService.getContext(), colorWhenConnected)
                 builder.color = color
                 currentColor = color
             }
@@ -732,7 +752,7 @@ class ServiceNotification internal constructor(
                 currentIcon = imageNetworkDisabled
                 builder.setSmallIcon(imageNetworkDisabled)
 
-                val color = ContextCompat.getColor(torService.context, R.color.tor_service_white)
+                val color = ContextCompat.getColor(torService.getContext(), R.color.tor_service_white)
                 builder.color = color
                 currentColor = color
             }
@@ -756,12 +776,15 @@ class ServiceNotification internal constructor(
     /// Progress Bar ///
     ////////////////////
     @Volatile
-    internal var progressBarShown = true
-        private set
-    @Volatile
-    internal var progressValue: Int? = null
-        private set
+    private var progressBarShown = true
+    @JvmSynthetic
+    internal fun getProgressBarShown(): Boolean =
+        progressBarShown
 
+    @Volatile
+    private var progressValue: Int? = null
+
+    @JvmSynthetic
     @Synchronized
     internal fun updateProgress(torService: BaseService, show: Boolean, progress: Int? = null) {
         val builder = notificationBuilder ?: return

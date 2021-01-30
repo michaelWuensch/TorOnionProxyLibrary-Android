@@ -85,9 +85,15 @@ import java.io.File
  * Use [io.matthewnelson.topl_service.TorServiceController.getV3ClientAuthManager] to
  * instantiate an instance of the Manager.
  * */
-internal class V3ClientAuthManager(
+internal class V3ClientAuthManager private constructor(
     private val torConfigFiles: TorConfigFiles
 ): BaseV3ClientAuthManager() {
+
+    companion object {
+        @JvmSynthetic
+        fun instantiate(torConfigFiles: TorConfigFiles): V3ClientAuthManager =
+            V3ClientAuthManager(torConfigFiles)
+    }
 
     ///////////////////////////////////
     /// Add v3 Client Authorization ///

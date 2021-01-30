@@ -99,7 +99,15 @@ import io.matthewnelson.topl_core.util.CoreConsts
 /**
  * Current State of Tor
  */
-class TorStateMachine(private val broadcastLogger: BroadcastLogger): CoreConsts() {
+class TorStateMachine private constructor(
+    private val broadcastLogger: BroadcastLogger
+): CoreConsts() {
+
+    companion object {
+        @JvmSynthetic
+        internal fun instantiate(broadcastLogger: BroadcastLogger): TorStateMachine =
+            TorStateMachine(broadcastLogger)
+    }
 
     private var currentTorState: @TorState String = TorState.OFF
     private var currentTorNetworkState: @TorNetworkState String = TorNetworkState.DISABLED
@@ -125,6 +133,7 @@ class TorStateMachine(private val broadcastLogger: BroadcastLogger): CoreConsts(
      * @param [state] [io.matthewnelson.topl_core_base.BaseConsts.TorState]
      * @return Previous [io.matthewnelson.topl_core_base.BaseConsts.TorState]
      * */
+    @JvmSynthetic
     @Synchronized
     internal fun setTorState(@TorState state: String): @TorState String {
         val currentState = currentTorState
@@ -144,6 +153,7 @@ class TorStateMachine(private val broadcastLogger: BroadcastLogger): CoreConsts(
      * @param [networkState] [io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState]
      * @return Previous [io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState]
      * */
+    @JvmSynthetic
     @Synchronized
     internal fun setTorNetworkState(@TorNetworkState networkState: String): @TorNetworkState String {
         val currentNetworkState = currentTorNetworkState

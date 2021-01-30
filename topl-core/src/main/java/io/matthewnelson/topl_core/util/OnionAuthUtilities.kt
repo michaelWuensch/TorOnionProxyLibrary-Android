@@ -110,7 +110,8 @@ object OnionAuthUtilities {
      *
      * @return The File if it was created properly, `null` if it was not
      * @throws [IllegalArgumentException] If passed arguments are not compliant with the spec
-     * @throws [IllegalStateException] If the file already exists (and must be deleted before overwriting)
+     * @throws [IllegalStateException] If the file already exists (and must be deleted before
+     *   overwriting), or if a file exists with the same onion address & private key
      * @throws [SecurityException] If access is not authorized
      * */
     @WorkerThread
@@ -159,7 +160,23 @@ object OnionAuthUtilities {
             )
         }
 
+        val existingFiles = getAllFiles(torConfigFiles)
+
         synchronized(torConfigFiles.v3AuthPrivateDirLock) {
+
+            if (existingFiles != null) {
+                for (existingFile in existingFiles) {
+                    existingFile.readText().split(':').let { split ->
+                        if (
+                            split.getOrNull(0) == onion &&
+                            split.getOrNull(3) == key
+                        ) {
+                            throw IllegalStateException("A file with identical information already exists")
+                        }
+                    }
+                }
+            }
+
             if (file.createNewFileIfDoesNotExist() != true) {
                 return null
             }

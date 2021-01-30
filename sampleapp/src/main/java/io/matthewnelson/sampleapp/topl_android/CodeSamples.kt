@@ -178,6 +178,7 @@ class CodeSamples {
             // TorServiceController.Companion?.appEventBroadcaster and cast what's returned
             // as MyEventBroadcaster
             .setEventBroadcaster(eventBroadcaster = MyEventBroadcaster())
+            .setServiceExecutionHooks(executionHooks = MyServiceExecutionHooks())
 
             // Only needed if you wish to customize the directories/files used by Tor if
             // the defaults aren't to your liking.

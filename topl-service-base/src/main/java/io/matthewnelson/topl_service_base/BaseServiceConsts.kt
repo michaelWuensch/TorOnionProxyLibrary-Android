@@ -100,9 +100,74 @@ abstract class BaseServiceConsts: BaseConsts() {
     }
 
 
+    /////////////////////
+    /// ServiceAction ///
+    /////////////////////
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.TYPE,
+        AnnotationTarget.PROPERTY
+    )
+    @StringDef(
+        ServiceActionName.DISABLE_NETWORK,
+        ServiceActionName.ENABLE_NETWORK,
+        ServiceActionName.NEW_ID,
+        ServiceActionName.RESTART_TOR,
+        ServiceActionName.START,
+        ServiceActionName.STOP
+    )
+    @Retention(AnnotationRetention.SOURCE)
+    annotation class ServiceActionName {
+        companion object {
+            private const val ACTION_NAME = "Action_"
+            const val DISABLE_NETWORK = "${ACTION_NAME}DISABLE_NETWORK"
+            const val ENABLE_NETWORK = "${ACTION_NAME}ENABLE_NETWORK"
+            const val NEW_ID = "${ACTION_NAME}NEW_ID"
+            const val RESTART_TOR = "${ACTION_NAME}RESTART_TOR"
+            const val START = "${ACTION_NAME}START"
+            const val STOP = "${ACTION_NAME}STOP"
+        }
+    }
+
+
+    ////////////////////////////////
+    /// Service Lifecycle Events ///
+    ////////////////////////////////
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.PROPERTY,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.TYPE
+    )
+    @StringDef(
+        ServiceLifecycleEvent.CREATED,
+        ServiceLifecycleEvent.DESTROYED,
+        ServiceLifecycleEvent.ON_BIND,
+        ServiceLifecycleEvent.ON_UNBIND,
+        ServiceLifecycleEvent.TASK_REMOVED,
+    )
+    @Retention(AnnotationRetention.SOURCE)
+    annotation class ServiceLifecycleEvent {
+        companion object {
+            const val CREATED = "onCreate"
+            const val DESTROYED = "onDestroy"
+            const val ON_BIND = "onBind"
+            const val ON_UNBIND = "onUnbind"
+            const val TASK_REMOVED = "onTaskRemoved"
+        }
+    }
+
+
     ///////////////////////
     /// TorServicePrefs ///
     ///////////////////////
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.PROPERTY,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.TYPE
+    )
     @StringDef(
         PrefKeyBoolean.DISABLE_NETWORK,
         PrefKeyBoolean.HAS_BRIDGES,
@@ -142,6 +207,12 @@ abstract class BaseServiceConsts: BaseConsts() {
         }
     }
 
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.PROPERTY,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.TYPE
+    )
     @StringDef(
         PrefKeyInt.DORMANT_CLIENT_TIMEOUT,
         PrefKeyInt.PROXY_PORT,
@@ -157,6 +228,12 @@ abstract class BaseServiceConsts: BaseConsts() {
         }
     }
 
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.PROPERTY,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.TYPE
+    )
     @StringDef(
         PrefKeyList.DNS_PORT_ISOLATION_FLAGS,
         PrefKeyList.HTTP_TUNNEL_PORT_ISOLATION_FLAGS,
@@ -176,6 +253,12 @@ abstract class BaseServiceConsts: BaseConsts() {
         }
     }
 
+    @Target(
+        AnnotationTarget.CLASS,
+        AnnotationTarget.PROPERTY,
+        AnnotationTarget.VALUE_PARAMETER,
+        AnnotationTarget.TYPE
+    )
     @StringDef(
         PrefKeyString.DNS_PORT,
         PrefKeyString.CUSTOM_TORRC,

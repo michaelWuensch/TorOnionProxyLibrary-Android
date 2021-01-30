@@ -94,27 +94,28 @@ import java.lang.reflect.InvocationTargetException
  *
  * @see [BaseService]
  * */
-internal class TorService: BaseService() {
+internal class TorService internal constructor(): BaseService() {
 
-    override val context: Context
-        get() = this
+    @JvmSynthetic
+    override fun getContext(): Context = this
 
 
     ///////////////
     /// Binding ///
     ///////////////
     private val torServiceBinder: TorServiceBinder by lazy {
-        TorServiceBinder(this)
+        TorServiceBinder.instantiate(this)
     }
 
+    @JvmSynthetic
     override fun unbindTorService() {
         try {
-            unbindService(context)
-            broadcastLogger.debug("Has been unbound")
+            unbindService(getContext())
+            super.unbindTorService()
         } catch (e: IllegalArgumentException) {}
     }
     override fun onBind(intent: Intent?): IBinder? {
-        broadcastLogger.debug("Has been bound")
+        super.onBind(null)
         return torServiceBinder
     }
 
@@ -123,14 +124,17 @@ internal class TorService: BaseService() {
     /// BroadcastReceiver ///
     /////////////////////////
     private val torServiceReceiver by lazy {
-        TorServiceReceiver(this)
+        TorServiceReceiver.instantiate(this)
     }
+    @JvmSynthetic
     override fun registerReceiver() {
         torServiceReceiver.register()
     }
+    @JvmSynthetic
     override fun setIsDeviceLocked() {
         torServiceReceiver.setDeviceIsLocked()
     }
+    @JvmSynthetic
     override fun unregisterReceiver() {
         torServiceReceiver.unregister()
     }
@@ -140,12 +144,19 @@ internal class TorService: BaseService() {
     /// Coroutines ///
     //////////////////
     private val supervisorJob = SupervisorJob()
+    private val scopeDefault = CoroutineScope(Dispatchers.Default + supervisorJob)
     private val scopeIO = CoroutineScope(Dispatchers.IO + supervisorJob)
     private val scopeMain = CoroutineScope(Dispatchers.Main + supervisorJob)
 
+    @JvmSynthetic
+    override fun getScopeDefault(): CoroutineScope {
+        return scopeDefault
+    }
+    @JvmSynthetic
     override fun getScopeIO(): CoroutineScope {
         return scopeIO
     }
+    @JvmSynthetic
     override fun getScopeMain(): CoroutineScope {
         return scopeMain
     }
@@ -164,10 +175,11 @@ internal class TorService: BaseService() {
 
     // See BaseService
 
+    @JvmSynthetic
     override fun refreshNotificationActions(): Boolean {
         val wasRefreshed = super.refreshNotificationActions()
         if (wasRefreshed) {
-            val debugMsg = if (TorServiceReceiver.deviceIsLocked == true)
+            val debugMsg = if (TorServiceReceiver.deviceIsLocked() == true)
                 "Removed Notification Actions"
             else
                 "Added Notification Actions"
@@ -175,6 +187,7 @@ internal class TorService: BaseService() {
         }
         return wasRefreshed
     }
+    @JvmSynthetic
     override fun startForegroundService(): Boolean {
         val wasStarted = super.startForegroundService()
         if (wasStarted) {
@@ -182,6 +195,7 @@ internal class TorService: BaseService() {
         }
         return wasStarted
     }
+    @JvmSynthetic
     override fun stopForegroundService(): Boolean {
         val wasStopped = super.stopForegroundService()
         if (wasStopped) {
@@ -199,71 +213,99 @@ internal class TorService: BaseService() {
     }
     private val onionProxyManager: OnionProxyManager by lazy {
         OnionProxyManager(
-            context,
+            getContext(),
             TorServiceController.getTorConfigFiles(),
-            ServiceTorInstaller(this),
+            ServiceTorInstaller.instantiate(this),
             TorServiceController.getServiceTorSettings(),
-            ServiceEventListener(),
-            ServiceEventBroadcaster(this),
-            buildConfigDebug
+            ServiceEventListener.instantiate(),
+            ServiceEventBroadcaster.instantiate(this),
+            getBuildConfigDebug()
         )
     }
 
+    @JvmSynthetic
     @WorkerThread
     @Throws(IOException::class)
     override fun copyAsset(assetPath: String, file: File) {
         try {
-            FileUtilities.copy(context.assets.open(assetPath), file.outputStream())
+            FileUtilities.copy(getContext().assets.open(assetPath), file.outputStream())
         } catch (e: Exception) {
             throw IOException("Failed copying asset from $assetPath", e)
         }
     }
+    @JvmSynthetic
     @WorkerThread
     @Throws(IOException::class, NullPointerException::class)
     override fun disableNetwork(disable: Boolean) {
         onionProxyManager.disableNetwork(disable)
     }
+    @JvmSynthetic
     override fun getBroadcastLogger(clazz: Class<*>): BroadcastLogger {
         return onionProxyManager.getBroadcastLogger(clazz)
     }
+    @JvmSynthetic
     override fun hasNetworkConnectivity(): Boolean {
         return onionProxyManager.hasNetworkConnectivity()
     }
+    @JvmSynthetic
     override fun hasControlConnection(): Boolean {
         return onionProxyManager.hasControlConnection
     }
+    @JvmSynthetic
     override fun isTorOff(): Boolean {
         return onionProxyManager.torStateMachine.isOff
     }
+    @JvmSynthetic
     override fun isTorOn(): Boolean {
         return onionProxyManager.torStateMachine.isOn
     }
+    @JvmSynthetic
     override fun refreshBroadcastLoggersHasDebugLogsVar() {
         onionProxyManager.refreshBroadcastLoggersHasDebugLogsVar()
     }
+    @JvmSynthetic
     @WorkerThread
     override fun signalControlConnection(torControlCommand: String): Boolean {
         return onionProxyManager.signalControlConnection(torControlCommand)
     }
+    @JvmSynthetic
     @WorkerThread
     override suspend fun signalNewNym() {
         onionProxyManager.signalNewNym()
     }
+    @JvmSynthetic
     @WorkerThread
-    override fun startTor() {
+    @Suppress("BlockingMethodInNonBlockingContext")
+    override suspend fun startTor() {
         try {
+            TorServiceController.serviceExecutionHooks
+                ?.executeBeforeStartTor(getContext().applicationContext)
+
             onionProxyManager.setup()
             generateTorrcFile()
 
             onionProxyManager.start()
+            delay(300L)
         } catch (e: Exception) {
             broadcastLogger.exception(e)
         }
     }
+    @JvmSynthetic
     @WorkerThread
-    override fun stopTor() {
+    @Suppress("BlockingMethodInNonBlockingContext")
+    override suspend fun stopTor() {
+
         try {
             onionProxyManager.stop()
+        } catch (e: Exception) {
+            broadcastLogger.exception(e)
+        }
+
+        delay(300L)
+
+        try {
+            TorServiceController.serviceExecutionHooks
+                ?.executeAfterStopTor(getContext().applicationContext)
         } catch (e: Exception) {
             broadcastLogger.exception(e)
         }
@@ -295,7 +337,7 @@ internal class TorService: BaseService() {
 
 
     override fun onCreate() {
-        broadcastLogger.notice("Created. BuildConfig.DEBUG set to: $buildConfigDebug")
+        broadcastLogger.notice("BuildConfig.DEBUG set to: ${getBuildConfigDebug()}")
         super.onCreate()
     }
 
@@ -309,7 +351,6 @@ internal class TorService: BaseService() {
     override fun onTaskRemoved(rootIntent: Intent?) {
         // Cancel the BackgroundManager's coroutine if it's active so it doesn't execute
         torServiceBinder.cancelExecuteBackgroundPolicyJob()
-        broadcastLogger.notice("Task has been removed")
         super.onTaskRemoved(rootIntent)
     }
 }

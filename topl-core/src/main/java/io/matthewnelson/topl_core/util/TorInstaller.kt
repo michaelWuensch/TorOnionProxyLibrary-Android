@@ -113,8 +113,10 @@ abstract class TorInstaller: CoreConsts() {
      * This gets set as soon as [io.matthewnelson.topl_core.OnionProxyManager] is instantiated,
      * and can be used to broadcast messages in your class which extends [TorInstaller].
      * */
-    var broadcastLogger: BroadcastLogger? = null
+    protected var broadcastLogger: BroadcastLogger? = null
         private set
+
+    @JvmSynthetic
     internal fun initBroadcastLogger(torInstallerBroadcastLogger: BroadcastLogger) {
         if (broadcastLogger == null)
             broadcastLogger = torInstallerBroadcastLogger

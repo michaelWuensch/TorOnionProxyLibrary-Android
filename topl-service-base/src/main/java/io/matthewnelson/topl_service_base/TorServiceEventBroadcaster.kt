@@ -71,6 +71,7 @@
 * */
 package io.matthewnelson.topl_service_base
 
+import io.matthewnelson.topl_service_base.BaseServiceConsts.ServiceLifecycleEvent
 import io.matthewnelson.topl_core_base.EventBroadcaster
 
 /**
@@ -98,4 +99,6 @@ abstract class TorServiceEventBroadcaster: EventBroadcaster() {
      * @see [TorPortInfo]
      * */
     abstract fun broadcastPortInformation(torPortInfo: TorPortInfo)
+
+    open fun broadcastServiceLifecycleEvent(@ServiceLifecycleEvent event: String, hashCode: Int) {}
 }

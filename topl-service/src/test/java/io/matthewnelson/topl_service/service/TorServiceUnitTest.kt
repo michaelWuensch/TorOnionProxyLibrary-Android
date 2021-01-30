@@ -74,7 +74,6 @@ package io.matthewnelson.topl_service.service
 import android.app.Application
 import android.content.ComponentName
 import android.content.Intent
-import android.os.Looper.getMainLooper
 import androidx.test.core.app.ApplicationProvider
 import io.matthewnelson.test_helpers.application_provided_classes.TestEventBroadcaster
 import io.matthewnelson.test_helpers.application_provided_classes.TestTorSettings
@@ -91,7 +90,7 @@ import io.matthewnelson.topl_service.service.components.receiver.TorServiceRecei
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
 import io.matthewnelson.topl_service.service.components.binding.TorServiceConnection
 import io.matthewnelson.topl_service_base.BaseServiceConsts.PrefKeyBoolean
-import io.matthewnelson.topl_service.util.ServiceConsts.ServiceActionName
+import io.matthewnelson.topl_service_base.BaseServiceConsts.ServiceActionName
 import io.matthewnelson.topl_service_base.ServiceUtilities
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.TestCoroutineDispatcher
@@ -131,7 +130,7 @@ internal class TorServiceUnitTest {
     private val serviceEventBroadcaster: ServiceEventBroadcaster
         get() = testTorService.serviceEventBroadcaster
     private val serviceNotification: ServiceNotification
-        get() = ServiceNotification.serviceNotification
+        get() = ServiceNotification.getServiceNotification()
 
     private val testDispatcher = TestCoroutineDispatcher()
 
@@ -176,7 +175,7 @@ internal class TorServiceUnitTest {
         )
         BaseService.startService(app, TestTorService::class.java)
         assertEquals(shadowOf(app).nextStartedService.action, ServiceActionName.START)
-        assertNotNull(TorServiceConnection.serviceBinder)
+        assertNotNull(TorServiceConnection.getServiceBinder())
 
         // Simulate startup
         testTorService.onCreate()
@@ -228,13 +227,13 @@ internal class TorServiceUnitTest {
         var statePair = testTorService.getSimulatedTorStates()
         assertEquals(TorState.STARTING, statePair.first)
         assertEquals(TorNetworkState.DISABLED, statePair.second)
-        assertEquals(TorState.STARTING, serviceNotification.currentContentTitle)
+        assertEquals(TorState.STARTING, serviceNotification.getCurrentContentTitle())
         delay(1000)
 
         statePair = testTorService.getSimulatedTorStates()
         assertEquals(TorState.ON, statePair.first)
         assertEquals(TorNetworkState.DISABLED, statePair.second)
-        assertEquals(TorState.ON, serviceNotification.currentContentTitle)
+        assertEquals(TorState.ON, serviceNotification.getCurrentContentTitle())
         delay(1000)
 
         // Ensure ServiceActionProcessor started Tor, messages broadcast properly,
@@ -242,31 +241,31 @@ internal class TorServiceUnitTest {
         statePair = testTorService.getSimulatedTorStates()
         assertEquals(TorState.ON, statePair.first)
         assertEquals(TorNetworkState.ENABLED, statePair.second)
-        assertEquals(TorState.ON, serviceNotification.currentContentTitle)
+        assertEquals(TorState.ON, serviceNotification.getCurrentContentTitle())
 
         // Waiting to Bootstrap
-        assertEquals(true, serviceNotification.progressBarShown)
-        assertEquals(serviceNotification.imageNetworkDisabled, serviceNotification.currentIcon)
+        assertEquals(true, serviceNotification.getProgressBarShown())
+        assertEquals(serviceNotification.imageNetworkDisabled, serviceNotification.getCurrentIcon())
         delay(1000)
 
         // Bootstrapped
-        assertEquals("Bootstrapped 95%", serviceNotification.currentContentText)
+        assertEquals("Bootstrapped 95%", serviceNotification.getCurrentContentText())
         delay(1000)
 
-        assertEquals("Bootstrapped 100%", serviceNotification.currentContentText)
-        assertEquals(false, serviceNotification.progressBarShown)
-        assertEquals(serviceNotification.imageNetworkEnabled, serviceNotification.currentIcon)
+        assertEquals("Bootstrapped 100%", serviceNotification.getCurrentContentText())
+        assertEquals(false, serviceNotification.getProgressBarShown())
+        assertEquals(serviceNotification.imageNetworkEnabled, serviceNotification.getCurrentIcon())
         delay(1000)
 
         // Data transfer
         val bandwidth = testTorService.bandwidth1000
         val contentTextString =
             ServiceUtilities.getFormattedBandwidthString(bandwidth.toLong(), bandwidth.toLong())
-        assertEquals(contentTextString, serviceNotification.currentContentText)
-        assertEquals(serviceNotification.imageDataTransfer, serviceNotification.currentIcon)
+        assertEquals(contentTextString, serviceNotification.getCurrentContentText())
+        assertEquals(serviceNotification.imageDataTransfer, serviceNotification.getCurrentIcon())
         delay(1000)
 
-        assertEquals(serviceNotification.imageNetworkEnabled, serviceNotification.currentIcon)
+        assertEquals(serviceNotification.imageNetworkEnabled, serviceNotification.getCurrentIcon())
         delay(1000)
 
         // Ensure Receivers were registered
@@ -274,7 +273,7 @@ internal class TorServiceUnitTest {
             // Registered with the system
             assertEquals(testTorService.torServiceReceiver, it.broadcastReceiver)
             // Boolean value is correct
-            assertEquals(true, TorServiceReceiver.isRegistered)
+            assertEquals(true, TorServiceReceiver.isRegistered())
         }
 
         // Test TorServicePrefsListener is working (will refresh Loggers if tor is _not_ off)
@@ -296,20 +295,20 @@ internal class TorServiceUnitTest {
         var statePair = testTorService.getSimulatedTorStates()
         assertEquals(TorState.STOPPING, statePair.first)
         assertEquals(TorNetworkState.ENABLED, statePair.second)
-        assertEquals(TorState.STOPPING, serviceNotification.currentContentTitle)
-        assertEquals("Stopping Service...", serviceNotification.currentContentText)
+        assertEquals(TorState.STOPPING, serviceNotification.getCurrentContentTitle())
+        assertEquals("Stopping Service...", serviceNotification.getCurrentContentText())
         delay(1000)
 
         statePair = testTorService.getSimulatedTorStates()
         assertEquals(TorState.STOPPING, statePair.first)
         assertEquals(TorNetworkState.DISABLED, statePair.second)
-        assertEquals(TorState.STOPPING, serviceNotification.currentContentTitle)
+        assertEquals(TorState.STOPPING, serviceNotification.getCurrentContentTitle())
         delay(1000)
 
         statePair = testTorService.getSimulatedTorStates()
         assertEquals(TorState.OFF, statePair.first)
         assertEquals(TorNetworkState.DISABLED, statePair.second)
-        assertEquals(TorState.OFF, serviceNotification.currentContentTitle)
+        assertEquals(TorState.OFF, serviceNotification.getCurrentContentTitle())
         delay(1000)
 
         // Ensure Receivers were unregistered
@@ -317,7 +316,7 @@ internal class TorServiceUnitTest {
             // Registered with the system
             assertNull(it.broadcastReceiver)
             // Boolean value is correct
-            assertEquals(false, TorServiceReceiver.isRegistered)
+            assertEquals(false, TorServiceReceiver.isRegistered())
         }
 
         // Test TorServicePrefsListener is unregistered

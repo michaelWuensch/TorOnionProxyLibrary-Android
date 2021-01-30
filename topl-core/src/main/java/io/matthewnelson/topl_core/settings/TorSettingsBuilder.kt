@@ -127,10 +127,19 @@ import java.util.*
  * @param [broadcastLogger] for broadcasting/logging
  * @sample [io.matthewnelson.topl_service.service.TorService.generateTorrcFile]
  * */
-class TorSettingsBuilder internal constructor(
+class TorSettingsBuilder private constructor(
     private val onionProxyContext: OnionProxyContext,
     private val broadcastLogger: BroadcastLogger
 ): CoreConsts() {
+
+    companion object {
+        @JvmSynthetic
+        internal fun instantiate(
+            onionProxyContext: OnionProxyContext,
+            broadcastLogger: BroadcastLogger
+        ): TorSettingsBuilder =
+            TorSettingsBuilder(onionProxyContext, broadcastLogger)
+    }
 
     private var buffer = StringBuffer()
     private val torConfigFiles: TorConfigFiles
