@@ -11,7 +11,7 @@
         <meta name="description" content="An Android Library for embedding Tor as a service into your Application">
       
       
-        <link rel="canonical" href="https://topl-android.matthewnelson.io/topl-core/io.matthewnelson.topl_core.broadcaster/-tor-state-machine/-init-/">
+        <link rel="canonical" href="https://topl-android.matthewnelson.io/topl-service-base/io.matthewnelson.topl_service_base/-service-execution-hooks/execute-after-stop-tor/">
       
       
         <meta name="author" content="Matthew Nelson">
@@ -21,7 +21,7 @@
     
     
       
-        <title>init - TorOnionProxyLibrary-Android</title>
+        <title>Execute after stop tor - TorOnionProxyLibrary-Android</title>
       
     
     
@@ -59,7 +59,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#init" class="md-skip">
+        <a href="#executeafterstoptor" class="md-skip">
           Skip to content
         </a>
       
@@ -87,7 +87,7 @@
           </span>
           <span class="md-header-nav__topic md-ellipsis">
             
-               init 
+              Execute after stop tor
             
           </span>
         </div>
@@ -387,7 +387,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/edit/master/docs/topl-core/io.matthewnelson.topl_core.broadcaster/-tor-state-machine/-init-.md" title="Edit this page" class="md-content__button md-icon">
+                  <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/edit/master/docs/topl-service-base/io.matthewnelson.topl_service_base/-service-execution-hooks/execute-after-stop-tor.md" title="Edit this page" class="md-content__button md-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
                   </a>
                 
@@ -395,10 +395,43 @@
                   
                 
                 
-                <p><a href="../../../">topl-core</a> / <a href="../../">io.matthewnelson.topl_core.broadcaster</a> / <a href="../">TorStateMachine</a> / <a href="./">&lt;init&gt;</a></p>
-<h1 id="init">&lt;init&gt;<a class="headerlink" href="#init" title="Permanent link">&para;</a></h1>
-<p><code>TorStateMachine(broadcastLogger:</code><a href="../../-broadcast-logger/"><code>BroadcastLogger</code></a><code>)</code></p>
-<p>Current State of Tor</p>
+                <p><a href="../../../">topl-service-base</a> / <a href="../../">io.matthewnelson.topl_service_base</a> / <a href="../">ServiceExecutionHooks</a> / <a href="./">executeAfterStopTor</a></p>
+<h1 id="executeafterstoptor">executeAfterStopTor<a class="headerlink" href="#executeafterstoptor" title="Permanent link">&para;</a></h1>
+<p><code>open suspend fun executeAfterStopTor(context:</code><a href="https://developer.android.com/reference/android/content/Context.html"><code>Context</code></a><code>):</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><code>Unit</code></a> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service-base/src/main/java/io/matthewnelson/topl_service_base/ServiceExecutionHooks.kt#L57">(source)</a></p>
+<p>Is executed from TorService.stopTor on Dispatchers.IO</p>
+<p>This is meant to provide synchronous code execution after Tor has been
+stopped, and will be executed every single time Tor is stopped (even on restarts).</p>
+<p><strong>WARNING</strong>: Indefinitely suspending the coroutine (ex. collecting
+Flow or something) will also indefinitely suspend the ServiceActionProcessor
+which will inhibit processing of any other commands; perform those tasks
+from <a href="../execute-on-create-tor-service/">executeOnCreateTorService</a>.</p>
+<p><strong>NOTE</strong>: Exceptions thrown from your implementation will be broadcast via
+the EventBroadcaster on Dispatchers.Main.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Executed on Dispatchers.IO</span>
+<span class="n">withContext</span><span class="p">(</span><span class="n">Dispatchers</span><span class="p">.</span><span class="n">Main</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">TorServiceController</span><span class="p">.</span><span class="n">getServiceTorSettings</span><span class="p">()</span>
+<span class="p">}.</span><span class="n">let</span> <span class="p">{</span> <span class="n">settings</span> <span class="p">-&gt;</span>
+    <span class="k">if</span> <span class="p">(!</span><span class="n">settings</span><span class="p">.</span><span class="n">hasDebugLogs</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span>
+    <span class="p">}</span>
+
+    <span class="n">withContext</span><span class="p">(</span><span class="n">Dispatchers</span><span class="p">.</span><span class="n">Main</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">TorServiceController</span><span class="p">.</span><span class="n">appEventBroadcaster</span><span class="o">?.</span><span class="n">broadcastDebug</span><span class="p">(</span>
+            <span class="s">&quot;${BroadcastType.DEBUG}|&quot;</span> <span class="p">+</span>
+                    <span class="s">&quot;${this@MyServiceExecutionHooks.javaClass.simpleName}|&quot;</span> <span class="p">+</span>
+                    <span class="s">&quot;AfterStopTor execution hook started&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">delay</span><span class="p">(</span><span class="m">500L</span><span class="p">)</span>
+
+        <span class="n">TorServiceController</span><span class="p">.</span><span class="n">appEventBroadcaster</span><span class="o">?.</span><span class="n">broadcastDebug</span><span class="p">(</span>
+            <span class="s">&quot;${BroadcastType.DEBUG}|&quot;</span> <span class="p">+</span>
+                    <span class="s">&quot;${this@MyServiceExecutionHooks.javaClass.simpleName}|&quot;</span> <span class="p">+</span>
+                    <span class="s">&quot;AfterStopTor execution hook completed&quot;</span>
+        <span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
                 
               
               

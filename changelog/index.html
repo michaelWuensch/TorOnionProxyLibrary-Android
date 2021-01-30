@@ -389,6 +389,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-210-2021-01-30" class="md-nav__link">
+    Version 2.1.0 (2021-01-30)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-202-2020-10-19" class="md-nav__link">
     Version 2.0.2 (2020-10-19)
   </a>
@@ -470,6 +477,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#version-210-2021-01-30" class="md-nav__link">
+    Version 2.1.0 (2021-01-30)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#version-202-2020-10-19" class="md-nav__link">
     Version 2.0.2 (2020-10-19)
   </a>
@@ -539,6 +553,29 @@
                 
                 
                 <h1 id="change-log">Change Log<a class="headerlink" href="#change-log" title="Permanent link">&para;</a></h1>
+<h2 id="version-210-2021-01-30">Version 2.1.0 (2021-01-30)<a class="headerlink" href="#version-210-2021-01-30" title="Permanent link">&para;</a></h2>
+<ul>
+<li>New Features Added:<ul>
+<li><code>topl-service:TorService</code> Lifecycle Events are now broadcast to <code>TorServiceEventBroadcaster</code></li>
+<li><code>topl-service-base:ServiceExecutionHooks</code> have been implemented such that library users can
+ leverage suspension functions at key points of <code>TorService</code>&lsquo;s operation, and allow for synchronous
+ code execution.</li>
+<li>Moved <code>topl-service:ServiceActionName</code> String definitions to <code>topl-service-base</code> to expose them
+ such that library users can utilize them in their implementation of <code>TorServiceEventBroadcaster</code></li>
+</ul>
+</li>
+<li>Bug Fixes:<ul>
+<li>Kotlin internal visibility modifier is public from Java code.
+ See Issue <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/issues/100" target="_blank">100</a></li>
+<li>Duplicate v3 Client Authentication files were inhibiting Tor from starting properly.
+ See Issue <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/issues/105" target="_blank">105</a></li>
+<li>Tor notice messages were modified between 0.4.4.0 and 0.4.5.4-rc, which caused
+ <code>topl-service:ServiceEventBroadcaster</code>&lsquo;s notice message filter to miss broadcasting of ports.
+ See Issue <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/issues/110" target="_blank">110</a></li>
+</ul>
+</li>
+<li>Dependencies were bumped to latest stable releases.</li>
+</ul>
 <h2 id="version-202-2020-10-19">Version 2.0.2 (2020-10-19)<a class="headerlink" href="#version-202-2020-10-19" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Bug Fix: Notifications not showing on API 25 and below <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/commit/12abbf7faec781cb2c9b0a9babf3fe0e3d6cb352">12abbf7</a></li>

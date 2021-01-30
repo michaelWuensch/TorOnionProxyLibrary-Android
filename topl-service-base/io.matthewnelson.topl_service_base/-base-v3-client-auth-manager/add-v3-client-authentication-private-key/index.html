@@ -421,7 +421,7 @@
                 
                 <p><a href="../../../">topl-service-base</a> / <a href="../../">io.matthewnelson.topl_service_base</a> / <a href="../">BaseV3ClientAuthManager</a> / <a href="./">addV3ClientAuthenticationPrivateKey</a></p>
 <h1 id="addv3clientauthenticationprivatekey">addV3ClientAuthenticationPrivateKey<a class="headerlink" href="#addv3clientauthenticationprivatekey" title="Permanent link">&para;</a></h1>
-<p><code>@WorkerThread abstract fun addV3ClientAuthenticationPrivateKey(nickname:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>, onionAddress:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>, base32EncodedPrivateKey:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>):</code><a href="https://docs.oracle.com/javase/6/docs/api/java/io/File.html"><code>File</code></a><code>?</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service-base/src/main/java/io/matthewnelson/topl_service_base/BaseV3ClientAuthManager.kt#L118">(source)</a></p>
+<p><code>@WorkerThread abstract fun addV3ClientAuthenticationPrivateKey(nickname:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>, onionAddress:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>, base32EncodedPrivateKey:</code><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><code>String</code></a><code>):</code><a href="https://docs.oracle.com/javase/6/docs/api/java/io/File.html"><code>File</code></a><code>?</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service-base/src/main/java/io/matthewnelson/topl_service_base/BaseV3ClientAuthManager.kt#L119">(source)</a></p>
 <p>Creates a file containing v3 Client Authorization for a Hidden Service in the format of:</p>
 <ul>
 <li>Filename: <a href="./#io.matthewnelson.topl_service_base.BaseV3ClientAuthManager$addV3ClientAuthenticationPrivateKey(kotlin.String, kotlin.String, kotlin.String)/nickname">nickname</a>.auth_private</li>
@@ -437,7 +437,8 @@ are non-compliant.</p>
 <p><code>base32EncodedPrivateKey</code> - The private key for authenticating to the Hidden Service</p>
 <h3 id="exceptions">Exceptions<a class="headerlink" href="#exceptions" title="Permanent link">&para;</a></h3>
 <p><code>IllegalArgumentException</code> - If passed arguments are not compliant with the spec</p>
-<p><code>IllegalStateException</code> - If the file already exists (and must be deleted before overwriting)</p>
+<p><code>IllegalStateException</code> - If the file already exists (and must be deleted before
+overwriting), or if a file exists with the same onion address &amp; private key</p>
 <p><code>SecurityException</code> - If access is not authorized</p>
 <p><strong>Return</strong>
 The File if it was created properly, <code>null</code> if it was not</p>

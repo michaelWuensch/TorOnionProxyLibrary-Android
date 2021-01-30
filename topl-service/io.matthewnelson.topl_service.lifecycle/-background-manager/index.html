@@ -428,7 +428,7 @@
                 
                 <p><a href="../../">topl-service</a> / <a href="../">io.matthewnelson.topl_service.lifecycle</a> / <a href="./">BackgroundManager</a></p>
 <h1 id="backgroundmanager">BackgroundManager<a class="headerlink" href="#backgroundmanager" title="Permanent link">&para;</a></h1>
-<p><code>class BackgroundManager :</code><a href="../../io.matthewnelson.topl_service.util/-service-consts/"><code>ServiceConsts</code></a><code>, LifecycleObserver</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/lifecycle/BackgroundManager.kt#L136">(source)</a></p>
+<p><code>class BackgroundManager :</code><a href="../../io.matthewnelson.topl_service.util/-service-consts/"><code>ServiceConsts</code></a><code>, LifecycleObserver</code> <a href="https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/lifecycle/BackgroundManager.kt#L137">(source)</a></p>
 <p>When your application is sent to the background (the Recent App&rsquo;s tray or lock screen), the
 chosen <a href="-builder/-policy/">BackgroundManager.Builder.Policy</a> will be triggered.</p>
 <p>Additionally, there are 2 values for you to query if needed to give you context surrounding
@@ -437,12 +437,12 @@ your application&rsquo;s background state; <a href="task-is-in-foreground/">task
 <ul>
 <li>
 <p><strong>Before Policy execution</strong>: Execution is canceled. If <a href="#">BaseService.lastAcceptedServiceAction</a>
-was <strong>not</strong> <a href="#">ServiceConsts.ServiceActionName.STOP</a>, a startService call is made to ensure it&rsquo;s
+was <strong>not</strong> <a href="../../..//topl-service-base/io.matthewnelson.topl_service_base/-base-service-consts/-service-action-name/-companion/-s-t-o-p.md">ServiceActionName.STOP</a>, a startService call is made to ensure it&rsquo;s
 started.</p>
 </li>
 <li>
 <p><strong>After Policy execution</strong>: If <a href="#">BaseService.lastAcceptedServiceAction</a> was <strong>not</strong>
-<a href="#">ServiceConsts.ServiceActionName.STOP</a>, a startService call is made to ensure it&rsquo;s started.</p>
+<a href="../../..//topl-service-base/io.matthewnelson.topl_service_base/-base-service-consts/-service-action-name/-companion/-s-t-o-p.md">ServiceActionName.STOP</a>, a startService call is made to ensure it&rsquo;s started.</p>
 </li>
 <li>
 <p>See <a href="#">io.matthewnelson.topl_service.service.components.binding.BaseServiceBinder</a>,

@@ -515,6 +515,7 @@ for your application. Call it in <code>Application.onCreate</code> and follow al
             <span class="c1">// TorServiceController.Companion?.appEventBroadcaster and cast what&#39;s returned</span>
             <span class="c1">// as MyEventBroadcaster</span>
             <span class="p">.</span><span class="n">setEventBroadcaster</span><span class="p">(</span><span class="n">eventBroadcaster</span> <span class="p">=</span> <span class="n">MyEventBroadcaster</span><span class="p">())</span>
+            <span class="p">.</span><span class="n">setServiceExecutionHooks</span><span class="p">(</span><span class="n">executionHooks</span> <span class="p">=</span> <span class="n">MyServiceExecutionHooks</span><span class="p">())</span>
 
             <span class="c1">// Only needed if you wish to customize the directories/files used by Tor if</span>
             <span class="c1">// the defaults aren&#39;t to your liking.</span>
@@ -589,6 +590,10 @@ assets/common directory, send this variable &ldquo;common/geoip6&rdquo;)</p>
 <tr>
 <td><a href="set-event-broadcaster/">setEventBroadcaster</a></td>
 <td>Get broadcasts piped to your Application to do with them what you desire. What you send this will live at <a href="../app-event-broadcaster/">Companion.appEventBroadcaster</a> for the remainder of your application&rsquo;s lifecycle to refer to elsewhere in your App.<code>fun setEventBroadcaster(eventBroadcaster:</code><a href="../../../../topl-service-base/io.matthewnelson.topl_service_base/-tor-service-event-broadcaster/"><code>TorServiceEventBroadcaster</code></a><code>): Builder</code></td>
+</tr>
+<tr>
+<td><a href="set-service-execution-hooks/">setServiceExecutionHooks</a></td>
+<td>Implement and set hooks to be executed in <a href="#">TorService.onCreate</a>, and <a href="#">ServiceActionProcessor.processServiceAction</a> prior to starting of Tor, and post stopping of Tor.<code>fun setServiceExecutionHooks(executionHooks:</code><a href="../../../../topl-service-base/io.matthewnelson.topl_service_base/-service-execution-hooks/"><code>ServiceExecutionHooks</code></a><code>): Builder</code></td>
 </tr>
 <tr>
 <td><a href="use-custom-tor-config-files/">useCustomTorConfigFiles</a></td>

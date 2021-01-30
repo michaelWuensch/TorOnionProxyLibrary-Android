@@ -426,6 +426,10 @@ to <strong>DISABLED</strong>), a <a href="../../-tor-port-info/">TorPortInfo</a>
         <span class="n">_liveTorPortInfo</span><span class="p">.</span><span class="n">value</span> <span class="p">=</span> <span class="n">torPortInfo</span>
     <span class="p">}</span>
 
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">broadcastServiceLifecycleEvent</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">String</span><span class="p">,</span> <span class="n">hashCode</span><span class="p">:</span> <span class="n">Int</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">broadcastLogMessage</span><span class="p">(</span><span class="s">&quot;NOTICE|TorService|LCE=$event - HashCode=$hashCode&quot;</span><span class="p">)</span>
+    <span class="p">}</span>
+
 
     <span class="c1">/////////////////</span>
     <span class="c1">/// Bandwidth ///</span>

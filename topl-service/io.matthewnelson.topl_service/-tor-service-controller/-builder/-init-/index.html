@@ -501,6 +501,7 @@ for your application. Call it in <code>Application.onCreate</code> and follow al
             <span class="c1">// TorServiceController.Companion?.appEventBroadcaster and cast what&#39;s returned</span>
             <span class="c1">// as MyEventBroadcaster</span>
             <span class="p">.</span><span class="n">setEventBroadcaster</span><span class="p">(</span><span class="n">eventBroadcaster</span> <span class="p">=</span> <span class="n">MyEventBroadcaster</span><span class="p">())</span>
+            <span class="p">.</span><span class="n">setServiceExecutionHooks</span><span class="p">(</span><span class="n">executionHooks</span> <span class="p">=</span> <span class="n">MyServiceExecutionHooks</span><span class="p">())</span>
 
             <span class="c1">// Only needed if you wish to customize the directories/files used by Tor if</span>
             <span class="c1">// the defaults aren&#39;t to your liking.</span>

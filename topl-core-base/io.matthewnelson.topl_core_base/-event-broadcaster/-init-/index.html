@@ -412,7 +412,15 @@ allows for easier separation of messages based on the type, process or class.</p
 <span class="cm"> *</span>
 <span class="cm"> * @param [torService] [BaseService] for context.</span>
 <span class="cm"> * */</span>
-<span class="k">internal</span> <span class="k">class</span> <span class="nc">ServiceEventBroadcaster</span><span class="p">(</span><span class="k">private</span> <span class="k">val</span> <span class="py">torService</span><span class="p">:</span> <span class="n">BaseService</span><span class="p">):</span> <span class="n">EventBroadcaster</span><span class="p">()</span> <span class="p">{</span>
+<span class="k">internal</span> <span class="k">class</span> <span class="nc">ServiceEventBroadcaster</span> <span class="k">private</span> <span class="k">constructor</span><span class="p">(</span>
+    <span class="k">private</span> <span class="k">val</span> <span class="py">torService</span><span class="p">:</span> <span class="n">BaseService</span>
+<span class="p">):</span> <span class="n">EventBroadcaster</span><span class="p">()</span> <span class="p">{</span>
+
+    <span class="k">companion</span> <span class="k">object</span> <span class="p">{</span>
+        <span class="n">@JvmSynthetic</span>
+        <span class="k">fun</span> <span class="nf">instantiate</span><span class="p">(</span><span class="n">torService</span><span class="p">:</span> <span class="n">BaseService</span><span class="p">):</span> <span class="n">ServiceEventBroadcaster</span> <span class="p">=</span>
+            <span class="n">ServiceEventBroadcaster</span><span class="p">(</span><span class="n">torService</span><span class="p">)</span>
+    <span class="p">}</span>
 
     <span class="k">private</span> <span class="k">val</span> <span class="py">scopeMain</span><span class="p">:</span> <span class="n">CoroutineScope</span>
         <span class="k">get</span><span class="p">()</span> <span class="p">=</span> <span class="n">torService</span><span class="p">.</span><span class="n">getScopeMain</span><span class="p">()</span>
@@ -570,28 +578,28 @@ allows for easier separation of messages based on the type, process or class.</p
             <span class="p">}</span>
             <span class="c1">// Dns Port</span>
             <span class="c1">// NOTICE|OnionProxyManager|Opened DNS listener on 127.0.0.1:5400</span>
-            <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&quot;Opened DNS listener on &quot;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
+            <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&quot;Opened DNS listener &quot;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
                 <span class="n">dnsPort</span> <span class="p">=</span> <span class="n">getPortFromMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">isBootstrappingComplete</span><span class="p">())</span>
                     <span class="n">updateAppEventBroadcasterWithPortInfo</span><span class="p">()</span>
             <span class="p">}</span>
             <span class="c1">// Http Tunnel Port</span>
             <span class="c1">// NOTICE|BaseEventListener|Opened HTTP tunnel listener on 127.0.0.1:8118</span>
-            <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&quot;Opened HTTP tunnel listener on &quot;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
+            <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&quot;Opened HTTP tunnel listener &quot;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
                 <span class="n">httpTunnelPort</span> <span class="p">=</span> <span class="n">getPortFromMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">isBootstrappingComplete</span><span class="p">())</span>
                     <span class="n">updateAppEventBroadcasterWithPortInfo</span><span class="p">()</span>
             <span class="p">}</span>
             <span class="c1">// Socks Port</span>
             <span class="c1">// NOTICE|BaseEventListener|Opened Socks listener on 127.0.0.1:9050</span>
-            <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&quot;Opened Socks listener on &quot;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
+            <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&quot;Opened Socks listener &quot;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
                 <span class="n">socksPort</span> <span class="p">=</span> <span class="n">getPortFromMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">isBootstrappingComplete</span><span class="p">())</span>
                     <span class="n">updateAppEventBroadcasterWithPortInfo</span><span class="p">()</span>
             <span class="p">}</span>
             <span class="c1">// Trans Port</span>
             <span class="c1">// NOTICE|BaseEventListener|Opened Transparent pf/netfilter listener on 127.0.0.1:9040</span>
-            <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&quot;Opened Transparent pf/netfilter listener on &quot;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
+            <span class="n">msg</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="s">&quot;Opened Transparent pf/netfilter listener &quot;</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="p">{</span>
                 <span class="n">transPort</span> <span class="p">=</span> <span class="n">getPortFromMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">isBootstrappingComplete</span><span class="p">())</span>
                     <span class="n">updateAppEventBroadcasterWithPortInfo</span><span class="p">()</span>
