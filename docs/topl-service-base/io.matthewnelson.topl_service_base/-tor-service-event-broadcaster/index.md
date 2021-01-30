@@ -2,7 +2,7 @@
 
 # TorServiceEventBroadcaster
 
-`abstract class TorServiceEventBroadcaster : `[`EventBroadcaster`](../../..//topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service-base/src/main/java/io/matthewnelson/topl_service_base/TorServiceEventBroadcaster.kt#L93)
+`abstract class TorServiceEventBroadcaster : `[`EventBroadcaster`](../../..//topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md) [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service-base/src/main/java/io/matthewnelson/topl_service_base/TorServiceEventBroadcaster.kt#L94)
 
 Adds broadcasting methods to the [EventBroadcaster](../../..//topl-core-base/io.matthewnelson.topl_core_base/-event-broadcaster/index.md) for updating you with information about
 what addresses Tor is operating on. Very helpful when choosing "auto" in your
@@ -35,6 +35,10 @@ class MyEventBroadcaster: TorServiceEventBroadcaster() {
 
     override fun broadcastPortInformation(torPortInfo: TorPortInfo) {
         _liveTorPortInfo.value = torPortInfo
+    }
+
+    override fun broadcastServiceLifecycleEvent(event: String, hashCode: Int) {
+        broadcastLogMessage("NOTICE|TorService|LCE=$event - HashCode=$hashCode")
     }
 
 
@@ -127,3 +131,4 @@ class MyEventBroadcaster: TorServiceEventBroadcaster() {
 | Name | Summary |
 |---|---|
 | [broadcastPortInformation](broadcast-port-information.md) | Override this method to implement receiving of port information pertaining to Tor.`abstract fun broadcastPortInformation(torPortInfo: `[`TorPortInfo`](../-tor-port-info/index.md)`): `[`Unit`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html) |
+| [broadcastServiceLifecycleEvent](broadcast-service-lifecycle-event.md) | `open fun broadcastServiceLifecycleEvent(event: `[`String`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)`, hashCode: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`): `[`Unit`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html) |

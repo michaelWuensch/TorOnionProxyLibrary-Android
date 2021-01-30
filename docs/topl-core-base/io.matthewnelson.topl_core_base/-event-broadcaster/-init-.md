@@ -22,7 +22,15 @@ See [BaseConsts.BroadcastType](../-base-consts/-broadcast-type/index.md)s
  *
  * @param [torService] [BaseService] for context.
  * */
-internal class ServiceEventBroadcaster(private val torService: BaseService): EventBroadcaster() {
+internal class ServiceEventBroadcaster private constructor(
+    private val torService: BaseService
+): EventBroadcaster() {
+
+    companion object {
+        @JvmSynthetic
+        fun instantiate(torService: BaseService): ServiceEventBroadcaster =
+            ServiceEventBroadcaster(torService)
+    }
 
     private val scopeMain: CoroutineScope
         get() = torService.getScopeMain()
@@ -180,28 +188,28 @@ internal class ServiceEventBroadcaster(private val torService: BaseService): Eve
             }
             // Dns Port
             // NOTICE|OnionProxyManager|Opened DNS listener on 127.0.0.1:5400
-            msg.contains("Opened DNS listener on ") -> {
+            msg.contains("Opened DNS listener ") -> {
                 dnsPort = getPortFromMsg(msg)
                 if (isBootstrappingComplete())
                     updateAppEventBroadcasterWithPortInfo()
             }
             // Http Tunnel Port
             // NOTICE|BaseEventListener|Opened HTTP tunnel listener on 127.0.0.1:8118
-            msg.contains("Opened HTTP tunnel listener on ") -> {
+            msg.contains("Opened HTTP tunnel listener ") -> {
                 httpTunnelPort = getPortFromMsg(msg)
                 if (isBootstrappingComplete())
                     updateAppEventBroadcasterWithPortInfo()
             }
             // Socks Port
             // NOTICE|BaseEventListener|Opened Socks listener on 127.0.0.1:9050
-            msg.contains("Opened Socks listener on ") -> {
+            msg.contains("Opened Socks listener ") -> {
                 socksPort = getPortFromMsg(msg)
                 if (isBootstrappingComplete())
                     updateAppEventBroadcasterWithPortInfo()
             }
             // Trans Port
             // NOTICE|BaseEventListener|Opened Transparent pf/netfilter listener on 127.0.0.1:9040
-            msg.contains("Opened Transparent pf/netfilter listener on ") -> {
+            msg.contains("Opened Transparent pf/netfilter listener ") -> {
                 transPort = getPortFromMsg(msg)
                 if (isBootstrappingComplete())
                     updateAppEventBroadcasterWithPortInfo()

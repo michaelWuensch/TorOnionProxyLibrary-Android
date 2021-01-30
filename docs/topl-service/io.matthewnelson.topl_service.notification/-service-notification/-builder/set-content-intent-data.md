@@ -2,7 +2,7 @@
 
 # setContentIntentData
 
-`fun ~~setContentIntentData~~(bundle: `[`Bundle`](https://developer.android.com/reference/android/os/Bundle.html)`?, requestCode: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`?): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L211)
+`fun ~~setContentIntentData~~(bundle: `[`Bundle`](https://developer.android.com/reference/android/os/Bundle.html)`?, requestCode: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)`?): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L210)
 **Deprecated:** This method will be removed in a future release
 
 Do not use this method.

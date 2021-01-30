@@ -2,7 +2,7 @@
 
 # openBridgesStream
 
-`abstract fun openBridgesStream(): `[`InputStream`](https://docs.oracle.com/javase/6/docs/api/java/io/InputStream.html)`?` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/util/TorInstaller.kt#L154)
+`abstract fun openBridgesStream(): `[`InputStream`](https://docs.oracle.com/javase/6/docs/api/java/io/InputStream.html)`?` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-core/src/main/java/io/matthewnelson/topl_core/util/TorInstaller.kt#L156)
 
 If first byte of stream is 0, then the following stream will have the form
 
@@ -29,8 +29,10 @@ The second form is used for custom bridges from the user.
     If length is greater than 9, then we know this is a custom bridge
 * */
 // TODO: Completely refactor how bridges work.
-val userDefinedBridgeList: String =
-    torServicePrefs.getList(PrefKeyList.USER_DEFINED_BRIDGES, arrayListOf()).joinToString()
+val userDefinedBridgeList: String = TorServicePrefs(torService.getContext())
+    .getList(PrefKeyList.USER_DEFINED_BRIDGES, arrayListOf())
+    .joinToString()
+
 var bridgeType = (if (userDefinedBridgeList.length > 9) 1 else 0).toByte()
 // Terrible hack. Must keep in sync with topl::addBridgesFromResources.
 if (bridgeType.toInt() == 0) {
@@ -46,7 +48,7 @@ val bridgeStream =
     if (bridgeType.toInt() == 1) {
         ByteArrayInputStream(userDefinedBridgeList.toByteArray())
     } else {
-        torService.context.resources.openRawResource(R.raw.bridges)
+        torService.getContext().resources.openRawResource(R.raw.bridges)
     }
 return SequenceInputStream(bridgeTypeStream, bridgeStream)
 ```

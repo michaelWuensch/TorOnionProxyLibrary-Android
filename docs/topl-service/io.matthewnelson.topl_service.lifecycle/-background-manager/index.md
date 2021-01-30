@@ -2,7 +2,7 @@
 
 # BackgroundManager
 
-`class BackgroundManager : `[`ServiceConsts`](../../io.matthewnelson.topl_service.util/-service-consts/index.md)`, LifecycleObserver` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/lifecycle/BackgroundManager.kt#L136)
+`class BackgroundManager : `[`ServiceConsts`](../../io.matthewnelson.topl_service.util/-service-consts/index.md)`, LifecycleObserver` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/lifecycle/BackgroundManager.kt#L137)
 
 When your application is sent to the background (the Recent App's tray or lock screen), the
 chosen [BackgroundManager.Builder.Policy](-builder/-policy.md) will be triggered.
@@ -13,11 +13,11 @@ your application's background state; [taskIsInForeground](task-is-in-foreground.
 If brought back into the foreground by the user:
 
 * **Before Policy execution**: Execution is canceled. If [BaseService.lastAcceptedServiceAction](#)
-was **not** [ServiceConsts.ServiceActionName.STOP](#), a startService call is made to ensure it's
+was **not** [ServiceActionName.STOP](../../..//topl-service-base/io.matthewnelson.topl_service_base/-base-service-consts/-service-action-name/-companion/-s-t-o-p.md), a startService call is made to ensure it's
 started.
 
 * **After Policy execution**: If [BaseService.lastAcceptedServiceAction](#) was **not**
-[ServiceConsts.ServiceActionName.STOP](#), a startService call is made to ensure it's started.
+[ServiceActionName.STOP](../../..//topl-service-base/io.matthewnelson.topl_service_base/-base-service-consts/-service-action-name/-companion/-s-t-o-p.md), a startService call is made to ensure it's started.
 
 * See [io.matthewnelson.topl_service.service.components.binding.BaseServiceBinder](#),
 [BaseService.updateLastAcceptedServiceAction](#), and [TorService.onTaskRemoved](#) for

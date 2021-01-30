@@ -41,6 +41,7 @@ broadcast to the provided [EventBroadcaster](../../..//topl-core-base/io.matthew
 
 | Name | Summary |
 |---|---|
+| [eventListener](event-listener.md) | [BaseEventListener](../../io.matthewnelson.topl_core.listener/-base-event-listener/index.md) For processing Tor OP messages.`val eventListener: `[`BaseEventListener`](../../io.matthewnelson.topl_core.listener/-base-event-listener/index.md) |
 | [hasControlConnection](has-control-connection.md) | `val hasControlConnection: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) |
 | [iPv4LocalHostSocksPort](i-pv4-local-host-socks-port.md) | Returns the socks port on the IPv4 localhost address that the Tor OP is listening on`val iPv4LocalHostSocksPort: `[`Int`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html) |
 | [isIPv4LocalHostSocksPortOpen](is-i-pv4-local-host-socks-port-open.md) | `val isIPv4LocalHostSocksPortOpen: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html) |

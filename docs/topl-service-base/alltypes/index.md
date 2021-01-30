@@ -33,6 +33,13 @@ your [ApplicationDefaultTorSettings](../io.matthewnelson.topl_service_base/-appl
 
 |
 
+##### [io.matthewnelson.topl_service_base.ServiceExecutionHooks](../io.matthewnelson.topl_service_base/-service-execution-hooks/index.md)
+
+Set Hooks to be executed from TorService.
+
+
+|
+
 ##### [io.matthewnelson.topl_service_base.ServiceUtilities](../io.matthewnelson.topl_service_base/-service-utilities/index.md)
 
 

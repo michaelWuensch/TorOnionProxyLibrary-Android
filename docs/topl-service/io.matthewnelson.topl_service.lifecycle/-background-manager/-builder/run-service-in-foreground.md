@@ -2,7 +2,7 @@
 
 # runServiceInForeground
 
-`@JvmOverloads fun runServiceInForeground(killAppIfTaskIsRemoved: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)` = false): Policy` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/lifecycle/BackgroundManager.kt#L219)
+`@JvmOverloads fun runServiceInForeground(killAppIfTaskIsRemoved: `[`Boolean`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)` = false): Policy` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/lifecycle/BackgroundManager.kt#L220)
 
 Electing this option will, when your application is sent to the background, immediately
 move [TorService](#) to the Foreground. If the user returns to your application,

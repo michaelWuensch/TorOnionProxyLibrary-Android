@@ -2,7 +2,7 @@
 
 # setContentIntent
 
-`fun setContentIntent(pendingIntent: `[`PendingIntent`](https://developer.android.com/reference/android/app/PendingIntent.html)`?): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L226)
+`fun setContentIntent(pendingIntent: `[`PendingIntent`](https://developer.android.com/reference/android/app/PendingIntent.html)`?): Builder` [(source)](https://github.com/05nelsonm/TorOnionProxyLibrary-Android/blob/master/topl-service/src/main/java/io/matthewnelson/topl_service/notification/ServiceNotification.kt#L225)
 
 Allows for full control over the [PendingIntent](https://developer.android.com/reference/android/app/PendingIntent.html) used when the user taps the
 [ServiceNotification](../index.md).

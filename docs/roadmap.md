@@ -10,6 +10,5 @@
  :material-checkbox-blank-outline: Pass-through commands to the TorControlConnection
  :material-checkbox-blank-outline: Transport Plugin support
  :material-checkbox-blank-outline: v3 Hidden Service Creation
- :material-checkbox-blank-outline: Settings/Debug Activity (so devs don't have to create one if they don't wish to)
 
 [back](index.md)
