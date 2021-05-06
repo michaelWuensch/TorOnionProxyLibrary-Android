@@ -3,10 +3,10 @@ ext.versions = [
     'compileSdk': 30,
     'minSdk': 16,
 
-    'coroutines': '1.4.2',
-    'lifecycle': '2.2.0',
-    'kotlin': '1.4.21-2',
-    'navigation': '2.3.3',
+    'coroutines': '1.4.3',
+    'lifecycle': '2.3.1',
+    'kotlin': '1.4.32',
+    'navigation': '2.3.5',
 ]
 
 /**
@@ -19,7 +19,7 @@ ext.versions = [
 ext.deps = [
     androidx: [
         appCompat: "androidx.appcompat:appcompat:1.2.0",
-        constraintLayout: "androidx.constraintlayout:constraintlayout:2.0.1",
+        constraintLayout: "androidx.constraintlayout:constraintlayout:2.0.4",
         core: "androidx.core:core-ktx:1.3.2",
         lifecycle: [
             commonJava8: "androidx.lifecycle:lifecycle-common-java8:${versions.lifecycle}",
@@ -33,7 +33,7 @@ ext.deps = [
             fragment: "androidx.navigation:navigation-fragment-ktx:${versions.navigation}",
             ui: "androidx.navigation:navigation-ui-ktx:${versions.navigation}",
         ],
-        recyclerView: "androidx.recyclerview:recyclerview:1.1.0",
+        recyclerView: "androidx.recyclerview:recyclerview:1.2.0",
     ],
     jtorctl: "info.guardianproject:jtorctl:0.4",
     kotlin: [
@@ -50,7 +50,7 @@ ext.plugin = [
         dokka: "org.jetbrains.dokka:dokka-gradle-plugin:0.10.1",
         gradle: "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
     ],
-    mavenPublish: "com.vanniktech:gradle-maven-publish-plugin:0.13.0",
+    mavenPublish: "com.vanniktech:gradle-maven-publish-plugin:0.14.2",
 ]
 
 /**
