@@ -1,5 +1,8 @@
 # Change Log
 
+## Version 2.1.1 (2021-05-06)
+ - Bump dependencies
+
 ## Version 2.1.0 (2021-01-30)
  - New Features Added:
      - `topl-service:TorService` Lifecycle Events are now broadcast to `TorServiceEventBroadcaster`
