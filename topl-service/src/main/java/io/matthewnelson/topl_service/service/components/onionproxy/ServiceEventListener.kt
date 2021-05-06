@@ -123,11 +123,6 @@ internal class ServiceEventListener private constructor(): BaseEventListener() {
         debug("UNRECOGNIZED $data")
     }
 
-    override fun newConsensus(data: String?) {
-        if (data.isNullOrEmpty()) return
-        debug("${TorControlCommands.EVENT_NEWCONSENSUS} $data")
-    }
-
     override fun connBw(data: String?) {
         if (data.isNullOrEmpty()) return
         debug("${TorControlCommands.EVENT_CONN_BW} $data")
@@ -170,11 +165,6 @@ internal class ServiceEventListener private constructor(): BaseEventListener() {
     override fun gotSignal(data: String?) {
         if (data.isNullOrEmpty()) return
         debug("${TorControlCommands.EVENT_GOT_SIGNAL} $data")
-    }
-
-    override fun hsDescContent(data: String?) {
-        if (data.isNullOrEmpty()) return
-        debug("${TorControlCommands.EVENT_HS_DESC_CONTENT} $data")
     }
 
     override fun transportLaunched(data: String?) {

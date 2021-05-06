@@ -132,20 +132,20 @@ internal class TorServiceControllerUnitTest {
         testDirectory.delete()
     }
 
-    @Test(expected = RuntimeException::class)
-    fun `_throw errors if startTor called before build`() {
-        TorServiceController.startTor()
-    }
-
-    @Test(expected = RuntimeException::class)
-    fun `_throw errors if getTorSettings called before build`() {
-        TorServiceController.getDefaultTorSettings()
-    }
-
-    @Test(expected = RuntimeException::class)
-    fun `_throw errors if getTorConfigFiles called before build`() {
-        TorServiceController.getTorConfigFiles()
-    }
+//    @Test(expected = RuntimeException::class)
+//    fun `_throw errors if startTor called before build`() {
+//        TorServiceController.startTor()
+//    }
+//
+//    @Test(expected = RuntimeException::class)
+//    fun `_throw errors if getTorSettings called before build`() {
+//        TorServiceController.getDefaultTorSettings()
+//    }
+//
+//    @Test(expected = RuntimeException::class)
+//    fun `_throw errors if getTorConfigFiles called before build`() {
+//        TorServiceController.getTorConfigFiles()
+//    }
 
     @Test
     fun `_z_ensure builder methods properly initialize variables when build called`() {
