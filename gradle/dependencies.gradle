@@ -35,7 +35,7 @@ ext.deps = [
         ],
         recyclerView: "androidx.recyclerview:recyclerview:1.2.0",
     ],
-    jtorctl: "info.guardianproject:jtorctl:0.4",
+    jtorctl: "info.guardianproject:jtorctl:0.4.5.7",
     kotlin: [
         coroutinesAndroid: "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.coroutines}",
         coroutinesCore: "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.coroutines}",
