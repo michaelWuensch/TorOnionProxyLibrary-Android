@@ -32,6 +32,7 @@ alt="Donate to Matthew Nelson" src="assets/bitcoindonate.png"/></a>
 ## Other Projects Using It
 <!-- Example (copy between the brackets [] below): -->
 <!-- [- <a href="https://your.project.website.com" target="_blank">Your Project's Name</a>] -->
+- <a href="https://github.com/LN-Zap/zap-android" target="_blank">Zap Android</a>
 
 !!! Info
     Add your project to the list by submitting a PR!  
